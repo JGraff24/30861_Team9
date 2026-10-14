@@ -1,0 +1,566 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Team 9 system foundation",
+    "description": "Bootstrap only. Health, upload, version, audit, test interface and UI pending.",
+    "version": "0.1.0"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "AuditResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "auditId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Auditid",
+            "type": "string"
+          },
+          "workbookId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Workbookid",
+            "type": "string"
+          },
+          "versionId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Versionid",
+            "type": "string"
+          },
+          "rulesetVersion": {
+            "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(\\.(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$",
+            "title": "Rulesetversion",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AuditStatus"
+          },
+          "startedAt": {
+            "format": "date-time",
+            "title": "Startedat",
+            "type": "string"
+          },
+          "completedAt": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completedat"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "limitations": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectError"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "auditId",
+          "workbookId",
+          "versionId",
+          "rulesetVersion",
+          "status",
+          "startedAt",
+          "completedAt",
+          "findings",
+          "limitations",
+          "error"
+        ],
+        "title": "AuditResponse",
+        "type": "object"
+      },
+      "AuditStatus": {
+        "enum": [
+          "PROCESSING",
+          "AUDIT_COMPLETE",
+          "REVIEW_REQUIRED",
+          "REMEDIATION_AVAILABLE",
+          "PROCESSING_FAILED"
+        ],
+        "title": "AuditStatus",
+        "type": "string"
+      },
+      "CoverageMeasure": {
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "covered": {
+                "type": "null"
+              },
+              "total": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "covered": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "properties": {
+          "covered": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Covered"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "basis": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Basis",
+            "type": "string"
+          }
+        },
+        "required": [
+          "covered",
+          "total",
+          "basis"
+        ],
+        "title": "CoverageMeasure",
+        "type": "object"
+      },
+      "ErrorSource": {
+        "enum": [
+          "tester",
+          "system",
+          "communication",
+          "unknown"
+        ],
+        "title": "ErrorSource",
+        "type": "string"
+      },
+      "Finding": {
+        "additionalProperties": false,
+        "properties": {
+          "findingId": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Findingid",
+            "type": "string"
+          },
+          "ruleId": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Ruleid",
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/FindingCategory"
+          },
+          "worksheet": {
+            "title": "Worksheet",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "classification": {
+            "$ref": "#/components/schemas/FindingClassification"
+          },
+          "message": {
+            "maxLength": 500,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Message",
+            "type": "string"
+          },
+          "recommendation": {
+            "maxLength": 500,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Recommendation",
+            "type": "string"
+          }
+        },
+        "required": [
+          "findingId",
+          "ruleId",
+          "category",
+          "worksheet",
+          "target",
+          "classification",
+          "message",
+          "recommendation"
+        ],
+        "title": "Finding",
+        "type": "object"
+      },
+      "FindingCategory": {
+        "enum": [
+          "NON_TEXT_CONTENT",
+          "TABLE_STRUCTURE",
+          "MERGED_CELLS",
+          "WORKSHEET_NAME",
+          "LINK_TEXT",
+          "COLOR_OR_CONTRAST"
+        ],
+        "title": "FindingCategory",
+        "type": "string"
+      },
+      "FindingClassification": {
+        "enum": [
+          "AUTOMATICALLY_REMEDIABLE",
+          "REQUIRES_USER_INPUT",
+          "MANUAL_REVIEW"
+        ],
+        "title": "FindingClassification",
+        "type": "string"
+      },
+      "HealthResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "const": "AVAILABLE",
+            "title": "Status",
+            "type": "string"
+          },
+          "apiVersion": {
+            "const": "1.0",
+            "title": "Apiversion",
+            "type": "string"
+          },
+          "rulesetVersion": {
+            "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(\\.(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$",
+            "title": "Rulesetversion",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "apiVersion",
+          "rulesetVersion"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "JsonValue": {},
+      "ProjectError": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Message",
+            "type": "string"
+          },
+          "requestId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Requestid",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Details",
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "requestId",
+          "details"
+        ],
+        "title": "ProjectError",
+        "type": "object"
+      },
+      "SetupResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Session Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "title": "SetupResponse",
+        "type": "object"
+      },
+      "SystemCoverage": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/CoverageMeasure"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "SystemCoverage",
+        "type": "object"
+      },
+      "SystemReport": {
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/SystemCoverage"
+          }
+        },
+        "required": [
+          "session_id",
+          "coverage"
+        ],
+        "title": "SystemReport",
+        "type": "object"
+      },
+      "SystemSetupRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "setup": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Setup",
+            "type": "object"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "title": "SystemSetupRequest",
+        "type": "object"
+      },
+      "TestEndpointError": {
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Message",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ErrorSource"
+          }
+        },
+        "required": [
+          "message",
+          "source"
+        ],
+        "title": "TestEndpointError",
+        "type": "object"
+      },
+      "UploadResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "workbookId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Workbookid",
+            "type": "string"
+          },
+          "versionId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Versionid",
+            "type": "string"
+          },
+          "auditId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Auditid",
+            "type": "string"
+          },
+          "status": {
+            "const": "PROCESSING",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workbookId",
+          "versionId",
+          "auditId",
+          "status"
+        ],
+        "title": "UploadResponse",
+        "type": "object"
+      },
+      "VersionResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "workbookId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Workbookid",
+            "type": "string"
+          },
+          "versionId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Versionid",
+            "type": "string"
+          },
+          "fileName": {
+            "maxLength": 255,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Filename",
+            "type": "string"
+          },
+          "sha256": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/VersionStatus"
+          },
+          "latestAuditId": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latestauditid"
+          },
+          "sourceVersionId": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sourceversionid"
+          }
+        },
+        "required": [
+          "workbookId",
+          "versionId",
+          "fileName",
+          "sha256",
+          "createdAt",
+          "status",
+          "latestAuditId",
+          "sourceVersionId"
+        ],
+        "title": "VersionResponse",
+        "type": "object"
+      },
+      "VersionStatus": {
+        "enum": [
+          "PROCESSING",
+          "AUDIT_COMPLETE",
+          "REVIEW_REQUIRED",
+          "REMEDIATION_AVAILABLE",
+          "REMEDIATING",
+          "REMEDIATED",
+          "PROCESSING_FAILED"
+        ],
+        "title": "VersionStatus",
+        "type": "string"
+      }
+    }
+  },
+  "x-foundation-status": "DTO catalog only; all feature endpoints pending",
+  "x-team9-contract-profile": "1.0.0",
+  "x-instructor-interface-version": "0.4.2"
+}
