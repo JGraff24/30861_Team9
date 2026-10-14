@@ -1,0 +1,66 @@
+[project]
+name = "team9-excel-accessibility-hub"
+version = "0.1.0"
+description = "Phase 3 shared foundation for the Team 9 Excel accessibility hub"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "boto3==1.43.113",
+    "defusedxml==0.7.1",
+    "fastapi==0.143.1",
+    "httpx==0.28.1",
+    "jinja2==3.1.6",
+    "openpyxl==3.1.5",
+    "pydantic==2.14.1",
+    "pydantic-settings==2.16.0",
+    "python-multipart==0.0.32",
+    "uvicorn==0.54.0",
+]
+
+[project.optional-dependencies]
+measurement = [
+    "coverage==7.16.2",
+]
+
+[dependency-groups]
+dev = [
+    "coverage==7.16.2",
+    "hatchling==1.32.4",
+    "jsonschema==4.26.0",
+    "mypy==2.4.0",
+    "openapi-spec-validator==0.9.0",
+    "pip-audit==2.10.1",
+    "pytest==9.1.1",
+    "pytest-asyncio==1.4.0",
+    "ruff==0.17.0",
+]
+
+[build-system]
+requires = ["hatchling==1.32.4"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app", "tester"]
+
+[tool.uv]
+required-version = "==0.13.1"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.format]
+exclude = ["*.md"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+asyncio_mode = "strict"
+
