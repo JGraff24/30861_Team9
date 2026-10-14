@@ -34,8 +34,16 @@ def test_factories_do_not_contact_network_or_write_storage(monkeypatch: pytest.M
     def blocked(*args: object, **kwargs: object) -> None:
         raise AssertionError("foundation must not contact network")
 
+    original_connect = socket.socket.connect
+
+    def blocked_connect(self: socket.socket, address: object) -> None:
+        # Windows emulates the event loop's self-pipe socketpair with a loopback connect.
+        if os.name == "nt" and isinstance(address, tuple) and address[0] in {"127.0.0.1", "::1"}:
+            return original_connect(self, address)
+        raise AssertionError("foundation must not contact network")
+
     monkeypatch.setattr(socket, "getaddrinfo", blocked)
-    monkeypatch.setattr(socket.socket, "connect", blocked)
+    monkeypatch.setattr(socket.socket, "connect", blocked_connect)
     for factory, pending in (
         (create_system, ["/api/v1/health", "/api/v1/workbooks", "/test/setup", "/test/report"]),
         (create_tester, ["/test/setup", "/test/run", "/test/report"]),

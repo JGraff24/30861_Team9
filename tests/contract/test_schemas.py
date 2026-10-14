@@ -13,7 +13,7 @@ from scripts.export_schemas import CONTRACT_DIR, schema_documents
 
 def test_openapi_catalogs_are_valid_current_and_have_no_feature_routes() -> None:
     for name, expected in schema_documents().items():
-        stored = json.loads((CONTRACT_DIR / f"{name}.openapi.json").read_text())
+        stored = json.loads((CONTRACT_DIR / f"{name}.openapi.json").read_text(encoding="utf-8"))
         assert stored == expected
         validate(stored)
         assert stored["paths"] == {}
@@ -24,7 +24,7 @@ def test_openapi_catalogs_are_valid_current_and_have_no_feature_routes() -> None
 
 
 def test_independent_valid_version_payload_and_corrupted_hash() -> None:
-    document = json.loads((CONTRACT_DIR / "system.openapi.json").read_text())
+    document = json.loads((CONTRACT_DIR / "system.openapi.json").read_text(encoding="utf-8"))
     schema = document["components"]["schemas"]["VersionResponse"]
     validator = Draft202012Validator(
         {
@@ -89,7 +89,7 @@ def test_independent_identity_vectors_match_packet_and_preserve_unicode() -> Non
 
 
 def test_packet_profile_is_preserved_verbatim() -> None:
-    profile = (CONTRACT_DIR / "phase3.md").read_text()
+    profile = (CONTRACT_DIR / "phase3.md").read_text(encoding="utf-8")
     assert "# Shared Phase 3 specification" in profile
     assert "## Contract completion appendix for bootstrap and all owners" in profile
     assert "Team 9 implementation defaults" in profile
