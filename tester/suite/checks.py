@@ -400,6 +400,9 @@ def audit_seeded(ctx: SuiteContext) -> str:
     ids: UploadResponse = require(ctx, "seeded_issues", "the seeded upload")
     audit = poll_audit(ctx, ids, "Seeded audit")
     ctx.state["seeded_audit"] = audit
+    # Repeatability uses an observed valid completed audit, independently of accuracy.
+    ctx.state["seeded_findings"] = finding_keys(audit)
+    ctx.state["seeded_prose"] = [(f.message, f.recommendation) for f in audit.findings]
     ctx.qualify()
     expected_status = ctx.suite.accepted("seeded_issues").expected_status
     if audit.status != expected_status:
@@ -409,8 +412,6 @@ def audit_seeded(ctx: SuiteContext) -> str:
     actual, expected = finding_keys(audit), expected_keys(ctx, "seeded_issues")
     if actual != expected:
         raise CheckFailed(describe_difference(actual, expected))
-    ctx.state["seeded_findings"] = actual
-    ctx.state["seeded_prose"] = [(f.message, f.recommendation) for f in audit.findings]
     return f"Seeded audit returned exactly the {len(expected)} expected findings in contract order."
 
 
@@ -501,6 +502,44 @@ def foreign_owner_forbidden(ctx: SuiteContext) -> str:
     response = ctx.client.request("GET", version_path(ids), identity="userB")
     evaluate_project_error(ctx, response, 403, "User B reading user A's version")
     return "User B was refused user A's version with 403."
+
+
+def reviewer_version(ctx: SuiteContext) -> str:
+    ids: UploadResponse = require(ctx, "seeded_issues", "the seeded upload")
+    response = ctx.client.request("GET", version_path(ids), identity="reviewer")
+    if response.status_code >= 500:
+        expect_status(response, 200, "Authorized reviewer version")
+    ctx.qualify()
+    expect_status(response, 200, "Authorized reviewer version")
+    version = parse(response, VersionResponse, "Authorized reviewer version")
+    fixture = ctx.suite.accepted("seeded_issues")
+    if (version.workbookId, version.versionId) != (ids.workbookId, ids.versionId):
+        raise CheckFailed("Authorized reviewer version names a different resource.")
+    if version.sha256 != fixture.sha256 or version.fileName != fixture.upload_name:
+        raise CheckFailed("Authorized reviewer version differs from the uploaded workbook.")
+    return "An explicitly authorized reviewer retrieved user A's version and matching metadata."
+
+
+def reviewer_audit(ctx: SuiteContext) -> str:
+    ids: UploadResponse = require(ctx, "seeded_issues", "the seeded upload")
+    response = ctx.client.request("GET", audit_path(ids), identity="reviewer")
+    if response.status_code >= 500:
+        expect_status(response, 200, "Authorized reviewer audit")
+    ctx.qualify()
+    expect_status(response, 200, "Authorized reviewer audit")
+    audit = parse(response, AuditResponse, "Authorized reviewer audit")
+    if (audit.workbookId, audit.versionId, audit.auditId) != (
+        ids.workbookId,
+        ids.versionId,
+        ids.auditId,
+    ):
+        raise CheckFailed("Authorized reviewer audit names a different resource.")
+    if audit.rulesetVersion != ctx.suite.manifest.ruleset_version:
+        raise CheckFailed("Authorized reviewer audit reports a different ruleset.")
+    observed: AuditResponse | None = ctx.state.get("seeded_audit")
+    if observed is not None and audit.model_dump() != observed.model_dump():
+        raise CheckFailed("Authorized reviewer audit differs from the owner's completed audit.")
+    return "An explicitly authorized reviewer retrieved user A's audit and matching data."
 
 
 def unknown_resources(ctx: SuiteContext) -> str:
@@ -657,6 +696,8 @@ CHECKS: dict[str, Callable[[SuiteContext], str]] = {
         audit_seeded,
         hash_after_audit,
         foreign_owner_forbidden,
+        reviewer_version,
+        reviewer_audit,
         unknown_resources,
         determinism,
         controlled_failure,

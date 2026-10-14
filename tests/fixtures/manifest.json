@@ -1,5 +1,5 @@
 {
-  "manifest_version": "1.3.0",
+  "manifest_version": "1.4.0",
   "ruleset_version": "1.0.0",
   "expectations": "expectations.json",
   "components": {
@@ -659,6 +659,46 @@
         5
       ],
       "path": "error",
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-VERSION-REVIEWER",
+      "check": "reviewer_version",
+      "description": "Explicitly granted reviewer reads user A's version.",
+      "qualifying_assertion": "Authorized reviewer 200 status, strict schema, resource IDs and returned metadata evaluated.",
+      "components": [
+        "C1",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-15"
+      ],
+      "operations": [
+        4
+      ],
+      "path": "success",
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-AUDIT-REVIEWER",
+      "check": "reviewer_audit",
+      "description": "Explicitly granted reviewer reads user A's audit.",
+      "qualifying_assertion": "Authorized reviewer 200 status, strict schema, resource IDs and returned metadata evaluated.",
+      "components": [
+        "C1",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-15"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
       "prerequisites": [
         "P3-UPLOAD-SEEDED"
       ]

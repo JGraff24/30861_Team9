@@ -1,7 +1,7 @@
 # Dixon Phase 3 implementation
 
 Updated 2026-10-14 on `phase3/dixon`, based on foundation `ffa6947`. The current working-tree
-changes extend the original Dixon implementation at `9a76499`; they have not been committed,
+changes correct CI and coverage gaps in Dixon's implementation at `ae40ed9`; they have not been committed,
 pushed, merged or deployed by this Codex session. Historical Claude Code evidence remains in
 [the evidence log](../evidence/dixon_phase3.md). The final requirement audit is
 [dixon_handoff_verification.md](../evidence/dixon_handoff_verification.md).
@@ -12,7 +12,7 @@ The independent tester implements authenticated `POST /test/setup`, `POST /test/
 `GET /test/report`. It calls only explicitly approved system URLs through HTTP, using private
 per-target credentials. It imports shared DTOs/settings, never the target engine or storage.
 A wheel includes its fixture manifest, independent expectations and thirteen synthetic files.
-A wheel loaded outside the checkout was verified to expose all three routes and load all 51
+A wheel loaded outside the checkout was verified to expose all three routes and load all 53
 planned cases without importing `tests/support/` or contacting a target.
 
 Sessions, setup payloads, frozen suite definitions, progress markers and immutable final report
@@ -21,10 +21,10 @@ startup recovery is intended for a stopped previous process, not overlapping dep
 The service runs suites in a server worker thread, so disconnecting the caller does not cancel
 the suite. The local live acceptance check actually exercised lost-response recovery.
 
-The deployed suite contains 51 fixed cases. Unknown/mismatched IDs and audits two through five
+The deployed suite contains 53 fixed cases. Unknown/mismatched IDs and audits two through five
 each have separate IDs and outcomes; an evaluable failure does not suppress later cases.
 `P3-AUDIT-FAILURE-ENVELOPE` skips unless a target audit actually reports `PROCESSING_FAILED`.
-A healthy fake produces 50 passes, one skip, component coverage 6/6 and partial system coverage
+A healthy fake produces 52 passes, one skip, component coverage 6/6 and partial system coverage
 7/8. The fake's code coverage 40/50 is a constant test value, never a real target measurement.
 
 The real Team 9 system API/engine/worker/UI/test interface are not integrated on this branch.
@@ -132,7 +132,7 @@ sequenceDiagram
   Tester->>Store: READY
   Operator->>Tester: run once
   Tester->>Store: atomically claim RUNNING
-  loop 51 planned cases
+  loop 53 planned cases
     Tester->>Target: bounded request/assertion when prerequisites exist
     Tester->>Store: results and executed markers
   end
@@ -184,14 +184,16 @@ missing/error/skip cases remaining incomplete or untested, never silently yes.
 | Missing/corrupt/CSV/xls/xlsm/protected/bounds | Expected statuses and strict error envelopes; at/over byte/sheet/cell limits | Op 2; C2; AC-01/02 |
 | ZIP/XML/macros/encrypted ZIP | Traversal, duplicate paths, DTD/entity declaration, macro parts in xlsx, genuine encrypted ZIP rejected | Op 2; C2; AC-02 |
 | Unicode/repeated IDs/multiple drawings | Explicit whitespace policy and zero-width exclusion; duplicate-ID XML targets/limitation; hidden drawing objects | Op 2/5; C2-C5; AC-01/04/05 |
-| Unknown/mismatched/foreign resources | Separate 404 cases; unauthenticated/foreign-owner 401/403 | Op 4/5; C1/C3/C5; AC-15 |
-| Determinism | Five separate uploads; semantic finding fields plus same-target message/recommendation text identical | Op 2/5; C4; AC-18 |
+| Unknown/mismatched/foreign/reviewer resources | Explicitly granted reviewer version/audit GETs; separate 404 cases; unauthenticated/foreign-owner 401/403 | Op 4/5; C1/C3/C5; AC-15 |
+| Determinism | Completed observed baseline independent of expected-finding accuracy; five separate uploads; semantic finding fields plus same-target message/recommendation text identical | Op 2/5; C4; AC-18 |
 | Observed controlled audit failure | PROCESSING_FAILED timestamp/error/no partial findings; otherwise skip | Op 5; C5; AC-14 |
 | Sessions and code report | Unknown session, duplicate setup; actual coverage counts/basis or paired nulls | C6 |
 
 Expected fixture findings are authored from explicit OOXML object/sheet definitions and the
 handoff, not an engine run. `identity.py` independently implements the compact UTF-8 SHA256
-algorithm and golden/Unicode vectors. Cross-team semantic comparisons do not require identical
+algorithm and golden/Unicode vectors. Accuracy and repeatability are independent: the first valid completed audit supplies the
+repeatability baseline even when its expected findings/status differ. A malformed, wrong-ID,
+failed or unavailable audit does not supply a baseline. Cross-team semantic comparisons do not require identical
 prose between teams; determinism within one target does require stable prose. Presence/length
 is validated by the shared schema; correctness of prose meaning requires manual review.
 
@@ -219,7 +221,9 @@ Configuration names: `APP_ENV`, `TESTER_ROOT_PATH`, `TESTER_DB_PATH`,
 `TESTER_OPERATOR_TOKEN_HASHES_JSON`, `ALLOWED_TARGET_URLS`, `TARGET_AUTH_MAP_JSON`,
 `FIXTURE_MANIFEST_PATH`, `TESTER_SETUP_TIMEOUT_SECONDS`, `TESTER_RUN_TIMEOUT_SECONDS`,
 `TESTER_CLEANUP_PRIOR_SESSIONS`. The target map has `userA`, `userB`, `reviewer`, `test-admin`.
-No default credential authorizes an operator. Store raw target tokens only in protected config;
+Provision the reviewer with an explicit grant to userA (target `REVIEWER_GRANTS_JSON`) and
+include that identity in the target test-admin's `TEST_SESSION_USERS_JSON` namespace. A reviewer
+role alone is not sufficient. No default credential authorizes an operator. Store raw target tokens only in protected config;
 provision matching test-admin/user identities on each target before grader setup.
 
 ```sh

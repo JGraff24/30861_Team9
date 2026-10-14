@@ -1,7 +1,7 @@
 # Dixon handoff verification — 2026-10-14
 
 Scope: the entire Dixon branch relative to foundation `ffa6947`, including the existing
-implementation at `9a76499` and this session's working-tree changes. Authority: the user supplied
+implementation at `ae40ed9` and the current CI/repeatability/reviewer corrections. Authority: the user supplied
 `04_Phase3_Dixon_Codex.md`; its role-specific prompts and shared Team 9 contract profile were
 compared with actual code, tests, models and artifacts. The document's starter prompt was a
 specification reference, not permission to push, merge, provision AWS or probe unapproved URLs.
@@ -17,7 +17,7 @@ or every extended fixture representation is complete.
 
 | Handoff requirement | Actual implementation and verification | Assessment |
 |---|---|---|
-| Independent deployment and HTTP-only target access | `tester/main.py`, `target.py`; import audit finds only `app.config`/`app.contracts`; wheel loaded outside checkout with 51 cases, 13 fixture assets and three routes | Locally verified |
+| Independent deployment and HTTP-only target access | `tester/main.py`, `target.py`; import audit finds only `app.config`/`app.contracts`; wheel loaded outside checkout with 53 cases, 13 fixture assets and three routes | Locally verified |
 | Operator auth, ownership and exact target-specific config | `auth.py`, `config.py`, `service.py`; missing/invalid tokens, foreign sessions, exact allowlist, prefix and second-target token regressions | Verified |
 | Reject unsafe URLs/addresses, credentials, redirects; preserve TLS/prefixes | Existing URL/address tests plus prefix regression; HTTPX `verify=True`, redirects/proxies disabled | Verified; DNS rebind limitation disclosed |
 | UUID setup; target preparation 201 with same ID; no tests during setup | Setup forwards one POST, validates echo, saves plan/setup/operator/target; auth/config checks precede target work | Verified |
@@ -26,7 +26,7 @@ or every extended fixture representation is complete.
 | Separate SQLite and transactional transitions | WAL/busy timeout, `BEGIN IMMEDIATE`, one-time claim/final-body guard; concurrency and retention tests | Verified; one process per store |
 | Fixed session plan/setup persistence | Definitions and fixture root snapshotted at setup; tampered fixture refuses before consuming; changed/missing manifest cannot change/rebuild a run | Verified |
 | One run per session, including after abort | Atomic READY→RUNNING; repeated/concurrent/foreign/unknown/invalid request and post-abort tests | Verified |
-| All planned results exactly once, including fail/error/skip | 51 unique cases; separate resource-ID cases and audits 2–5; first failure does not suppress later independent cases | Verified |
+| All planned results exactly once, including fail/error/skip | 53 unique cases; separate resource-ID cases and audits 2–5; first failure does not suppress later independent cases | Verified |
 | Accurate outcome classification | Expected project rejection passes; evaluable schema/semantic mismatch fails; unexpected 500/503/PROCESSING_FAILED is system error; no response communication error; tester defect aborts | Verified |
 | Store report before response; reads never rerun | Byte-identical report tests, recoverable abort, retained outcomes and skips; immutable database body | Verified |
 | Disconnect survival and lost-response recovery | Real tester process vs fake target; live acceptance times out its run read and retrieves the completed report without retrying run; CLI lost-response regression | Verified locally |
@@ -34,16 +34,16 @@ or every extended fixture representation is complete.
 | Bound calls, polls and suite; stop POST retries | Wall bounds include DNS and continuously streaming HTTP; checks before/after calls and evaluations; safe GET retries share budget; POST sent at most once | Verified caller/network bounds; late native thread and persistence limitations disclosed |
 | Predeclared coverage retrieval with truthful nulls | P3-CODE-REPORT retrieves once and caches the validated result; failed/malformed/wrong-session/unavailable instrumented responses tested | Verified |
 | Independent real fixture/oracle support | Canonical manifest entries can point to shared Team 12 files; raw SHA256 checked; synthetic OOXML expectations and identity vectors independent of engine | Tooling verified; shared files/manual review pending |
-| Health/upload/poll/schema/ID/finding/hash/access checks | Existing cases plus fresh distinct upload IDs, exact audit IDs, UTC Z strings, source integrity failure, foreign and unknown/mismatched resource cases | Verified on controlled targets |
+| Health/upload/poll/schema/ID/finding/hash/access checks | Existing cases plus fresh distinct upload IDs, exact audit IDs, UTC Z strings, source integrity failure, foreign and unknown/mismatched resource cases; explicitly granted reviewer version/audit reads | Verified on controlled targets |
 | Corrupt/unsupported/protected/each primary limit | Missing file/extension, CSV/xls/xlsm, corrupt, worksheet-only/structure-only protection, byte/sheet/cell at/over boundaries | Implemented; fake process runs use real configured boundary sizes |
 | Extended ZIP/XML/object/Unicode inputs | Traversal, duplicate ZIP paths, DTD/entities, macro parts, genuinely encrypted ZIP, repeated object IDs/XML fallback, multiple drawings/hidden sheet, legal XML White_Space variants | Locally verified; fixtures provisional |
-| Five-run determinism | Separate uploads 1–5; semantic finding fields plus within-target message/recommendation prose compared; later repetitions continue after failure | Verified |
+| Five-run determinism | Observed completed baseline retained even if accuracy assertions fail; separate uploads 1–5; semantic finding fields plus within-target message/recommendation prose compared; later repetitions continue after failure | Verified |
 | Cross-team prose handling | Independent expected semantic fields; no exact prose equality between teams; schema checks presence/length | Implemented; manual meaning review pending |
 | Local fault tests separate from deployed suite | Health 500/503, upload/storage-style failures, PROCESSING_FAILED timeout responses, integrity 500, communication/tester failures and recovery in local tests | Tester behavior verified; actual owner system fault handling pending |
 | Six components/eight ACs from execution | Per-assertion markers persisted; failed hash request/500 before auth assertion cannot claim those ACs; sets/count constraints; normal AC-14 skip | Verified; healthy fake 6/6 and partial 7/8 |
 | All fourteen operation statuses and partial AC evidence | `records.py` emits method/path/REQ/evidence/status; future operations unimplemented/untested; skipped/missing cases never silently conformance yes | Verified; real-system artifact pending |
 | Sanitized artifacts, datetime, target revision and counts | CLI report/record; executed versus planned/run/pass/fail/error/skip; supplied target SHA or unknown; per-AC evidence and known deviations | Verified; no target revision inferred |
-| Locked install, Ruff, mypy, unit/contract/OpenAPI/security CI | Existing workflow inspected; standard `uv sync --locked --group dev` succeeded; all local checks and runtime+measurement pip-audit succeeded | Verified locally; new remote CI run not initiated |
+| Locked install, Ruff, mypy, unit/contract/OpenAPI/security CI | Existing workflow inspected; standard `uv sync --locked --group dev` succeeded; all local checks and runtime+measurement pip-audit succeeded | Verified locally; new remote CI run not initiated; linked ae40ed9 run confirms Ubuntu/audit pass and Windows DNS test failure |
 | Protected opt-in live CI with no mandatory AWS/Team 12 | Manual job only; target/revision inputs via env, protected token secrets, report/record artifacts; CLI now returns nonzero after fail/error evidence | Implemented; live job remains unexecuted |
 | Branch protection evidence | Historical documentation reports unconfigured; no settings changed in this session; current remote settings not queried | Pending Jackson confirmation |
 | Actual models, configuration, commands and future prompt | Rewritten implementation document reflects store/saved plan/suite/coverage behavior; exact setup/run/report calls and recovery commands; Phase 4 prompt | Verified |
@@ -70,15 +70,15 @@ or every extended fixture representation is complete.
 | Check | Actual outcome |
 |---|---|
 | Standard locked uv installation | Passed; 84-package resolution, local project installed |
-| `pytest -q` | 225 passed, 4 live acceptance tests skipped when unconfigured; one existing Starlette/HTTPX warning |
-| Real process self-check, 51-case plan | HTTP 200 in 11.0 s; 50 executed/pass, 0 fail, 0 error, 1 expected skip |
-| Configured live acceptance against local fake process | 4 passed in 22.33 s, including lost-response/disconnect recovery |
+| `pytest -q` | 234 passed, 4 live acceptance tests skipped when unconfigured; one existing Starlette/HTTPX warning |
+| Real process self-check, 53-case plan | HTTP 200 in 11.2 s; 52 executed/pass, 0 fail, 0 error, 1 expected skip |
+| Configured live acceptance against local fake process | 4 passed in 22.35 s, including lost-response/disconnect recovery |
 | Ruff lint and format | Passed; 49 Python files formatted |
 | Strict mypy | Passed; 32 source files |
 | OpenAPI catalogs and contract/profile checks | Passed; tester routes current, system routes honestly empty |
 | Finding-ID vectors and thirteen fixture byte/hash checks | Passed |
 | Locked runtime + measurement dependency audit | No known vulnerabilities found |
-| Wheel build/load outside source checkout | Passed; 51 cases, 13 fixtures, 3 routes, no network/state writes |
+| Wheel build/load outside source checkout | Passed; 53 cases, 13 fixtures, 3 routes, no network/state writes |
 | `git diff --check` and source boundary inspection | Passed; tester production imports only shared contracts/settings |
 
 Recorded process artifacts: [report.json](dixon_local_selfcheck/report.json) and
@@ -107,3 +107,37 @@ component/system catalogs cover partial Phase 3 scope and are not measures of fu
 
 The locally deliverable tester work is complete. These outside inputs prevent declaring the
 entire shared Phase 3 integration and submission evidence complete.
+
+
+## Follow-up review and Windows CI correction
+
+The user supplied [the Windows failure](https://github.com/JGraff24/30861_Team9/actions/runs/38624661749/job/116060646470?pr=2)
+at `ae40ed953212bc90a53e01f7022e9c3ecc5562bb`. GitHub's public job metadata confirmed the
+failed unit/contract step; the user supplied its full traceback: 224 tests passed and
+`test_late_dns_cannot_send_or_repeat_setup_after_timeout` failed at `exited.wait(1)`.
+Public run metadata also confirmed the Ubuntu checks and dependency-audit jobs passed.
+
+The DNS regression assumed preparation always finished inside a 50 ms setup budget. On a
+slower runner, setup can correctly fail before DNS starts, so there is no resolver to exit.
+The corrected test uses an injected setup clock and the HTTP client's real wall deadline,
+explicitly verifies DNS was entered and is still blocked when the response arrives, and
+releases its gate in `finally`. Both ordinary preparation and a 300 ms preflight delay pass.
+Separate real-socket tests retain end-to-end setup and suite deadline coverage. Production
+setup deadlines were not relaxed.
+
+Repeatability now uses semantic findings/prose from a valid, correctly identified completed
+audit before any expected-status/finding assertion. A consistently wrong completed audit
+therefore fails accuracy and passes all four repeatability cases; unstable wrong results fail
+both independently. Malformed, mismatched, failed or unavailable audits still supply no baseline.
+
+`P3-VERSION-REVIEWER` and `P3-AUDIT-REVIEWER` use the existing configured reviewer token and
+assert 200, strict schemas, requested IDs and returned metadata/data. Local tests explicitly
+model a reviewer→userA grant and verify missing/other-owner grants fail, while userB denial
+continues to pass. The suite remains HTTP-only and introduces no new required grader input.
+
+The updated manifest is 1.4.0 with 53 cases; retained local reports were regenerated with
+52 passes and one expected observation skip. Final local checks: 234 pytest passes, four
+unconfigured live checks skipped; Ruff/mypy/schemas/fixtures and process smoke passed. The
+local real-process suite and all four configured acceptance checks passed. Current Windows
+execution and a new remote CI run remain pending; these local results do not claim Windows CI
+has already turned green.

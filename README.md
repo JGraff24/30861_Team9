@@ -116,9 +116,11 @@ uv run python -m scripts.tester_selfcheck --evidence-dir docs/evidence/dixon_loc
 ```
 
 The self-check starts only loopback tester/fake-target processes, uses temporary private state,
-and retains sanitized reports when requested. It refuses occupied ports. The suite has 51
-planned cases: on a healthy fake, 50 pass and the controlled-failure observation skips.
-Source preservation is checked through the target's version hash contract; the tester cannot
+and retains sanitized reports when requested. It refuses occupied ports. The suite has 53
+planned cases: on a healthy fake, 52 pass and the controlled-failure observation skips.
+Repeatability uses an observed valid completed audit even if detection accuracy fails.
+Reviewer checks require an explicit reviewer→userA grant and test-session authorization on
+the target, using the existing configured reviewer token. Source preservation is checked through the target's version hash contract; the tester cannot
 independently inspect target storage. Target code coverage comes only from `/test/report`.
 
 For an approved configured target, supply the tester operator token privately in

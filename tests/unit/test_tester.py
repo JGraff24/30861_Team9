@@ -333,9 +333,17 @@ def test_target_failures_map_to_outcomes(make_client: Callable[..., Any]) -> Non
     results = outcomes(report)
     assert results["P3-HEALTH"] == ("error", "system")
     assert results["P3-AUDIT-SEEDED"] == ("fail", None)
-    assert results["P3-DETERMINISM"] == ("skip", None)  # depends on a passing seeded audit
-    # AC-18 was skipped; AC-14 was not observed.
-    assert report.coverage.system.covered == 6
+    assert all(
+        results[test_id] == ("pass", None)
+        for test_id in (
+            "P3-DETERMINISM",
+            "P3-DETERMINISM-3",
+            "P3-DETERMINISM-4",
+            "P3-DETERMINISM-5",
+        )
+    )
+    # Consistently wrong findings still exercise repeatability; AC-14 was not observed.
+    assert report.coverage.system.covered == 7
 
 
 def test_communication_failure_is_reported_per_test(make_client: Callable[..., Any]) -> None:
@@ -619,13 +627,9 @@ def test_run_record_reports_all_operations_without_secrets(
     assert record["report_sha256"] == hashlib.sha256(body).hexdigest()
     assert record["counts"]["planned"] == len(manifest.tests)
     assert record["counts"]["run"] + record["counts"]["skip"] == len(manifest.tests)
-    assert record["counts"]["fail"] == 4 and record["counts"]["skip"] == 5
+    assert record["counts"]["fail"] == 4 and record["counts"]["skip"] == 1
     assert {item["test_id"] for item in record["not_passed"]} == {
         "P3-AUDIT-SEEDED",
-        "P3-DETERMINISM",
-        "P3-DETERMINISM-3",
-        "P3-DETERMINISM-4",
-        "P3-DETERMINISM-5",
         "P3-AUDIT-UNICODE",
         "P3-AUDIT-REPEATED-IDS",
         "P3-AUDIT-MULTIPLE-DRAWINGS",
@@ -869,32 +873,53 @@ def test_setup_validates_suite_before_contacting_target(
     assert fake.requests == []
 
 
+@pytest.mark.parametrize("preparation_delay", [0.0, 0.3])
 def test_late_dns_cannot_send_or_repeat_setup_after_timeout(
-    make_client: Callable[..., Any], tmp_path: Path
+    make_client: Callable[..., Any],
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    preparation_delay: float,
 ) -> None:
-    import time
-
+    entered = threading.Event()
     gate = threading.Event()
     exited = threading.Event()
     fake = small_fake()
 
     def slow_resolver(*args: object, **kwargs: object) -> list[Any]:
-        gate.wait(2)
+        entered.set()
+        gate.wait(5)
         exited.set()
         return address_resolver()(*args, **kwargs)
 
+    # A fake setup clock isolates the DNS request's real wall-clock budget from fixture
+    # and SQLite preparation. On Windows that preparation can exceed a 50 ms setup budget
+    # and safely reject the call before DNS ever starts. The streaming tests separately
+    # verify end-to-end setup timing with a real clock.
     services = ServicesForTester(
-        settings=settings(tmp_path, tester_setup_timeout_seconds=0.05),
+        settings=settings(tmp_path, tester_setup_timeout_seconds=0.2),
         transport=fake.transport(),
         resolver=slow_resolver,
+        clock=FakeClock(),
     )
-    with TestClient(create_app(services=services)) as client:
-        started = time.monotonic()
-        response = client.post("/test/setup", json={"target_url": BASE_URL}, headers=AUTH)
-        assert response.status_code == 500 and response.json()["source"] == "communication"
-        assert time.monotonic() - started < 0.7
+    app = create_app(services=services)
+    load = app.state.tester.load_suite
+
+    def prepare() -> Any:
+        import time
+
+        time.sleep(preparation_delay)  # Reproduce slow pre-call preparation on a CI runner.
+        return load()
+
+    monkeypatch.setattr(app.state.tester, "load_suite", prepare)
+    try:
+        with TestClient(app) as client:
+            response = client.post("/test/setup", json={"target_url": BASE_URL}, headers=AUTH)
+            assert response.status_code == 500 and response.json()["source"] == "communication"
+            assert entered.is_set() and not exited.is_set()
+            gate.set()
+            assert exited.wait(2)
+    finally:
         gate.set()
-        assert exited.wait(1)
     assert fake.requests == []
     failed = Store(tmp_path / "tester.sqlite3").cleanup_candidates(BASE_URL, failed_only=True)
     assert len(failed) == 1
@@ -1194,3 +1219,94 @@ def test_interrupted_setup_queues_compensation_without_repeating_post(tmp_path: 
     body = json.loads(fake.requests[0].content)
     assert body["session_id"] != "lost-setup"
     assert body["setup"] == {"cleanup_session_ids": ["lost-setup"]}
+
+
+@pytest.mark.parametrize("wrong", ["empty", "classification"])
+def test_inaccurate_completed_audit_still_supplies_repeatability_baseline(
+    make_client: Callable[..., Any], wrong: str
+) -> None:
+    def mutate(findings: list[dict[str, str]]) -> list[dict[str, str]]:
+        if wrong == "empty":
+            return []
+        return [finding | {"classification": "MANUAL_REVIEW"} for finding in findings]
+
+    client, fake = make_client(small_fake(mutate_findings=mutate))
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-AUDIT-SEEDED"] == ("fail", None)
+    repeated = [result for result in report.results if result.test_id.startswith("P3-DETERMINISM")]
+    assert len(repeated) == 4 and all(result.outcome == Outcome.PASS for result in repeated)
+    assert (
+        len([audit for audit in fake.audits.values() if audit.file_name == "seeded_issues.xlsx"])
+        == 5
+    )
+
+
+def test_inaccurate_and_unstable_findings_report_both_failures(
+    make_client: Callable[..., Any],
+) -> None:
+    seeded = [0]
+
+    def mutate(findings: list[dict[str, str]]) -> list[dict[str, str]]:
+        if len(findings) == 6:
+            seeded[0] += 1
+            classification = "REQUIRES_USER_INPUT" if seeded[0] == 2 else "MANUAL_REVIEW"
+            return [finding | {"classification": classification} for finding in findings]
+        return findings
+
+    client, _ = make_client(small_fake(mutate_findings=mutate))
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-AUDIT-SEEDED"] == ("fail", None)
+    assert outcomes(report)["P3-DETERMINISM"] == ("fail", None)
+    for test_id in ("P3-DETERMINISM-3", "P3-DETERMINISM-4", "P3-DETERMINISM-5"):
+        assert outcomes(report)[test_id] == ("pass", None)
+    assert seeded[0] == 5
+
+
+def test_explicitly_granted_reviewer_reads_version_and_audit(
+    make_client: Callable[..., Any],
+) -> None:
+    client, fake = make_client(small_fake(reviewer_grants={"reviewer": {"userA"}}))
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    for test_id in ("P3-VERSION-REVIEWER", "P3-AUDIT-REVIEWER"):
+        assert outcomes(report)[test_id] == ("pass", None)
+    for test_id in ("P3-VERSION-FOREIGN", "P3-AUDIT-FOREIGN"):
+        assert outcomes(report)[test_id] == ("pass", None)
+    reviewer_requests = [r for r in fake.requests if fake.subject(r) == "reviewer"]
+    assert len(reviewer_requests) == 2 and all(r.method == "GET" for r in reviewer_requests)
+    assert any("/audits/" in r.url.path for r in reviewer_requests)
+    assert TOKENS["reviewer"] not in report.model_dump_json()
+
+
+@pytest.mark.parametrize("grants", [{}, {"reviewer": {"userB"}}])
+def test_reviewer_role_without_matching_grant_is_reported_as_failure(
+    make_client: Callable[..., Any], grants: dict[str, set[str]]
+) -> None:
+    client, _ = make_client(small_fake(reviewer_grants=grants))
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-VERSION-REVIEWER"] == ("fail", None)
+    assert outcomes(report)["P3-AUDIT-REVIEWER"] == ("fail", None)
+    assert outcomes(report)["P3-VERSION-FOREIGN"] == ("pass", None)
+    assert outcomes(report)["P3-AUDIT-FOREIGN"] == ("pass", None)
+
+
+@pytest.mark.parametrize("resource", ["version", "audit"])
+def test_reviewer_success_must_return_requested_resource(
+    make_client: Callable[..., Any], resource: str
+) -> None:
+    fake = small_fake()
+    original = fake.read
+
+    def wrong(path: str, subject: str) -> httpx.Response:
+        response = original(path, subject)
+        if subject == "reviewer" and response.status_code == 200:
+            is_audit = "/audits/" in path
+            if is_audit == (resource == "audit"):
+                return httpx.Response(
+                    200, json=response.json() | {"workbookId": "foreign-resource"}
+                )
+        return response
+
+    fake.read = wrong  # type: ignore[method-assign]
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-" + resource.upper() + "-REVIEWER"] == ("fail", None)

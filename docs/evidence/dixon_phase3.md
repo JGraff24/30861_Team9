@@ -128,8 +128,9 @@ in the wheel, and the operator CLI writes evidence then returns nonzero on failu
 
 Retained artifacts: [local report](dixon_local_selfcheck/report.json),
 [run/operation/AC record](dixon_local_selfcheck/run-record.json), and the complete
-[handoff verification matrix](dixon_handoff_verification.md). The record's UTC timestamp is
-2026-10-14T19:24:25.460510Z; target revision is **unknown**, not inferred. This was an explicitly
+[handoff verification matrix](dixon_handoff_verification.md). That earlier run's UTC timestamp was
+2026-10-14T19:24:25.460510Z; the retained files now represent the latest follow-up below.
+Target revision remains **unknown**, not inferred. This was an explicitly
 fake target at loopback, not the integrated Team 9 system. Code 40/50 is a constant fake response;
 component 6/6 and system 7/8 are partial Phase 3 catalogs. A healthy target does not earn AC-14
 without an observed controlled failure. Local controlled fault regressions separately prove
@@ -154,3 +155,35 @@ regressions, local processes, artifact packaging, dependency scan and final requ
 The user directed the scope and requested the final handoff verification. Code and claims were
 checked against controlled HTTP responses, actual socket behavior, saved report bytes and real
 command output; the report distinguishes external/manual evidence from local implementation.
+
+
+## Windows CI and tester coverage follow-up (2026-10-14)
+
+At `ae40ed9`, [Windows CI](https://github.com/JGraff24/30861_Team9/actions/runs/38624661749/job/116060646470?pr=2)
+reported 224 passed / 1 failed: the late-DNS test timed out before entering DNS and then waited
+for a resolver that never ran. The supplied traceback and public job metadata agree. Ubuntu
+checks and the dependency audit passed on that run. The test now isolates the DNS wall timeout
+from filesystem preparation using the injected clock, checks that DNS actually started, and
+releases its worker in `finally`. Ordinary and deliberately slow preparation both pass locally;
+real-clock streaming setup/suite tests remain enabled. No production deadlines were loosened.
+
+The review's two gaps are also fixed: baseline findings/prose are saved from a valid completed
+audit before accuracy assertions, and authorized reviewer version/audit GETs are in the plan.
+Regressions cover consistently incorrect findings that still repeat, unstable incorrect findings,
+missing/foreign reviewer grants and wrong reviewer response IDs. Existing foreign-user denial
+checks remain in the suite. Models were checked; higher-level state/architecture nodes are
+unchanged, and suite descriptions/counts were updated.
+
+| Actual check | Outcome |
+|---|---|
+| Final local pytest | 234 passed, 4 unconfigured live checks skipped; existing deprecation warning |
+| Local process suite, manifest 1.4.0 | 53 planned, 52 executed/pass, 0 fail/error, 1 expected skip; HTTP 200 in 11.2 s |
+| Configured local acceptance | 4 passed in 22.35 s |
+| Ruff, strict mypy, schemas, fixture hashes and factory process smoke | Passed |
+| New Windows/GitHub run | Pending; no push or rerun performed in this session |
+
+The retained [report](dixon_local_selfcheck/report.json) and
+[run/operation/AC record](dixon_local_selfcheck/run-record.json) now include both reviewer cases.
+The fake code measure remains explicitly 40/50; component/system coverage is still partial 6/6
+and 7/8. These are local fake-target results, not real Team 9/Team 12 evidence. Codex performed
+this follow-up from the user's CI traceback and review, without subagents or deployment.

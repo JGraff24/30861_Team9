@@ -67,6 +67,8 @@ class FakeSystem:
         }
     )
     processing_polls: int = 1
+    # Reviewer role alone grants nothing; this test target explicitly scopes approved owners.
+    reviewer_grants: dict[str, set[str]] = field(default_factory=lambda: {"reviewer": {"userA"}})
     # Faults: path -> HTTP status to return, path -> raise a transport error, custom handlers.
     status_overrides: dict[str, int] = field(default_factory=dict)
     drop_paths: set[str] = field(default_factory=set)
@@ -238,7 +240,7 @@ class FakeSystem:
         )
         if audit is None or (len(parts) == 8 and parts[7] != audit.audit_id):
             return self.project_error(404, "NOT_FOUND")
-        if audit.owner != subject:
+        if audit.owner != subject and audit.owner not in self.reviewer_grants.get(subject, set()):
             return self.project_error(403, "FORBIDDEN")
         status = "REVIEW_REQUIRED" if audit.findings else "AUDIT_COMPLETE"
         if len(parts) == 6:

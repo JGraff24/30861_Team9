@@ -72,3 +72,11 @@ and `corrupt` expectation entries to `shared/` files with `origin: team12`, and 
 hashes/targets/classes independently. Configure a copy of the manifest if both fixture sets
 need separate runs. No expectation may be derived from the target engine. The six component
 and eight AC catalogs remain Team 9 defaults awaiting pod confirmation.
+
+
+Manifest 1.4.0 has 53 cases, including `P3-VERSION-REVIEWER` and `P3-AUDIT-REVIEWER`.
+The configured reviewer must be explicitly granted access to userA and authorized for the test
+session on the target; reviewer role alone is not access. Expected findings and repeatability
+are independent: any valid correctly identified completed seeded audit supplies the comparison
+baseline, even if its detection accuracy fails the oracle. Invalid/missing/failed audits still
+cause repeatability skips. The healthy local fake yields 52 passes and one observation skip.
