@@ -68,6 +68,8 @@ class Sheet:
     hidden: bool = False
     objects: tuple[DrawingObject, ...] = ()
     cells: tuple[tuple[str, str | int], ...] = (("A1", "Item"), ("B1", 1))
+    bulk_cells: int = 0  # replaces cells with this many numeric cells, ten per row
+    protected: bool = False  # password-protected sheet structure
 
 
 @dataclass
@@ -142,18 +144,46 @@ CHART_XML = (
 )
 
 
+# Fixed, not a real credential: only the presence of protection metadata matters here.
+PROTECTION = (
+    'algorithmName="SHA-512" hashValue="dGVhbTktc3ludGhldGljLXByb3RlY3Rpb24=" '
+    'saltValue="c3ludGhldGljLXNhbHQ=" spinCount="100000"'
+)
+WORKBOOK_PROTECTION = (
+    '<workbookProtection lockStructure="1" workbookAlgorithmName="SHA-512" '
+    'workbookHashValue="dGVhbTktc3ludGhldGljLXByb3RlY3Rpb24=" '
+    'workbookSaltValue="c3ludGhldGljLXNhbHQ=" workbookSpinCount="100000"/>'
+)
+
+
+def _bulk_rows(count: int) -> str:
+    columns = "ABCDEFGHIJ"
+    rows = []
+    for start in range(0, count, len(columns)):
+        row = start // len(columns) + 1
+        width = min(len(columns), count - start)
+        cells = "".join(f'<c r="{columns[i]}{row}"><v>1</v></c>' for i in range(width))
+        rows.append(f'<row r="{row}">{cells}</row>')
+    return "".join(rows)
+
+
 def _sheet_xml(sheet: Sheet, has_drawing: bool) -> str:
-    cells = []
-    for ref, value in sheet.cells:
-        if isinstance(value, int):
-            cells.append(f'<c r="{ref}"><v>{value}</v></c>')
-        else:
-            cells.append(f'<c r="{ref}" t="inlineStr"><is><t>{value}</t></is></c>')
+    if sheet.bulk_cells:
+        rows = _bulk_rows(sheet.bulk_cells)
+    else:
+        cells = []
+        for ref, value in sheet.cells:
+            if isinstance(value, int):
+                cells.append(f'<c r="{ref}"><v>{value}</v></c>')
+            else:
+                cells.append(f'<c r="{ref}" t="inlineStr"><is><t>{value}</t></is></c>')
+        rows = f'<row r="1">{"".join(cells)}</row>'
+    protection = f'<sheetProtection {PROTECTION} sheet="1"/>' if sheet.protected else ""
     drawing = '<drawing r:id="rId1"/>' if has_drawing else ""
     return (
         f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="{NS["main"]}"'
-        f' xmlns:r="{NS["r"]}"><sheetData><row r="1">{"".join(cells)}</row></sheetData>'
-        f"{drawing}</worksheet>"
+        f' xmlns:r="{NS["r"]}"><sheetData>{rows}</sheetData>'
+        f"{protection}{drawing}</worksheet>"
     )
 
 
@@ -168,7 +198,9 @@ def _rels(entries: list[tuple[str, str, str]]) -> bytes:
     ).encode()
 
 
-def build_workbook(sheets: list[Sheet], image_padding: int = 0) -> bytes:
+def build_workbook(
+    sheets: list[Sheet], image_padding: int = 0, protect_structure: bool = False
+) -> bytes:
     package = _Package()
     workbook_rels: list[tuple[str, str, str]] = []
     sheet_entries = []
@@ -228,9 +260,11 @@ def build_workbook(sheets: list[Sheet], image_padding: int = 0) -> bytes:
         package.parts[f"xl/drawings/_rels/drawing{drawing_number}.xml.rels"] = _rels(entries)
 
     workbook_rels.append((f"rId{len(sheets) + 1}", "styles", "styles.xml"))
+    workbook_protection = WORKBOOK_PROTECTION if protect_structure else ""
     package.parts["xl/workbook.xml"] = (
         f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<workbook xmlns="{NS["main"]}"'
-        f' xmlns:r="{NS["r"]}"><sheets>{"".join(sheet_entries)}</sheets></workbook>'
+        f' xmlns:r="{NS["r"]}">{workbook_protection}<sheets>{"".join(sheet_entries)}</sheets>'
+        "</workbook>"
     ).encode()
     package.parts["xl/_rels/workbook.xml.rels"] = _rels(workbook_rels)
     package.parts["xl/styles.xml"] = (
@@ -339,3 +373,21 @@ def padded_clean_workbook(size: int) -> bytes:
     if len(data) != size:
         raise ValueError("padded workbook size did not converge")
     return data
+
+
+def protected_workbook() -> bytes:
+    """A valid package whose workbook structure and only sheet are password protected."""
+    return build_workbook([Sheet("Budget", 1, "sheet1", protected=True)], protect_structure=True)
+
+
+def worksheets_workbook(count: int) -> bytes:
+    """A valid package with ``count`` descriptively named worksheets, one cell each."""
+    sheets = [
+        Sheet(f"Region {n}", n, f"sheet{n}", cells=(("A1", "Total"),)) for n in range(1, count + 1)
+    ]
+    return build_workbook(sheets)
+
+
+def cells_workbook(count: int) -> bytes:
+    """A valid one-sheet package with exactly ``count`` nonempty numeric cells."""
+    return build_workbook([Sheet("Data", 1, "sheet1", bulk_cells=count)])

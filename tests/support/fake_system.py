@@ -57,6 +57,15 @@ class Audit:
 @dataclass
 class FakeSystem:
     upload_limit: int = 25_000_000
+    worksheet_limit: int = 50
+    cell_limit: int = 250_000
+    code_coverage: dict[str, Any] = field(
+        default_factory=lambda: {
+            "covered": 40,
+            "total": 50,
+            "basis": "Fake audit/validation lines.",
+        }
+    )
     processing_polls: int = 1
     # Faults: path -> HTTP status to return, path -> raise a transport error, custom handlers.
     status_overrides: dict[str, int] = field(default_factory=dict)
@@ -134,7 +143,7 @@ class FakeSystem:
         session_id = parse_qs(urlsplit(str(request.url)).query).get("session_id", [""])[0]
         if session_id not in self.sessions:
             return self.test_error(404, "unknown session")
-        coverage = {"covered": 40, "total": 50, "basis": "Fake audit/validation lines."}
+        coverage = self.code_coverage
         return httpx.Response(200, json={"session_id": session_id, "coverage": {"code": coverage}})
 
     def upload(self, request: httpx.Request, subject: str) -> httpx.Response:
@@ -158,9 +167,18 @@ class FakeSystem:
         if len(data) > self.upload_limit:
             return self.project_error(413, "FILE_TOO_LARGE")
         try:
-            zipfile.ZipFile(io.BytesIO(data)).testzip()
+            package = zipfile.ZipFile(io.BytesIO(data))
+            parts = {name: package.read(name) for name in package.namelist()}
         except zipfile.BadZipFile:
             return self.project_error(422, "INVALID_WORKBOOK")
+        workbook = parts.get("xl/workbook.xml", b"")
+        sheets = [p for name, p in parts.items() if name.startswith("xl/worksheets/sheet")]
+        if b"workbookProtection" in workbook or any(b"sheetProtection" in s for s in sheets):
+            return self.project_error(422, "PROTECTED_WORKBOOK")
+        if workbook.count(b"<sheet ") > self.worksheet_limit:
+            return self.project_error(422, "TOO_MANY_WORKSHEETS")
+        if sum(s.count(b"<c r=") for s in sheets) > self.cell_limit:
+            return self.project_error(422, "TOO_MANY_CELLS")
         sha = hashlib.sha256(data).hexdigest()
         fixture = self.expected.get(sha, {"findings": []})
         findings = [

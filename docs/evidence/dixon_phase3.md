@@ -15,6 +15,8 @@ actual local run unless it is marked **pending**.
 | 2026-10-14 | `scripts.tester_selfcheck`, run 1 | Real tester process → **test-only fake target** process | HTTP 200 in 11.5 s; 22 run / 22 pass / 0 fail / 0 error / 0 skip; code 40/50 (fake value), component 6/6, system 8/8; acceptance 3 passed |
 | 2026-10-14 | `scripts.tester_selfcheck`, run 2 | Same | HTTP 200 in 10.5 s; 22/22 pass; acceptance 3 passed |
 | 2026-10-14 | pip-audit, locked runtime + measurement extra | Lock file | No known vulnerabilities found |
+| 2026-10-14 | `pytest tests/unit tests/contract` after closing handoff gaps (30-test suite, records, limits) | Tester, test-only fake transport | 193 passed |
+| 2026-10-14 | `scripts.tester_selfcheck`, 30-test suite | Real tester process → **test-only fake target** process | HTTP 200 in 11.7 s; 30 run / 30 pass / 0 fail / 0 error / 0 skip; acceptance 3 passed |
 | **pending** | `scripts/run_suite.py` | Integrated local Team 9 system | System endpoints not implemented yet |
 | **pending** | Same | Team 9 on AWS | No deployment or URL |
 | **pending** | Team 12 tester → Team 9 system, and Team 9 tester → Team 12 system | Cross-team | URLs and access provisioning not available |
@@ -37,6 +39,7 @@ percentages.
 | Area | Evidence | Status |
 |---|---|---|
 | Delivered scope | Implementation doc "Delivered boundary" | Local only |
+| All 14 operation statuses | `operation_status` in each run record (`scripts/run_suite.py --record`); catalog in `tests/fixtures/manifest.json` | Generator done; ops 3/6-14 names/paths and REQ IDs pending from the Phase 2 spec; Jackson consolidates |
 | Test-ID to AC map with oracle rationale | Implementation doc "Suite and traceability"; `tests/fixtures/manifest.json`; `tests/fixtures/README.md` | Done; manual review pending |
 | Regression and static checks, CI | Commands table in the implementation doc; `.github/workflows/ci.yml` | Local passes recorded; CI link pending a push |
 | Deployed-run results | This log | Pending integration and deployment |
@@ -53,11 +56,19 @@ percentages.
   `cleanup_session_ids` on the next setup).
 - Whether an unreferenced-ancillary-chunk PNG padding approach is an acceptable way to hit the
   exact 25,000,000-byte boundary for both teams' validators.
+- The HTTP status for worksheet/cell limit violations and password-protected structures (the
+  tester expects 422; only the byte limit has a contract status, 413).
+- The full list is in `pending_confirmation` in `tests/fixtures/manifest.json` and is copied
+  into every run record.
 
 ## GenAI use (Claude Code, this session)
 
 **Delegated:** reading the repository and contract; designing and writing the tester package,
 suite, fixtures generator, tests, CI workflow and these docs; running all verification commands.
+After the first PR, Dixon supplied the personal Phase 3 handoff. Claude Code compared it with
+the delivered work, reported the gaps (no operation-status artifact or run records, missing
+protected/limit/unauthenticated/foreign-audit tests, no opt-in live CI job, no
+coverage-unavailable test, docs gaps), and closed them on the same PR.
 Dixon directed the scope (implement the owner part, clone into `C:\Users\Dixon Wagner\code`, no
 push). Dixon has not yet reviewed the resulting code.
 

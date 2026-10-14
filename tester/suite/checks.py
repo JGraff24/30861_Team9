@@ -21,10 +21,17 @@ from app.contracts.models import (
 )
 from tester.suite.identity import finding_id
 from tester.suite.manifest import LoadedSuite
-from tester.suite.workbooks import padded_clean_workbook
+from tester.suite.workbooks import (
+    cells_workbook,
+    padded_clean_workbook,
+    protected_workbook,
+    worksheets_workbook,
+)
 from tester.target import Identity, TargetClient
 
 UPLOAD_LIMIT_BYTES = 25_000_000
+WORKSHEET_LIMIT = 50
+NONEMPTY_CELL_LIMIT = 250_000
 AUDIT_POLL_SECONDS = 75.0
 POLL_INTERVAL_SECONDS = 1.0
 DETERMINISM_RUNS = 5
@@ -319,6 +326,64 @@ def hash_after_audit(ctx: SuiteContext) -> str:
     return "Source SHA256 was unchanged after the audit and the version reflects it."
 
 
+def upload_protected(ctx: SuiteContext) -> str:
+    response = upload(ctx, protected_workbook(), "protected.xlsx")
+    project_error(response, 422, "Password-protected workbook upload")
+    return "A workbook with password-protected structure was rejected with 422."
+
+
+def _limit_upload(ctx: SuiteContext, data: bytes, name: str, status: int, action: str) -> None:
+    response = upload(ctx, data, name)
+    if status == 202:
+        expect_status(response, 202, action)
+        parse(response, UploadResponse, action)
+    else:
+        project_error(response, status, action)
+
+
+def upload_worksheets_over(ctx: SuiteContext) -> str:
+    data = worksheets_workbook(WORKSHEET_LIMIT + 1)
+    _limit_upload(ctx, data, "too-many-sheets.xlsx", 422, "Worksheet limit + 1")
+    return f"A workbook with {WORKSHEET_LIMIT + 1} worksheets was rejected with 422."
+
+
+def upload_worksheets_at(ctx: SuiteContext) -> str:
+    data = worksheets_workbook(WORKSHEET_LIMIT)
+    _limit_upload(ctx, data, "sheet-limit.xlsx", 202, "Worksheet limit")
+    return f"A workbook with exactly {WORKSHEET_LIMIT} worksheets was accepted with 202."
+
+
+def upload_cells_over(ctx: SuiteContext) -> str:
+    data = cells_workbook(NONEMPTY_CELL_LIMIT + 1)
+    _limit_upload(ctx, data, "too-many-cells.xlsx", 422, "Nonempty cell limit + 1")
+    return f"A workbook with {NONEMPTY_CELL_LIMIT + 1:,} nonempty cells was rejected with 422."
+
+
+def upload_cells_at(ctx: SuiteContext) -> str:
+    data = cells_workbook(NONEMPTY_CELL_LIMIT)
+    _limit_upload(ctx, data, "cell-limit.xlsx", 202, "Nonempty cell limit")
+    return f"A workbook with exactly {NONEMPTY_CELL_LIMIT:,} nonempty cells was accepted with 202."
+
+
+def version_unauthenticated(ctx: SuiteContext) -> str:
+    ids: UploadResponse = require(ctx, "clean", "the clean upload")
+    project_error(ctx.client.request("GET", version_path(ids)), 401, "Unauthenticated version")
+    return "Version read without a bearer token was rejected with 401."
+
+
+def audit_unauthenticated(ctx: SuiteContext) -> str:
+    ids: UploadResponse = require(ctx, "clean", "the clean upload")
+    project_error(ctx.client.request("GET", audit_path(ids)), 401, "Unauthenticated audit")
+    return "Audit read without a bearer token was rejected with 401."
+
+
+def audit_foreign_owner(ctx: SuiteContext) -> str:
+    ids: UploadResponse = require(ctx, "seeded_issues", "the seeded upload")
+    response = ctx.client.request("GET", audit_path(ids), identity="userB")
+    project_error(response, 403, "User B reading user A's audit")
+    return "User B was refused user A's audit with 403."
+
+
 def foreign_owner_forbidden(ctx: SuiteContext) -> str:
     ids: UploadResponse = require(ctx, "seeded_issues", "the seeded upload")
     response = ctx.client.request("GET", version_path(ids), identity="userB")
@@ -404,6 +469,14 @@ CHECKS: dict[str, Callable[[SuiteContext], str]] = {
         upload_xls,
         upload_xlsm,
         upload_corrupt,
+        upload_protected,
+        upload_worksheets_over,
+        upload_worksheets_at,
+        upload_cells_over,
+        upload_cells_at,
+        version_unauthenticated,
+        audit_unauthenticated,
+        audit_foreign_owner,
         upload_over_limit,
         upload_at_limit,
         upload_clean,

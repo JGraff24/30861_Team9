@@ -13,8 +13,10 @@ expected targets/classifications and rejection status for every fixture.
 | seeded_issues | `synthetic/seeded_issues.xlsx` | Synthetic (Dixon) | 202, `REVIEW_REQUIRED`, six findings |
 | corrupt | `synthetic/corrupt.xlsx` | Synthetic (Dixon) | 422, project envelope, no IDs |
 
-Generated at run time, not committed: the 25,000,000-byte boundary workbook (P3-10) and the
-25,000,001-byte over-limit upload (P3-09).
+Generated at run time by `tester/suite/workbooks.py`, not committed: the 25,000,000 / 25,000,001-byte
+uploads (P3-INPUT-BYTES-AT / -OVER), 50 / 51 worksheets (P3-INPUT-SHEETS-AT / -OVER), 250,000 /
+250,001 nonempty cells (P3-INPUT-CELLS-AT / -OVER) and a password-protected structure
+(P3-INPUT-PROTECTED). `manifest.json` also holds the 14-operation catalog used by run records.
 
 All three committed files are **synthetic stand-ins**. Team 12's shared `clean.xlsx`,
 `seeded_issues.xlsx` and `corrupt.xlsx` have not been delivered. When they arrive, add them under
@@ -42,5 +44,5 @@ If a fixture changes, update its SHA256 in `expectations.json` and re-review its
 
 Manual expected-result review by two pod members: **pending, not performed**. Opening the synthetic
 files in Excel without repair warnings: **not yet checked** (openpyxl loads them). Additional inputs
-named in the contract (protected files, ZIP/XML attacks, Unicode whitespace variants, repeated IDs,
-multiple drawings, controlled faults) are not yet in the deployed suite.
+named in the contract (ZIP/XML attacks, encrypted packages, Unicode whitespace variants, repeated
+IDs, multiple drawings, controlled faults) are not yet in the deployed suite.

@@ -26,6 +26,9 @@ class SuiteConfigurationError(Exception):
     """The manifest, expectations or fixture bytes cannot support an honest run."""
 
 
+OperationNumber = Annotated[int, Field(ge=1, le=14)]
+
+
 class PlannedTest(ContractModel):
     test_id: NonemptyText
     check: NonemptyText
@@ -33,7 +36,20 @@ class PlannedTest(ContractModel):
     qualifying_assertion: NonemptyText
     components: list[ComponentId]
     acceptance: list[AcceptanceId]
+    # Business operations this test exercises, and whether it checks their success or error path.
+    operations: list[OperationNumber] = Field(default_factory=list)
+    path: Literal["success", "error"] | None = None
     phase: Literal["3", "future"] = "3"
+
+
+class Operation(ContractModel):
+    number: OperationNumber
+    name: NonemptyText | None
+    method: NonemptyText | None
+    path: NonemptyText | None
+    requirements: list[NonemptyText]
+    phase3: bool
+    note: NonemptyText
 
 
 class SuiteManifest(ContractModel):
@@ -42,15 +58,22 @@ class SuiteManifest(ContractModel):
     expectations: NonemptyText
     components: dict[ComponentId, NonemptyText]
     acceptance: dict[AcceptanceId, NonemptyText]
+    operations: list[Operation]
+    pending_confirmation: list[NonemptyText]
     tests: list[PlannedTest]
 
     @model_validator(mode="after")
     def complete_catalogs(self) -> Self:
         if len(self.components) != 6 or len(self.acceptance) != 8:
             raise ValueError("Phase 3 catalogs are C1-C6 and the eight Phase 3 ACs")
+        if [operation.number for operation in self.operations] != list(range(1, 15)):
+            raise ValueError("the operation catalog lists all 14 business operations in order")
         ids = [test.test_id for test in self.tests]
         if not ids or len(ids) != len(set(ids)):
             raise ValueError("planned test IDs must be present and unique")
+        for test in self.tests:
+            if bool(test.operations) != (test.path is not None):
+                raise ValueError(f"{test.test_id}: operations and path are declared together")
         return self
 
 

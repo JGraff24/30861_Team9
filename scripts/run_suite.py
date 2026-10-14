@@ -2,6 +2,8 @@
 
 The operator token is read from TEAM9_TESTER_TOKEN, never from the command line, and never printed.
 A run POST is never repeated: if its response is lost, the stored report is polled instead.
+Optionally writes the exact report bytes (--output) and a sanitized run record (--record) with
+counts, failures to classify, coverage and the 14-operation status.
 """
 
 import argparse
@@ -9,35 +11,16 @@ import json
 import os
 import sys
 import time
-from collections import Counter
 from pathlib import Path
 
 import httpx
 
+from tester.suite.manifest import SuiteManifest
+from tester.suite.records import run_record
+
 RUN_READ_TIMEOUT_SECONDS = 630
 REPORT_POLL_SECONDS = 1.0
-
-
-def summarize(report: dict[str, object]) -> dict[str, object]:
-    results = report["results"]
-    assert isinstance(results, list)
-    counts = Counter(result["outcome"] for result in results)
-    return {
-        "session_id": report["session_id"],
-        "target_url": report["target_url"],
-        "run": len(results),
-        **{outcome: counts.get(outcome, 0) for outcome in ("pass", "fail", "error", "skip")},
-        "coverage": report["coverage"],
-        "not_passed": [
-            {
-                key: result[key]
-                for key in ("test_id", "outcome", "message", "source")
-                if key in result
-            }
-            for result in results
-            if result["outcome"] != "pass"
-        ],
-    }
+DEFAULT_MANIFEST = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "manifest.json"
 
 
 def poll_report(client: httpx.Client, session_id: str, deadline: float) -> httpx.Response:
@@ -55,11 +38,19 @@ def main() -> int:
     )
     parser.add_argument("--target-url", required=True, help="approved system base URL to test")
     parser.add_argument("--output", type=Path, help="write the exact stored report bytes here")
+    parser.add_argument("--record", type=Path, help="write a sanitized run record JSON here")
+    parser.add_argument(
+        "--target-revision",
+        default="unknown",
+        help="target tag/SHA from pod documentation; never inferred (default: unknown)",
+    )
+    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     args = parser.parse_args()
     token = os.environ.get("TEAM9_TESTER_TOKEN")
     if not token:
         print("Set TEAM9_TESTER_TOKEN to the operator token.", file=sys.stderr)
         return 2
+    manifest = SuiteManifest.model_validate_json(args.manifest.read_bytes())
     headers = {"Authorization": f"Bearer {token}"}
     with httpx.Client(
         base_url=args.tester_url.rstrip("/"), headers=headers, timeout=60, trust_env=False
@@ -86,7 +77,16 @@ def main() -> int:
             return 1
     if args.output:
         args.output.write_bytes(report.content)
-    print(json.dumps(summarize(report.json()), indent=2, ensure_ascii=False))
+    record = run_record(
+        report.content, manifest, tester_url=args.tester_url, target_revision=args.target_revision
+    )
+    if args.record:
+        args.record.write_text(json.dumps(record, indent=2, ensure_ascii=False) + "\n", "utf-8")
+    summary = {key: record[key] for key in ("session_id", "target_url", "counts", "coverage")}
+    summary["not_passed"] = [
+        {k: v for k, v in item.items() if k != "classification"} for item in record["not_passed"]
+    ]
+    print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 0
 
 

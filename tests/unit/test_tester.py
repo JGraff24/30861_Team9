@@ -24,7 +24,8 @@ from tester.store import TesterStore as Store
 from tester.suite import checks
 from tester.suite.checks import CHECKS
 from tester.suite.identity import finding_id
-from tester.suite.manifest import SuiteConfigurationError, load_suite
+from tester.suite.manifest import SuiteConfigurationError, SuiteManifest, load_suite
+from tester.suite.records import run_record
 from tester.target import CommunicationError, check_address
 from tests.support.fake_system import BASE_URL, TOKENS, FakeSystem, access_map, address_resolver
 
@@ -35,6 +36,8 @@ OTHER_OPERATOR = "other-operator-token"
 AUTH = {"Authorization": f"Bearer {OPERATOR}"}
 OTHER = {"Authorization": f"Bearer {OTHER_OPERATOR}"}
 SMALL_LIMIT = 60_000
+SMALL_SHEETS = 5
+SMALL_CELLS = 100
 
 
 def digest(token: str) -> str:
@@ -59,6 +62,14 @@ def isolated(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.chdir(tmp_path)
     # Keep the boundary checks fast; the real limit is exercised by the live suite.
     monkeypatch.setattr(checks, "UPLOAD_LIMIT_BYTES", SMALL_LIMIT)
+    monkeypatch.setattr(checks, "WORKSHEET_LIMIT", SMALL_SHEETS)
+    monkeypatch.setattr(checks, "NONEMPTY_CELL_LIMIT", SMALL_CELLS)
+
+
+def small_fake(**options: Any) -> FakeSystem:
+    return FakeSystem(
+        upload_limit=SMALL_LIMIT, worksheet_limit=SMALL_SHEETS, cell_limit=SMALL_CELLS, **options
+    )
 
 
 def settings(tmp_path: Path, **overrides: Any) -> SettingsForTester:
@@ -82,7 +93,7 @@ def make_client(tmp_path: Path) -> Iterator[Callable[..., tuple[TestClient, Fake
     def build(
         fake: FakeSystem | None = None, clock: FakeClock | None = None, **overrides: Any
     ) -> tuple[TestClient, FakeSystem]:
-        fake = fake or FakeSystem(upload_limit=SMALL_LIMIT)
+        fake = fake or small_fake()
         clock = clock or FakeClock()
         services = ServicesForTester(
             settings=settings(tmp_path, **overrides),
@@ -127,7 +138,7 @@ def test_full_run_against_conforming_target(make_client: Callable[..., Any]) -> 
     assert (report.coverage.component.covered, report.coverage.component.total) == (6, 6)
     assert (report.coverage.system.covered, report.coverage.system.total) == (8, 8)
     assert (report.coverage.code.covered, report.coverage.code.total) == (40, 50)
-    # Every project call carries a session header; only P3-20 names an unknown session.
+    # Every project call carries a session header; only P3-SESSION-UNKNOWN names another.
     project = [r for r in fake.requests if r.url.path.startswith("/api/")]
     headers = [r.headers.get("x-test-session") for r in project]
     assert None not in headers and len([h for h in headers if h != session_id]) == 1
@@ -281,7 +292,7 @@ def test_report_access_rules(make_client: Callable[..., Any]) -> None:
 
 def test_concurrent_run_is_rejected(make_client: Callable[..., Any]) -> None:
     gate = threading.Event()
-    client, fake = make_client(FakeSystem(upload_limit=SMALL_LIMIT, gate=gate))
+    client, fake = make_client(small_fake(gate=gate))
     session_id = setup_session(client)
     first: dict[str, httpx.Response] = {}
     worker = threading.Thread(
@@ -315,10 +326,10 @@ def test_target_failures_map_to_outcomes(make_client: Callable[..., Any]) -> Non
         client.post("/test/run", json={"session_id": session_id}, headers=AUTH).content
     )
     results = outcomes(report)
-    assert results["P3-01"] == ("error", "system")
-    assert results["P3-15"] == ("fail", None)
-    assert results["P3-19"] == ("skip", None)  # depends on a passing seeded audit
-    # Errors and skips earn no coverage; P3-01 declares none anyway.
+    assert results["P3-HEALTH"] == ("error", "system")
+    assert results["P3-AUDIT-SEEDED"] == ("fail", None)
+    assert results["P3-DETERMINISM"] == ("skip", None)  # depends on a passing seeded audit
+    # Errors and skips earn no coverage; P3-HEALTH declares none anyway.
     assert report.coverage.system.covered == 7
 
 
@@ -329,7 +340,7 @@ def test_communication_failure_is_reported_per_test(make_client: Callable[..., A
     report = SuiteReport.model_validate_json(
         client.post("/test/run", json={"session_id": session_id}, headers=AUTH).content
     )
-    assert outcomes(report)["P3-01"] == ("error", "communication")
+    assert outcomes(report)["P3-HEALTH"] == ("error", "communication")
     health_calls = [r for r in fake.requests if r.url.path == "/api/v1/health"]
     assert len(health_calls) == 4  # one try plus three GET transport retries
 
@@ -340,25 +351,25 @@ def test_post_is_never_retried(make_client: Callable[..., Any]) -> None:
     fake.drop_paths.add("/api/v1/workbooks")
     client.post("/test/run", json={"session_id": session_id}, headers=AUTH)
     uploads = [r for r in fake.requests if r.url.path == "/api/v1/workbooks"]
-    planned_uploads = 11  # P3-02 to P3-12, each attempted once; P3-19 then skips
+    planned_uploads = 16  # every upload test through P3-UPLOAD-SEEDED once; determinism skips
     assert len(uploads) == planned_uploads
 
 
 def test_audit_that_never_finishes_fails_within_deadline(make_client: Callable[..., Any]) -> None:
-    client, _ = make_client(FakeSystem(upload_limit=SMALL_LIMIT, processing_polls=10**6))
+    client, _ = make_client(small_fake(processing_polls=10**6))
     session_id = setup_session(client)
     report = SuiteReport.model_validate_json(
         client.post("/test/run", json={"session_id": session_id}, headers=AUTH).content
     )
     results = outcomes(report)
-    assert results["P3-14"] == ("fail", None)
+    assert results["P3-AUDIT-CLEAN"] == ("fail", None)
     assert "PROCESSING after 75 s" in next(
-        r.message for r in report.results if r.test_id == "P3-14"
+        r.message for r in report.results if r.test_id == "P3-AUDIT-CLEAN"
     )
 
 
 def test_redirects_are_not_followed(make_client: Callable[..., Any]) -> None:
-    fake = FakeSystem(upload_limit=SMALL_LIMIT)
+    fake = small_fake()
     original = fake.handle
 
     def redirecting(request: httpx.Request) -> httpx.Response:
@@ -373,18 +384,18 @@ def test_redirects_are_not_followed(make_client: Callable[..., Any]) -> None:
     report = SuiteReport.model_validate_json(
         client.post("/test/run", json={"session_id": session_id}, headers=AUTH).content
     )
-    assert outcomes(report)["P3-01"] == ("fail", None)
+    assert outcomes(report)["P3-HEALTH"] == ("fail", None)
     assert all(r.url.host != "169.254.169.254" for r in fake.requests)
 
 
 def test_deadline_abort_stores_report_and_returns_500(make_client: Callable[..., Any]) -> None:
     clock = FakeClock()
-    fake = FakeSystem(upload_limit=SMALL_LIMIT)
+    fake = small_fake()
     original = fake.handle
 
     def slow_health(request: httpx.Request) -> httpx.Response:
         if request.url.path == "/api/v1/health":
-            clock.now += 601  # the suite budget is spent while P3-01 is answered
+            clock.now += 601  # the suite budget is spent while P3-HEALTH is answered
         return original(request)
 
     fake.handle = slow_health  # type: ignore[method-assign]
@@ -420,7 +431,7 @@ def test_interrupted_run_is_recovered_as_aborted(tmp_path: Path) -> None:
     store.create("crashed-session", "grader", BASE_URL, datetime.now(UTC))
     store.finish_setup("crashed-session", ready=True)
     store.begin_run("crashed-session", "grader")
-    done = TestResult(test_id="P3-01", outcome=Outcome.PASS, message="Health matched.")
+    done = TestResult(test_id="P3-HEALTH", outcome=Outcome.PASS, message="Health matched.")
     store.save_progress("crashed-session", [done])
     services = ServicesForTester(settings=settings(tmp_path))
     with TestClient(create_app(services=services)) as client:
@@ -533,3 +544,93 @@ def test_finding_id_matches_contract_vectors() -> None:
     composed = finding_id("0" * 64, "1.0.0", "WORKSHEET_NAME", "Dépenses \U0001f4ca", "t")
     decomposed = finding_id("0" * 64, "1.0.0", "WORKSHEET_NAME", "Dépenses \U0001f4ca", "t")
     assert composed != decomposed
+
+
+def run_once(client: TestClient) -> httpx.Response:
+    session_id = setup_session(client)
+    response: httpx.Response = client.post(
+        "/test/run", json={"session_id": session_id}, headers=AUTH
+    )
+    return response
+
+
+def test_unavailable_target_instrumentation_is_paired_null(
+    make_client: Callable[..., Any],
+) -> None:
+    basis = "Code measurement disabled on this deployment."
+    fake = small_fake(code_coverage={"covered": None, "total": None, "basis": basis})
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert (report.coverage.code.covered, report.coverage.code.total) == (None, None)
+    assert report.coverage.code.basis == basis
+    assert outcomes(report)["P3-CODE-REPORT"] == ("pass", None)
+
+
+def test_failed_coverage_retrieval_is_reported_not_invented(
+    make_client: Callable[..., Any],
+) -> None:
+    client, _ = make_client(small_fake(status_overrides={"/test/report": 503}))
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert (report.coverage.code.covered, report.coverage.code.total) == (None, None)
+    assert "HTTP 503" in report.coverage.code.basis
+    assert outcomes(report)["P3-CODE-REPORT"] == ("error", "system")
+    # Earlier outcomes are kept even though coverage retrieval failed.
+    assert outcomes(report)["P3-AUDIT-SEEDED"] == ("pass", None)
+
+
+def test_run_record_reports_all_operations_without_secrets(
+    make_client: Callable[..., Any],
+) -> None:
+    def wrong_classification(findings: list[dict[str, str]]) -> list[dict[str, str]]:
+        return [f | {"classification": "MANUAL_REVIEW"} for f in findings]
+
+    client, _ = make_client(small_fake(mutate_findings=wrong_classification))
+    body = run_once(client).content
+    manifest = SuiteManifest.model_validate_json(MANIFEST.read_bytes())
+    record = run_record(
+        body,
+        manifest,
+        tester_url="http://127.0.0.1:8001",
+        target_revision="unknown",
+        recorded_at=datetime(2026, 10, 14, 18, 0, tzinfo=UTC),
+    )
+    assert record["recorded_at"] == "2026-10-14T18:00:00Z"
+    assert record["report_sha256"] == hashlib.sha256(body).hexdigest()
+    assert record["counts"]["run"] == len(manifest.tests)
+    assert record["counts"]["fail"] == 1 and record["counts"]["skip"] == 1
+    assert {item["test_id"] for item in record["not_passed"]} == {
+        "P3-AUDIT-SEEDED",
+        "P3-DETERMINISM",
+    }
+    assert all(item["classification"] == "unclassified" for item in record["not_passed"])
+    status = {row["number"]: row for row in record["operation_status"]}
+    assert sorted(status) == list(range(1, 15))
+    assert status[1]["success_conformance"] == "yes"
+    assert status[2]["error_conformance"] == "yes"
+    assert status[5]["success_conformance"] == "no"  # seeded findings differed
+    assert status[5]["error_conformance"] == "yes"
+    assert status[4]["implemented"] == "observed responding"
+    assert status[3]["implemented"] == "not delivered in Phase 3"
+    assert status[3]["success_conformance"] == "untested" and status[3]["name"] is None
+    serialized = json.dumps(record)
+    for secret in [*TOKENS.values(), OPERATOR]:
+        assert secret not in serialized
+
+
+def test_limit_and_protection_workbooks() -> None:
+    import io
+    import re
+    import zipfile
+
+    from tester.suite.workbooks import cells_workbook, protected_workbook, worksheets_workbook
+
+    def parts(data: bytes) -> dict[str, bytes]:
+        package = zipfile.ZipFile(io.BytesIO(data))
+        return {name: package.read(name) for name in package.namelist()}
+
+    protected = parts(protected_workbook())
+    assert b"workbookProtection" in protected["xl/workbook.xml"]
+    assert b"sheetProtection" in protected["xl/worksheets/sheet1.xml"]
+    assert parts(worksheets_workbook(51))["xl/workbook.xml"].count(b"<sheet ") == 51
+    sheet = parts(cells_workbook(250_001))["xl/worksheets/sheet1.xml"].decode()
+    assert len(re.findall(r"<c r=", sheet)) == 250_001

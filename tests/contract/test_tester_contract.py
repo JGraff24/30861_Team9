@@ -31,6 +31,8 @@ def validator(name: str) -> Draft202012Validator:
 def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Any:
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(checks, "UPLOAD_LIMIT_BYTES", 60_000)
+    monkeypatch.setattr(checks, "WORKSHEET_LIMIT", 5)
+    monkeypatch.setattr(checks, "NONEMPTY_CELL_LIMIT", 100)
     settings = SettingsForTester(
         tester_db_path=tmp_path / "tester.sqlite3",
         allowed_target_urls=[BASE_URL],
@@ -40,7 +42,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Any:
     )
     services = ServicesForTester(
         settings=settings,
-        transport=FakeSystem(upload_limit=60_000).transport(),
+        transport=FakeSystem(upload_limit=60_000, worksheet_limit=5, cell_limit=100).transport(),
         resolver=address_resolver(),
         sleep=lambda seconds: None,
     )
