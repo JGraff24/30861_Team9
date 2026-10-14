@@ -47,6 +47,9 @@ class SessionRow:
     state: TesterSessionState
     results: list[TestResult]
     report: bytes | None
+    plan: str | None
+    setup: dict[str, object]
+    markers: dict[str, dict[str, list[str]]]
 
 
 class TesterStore:
@@ -66,6 +69,18 @@ class TesterStore:
                 with sqlite3.connect(self.path) as setup:
                     setup.execute("PRAGMA journal_mode=WAL")
                     setup.execute(SCHEMA)
+                    columns = {
+                        row[1] for row in setup.execute("PRAGMA table_info(tester_sessions)")
+                    }
+                    for name, definition in {
+                        "plan": "TEXT",
+                        "setup_json": "TEXT NOT NULL DEFAULT '{}'",
+                        "markers": "TEXT NOT NULL DEFAULT '{}'",
+                    }.items():
+                        if name not in columns:
+                            setup.execute(
+                                f"ALTER TABLE tester_sessions ADD COLUMN {name} {definition}"
+                            )
                 self._initialized = True
         connection = sqlite3.connect(self.path, timeout=10, isolation_level=None)
         connection.row_factory = sqlite3.Row
@@ -91,14 +106,34 @@ class TesterStore:
             state=TesterSessionState(row["state"]),
             results=[TestResult.model_validate(item) for item in json.loads(row["results"])],
             report=row["report"],
+            plan=row["plan"],
+            setup=json.loads(row["setup_json"]),
+            markers=json.loads(row["markers"]),
         )
 
-    def create(self, session_id: str, operator: str, target_url: str, now: datetime) -> None:
+    def create(
+        self,
+        session_id: str,
+        operator: str,
+        target_url: str,
+        now: datetime,
+        *,
+        plan: str | None = None,
+        setup: dict[str, object] | None = None,
+    ) -> None:
         with self._connect(write=True) as db:
             db.execute(
                 "INSERT INTO tester_sessions (session_id, operator_subject, target_url, state,"
-                " created_at) VALUES (?, ?, ?, ?, ?)",
-                (session_id, operator, target_url, TesterSessionState.PREPARING, now.isoformat()),
+                " created_at, plan, setup_json) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (
+                    session_id,
+                    operator,
+                    target_url,
+                    TesterSessionState.PREPARING,
+                    now.isoformat(),
+                    plan,
+                    json.dumps(setup or {}),
+                ),
             )
 
     def finish_setup(self, session_id: str, ready: bool) -> None:
@@ -145,12 +180,18 @@ class TesterStore:
             )
         return self._row(row)
 
-    def save_progress(self, session_id: str, results: list[TestResult]) -> None:
+    def save_progress(
+        self,
+        session_id: str,
+        results: list[TestResult],
+        markers: dict[str, dict[str, list[str]]] | None = None,
+    ) -> None:
         payload = json.dumps([item.model_dump(mode="json") for item in results])
         with self._connect(write=True) as db:
             db.execute(
-                "UPDATE tester_sessions SET results = ? WHERE session_id = ? AND state = ?",
-                (payload, session_id, TesterSessionState.RUNNING),
+                "UPDATE tester_sessions SET results = ?, markers = ?"
+                " WHERE session_id = ? AND state = ?",
+                (payload, json.dumps(markers or {}), session_id, TesterSessionState.RUNNING),
             )
 
     def finish_run(self, session_id: str, report: bytes, aborted: bool) -> None:
@@ -163,6 +204,14 @@ class TesterStore:
             ).rowcount
         if changed != 1:
             raise RuntimeError("final reports are written once by the running suite")
+
+    def recover_preparing(self) -> None:
+        """A stopped process's uncertain setup is not replayed; queue compensation."""
+        with self._connect(write=True) as db:
+            db.execute(
+                "UPDATE tester_sessions SET state = ?, cleanup_pending = 1 WHERE state = ?",
+                (TesterSessionState.SETUP_FAILED, TesterSessionState.PREPARING),
+            )
 
     def running_sessions(self) -> list[SessionRow]:
         with self._connect() as db:
@@ -178,11 +227,13 @@ class TesterStore:
                 (session_id,),
             )
 
-    def cleanup_candidates(self, target_url: str) -> list[str]:
+    def cleanup_candidates(self, target_url: str, *, failed_only: bool = False) -> list[str]:
         with self._connect() as db:
             rows = db.execute(
                 "SELECT session_id FROM tester_sessions WHERE target_url = ?"
-                " AND cleanup_pending = 1 ORDER BY created_at",
+                " AND cleanup_pending = 1"
+                + (" AND state = 'SETUP_FAILED'" if failed_only else "")
+                + " ORDER BY created_at",
                 (target_url,),
             ).fetchall()
         return [row["session_id"] for row in rows]

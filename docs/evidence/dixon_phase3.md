@@ -52,8 +52,9 @@ percentages.
 - Exact error `code` strings for 400/401/403/404/413/415/422 (only the `.xlsm` code is fixed).
 - Whether `X-Test-Session` should go on the public health call (the tester sends it; an unknown
   session there would be a 400 under the current default).
-- How a tester should clean up namespaces after a failed setup (implemented as opt-in
-  `cleanup_session_ids` on the next setup).
+- Cleanup uses `cleanup_session_ids` on a later new setup. The current implementation always
+  queues failed/uncertain setup compensation; cleanup of retrieved completed namespaces remains
+  opt-in. Pod confirmation of cleanup/idempotency behavior is still pending.
 - Whether an unreferenced-ancillary-chunk PNG padding approach is an acceptable way to hit the
   exact 25,000,000-byte boundary for both teams' validators.
 - Resolved from the Phase 2 specification: worksheet/cell limit violations and password-protected
@@ -95,3 +96,61 @@ the self-check. Tests cover the failure paths, not just the passing path.
 
 **Reflection (Dixon to write):** _Personal reflection on agentic engineering is the student's own
 and has not been drafted here._
+
+
+## Codex handoff completion and final audit (2026-10-14)
+
+The user requested comparing `phase3/dixon` with `04_Phase3_Dixon_Codex.md`, then completing the
+Dixon-owned implementation and verifying every branch change against that document. Codex
+reviewed the original branch at `9a76499` and the complete Dixon diff from foundation `ffa6947`,
+modified local files, and ran actual local checks. No subagents, push, merge, deployment,
+paid provisioning or unapproved remote target calls were used.
+
+The initial 193-test green suite missed real defects: continuously streamed replies could
+exceed a setup deadline and become READY; audit resource IDs/prose were not checked; failed
+pre-hash requests counted AC-03; coverage was fetched twice; and recovery rebuilt from a changed
+manifest. Controlled reproductions established these defects before changes. The implementation
+now bounds calls, snapshots setup/plans, preserves actual assertion markers, uses individual
+case outcomes, retrieves code coverage once, and rejects wrong/reused resource IDs and non-Z
+wire timestamps. Interrupted setup queues deferred compensation. Runtime fixture assets ship
+in the wheel, and the operator CLI writes evidence then returns nonzero on failures/errors.
+
+| Date | Actual check | Outcome |
+|---|---|---|
+| 2026-10-14 | Complete pytest run, final working tree | 225 passed; 4 configured-live tests skipped; one existing Starlette/HTTPX warning |
+| 2026-10-14 | Final local real-process self-check | 51 planned; 50 executed/pass, 0 fail, 0 error, 1 controlled-failure observation skip; run 200 in 11.0 s |
+| 2026-10-14 | Configured acceptance against the local fake target/tester | 4 passed in 22.33 s, including lost-response recovery without a second run |
+| 2026-10-14 | Ruff lint/format, strict mypy, OpenAPI/profile, vectors and fixture hashes | Passed; 49 formatted Python files, 32 source files typed, 13 fixtures current |
+| 2026-10-14 | uv lock consistency and standard locked install | Passed; 84 packages resolved, local project installed |
+| 2026-10-14 | Wheel build and load outside checkout | Passed; 51 cases, 13 assets and 3 routes; no target/network/state access |
+| 2026-10-14 | Locked runtime + measurement dependency scan | No known vulnerabilities found |
+| 2026-10-14 | Full diff/import boundary and whitespace review | Passed; production tester imports shared contracts/settings only |
+
+Retained artifacts: [local report](dixon_local_selfcheck/report.json),
+[run/operation/AC record](dixon_local_selfcheck/run-record.json), and the complete
+[handoff verification matrix](dixon_handoff_verification.md). The record's UTC timestamp is
+2026-10-14T19:24:25.460510Z; target revision is **unknown**, not inferred. This was an explicitly
+fake target at loopback, not the integrated Team 9 system. Code 40/50 is a constant fake response;
+component 6/6 and system 7/8 are partial Phase 3 catalogs. A healthy target does not earn AC-14
+without an observed controlled failure. Local controlled fault regressions separately prove
+tester error classification/retention, not system storage/worker implementation.
+
+**Verification corrections during this session:** the first controlled-failure regression
+incorrectly expected five covered ACs; execution showed only four relevant assertions ran,
+so the test expectation was corrected without increasing fabricated coverage. The first
+non-isolated offline editable build lacked Hatchling's dynamically required `editables`
+build tool; the normal isolated `uv sync --locked --group dev` succeeded. The standalone wheel
+was independently built and loaded outside the checkout. These are actual observed corrections.
+
+**Remaining evidence:** real Team 9 integration, AWS/HTTPS and Team 12 both-direction runs;
+shared workbooks, two-member/manual prose review, Excel repair-warning checks, real-world
+precision/preservation experiments and UI accessibility. Office CFB encryption and additional
+unsupported/ambiguous object fixtures are explicit remaining fixture scope. Jackson must
+confirm current remote CI/protection state and shared profile defaults. No new remote CI run or
+branch-protection setting was performed here. Human reflection remains the student's own task.
+
+**GenAI contribution/verification:** Codex performed the comparison, implementation, test
+regressions, local processes, artifact packaging, dependency scan and final requirement audit.
+The user directed the scope and requested the final handoff verification. Code and claims were
+checked against controlled HTTP responses, actual socket behavior, saved report bytes and real
+command output; the report distinguishes external/manual evidence from local implementation.

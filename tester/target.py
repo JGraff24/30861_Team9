@@ -7,8 +7,10 @@ also restrict tester egress at the network layer.
 
 import ipaddress
 import socket
+import threading
 import time
 from collections.abc import Callable, Mapping
+from queue import Empty, Queue
 from typing import Any, Literal
 from urllib.parse import urlsplit
 
@@ -21,6 +23,7 @@ Identity = Literal["userA", "userB", "reviewer", "test-admin"]
 Resolver = Callable[..., list[Any]]
 
 GET_RETRIES = 3
+MAX_RESPONSE_BYTES = 2_097_152
 FORBIDDEN_ADDRESSES = {
     ipaddress.ip_address("169.254.169.254"),
     ipaddress.ip_address("fd00:ec2::254"),
@@ -79,12 +82,11 @@ class TargetClient:
         self._access = access
         self._resolver = resolver
         self._clock = clock
-        self._client = httpx.Client(
-            transport=transport, trust_env=False, verify=True, follow_redirects=False
-        )
+        self._transport = transport
 
     def close(self) -> None:
-        self._client.close()
+        # Each bounded request owns and closes its client, including late responses.
+        pass
 
     def __enter__(self) -> "TargetClient":
         return self
@@ -124,22 +126,83 @@ class TargetClient:
         if session_header and self.session_id and not path.startswith("/test/"):
             request_headers["X-Test-Session"] = self.session_id
         request_headers.update(headers or {})
-        attempts = GET_RETRIES + 1 if method == "GET" else 1
-        for attempt in range(attempts):
-            budget = min(timeout, self.remaining())
-            if budget <= 0:
-                raise DeadlineExceeded("tester deadline reached before the request")
-            check_address(self.host, self.environment, self._resolver)
+        # A daemon owns the blocking DNS/socket work. The caller has a real wall-clock
+        # bound even if DNS hangs or a peer continuously streams below HTTPX's idle timeout.
+        # A timed-out POST has an uncertain outcome and is never retried. No late worker
+        # mutates session state; after DNS it checks the deadline before sending anything.
+        budget = min(timeout, self.remaining())
+        if budget <= 0:
+            raise DeadlineExceeded("tester deadline reached before the request")
+        wall_deadline = time.monotonic() + budget
+        call_deadline = self._clock() + budget
+        completed: Queue[httpx.Response | Exception] = Queue(maxsize=1)
+
+        def remaining() -> float:
+            return min(wall_deadline - time.monotonic(), call_deadline - self._clock())
+
+        def perform() -> None:
             try:
-                return self._client.request(
-                    method,
-                    self.base_url + path,
-                    headers=request_headers,
-                    timeout=budget,
-                    **kwargs,
-                )
-            except httpx.TransportError as exc:
-                if attempt + 1 == attempts:
-                    # Never include the request (and so its headers) in the message.
-                    raise CommunicationError(f"{method} {path}: {type(exc).__name__}") from None
-        raise AssertionError("unreachable")
+                attempts = GET_RETRIES + 1 if method == "GET" else 1
+                for attempt in range(attempts):
+                    check_address(self.host, self.environment, self._resolver)
+                    left = remaining()
+                    if left <= 0:
+                        raise CommunicationError("request total deadline reached")
+                    try:
+                        with httpx.Client(
+                            transport=self._transport,
+                            trust_env=False,
+                            verify=True,
+                            follow_redirects=False,
+                        ) as client:
+                            left = remaining()
+                            if left <= 0:
+                                raise CommunicationError("request total deadline reached")
+                            with client.stream(
+                                method,
+                                self.base_url + path,
+                                headers=request_headers,
+                                timeout=left,
+                                **kwargs,
+                            ) as response:
+                                content = bytearray()
+                                for chunk in response.iter_bytes():
+                                    if remaining() <= 0:
+                                        raise CommunicationError("request total deadline reached")
+                                    if len(content) + len(chunk) > MAX_RESPONSE_BYTES:
+                                        raise CommunicationError(
+                                            "target response exceeded size limit"
+                                        )
+                                    content.extend(chunk)
+                                result = httpx.Response(
+                                    response.status_code,
+                                    headers={
+                                        key: value
+                                        for key, value in response.headers.items()
+                                        if key.lower() not in {"content-encoding", "content-length"}
+                                    },
+                                    content=bytes(content),
+                                    request=response.request,
+                                )
+                        completed.put(result)
+                        return
+                    except httpx.TransportError as exc:
+                        if attempt + 1 == attempts:
+                            raise CommunicationError(
+                                f"{method} {path}: {type(exc).__name__}"
+                            ) from None
+            except Exception as exc:
+                completed.put(exc)
+
+        threading.Thread(target=perform, daemon=True, name="tester-http-call").start()
+        try:
+            value = completed.get(timeout=max(0, wall_deadline - time.monotonic()))
+        except Empty:
+            value = CommunicationError("request total deadline reached")
+        if self.remaining() <= 0:
+            raise DeadlineExceeded("tester total deadline reached during the request")
+        if isinstance(value, Exception):
+            raise value
+        if self._clock() >= call_deadline or time.monotonic() >= wall_deadline:
+            raise CommunicationError("request total deadline reached")
+        return value

@@ -138,6 +138,8 @@ class FakeSystem:
                 return self.setup_response(body)
             if body["session_id"] in self.sessions:
                 return self.test_error(409, "session exists")
+            for old in body.get("setup", {}).get("cleanup_session_ids", []):
+                self.sessions.discard(old)
             self.sessions.add(body["session_id"])
             return httpx.Response(201, json={"session_id": body["session_id"]})
         session_id = parse_qs(urlsplit(str(request.url)).query).get("session_id", [""])[0]
@@ -166,6 +168,12 @@ class FakeSystem:
             return self.project_error(415, "UNSUPPORTED_FILE_TYPE")
         if len(data) > self.upload_limit:
             return self.project_error(413, "FILE_TOO_LARGE")
+        sha = hashlib.sha256(data).hexdigest()
+        fixture = self.expected.get(sha, {"findings": []})
+        if fixture.get("kind") == "rejected":
+            return self.project_error(
+                fixture["http_status"], fixture.get("error_code") or "INVALID_WORKBOOK"
+            )
         try:
             package = zipfile.ZipFile(io.BytesIO(data))
             parts = {name: package.read(name) for name in package.namelist()}
@@ -275,7 +283,9 @@ class FakeSystem:
                 "startedAt": "2026-10-14T16:00:01Z",
                 "completedAt": "2026-10-14T16:00:03Z",
                 "findings": audit.findings,
-                "limitations": [],
+                "limitations": ["Duplicate object IDs use indexed XML targets."]
+                if audit.file_name == "repeated_ids.xlsx"
+                else [],
                 "error": None,
             },
         )

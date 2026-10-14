@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from app.contracts.models import (
     AuditResponse,
     AuditStatus,
+    CoverageMeasure,
     HealthResponse,
     ProjectError,
     SystemReport,
@@ -20,7 +21,7 @@ from app.contracts.models import (
     VersionResponse,
 )
 from tester.suite.identity import finding_id
-from tester.suite.manifest import LoadedSuite
+from tester.suite.manifest import LoadedSuite, PlannedTest
 from tester.suite.workbooks import (
     cells_workbook,
     padded_clean_workbook,
@@ -59,6 +60,35 @@ class SuiteContext:
     sleep: Callable[[float], None] = time.sleep
     clock: Callable[[], float] = time.monotonic
     state: dict[str, Any] = field(default_factory=dict)
+    current: PlannedTest | None = None
+    markers: dict[str, dict[str, list[str]]] = field(default_factory=dict)
+    code: CoverageMeasure = field(
+        default_factory=lambda: CoverageMeasure(
+            covered=None,
+            total=None,
+            basis="Target code coverage unavailable: retrieval not executed",
+        )
+    )
+
+    def qualify(
+        self, *, components: list[str] | None = None, acceptance: list[str] | None = None
+    ) -> None:
+        """Record only the predeclared assertions/calls that have actually been reached."""
+        if self.current is None:
+            return
+        row = self.markers.setdefault(self.current.test_id, {"components": [], "acceptance": []})
+        for key, requested, allowed in (
+            ("components", components, self.current.components),
+            ("acceptance", acceptance, self.current.acceptance),
+        ):
+            selected = allowed if requested is None else requested
+            if set(selected) - set(allowed):
+                raise RuntimeError("coverage marker was not predeclared")
+            row[key] = sorted(set(row[key]) | set(selected))
+
+    @property
+    def parameters(self) -> dict[str, str | int]:
+        return self.current.parameters if self.current else {}
 
 
 def expect_status(response: httpx.Response, status: int, action: str) -> None:
@@ -71,6 +101,15 @@ def expect_status(response: httpx.Response, status: int, action: str) -> None:
 
 def parse[ModelT: BaseModel](response: httpx.Response, model: type[ModelT], action: str) -> ModelT:
     try:
+        if model in (VersionResponse, AuditResponse):
+            body = response.json()
+            if not isinstance(body, dict):
+                raise ValueError("response body must be an object")
+            fields = ("createdAt",) if model is VersionResponse else ("startedAt", "completedAt")
+            for name in fields:
+                value = body.get(name)
+                if value is not None and (not isinstance(value, str) or not value.endswith("Z")):
+                    raise ValueError("wire timestamps must be UTC RFC3339 ending Z")
         return model.model_validate_json(response.content)
     except ValueError:
         raise CheckFailed(f"{action} body does not match {model.__name__}.") from None
@@ -84,6 +123,15 @@ def project_error(
     if code is not None and error.code != code:
         raise CheckFailed(f"{action} returned code {error.code}; expected {code}.")
     return error
+
+
+def evaluate_project_error(
+    ctx: SuiteContext, response: httpx.Response, status: int, action: str, code: str | None = None
+) -> ProjectError:
+    if response.status_code >= 500:
+        expect_status(response, status, action)
+    ctx.qualify()
+    return project_error(response, status, action, code)
 
 
 def upload(
@@ -106,6 +154,16 @@ def upload(
     )
 
 
+def accepted_ids(ctx: SuiteContext, response: httpx.Response, action: str) -> UploadResponse:
+    ids = parse(response, UploadResponse, action)
+    values = {ids.workbookId, ids.versionId, ids.auditId}
+    seen: set[str] = ctx.state.setdefault("accepted_resource_ids", set())
+    if len(values) != 3 or values & seen:
+        raise CheckFailed(f"{action} did not allocate three distinct fresh resource IDs.")
+    seen.update(values)
+    return ids
+
+
 def version_path(ids: UploadResponse) -> str:
     return f"/api/v1/workbooks/{ids.workbookId}/versions/{ids.versionId}"
 
@@ -123,9 +181,31 @@ def require(ctx: SuiteContext, key: str, producer: str) -> Any:
 def poll_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> AuditResponse:
     give_up = ctx.clock() + AUDIT_POLL_SECONDS
     while True:
-        response = ctx.client.request("GET", audit_path(ids), identity="userA")
+        left = give_up - ctx.clock()
+        if left <= 0:
+            raise CheckFailed(f"{action} was still PROCESSING after {AUDIT_POLL_SECONDS:.0f} s.")
+        response = ctx.client.request(
+            "GET", audit_path(ids), identity="userA", timeout=min(10, left)
+        )
         expect_status(response, 200, action)
+        ctx.qualify(
+            components=[c for c in (ctx.current.components if ctx.current else []) if c == "C5"],
+            acceptance=[],
+        )
         audit = parse(response, AuditResponse, action)
+        if (audit.workbookId, audit.versionId, audit.auditId) != (
+            ids.workbookId,
+            ids.versionId,
+            ids.auditId,
+        ):
+            raise CheckFailed(f"{action} response identifiers differ from the requested resource.")
+        if audit.rulesetVersion != ctx.suite.manifest.ruleset_version:
+            raise CheckFailed(f"{action} reports a different ruleset.")
+        if audit.status == AuditStatus.PROCESSING_FAILED:
+            ctx.state["processing_failure"] = audit
+            raise SystemFault(f"{action} ended PROCESSING_FAILED with a controlled target error.")
+        if ctx.clock() > give_up:
+            raise CheckFailed(f"{action} exceeded its audit polling deadline.")
         if audit.status != AuditStatus.PROCESSING:
             return audit
         if (
@@ -191,7 +271,7 @@ def health(ctx: SuiteContext) -> str:
 
 def upload_without_token(ctx: SuiteContext) -> str:
     response = upload(ctx, ctx.suite.data["clean"], "clean.xlsx", identity=None)
-    project_error(response, 401, "Unauthenticated upload")
+    evaluate_project_error(ctx, response, 401, "Unauthenticated upload")
     return "Upload without a bearer token was rejected with 401 and the project error envelope."
 
 
@@ -199,26 +279,32 @@ def upload_invalid_token(ctx: SuiteContext) -> str:
     response = upload(
         ctx, ctx.suite.data["clean"], "clean.xlsx", raw_token="team9-invalid-negative-test-token"
     )
-    project_error(response, 401, "Upload with an invalid token")
+    evaluate_project_error(ctx, response, 401, "Upload with an invalid token")
     return "Upload with an unknown bearer token was rejected with 401."
 
 
 def upload_missing_file(ctx: SuiteContext) -> str:
     response = upload(ctx, ctx.suite.data["clean"], "clean.xlsx", field_name="attachment")
-    project_error(response, 400, "Upload without a file field")
+    evaluate_project_error(ctx, response, 400, "Upload without a file field")
     return "Multipart upload without the file field returned 400 with the project envelope."
 
 
 def upload_csv(ctx: SuiteContext) -> str:
     response = upload(ctx, b"name,amount\nrent,1200\n", "data.csv", content_type="text/csv")
-    project_error(response, 415, "CSV upload")
+    evaluate_project_error(ctx, response, 415, "CSV upload")
     return "CSV upload was rejected with 415."
+
+
+def upload_no_extension(ctx: SuiteContext) -> str:
+    response = upload(ctx, ctx.suite.data["clean"], "missing-extension")
+    evaluate_project_error(ctx, response, 415, "Missing filename extension")
+    return "A filename without a supported extension returned 415."
 
 
 def upload_xls(ctx: SuiteContext) -> str:
     data = OLE_HEADER + bytes(504)
     response = upload(ctx, data, "legacy.xls", content_type="application/vnd.ms-excel")
-    project_error(response, 415, "Legacy .xls upload")
+    evaluate_project_error(ctx, response, 415, "Legacy .xls upload")
     return "Legacy .xls upload was rejected with 415."
 
 
@@ -229,7 +315,9 @@ def upload_xlsm(ctx: SuiteContext) -> str:
         "macro.xlsm",
         content_type="application/vnd.ms-excel.sheet.macroEnabled.12",
     )
-    project_error(response, 422, "Named .xlsm upload", "MACRO_ENABLED_WORKBOOK_UNSUPPORTED")
+    evaluate_project_error(
+        ctx, response, 422, "Named .xlsm upload", "MACRO_ENABLED_WORKBOOK_UNSUPPORTED"
+    )
     return "Named .xlsm upload returned 422 MACRO_ENABLED_WORKBOOK_UNSUPPORTED."
 
 
@@ -237,29 +325,38 @@ def upload_corrupt(ctx: SuiteContext) -> str:
     fixture = ctx.suite.rejected("corrupt")
     response = upload(ctx, ctx.suite.data["corrupt"], fixture.upload_name)
     # ProjectError forbids extra fields, so an accepted workbookId would also fail here.
-    project_error(response, fixture.http_status, "Corrupt workbook upload", fixture.error_code)
+    evaluate_project_error(
+        ctx, response, fixture.http_status, "Corrupt workbook upload", fixture.error_code
+    )
     return f"Corrupt workbook returned {fixture.http_status} with no accepted identifiers."
 
 
 def upload_over_limit(ctx: SuiteContext) -> str:
     response = upload(ctx, bytes(UPLOAD_LIMIT_BYTES + 1), "over-limit.xlsx")
-    project_error(response, 413, "Upload one byte over the limit")
+    evaluate_project_error(ctx, response, 413, "Upload one byte over the limit")
     return "An upload of 25,000,001 bytes was rejected with 413."
 
 
 def upload_at_limit(ctx: SuiteContext) -> str:
     data = padded_clean_workbook(UPLOAD_LIMIT_BYTES)
     response = upload(ctx, data, "at-limit.xlsx")
+    if response.status_code >= 500:
+        expect_status(response, 202, "Upload exactly at the byte limit")
+    ctx.qualify()
     expect_status(response, 202, "Upload exactly at the byte limit")
-    parse(response, UploadResponse, "Upload exactly at the byte limit")
+    accepted_ids(ctx, response, "Upload exactly at the byte limit")
     return "A valid workbook of exactly 25,000,000 bytes was accepted with 202."
 
 
 def _accepted_upload(ctx: SuiteContext, name: str) -> str:
     fixture = ctx.suite.accepted(name)
     response = upload(ctx, ctx.suite.data[name], fixture.upload_name)
+    if response.status_code >= 500:
+        expect_status(response, 202, f"{name} upload")
+    ctx.qualify(components=["C2"], acceptance=["AC-01"])
     expect_status(response, 202, f"{name} upload")
-    ctx.state[name] = parse(response, UploadResponse, f"{name} upload")
+    ctx.state[name] = accepted_ids(ctx, response, f"{name} upload")
+    ctx.qualify()
     return f"{fixture.upload_name} was accepted with 202 and PROCESSING identifiers."
 
 
@@ -276,6 +373,7 @@ def version_clean(ctx: SuiteContext) -> str:
     fixture = ctx.suite.accepted("clean")
     response = ctx.client.request("GET", version_path(ids), identity="userA")
     expect_status(response, 200, "Clean version")
+    ctx.qualify()
     version = parse(response, VersionResponse, "Clean version")
     if (version.workbookId, version.versionId) != (ids.workbookId, ids.versionId):
         raise CheckFailed("Version response identifiers differ from the upload response.")
@@ -289,6 +387,7 @@ def version_clean(ctx: SuiteContext) -> str:
 def audit_clean(ctx: SuiteContext) -> str:
     ids: UploadResponse = require(ctx, "clean", "the clean upload")
     audit = poll_audit(ctx, ids, "Clean audit")
+    ctx.qualify()
     expected = ctx.suite.accepted("clean").expected_status
     if audit.status != expected or audit.findings:
         raise CheckFailed(
@@ -301,6 +400,7 @@ def audit_seeded(ctx: SuiteContext) -> str:
     ids: UploadResponse = require(ctx, "seeded_issues", "the seeded upload")
     audit = poll_audit(ctx, ids, "Seeded audit")
     ctx.state["seeded_audit"] = audit
+    ctx.qualify()
     expected_status = ctx.suite.accepted("seeded_issues").expected_status
     if audit.status != expected_status:
         raise CheckFailed(f"Seeded audit ended {audit.status}; expected {expected_status}.")
@@ -310,6 +410,7 @@ def audit_seeded(ctx: SuiteContext) -> str:
     if actual != expected:
         raise CheckFailed(describe_difference(actual, expected))
     ctx.state["seeded_findings"] = actual
+    ctx.state["seeded_prose"] = [(f.message, f.recommendation) for f in audit.findings]
     return f"Seeded audit returned exactly the {len(expected)} expected findings in contract order."
 
 
@@ -319,6 +420,12 @@ def hash_after_audit(ctx: SuiteContext) -> str:
     response = ctx.client.request("GET", version_path(ids), identity="userA")
     expect_status(response, 200, "Seeded version after audit")
     version = parse(response, VersionResponse, "Seeded version after audit")
+    ctx.qualify(components=["C3"], acceptance=[])
+    if (version.workbookId, version.versionId) != (ids.workbookId, ids.versionId):
+        raise CheckFailed(
+            "Post-audit version response identifiers differ from the requested resource."
+        )
+    ctx.qualify()
     if version.sha256 != ctx.suite.accepted("seeded_issues").sha256:
         raise CheckFailed("Source SHA256 changed after auditing.")
     if version.latestAuditId != audit.auditId or version.status.value != audit.status.value:
@@ -328,15 +435,18 @@ def hash_after_audit(ctx: SuiteContext) -> str:
 
 def upload_protected(ctx: SuiteContext) -> str:
     response = upload(ctx, protected_workbook(), "protected.xlsx")
-    project_error(response, 422, "Password-protected workbook upload")
+    evaluate_project_error(ctx, response, 422, "Password-protected workbook upload")
     return "A workbook with password-protected structure was rejected with 422."
 
 
 def _limit_upload(ctx: SuiteContext, data: bytes, name: str, status: int, action: str) -> None:
     response = upload(ctx, data, name)
+    if response.status_code >= 500:
+        expect_status(response, status, action)
+    ctx.qualify()
     if status == 202:
         expect_status(response, 202, action)
-        parse(response, UploadResponse, action)
+        accepted_ids(ctx, response, action)
     else:
         project_error(response, status, action)
 
@@ -367,59 +477,104 @@ def upload_cells_at(ctx: SuiteContext) -> str:
 
 def version_unauthenticated(ctx: SuiteContext) -> str:
     ids: UploadResponse = require(ctx, "clean", "the clean upload")
-    project_error(ctx.client.request("GET", version_path(ids)), 401, "Unauthenticated version")
+    response = ctx.client.request("GET", version_path(ids))
+    evaluate_project_error(ctx, response, 401, "Unauthenticated version")
     return "Version read without a bearer token was rejected with 401."
 
 
 def audit_unauthenticated(ctx: SuiteContext) -> str:
     ids: UploadResponse = require(ctx, "clean", "the clean upload")
-    project_error(ctx.client.request("GET", audit_path(ids)), 401, "Unauthenticated audit")
+    response = ctx.client.request("GET", audit_path(ids))
+    evaluate_project_error(ctx, response, 401, "Unauthenticated audit")
     return "Audit read without a bearer token was rejected with 401."
 
 
 def audit_foreign_owner(ctx: SuiteContext) -> str:
     ids: UploadResponse = require(ctx, "seeded_issues", "the seeded upload")
     response = ctx.client.request("GET", audit_path(ids), identity="userB")
-    project_error(response, 403, "User B reading user A's audit")
+    evaluate_project_error(ctx, response, 403, "User B reading user A's audit")
     return "User B was refused user A's audit with 403."
 
 
 def foreign_owner_forbidden(ctx: SuiteContext) -> str:
     ids: UploadResponse = require(ctx, "seeded_issues", "the seeded upload")
     response = ctx.client.request("GET", version_path(ids), identity="userB")
-    project_error(response, 403, "User B reading user A's version")
+    evaluate_project_error(ctx, response, 403, "User B reading user A's version")
     return "User B was refused user A's version with 403."
 
 
 def unknown_resources(ctx: SuiteContext) -> str:
-    seeded: UploadResponse = require(ctx, "seeded_issues", "the seeded upload")
-    clean: UploadResponse = require(ctx, "clean", "the clean upload")
-    unknown = UploadResponse(
-        workbookId="unknown-workbook",
-        versionId="unknown-version",
-        auditId="unknown-audit",
-        status="PROCESSING",
-    )
-    for path, action in (
-        (version_path(unknown), "Unknown version"),
-        (f"/api/v1/workbooks/{seeded.workbookId}/versions/{clean.versionId}", "Mismatched IDs"),
-        (audit_path(seeded, clean.auditId), "Mismatched audit ID"),
-    ):
-        project_error(ctx.client.request("GET", path, identity="userA"), 404, action)
-    return "Unknown and mismatched version/audit identifiers each returned 404."
+    case = str(ctx.parameters.get("case", "version-unknown"))
+    if case == "version-unknown":
+        path = "/api/v1/workbooks/unknown-workbook/versions/unknown-version"
+    else:
+        seeded: UploadResponse = require(ctx, "seeded_issues", "the seeded upload")
+        if case == "version-mismatch":
+            clean: UploadResponse = require(ctx, "clean", "the clean upload")
+            path = f"/api/v1/workbooks/{seeded.workbookId}/versions/{clean.versionId}"
+        elif case == "audit-mismatch":
+            clean = require(ctx, "clean", "the clean upload")
+            path = audit_path(seeded, clean.auditId)
+        else:
+            path = audit_path(seeded, "unknown-audit")
+    response = ctx.client.request("GET", path, identity="userA")
+    evaluate_project_error(ctx, response, 404, case)
+    return f"{case} returned 404 with the project error envelope."
 
 
 def determinism(ctx: SuiteContext) -> str:
     baseline: list[tuple[str, ...]] = require(ctx, "seeded_findings", "the seeded audit")
+    prose = require(ctx, "seeded_prose", "the seeded audit")
     fixture = ctx.suite.accepted("seeded_issues")
-    for run in range(2, DETERMINISM_RUNS + 1):
-        response = upload(ctx, ctx.suite.data["seeded_issues"], fixture.upload_name)
-        expect_status(response, 202, f"Determinism upload {run}")
-        ids = parse(response, UploadResponse, f"Determinism upload {run}")
-        audit = poll_audit(ctx, ids, f"Determinism audit {run}")
-        if finding_keys(audit) != baseline:
-            raise CheckFailed(f"Audit {run} of identical bytes returned different findings.")
-    return f"{DETERMINISM_RUNS} audits of identical bytes returned identical findings."
+    run = ctx.parameters.get("run", 2)
+    response = upload(ctx, ctx.suite.data["seeded_issues"], fixture.upload_name)
+    expect_status(response, 202, f"Determinism upload {run}")
+    ids = accepted_ids(ctx, response, f"Determinism upload {run}")
+    audit = poll_audit(ctx, ids, f"Determinism audit {run}")
+    ctx.qualify()
+    if (
+        finding_keys(audit) != baseline
+        or [(f.message, f.recommendation) for f in audit.findings] != prose
+    ):
+        raise CheckFailed(f"Audit {run} of identical bytes returned different findings or prose.")
+    return f"Audit {run} matched the first audit's semantic findings and prose."
+
+
+def rejected_fixture(ctx: SuiteContext) -> str:
+    name = str(ctx.parameters["fixture"])
+    fixture = ctx.suite.rejected(name)
+    response = upload(ctx, ctx.suite.data[name], fixture.upload_name)
+    evaluate_project_error(ctx, response, fixture.http_status, name, fixture.error_code)
+    return f"{name} returned {fixture.http_status} with no accepted identifiers."
+
+
+def edge_upload(ctx: SuiteContext) -> str:
+    return _accepted_upload(ctx, str(ctx.parameters["fixture"]))
+
+
+def edge_audit(ctx: SuiteContext) -> str:
+    name = str(ctx.parameters["fixture"])
+    ids: UploadResponse = require(ctx, name, f"the {name} upload")
+    audit = poll_audit(ctx, ids, f"{name} audit")
+    ctx.qualify()
+    fixture = ctx.suite.accepted(name)
+    if audit.status != fixture.expected_status or finding_keys(audit) != expected_keys(ctx, name):
+        raise CheckFailed(f"{name} audit differed from independent expected findings/status.")
+    if name == "repeated_ids" and not audit.limitations:
+        raise CheckFailed("Repeated object IDs were not disclosed in audit limitations.")
+    return f"{name} returned exact independently expected findings."
+
+
+def controlled_failure(ctx: SuiteContext) -> str:
+    audit: AuditResponse = require(
+        ctx, "processing_failure", "an observed controlled audit failure"
+    )
+    ctx.qualify()
+    if audit.error is None or audit.completedAt is None or audit.findings:
+        raise CheckFailed(
+            "Controlled audit failure did not preserve the required failure envelope."
+        )
+    return "Observed PROCESSING_FAILED has a completion timestamp, error and no partial findings."
 
 
 def unknown_session_header(ctx: SuiteContext) -> str:
@@ -430,7 +585,7 @@ def unknown_session_header(ctx: SuiteContext) -> str:
         identity="userA",
         headers={"X-Test-Session": str(uuid.uuid4())},
     )
-    project_error(response, 400, "Project call with an unknown X-Test-Session")
+    evaluate_project_error(ctx, response, 400, "Project call with an unknown X-Test-Session")
     return "A project call naming an unknown test session returned 400."
 
 
@@ -442,6 +597,7 @@ def system_setup_duplicate(ctx: SuiteContext) -> str:
         json={"session_id": ctx.session_id, "setup": {}},
         timeout=30,
     )
+    ctx.qualify()
     expect_status(response, 409, "Duplicate system setup")
     parse(response, TestEndpointError, "Duplicate system setup")
     return "Repeating system setup with an existing session_id returned 409."
@@ -451,10 +607,24 @@ def system_report(ctx: SuiteContext) -> str:
     response = ctx.client.request(
         "GET", "/test/report", identity="test-admin", params={"session_id": ctx.session_id}
     )
+    ctx.code = CoverageMeasure(
+        covered=None,
+        total=None,
+        basis=(
+            f"Target code coverage unavailable: system report returned HTTP {response.status_code}"
+        ),
+    )
     expect_status(response, 200, "System coverage report")
+    ctx.qualify()
+    ctx.code = CoverageMeasure(
+        covered=None,
+        total=None,
+        basis="Target code coverage unavailable: invalid system report schema/session",
+    )
     report = parse(response, SystemReport, "System coverage report")
     if report.session_id != ctx.session_id:
         raise CheckFailed("System report names a different session_id.")
+    ctx.code = report.coverage.code
     return "System report returned this session's code coverage in the agreed schema."
 
 
@@ -466,6 +636,7 @@ CHECKS: dict[str, Callable[[SuiteContext], str]] = {
         upload_invalid_token,
         upload_missing_file,
         upload_csv,
+        upload_no_extension,
         upload_xls,
         upload_xlsm,
         upload_corrupt,
@@ -488,6 +659,10 @@ CHECKS: dict[str, Callable[[SuiteContext], str]] = {
         foreign_owner_forbidden,
         unknown_resources,
         determinism,
+        controlled_failure,
+        rejected_fixture,
+        edge_upload,
+        edge_audit,
         unknown_session_header,
         system_setup_duplicate,
         system_report,

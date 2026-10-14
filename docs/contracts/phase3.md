@@ -4,7 +4,7 @@ Recorded 2026-10-14. This file preserves the supplied shared specification and c
 
 ## Foundation delivery status
 
-Only shared DTOs/ports/exceptions, typed settings, dependency containers, minimal factories and local checks are implemented. ALL 14 business operations and ALL instructor endpoints are pending. Runtime OpenAPI paths are empty. system.openapi.json and tester.openapi.json are valid foundation DTO catalogs with empty paths; they do not advertise feature routes. Jackson and Dixon must extend them with actual route descriptions when implementing services.
+The shared foundation and Dixon's independent tester are implemented. `tester.openapi.json` lists the authenticated instructor setup/run/report endpoints; `system.openapi.json` remains a foundation DTO catalog with empty paths. All 14 system business operations and the system testing endpoints are pending their owners' integration on this branch. Dixon's local HTTP evidence uses a test-only fake target; it does not establish system implementation or cross-team conformance. See `docs/evidence/dixon_handoff_verification.md` for the current completion audit.
 
 The instructor [Cross-team Testing Interface](https://docs.google.com/document/d/1GhEVTw3a2tNJY2arfDyWgWS94kVYfgC7/edit) was retrieved in full via text export on 2026-10-14 after the web viewer failed. Its fields, outcome/source rules, null coverage, single-use runs, report retention, and 0.4.2 starter match this profile. Factories and catalogs explicitly use the starter's OpenAPI 3.1.1 dialect. Catalogs expand DTO schemas while leaving pending route paths empty; they do not claim to be a delivered instructor service. No changes to the instructor interface were needed.
 

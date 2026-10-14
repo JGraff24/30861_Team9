@@ -6,6 +6,7 @@ part and alt-text field is written explicitly here so expectations never come fr
 
 import io
 import struct
+import warnings
 import zipfile
 import zlib
 from dataclasses import dataclass, field
@@ -391,3 +392,199 @@ def worksheets_workbook(count: int) -> bytes:
 def cells_workbook(count: int) -> bytes:
     """A valid one-sheet package with exactly ``count`` nonempty numeric cells."""
     return build_workbook([Sheet("Data", 1, "sheet1", bulk_cells=count)])
+
+
+def edge_workbooks() -> dict[str, bytes]:
+    """Additional valid packages; expectations are authored independently in JSON."""
+    whitespace = (
+        "\t\n\r \u0085\u00a0\u1680\u2000\u2001\u2002\u2003\u2004"
+        "\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000"
+    )
+    return {
+        "unicode.xlsx": build_workbook(
+            [
+                Sheet(
+                    " Sheet01 ",
+                    1,
+                    "sheet1",
+                    objects=(
+                        DrawingObject(
+                            "pic", 7, "Whitespace title", title=whitespace, descr="Meaning"
+                        ),
+                        DrawingObject(
+                            "sp", 8, "Whitespace description", title="Meaning", descr=whitespace
+                        ),
+                        DrawingObject(
+                            "sp", 9, "Zero width is not White_Space", title="\u200b", descr="\u200b"
+                        ),
+                    ),
+                ),
+                Sheet("Sheet0", 2, "sheet2"),
+            ]
+        ),
+        "repeated_ids.xlsx": build_workbook(
+            [
+                Sheet(
+                    "Expenses",
+                    1,
+                    "sheet1",
+                    objects=(
+                        DrawingObject("pic", 7, "First duplicate"),
+                        DrawingObject("pic", 7, "Second duplicate"),
+                    ),
+                ),
+            ]
+        ),
+        "multiple_drawings.xlsx": build_workbook(
+            [
+                Sheet(
+                    "Expenses", 1, "sheet1", objects=(DrawingObject("pic", 7, "Visible picture"),)
+                ),
+                Sheet(
+                    "Hidden costs",
+                    2,
+                    "sheet2",
+                    hidden=True,
+                    objects=(DrawingObject("chart", 8, "Hidden chart"),),
+                ),
+            ]
+        ),
+    }
+
+
+def hostile_workbooks() -> dict[str, bytes]:
+    """Deterministic malformed packages. These never contact relationships or execute XML."""
+    with zipfile.ZipFile(io.BytesIO(clean_workbook())) as archive:
+        original = [(info.filename, archive.read(info)) for info in archive.infolist()]
+
+    def package(parts: list[tuple[str, bytes]], *, encrypted: bool = False) -> bytes:
+        # ZIP_STORED and fixed headers avoid host/zlib-dependent fixture bytes.
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, "w") as archive:
+            for name, content in parts:
+                info = zipfile.ZipInfo(name, FIXED_TIME)
+                info.create_system = 0
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore", message="Duplicate name:", category=UserWarning
+                    )
+                    archive.writestr(info, content)
+        data = output.getvalue()
+        if not encrypted:
+            return data
+        return encrypted_zip(parts)
+
+    dtd = []
+    for name, content in original:
+        if name == "xl/workbook.xml":
+            content = content.replace(
+                b"<workbook ", b'<!DOCTYPE workbook [<!ENTITY probe "unsafe">]><workbook ', 1
+            )
+        dtd.append((name, content))
+    return {
+        "zip_traversal.xlsx": package(original + [("../escape.xml", b"unsafe")]),
+        "zip_duplicate.xlsx": package(
+            original + [("xl/workbook.xml", dict(original)["xl/workbook.xml"])]
+        ),
+        "xml_dtd.xlsx": package(dtd),
+        "macro_parts.xlsx": package(
+            original + [("xl/vbaProject.bin", b"synthetic macro marker; never execute")]
+        ),
+        "encrypted_zip.xlsx": package(original, encrypted=True),
+        "protected_sheet.xlsx": build_workbook([Sheet("Budget", 1, "sheet1", protected=True)]),
+        "protected_structure.xlsx": build_workbook(
+            [Sheet("Budget", 1, "sheet1")], protect_structure=True
+        ),
+    }
+
+
+ZIP_FIXTURE_PASSWORD = b"fixture-only-password"
+
+
+def encrypted_zip(parts: list[tuple[str, bytes]]) -> bytes:
+    """A genuinely password-encrypted ZIP package with deterministic ZipCrypto headers.
+
+    This exercises encrypted ZIP rejection, rather than Office's separate CFB encryption.
+    The fixed password and nonrandom headers are for this synthetic fixture only.
+    """
+
+    def crc_byte(value: int, crc: int) -> int:
+        value ^= crc & 255
+        for _ in range(8):
+            value = (value >> 1) ^ (0xEDB88320 if value & 1 else 0)
+        return (crc >> 8) ^ value
+
+    def encrypt(data: bytes) -> bytes:
+        keys = [0x12345678, 0x23456789, 0x34567890]
+
+        def update(value: int) -> None:
+            keys[0] = crc_byte(value, keys[0])
+            keys[1] = ((keys[1] + (keys[0] & 255)) * 134775813 + 1) & 0xFFFFFFFF
+            keys[2] = crc_byte(keys[1] >> 24, keys[2])
+
+        for value in ZIP_FIXTURE_PASSWORD:
+            update(value)
+        result = bytearray()
+        for value in data:
+            key = keys[2] | 2
+            result.append(value ^ (((key * (key ^ 1)) >> 8) & 255))
+            update(value)
+        return bytes(result)
+
+    output = bytearray()
+    directory = bytearray()
+    dos_date = ((FIXED_TIME[0] - 1980) << 9) | (FIXED_TIME[1] << 5) | FIXED_TIME[2]
+    for name, data in parts:
+        filename = name.encode("utf-8")
+        checksum = zlib.crc32(data) & 0xFFFFFFFF
+        encrypted = encrypt(bytes(range(11)) + bytes([checksum >> 24]) + data)
+        offset = len(output)
+        output.extend(
+            struct.pack(
+                "<IHHHHHIIIHH",
+                0x04034B50,
+                20,
+                1,
+                0,
+                0,
+                dos_date,
+                checksum,
+                len(encrypted),
+                len(data),
+                len(filename),
+                0,
+            )
+        )
+        output.extend(filename)
+        output.extend(encrypted)
+        directory.extend(
+            struct.pack(
+                "<IHHHHHHIIIHHHHHII",
+                0x02014B50,
+                20,
+                20,
+                1,
+                0,
+                0,
+                dos_date,
+                checksum,
+                len(encrypted),
+                len(data),
+                len(filename),
+                0,
+                0,
+                0,
+                0,
+                0,
+                offset,
+            )
+        )
+        directory.extend(filename)
+    offset = len(output)
+    output.extend(directory)
+    output.extend(
+        struct.pack(
+            "<IHHHHIIH", 0x06054B50, 0, 0, len(parts), len(parts), len(directory), offset, 0
+        )
+    )
+    return bytes(output)

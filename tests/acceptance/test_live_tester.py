@@ -68,3 +68,30 @@ def test_single_use_session_and_stored_report(client: httpx.Client) -> None:
         assert any(r.outcome == Outcome.ERROR and r.source == "tester" for r in report.results)
     again = client.post("/test/run", json={"session_id": session_id})
     assert again.status_code == 409
+
+
+def test_lost_run_response_is_recovered_without_another_run(client: httpx.Client) -> None:
+    import time
+
+    setup = client.post("/test/setup", json={"target_url": TARGET})
+    assert setup.status_code == 201
+    sid = setup.json()["session_id"]
+    try:
+        # On the local fake this disconnects while the suite is still running.
+        # A faster approved remote tester may complete before this read timeout.
+        run = client.post(
+            "/test/run", json={"session_id": sid}, timeout=httpx.Timeout(60, read=0.05)
+        )
+        assert run.status_code in (200, 500)
+    except httpx.TransportError:
+        pass
+    deadline = time.monotonic() + 630
+    while True:
+        stored = client.get("/test/report", params={"session_id": sid})
+        if stored.status_code != 409 or time.monotonic() >= deadline:
+            break
+        time.sleep(1)
+    assert stored.status_code == 200
+    report = SuiteReport.model_validate_json(stored.content)
+    assert report.session_id == sid
+    assert client.post("/test/run", json={"session_id": sid}).status_code == 409

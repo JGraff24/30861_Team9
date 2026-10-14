@@ -10,7 +10,6 @@ from app.contracts.models import (
     Outcome,
     SuiteCoverage,
     SuiteReport,
-    SystemReport,
     TestResult,
 )
 from tester.suite.checks import (
@@ -27,11 +26,12 @@ logger = logging.getLogger(__name__)
 
 COMPONENT_BASIS = (
     "Phase 3 component catalog C1-C6 in tests/fixtures/manifest.json; a component counts when "
-    "a test declaring it executed its qualifying assertion (pass or fail)."
+    "a recorded qualifying call/assertion executes, regardless of its final outcome."
 )
 SYSTEM_BASIS = (
     "Phase 3 portions of AC-01/02/03/04/05/14/15/18 in tests/fixtures/manifest.json; an AC "
-    "counts when a test declaring it executed its qualifying assertion (pass or fail)."
+    "counts only when its predeclared assertion executes. This measures partial scope; "
+    "AC-14 requires an observed controlled failure, not ordinary corrupt-input rejection."
 )
 CODE_UNAVAILABLE = "Target code coverage unavailable: {reason}"
 
@@ -49,15 +49,16 @@ def build_report(
     target_url: str,
     results: list[TestResult],
     code: CoverageMeasure,
+    markers: dict[str, dict[str, list[str]]] | None = None,
 ) -> SuiteReport:
     planned = {test.test_id: test for test in suite.manifest.tests}
-    executed = [
-        planned[result.test_id]
-        for result in results
-        if result.outcome in {Outcome.PASS, Outcome.FAIL} and result.test_id in planned
-    ]
-    components = {component for test in executed for component in test.components}
-    acceptance = {criterion for test in executed for criterion in test.acceptance}
+    components: set[str] = set()
+    acceptance: set[str] = set()
+    for test_id, evidence in (markers or {}).items():
+        test = planned.get(test_id)
+        if test is not None:
+            components.update(set(evidence["components"]) & set(test.components))
+            acceptance.update(set(evidence["acceptance"]) & set(test.acceptance))
     coverage = SuiteCoverage(
         code=code,
         component=CoverageMeasure(
@@ -77,7 +78,8 @@ def interrupted_results(
 ) -> list[TestResult]:
     """Keep completed outcomes, mark the interrupted test tester error, skip the rest."""
     results = list(completed)
-    remaining = suite.manifest.tests[len(completed) :]
+    completed_ids = {result.test_id for result in completed}
+    remaining = [test for test in suite.manifest.tests if test.test_id not in completed_ids]
     for index, test in enumerate(remaining):
         if index == 0:
             results.append(
@@ -103,6 +105,7 @@ def run_one(ctx: SuiteContext, test: PlannedTest) -> TestResult:
     def result(outcome: Outcome, message: str, source: ErrorSource | None = None) -> TestResult:
         return TestResult(test_id=test.test_id, outcome=outcome, message=message, source=source)
 
+    ctx.current = test
     if test.phase != "3":
         return result(Outcome.SKIP, f"Planned for a later phase: {test.description}")
     try:
@@ -114,54 +117,29 @@ def run_one(ctx: SuiteContext, test: PlannedTest) -> TestResult:
     except SystemFault as exc:
         return result(Outcome.ERROR, str(exc), ErrorSource.SYSTEM)
     except CommunicationError as exc:
+        if test.check == "system_report":
+            ctx.code = CoverageMeasure(
+                covered=None, total=None, basis=f"Target code coverage unavailable: {exc}"
+            )
         return result(Outcome.ERROR, f"No usable response: {exc}.", ErrorSource.COMMUNICATION)
     except DeadlineExceeded:
         raise
-    except Exception as exc:  # A tester defect must not hide the remaining outcomes.
-        logger.exception("Check %s failed inside the tester", test.test_id)
-        return result(
-            Outcome.ERROR,
-            f"Tester check failed internally ({type(exc).__name__}).",
-            ErrorSource.TESTER,
-        )
-
-
-def code_coverage(ctx: SuiteContext) -> CoverageMeasure:
-    try:
-        response = ctx.client.request(
-            "GET", "/test/report", identity="test-admin", params={"session_id": ctx.session_id}
-        )
-    except (CommunicationError, DeadlineExceeded) as exc:
-        return CoverageMeasure(
-            covered=None, total=None, basis=CODE_UNAVAILABLE.format(reason=type(exc).__name__)
-        )
-    if response.status_code != 200:
-        reason = f"system report returned HTTP {response.status_code}"
-        return CoverageMeasure(
-            covered=None, total=None, basis=CODE_UNAVAILABLE.format(reason=reason)
-        )
-    try:
-        report = SystemReport.model_validate_json(response.content)
-    except ValueError:
-        reason = "system report did not match the agreed schema"
-        return CoverageMeasure(
-            covered=None, total=None, basis=CODE_UNAVAILABLE.format(reason=reason)
-        )
-    if report.session_id != ctx.session_id:
-        reason = "system report named a different session"
-        return CoverageMeasure(
-            covered=None, total=None, basis=CODE_UNAVAILABLE.format(reason=reason)
-        )
-    return report.coverage.code
 
 
 def run_suite(
-    ctx: SuiteContext, target_url: str, progress: Callable[[list[TestResult]], None]
+    ctx: SuiteContext,
+    target_url: str,
+    progress: Callable[[list[TestResult], dict[str, dict[str, list[str]]]], None],
 ) -> RunOutcome:
     results: list[TestResult] = []
     for test in ctx.suite.manifest.tests:
         try:
-            results.append(run_one(ctx, test))
+            if ctx.client.remaining() <= 0:
+                raise DeadlineExceeded("suite deadline reached before the test")
+            result = run_one(ctx, test)
+            if ctx.client.remaining() <= 0:
+                raise DeadlineExceeded("suite deadline reached while evaluating the test")
+            results.append(result)
         except DeadlineExceeded:
             message = "The tester's suite deadline was reached during this test."
             final = interrupted_results(ctx.suite, results, message)
@@ -170,10 +148,11 @@ def run_suite(
                 total=None,
                 basis=CODE_UNAVAILABLE.format(reason="suite deadline reached before retrieval"),
             )
-            report = build_report(ctx.suite, ctx.session_id, target_url, final, code)
+            progress(final, ctx.markers)
+            report = build_report(ctx.suite, ctx.session_id, target_url, final, code, ctx.markers)
             return RunOutcome(
                 report, aborted=True, abort_message="Tester aborted: suite deadline reached."
             )
-        progress(results)
-    report = build_report(ctx.suite, ctx.session_id, target_url, results, code_coverage(ctx))
+        progress(results, ctx.markers)
+    report = build_report(ctx.suite, ctx.session_id, target_url, results, ctx.code, ctx.markers)
     return RunOutcome(report, aborted=False)

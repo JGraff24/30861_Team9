@@ -31,7 +31,7 @@ def operation_status(manifest: SuiteManifest, report: SuiteReport) -> list[dict[
     for operation in manifest.operations:
         tests = [test for test in manifest.tests if operation.number in test.operations]
         by_path = {
-            path: [outcomes[t.test_id] for t in tests if t.path == path and t.test_id in outcomes]
+            path: [outcomes.get(t.test_id, Outcome.SKIP) for t in tests if t.path == path]
             for path in ("success", "error")
         }
         observed = any(
@@ -71,6 +71,8 @@ def run_record(
     recorded_at: datetime | None = None,
 ) -> dict[str, Any]:
     report = SuiteReport.model_validate_json(report_bytes)
+    if {result.test_id for result in report.results} != {test.test_id for test in manifest.tests}:
+        raise ValueError("stored report does not match the supplied suite manifest")
     counts = Counter(result.outcome.value for result in report.results)
     return {
         "recorded_at": (recorded_at or datetime.now(UTC)).isoformat().replace("+00:00", "Z"),
@@ -82,7 +84,8 @@ def run_record(
         "report_sha256": hashlib.sha256(report_bytes).hexdigest(),
         "manifest_version": manifest.manifest_version,
         "counts": {
-            "run": len(report.results),
+            "run": sum(result.outcome != Outcome.SKIP for result in report.results),
+            "planned": len(manifest.tests),
             **{outcome.value: counts.get(outcome.value, 0) for outcome in Outcome},
         },
         "not_passed": [
@@ -95,5 +98,35 @@ def run_record(
         ],
         "coverage": report.coverage.model_dump(mode="json"),
         "operation_status": operation_status(manifest, report),
+        "acceptance_status": {
+            criterion: {
+                "scope": scope,
+                "evidence": [
+                    {
+                        "test_id": test.test_id,
+                        "outcome": next(
+                            (
+                                result.outcome.value
+                                for result in report.results
+                                if result.test_id == test.test_id
+                            ),
+                            "missing",
+                        ),
+                    }
+                    for test in manifest.tests
+                    if criterion in test.acceptance
+                ],
+                "completeness": "partial Phase 3 scope; outcomes do not prove every boundary",
+            }
+            for criterion, scope in manifest.acceptance.items()
+        },
+        "known_deviations": [
+            "Team 9 profile/defaults require pod confirmation.",
+            "Synthetic fixtures and message meaning require manual pod review.",
+            (
+                "Controlled system failures are exercised locally; "
+                "AC-14 is skipped remotely unless observed."
+            ),
+        ],
         "pending_confirmation": manifest.pending_confirmation,
     }

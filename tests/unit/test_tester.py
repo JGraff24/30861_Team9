@@ -24,7 +24,7 @@ from tester.store import TesterStore as Store
 from tester.suite import checks
 from tester.suite.checks import CHECKS
 from tester.suite.identity import finding_id
-from tester.suite.manifest import SuiteConfigurationError, SuiteManifest, load_suite
+from tester.suite.manifest import SuiteConfigurationError, SuiteManifest, load_suite, snapshot_suite
 from tester.suite.records import run_record
 from tester.target import CommunicationError, check_address
 from tests.support.fake_system import BASE_URL, TOKENS, FakeSystem, access_map, address_resolver
@@ -134,9 +134,14 @@ def test_full_run_against_conforming_target(make_client: Callable[..., Any]) -> 
     report = SuiteReport.model_validate_json(run.content)
     planned = [test["test_id"] for test in json.loads(MANIFEST.read_text())["tests"]]
     assert [r.test_id for r in report.results] == planned
-    assert all(r.outcome == Outcome.PASS for r in report.results), outcomes(report)
+    assert all(
+        r.outcome == Outcome.PASS
+        for r in report.results
+        if r.test_id != "P3-AUDIT-FAILURE-ENVELOPE"
+    ), outcomes(report)
+    assert outcomes(report)["P3-AUDIT-FAILURE-ENVELOPE"] == ("skip", None)
     assert (report.coverage.component.covered, report.coverage.component.total) == (6, 6)
-    assert (report.coverage.system.covered, report.coverage.system.total) == (8, 8)
+    assert (report.coverage.system.covered, report.coverage.system.total) == (7, 8)
     assert (report.coverage.code.covered, report.coverage.code.total) == (40, 50)
     # Every project call carries a session header; only P3-SESSION-UNKNOWN names another.
     project = [r for r in fake.requests if r.url.path.startswith("/api/")]
@@ -248,7 +253,7 @@ def test_setup_failure_sources(
     assert response.status_code == status and response.json()["source"] == source
 
 
-def test_cleanup_of_prior_sessions_is_opt_in(make_client: Callable[..., Any]) -> None:
+def test_failed_setup_cleanup_is_automatic(make_client: Callable[..., Any]) -> None:
     failing = FakeSystem(
         setup_response=lambda body: httpx.Response(500, json={"message": "x", "source": "system"})
     )
@@ -261,7 +266,7 @@ def test_cleanup_of_prior_sessions_is_opt_in(make_client: Callable[..., Any]) ->
             httpx.Response(201, json={"session_id": body["session_id"]}),
         )[1]
     )
-    enabled, _ = make_client(recording, tester_cleanup_prior_sessions=True)
+    enabled, _ = make_client(recording)
     setup_session(enabled)
     assert len(seen[0]["setup"]["cleanup_session_ids"]) == 1
     setup_session(enabled)
@@ -329,8 +334,8 @@ def test_target_failures_map_to_outcomes(make_client: Callable[..., Any]) -> Non
     assert results["P3-HEALTH"] == ("error", "system")
     assert results["P3-AUDIT-SEEDED"] == ("fail", None)
     assert results["P3-DETERMINISM"] == ("skip", None)  # depends on a passing seeded audit
-    # Errors and skips earn no coverage; P3-HEALTH declares none anyway.
-    assert report.coverage.system.covered == 7
+    # AC-18 was skipped; AC-14 was not observed.
+    assert report.coverage.system.covered == 6
 
 
 def test_communication_failure_is_reported_per_test(make_client: Callable[..., Any]) -> None:
@@ -351,7 +356,7 @@ def test_post_is_never_retried(make_client: Callable[..., Any]) -> None:
     fake.drop_paths.add("/api/v1/workbooks")
     client.post("/test/run", json={"session_id": session_id}, headers=AUTH)
     uploads = [r for r in fake.requests if r.url.path == "/api/v1/workbooks"]
-    planned_uploads = 16  # every upload test through P3-UPLOAD-SEEDED once; determinism skips
+    planned_uploads = 27  # original 16 + ten extra fixtures + missing extension; determinism skips
     assert len(uploads) == planned_uploads
 
 
@@ -405,9 +410,8 @@ def test_deadline_abort_stores_report_and_returns_500(make_client: Callable[...,
     assert run.status_code == 500 and run.json()["source"] == "tester"
     stored = client.get("/test/report", params={"session_id": session_id}, headers=AUTH)
     report = SuiteReport.model_validate_json(stored.content)
-    assert report.results[0].outcome == Outcome.PASS
-    assert (report.results[1].outcome, report.results[1].source) == (Outcome.ERROR, "tester")
-    assert {r.outcome for r in report.results[2:]} == {Outcome.SKIP}
+    assert (report.results[0].outcome, report.results[0].source) == (Outcome.ERROR, "tester")
+    assert {r.outcome for r in report.results[1:]} == {Outcome.SKIP}
     assert report.coverage.code.covered is None and report.coverage.code.total is None
     again = client.post("/test/run", json={"session_id": session_id}, headers=AUTH)
     assert again.status_code == 409
@@ -416,19 +420,36 @@ def test_deadline_abort_stores_report_and_returns_500(make_client: Callable[...,
 def test_invalid_suite_configuration_does_not_consume_session(
     make_client: Callable[..., Any], tmp_path: Path
 ) -> None:
-    broken = tmp_path / "manifest.json"
-    broken.write_text("{}", encoding="utf-8")
-    client, fake = make_client(fixture_manifest_path=broken)
+    client, fake = make_client()
     session_id = setup_session(client)
+    # A snapshotted fixture that changes before run must fail before consumption.
+    store = client.app.state.tester.store
+    with store._connect(write=True) as db:
+        row = db.execute(
+            "SELECT plan FROM tester_sessions WHERE session_id = ?", (session_id,)
+        ).fetchone()
+        plan = json.loads(row[0])
+        plan["fixture_root"] = str(tmp_path / "missing-fixtures")
+        db.execute(
+            "UPDATE tester_sessions SET plan = ? WHERE session_id = ?",
+            (json.dumps(plan), session_id),
+        )
     run = client.post("/test/run", json={"session_id": session_id}, headers=AUTH)
     assert run.status_code == 500 and run.json()["source"] == "tester"
     session = Store(tmp_path / "tester.sqlite3").get(session_id)
     assert session is not None and session.state == SessionState.READY
+    assert len(fake.requests) == 1
 
 
 def test_interrupted_run_is_recovered_as_aborted(tmp_path: Path) -> None:
     store = Store(tmp_path / "tester.sqlite3")
-    store.create("crashed-session", "grader", BASE_URL, datetime.now(UTC))
+    store.create(
+        "crashed-session",
+        "grader",
+        BASE_URL,
+        datetime.now(UTC),
+        plan=snapshot_suite(load_suite(MANIFEST, set(CHECKS)), MANIFEST),
+    )
     store.finish_setup("crashed-session", ready=True)
     store.begin_run("crashed-session", "grader")
     done = TestResult(test_id="P3-HEALTH", outcome=Outcome.PASS, message="Health matched.")
@@ -596,11 +617,19 @@ def test_run_record_reports_all_operations_without_secrets(
     )
     assert record["recorded_at"] == "2026-10-14T18:00:00Z"
     assert record["report_sha256"] == hashlib.sha256(body).hexdigest()
-    assert record["counts"]["run"] == len(manifest.tests)
-    assert record["counts"]["fail"] == 1 and record["counts"]["skip"] == 1
+    assert record["counts"]["planned"] == len(manifest.tests)
+    assert record["counts"]["run"] + record["counts"]["skip"] == len(manifest.tests)
+    assert record["counts"]["fail"] == 4 and record["counts"]["skip"] == 5
     assert {item["test_id"] for item in record["not_passed"]} == {
         "P3-AUDIT-SEEDED",
         "P3-DETERMINISM",
+        "P3-DETERMINISM-3",
+        "P3-DETERMINISM-4",
+        "P3-DETERMINISM-5",
+        "P3-AUDIT-UNICODE",
+        "P3-AUDIT-REPEATED-IDS",
+        "P3-AUDIT-MULTIPLE-DRAWINGS",
+        "P3-AUDIT-FAILURE-ENVELOPE",
     }
     assert all(item["classification"] == "unclassified" for item in record["not_passed"])
     status = {row["number"]: row for row in record["operation_status"]}
@@ -608,7 +637,7 @@ def test_run_record_reports_all_operations_without_secrets(
     assert status[1]["success_conformance"] == "yes"
     assert status[2]["error_conformance"] == "yes"
     assert status[5]["success_conformance"] == "no"  # seeded findings differed
-    assert status[5]["error_conformance"] == "yes"
+    assert status[5]["error_conformance"] == "incomplete"
     assert status[4]["implemented"] == "observed responding"
     assert status[3]["implemented"] == "not delivered in Phase 3"
     assert status[3]["success_conformance"] == "untested"
@@ -637,3 +666,531 @@ def test_limit_and_protection_workbooks() -> None:
     assert parts(worksheets_workbook(51))["xl/workbook.xml"].count(b"<sheet ") == 51
     sheet = parts(cells_workbook(250_001))["xl/worksheets/sheet1.xml"].decode()
     assert len(re.findall(r"<c r=", sheet)) == 250_001
+
+
+@pytest.mark.parametrize("field", ["workbookId", "versionId", "auditId"])
+def test_audit_response_must_identify_requested_resource(
+    make_client: Callable[..., Any], field: str
+) -> None:
+    fake = small_fake()
+    original = fake.read
+
+    def wrong(path: str, subject: str) -> httpx.Response:
+        response = original(path, subject)
+        if response.status_code == 200 and "/audits/" in path:
+            return httpx.Response(200, json=response.json() | {field: "wrong-resource"})
+        return response
+
+    fake.read = wrong  # type: ignore[method-assign]
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-AUDIT-CLEAN"] == ("fail", None)
+    assert outcomes(report)["P3-AUDIT-SEEDED"] == ("fail", None)
+    assert outcomes(report)["P3-DETERMINISM"] == ("skip", None)
+
+
+def test_determinism_checks_prose_and_continues_all_five_uploads(
+    make_client: Callable[..., Any],
+) -> None:
+    fake = small_fake()
+    original = fake.read
+
+    def changing(path: str, subject: str) -> httpx.Response:
+        response = original(path, subject)
+        if response.status_code == 200 and "/audits/" in path:
+            data = response.json()
+            for finding in data["findings"]:
+                finding["recommendation"] = "Review finding from " + data["auditId"]
+            return httpx.Response(200, json=data)
+        return response
+
+    fake.read = changing  # type: ignore[method-assign]
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    repeats = [r for r in report.results if r.test_id.startswith("P3-DETERMINISM")]
+    assert len(repeats) == 4 and all(r.outcome == Outcome.FAIL for r in repeats)
+    assert len([a for a in fake.audits.values() if a.file_name == "seeded_issues.xlsx"]) == 5
+
+
+def test_failed_hash_request_earns_no_hash_coverage(make_client: Callable[..., Any]) -> None:
+    fake = small_fake()
+    original = fake.read
+
+    def missing_version(path: str, subject: str) -> httpx.Response:
+        response = original(path, subject)
+        if (
+            response.status_code == 200
+            and "/audits/" not in path
+            and response.json().get("fileName") == "seeded_issues.xlsx"
+        ):
+            return fake.project_error(404, "NOT_FOUND")
+        return response
+
+    fake.read = missing_version  # type: ignore[method-assign]
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-SOURCE-HASH"] == ("fail", None)
+    assert report.coverage.system.covered == 6  # AC-03 and unobserved AC-14 excluded
+
+
+def test_coverage_is_retrieved_once_inside_declared_test(make_client: Callable[..., Any]) -> None:
+    client, fake = make_client()
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-CODE-REPORT"] == ("pass", None)
+    assert len([r for r in fake.requests if r.url.path == "/test/report"]) == 1
+    assert report.coverage.code.covered == 40
+
+
+@pytest.mark.parametrize("status", [500, 503])
+def test_health_and_upload_faults_are_system_errors(
+    make_client: Callable[..., Any], status: int
+) -> None:
+    client, _ = make_client(
+        small_fake(status_overrides={"/api/v1/health": status, "/api/v1/workbooks": status})
+    )
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-HEALTH"] == ("error", "system")
+    assert outcomes(report)["P3-UPLOAD-CLEAN"] == ("error", "system")
+    assert outcomes(report)["P3-AUDIT-CLEAN"] == ("skip", None)
+    assert report.coverage.system.covered == 0
+
+
+def test_processing_failure_is_a_system_error_with_separate_failure_assertion(
+    make_client: Callable[..., Any],
+) -> None:
+    fake = small_fake()
+    original = fake.read
+
+    def failed(path: str, subject: str) -> httpx.Response:
+        response = original(path, subject)
+        if response.status_code == 200 and "/audits/" in path:
+            data = response.json()
+            data.update(
+                status="PROCESSING_FAILED",
+                completedAt="2026-10-14T16:00:03Z",
+                findings=[],
+                error=fake.project_error(500, "AUDIT_TIMEOUT").json(),
+            )
+            return httpx.Response(200, json=data)
+        return response
+
+    fake.read = failed  # type: ignore[method-assign]
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-AUDIT-CLEAN"] == ("error", "system")
+    assert outcomes(report)["P3-AUDIT-FAILURE-ENVELOPE"] == ("pass", None)
+    assert report.coverage.system.covered == 4  # AC-03/04/05/18 did not execute
+
+
+def test_tester_defect_aborts_and_retains_outcomes(
+    make_client: Callable[..., Any], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def broken(ctx: checks.SuiteContext) -> str:
+        raise RuntimeError("private diagnostic must not be returned")
+
+    monkeypatch.setitem(CHECKS, "upload_without_token", broken)
+    client, _ = make_client()
+    sid = setup_session(client)
+    run = client.post("/test/run", json={"session_id": sid}, headers=AUTH)
+    assert run.status_code == 500 and "private diagnostic" not in run.text
+    stored = client.get("/test/report", params={"session_id": sid}, headers=AUTH)
+    report = SuiteReport.model_validate_json(stored.content)
+    assert report.results[0].outcome == Outcome.PASS
+    assert (report.results[1].outcome, report.results[1].source) == (Outcome.ERROR, "tester")
+    assert all(r.outcome == Outcome.SKIP for r in report.results[2:])
+    assert client.post("/test/run", json={"session_id": sid}, headers=AUTH).status_code == 409
+
+
+def test_setup_saves_plan_and_run_ignores_later_manifest_changes(
+    make_client: Callable[..., Any], tmp_path: Path
+) -> None:
+    import shutil
+
+    shutil.copytree(MANIFEST.parent, tmp_path / "fixtures")
+    manifest = tmp_path / "fixtures" / "manifest.json"
+    client, _ = make_client(fixture_manifest_path=manifest)
+    sid = setup_session(client)
+    session = client.app.state.tester.store.get(sid)
+    assert session.plan is not None and session.setup == {}
+    manifest.write_text("{}", encoding="utf-8")
+    (manifest.parent / "expectations.json").unlink()
+    run = client.post("/test/run", json={"session_id": sid}, headers=AUTH)
+    assert run.status_code == 200
+    report = SuiteReport.model_validate_json(run.content)
+    assert len(report.results) == len(json.loads(session.plan)["manifest"]["tests"])
+
+
+def test_recovery_uses_saved_plan_without_any_fixture_files(tmp_path: Path) -> None:
+    suite = load_suite(MANIFEST, set(CHECKS))
+    saved = json.loads(snapshot_suite(suite, MANIFEST))
+    saved["fixture_root"] = str(tmp_path / "deleted")
+    store = Store(tmp_path / "tester.sqlite3")
+    store.create("crashed", "grader", BASE_URL, datetime.now(UTC), plan=json.dumps(saved))
+    store.finish_setup("crashed", True)
+    store.begin_run("crashed", "grader")
+    done = [TestResult(test_id="P3-HEALTH", outcome="pass", message="Health matched")]
+    store.save_progress(
+        "crashed", done, {"P3-AUTH-UPLOAD": {"components": ["C1"], "acceptance": ["AC-15"]}}
+    )
+    services = ServicesForTester(
+        settings=settings(tmp_path, fixture_manifest_path=tmp_path / "missing.json")
+    )
+    with TestClient(create_app(services=services)) as client:
+        result = client.get("/test/report", params={"session_id": "crashed"}, headers=AUTH)
+    report = SuiteReport.model_validate_json(result.content)
+    assert report.results[0] == done[0]
+    assert [r.test_id for r in report.results] == [t.test_id for t in suite.manifest.tests]
+    assert report.coverage.system.covered == 1 and report.coverage.component.covered == 1
+
+
+def test_legacy_running_session_is_closed_without_fabricating_plan(tmp_path: Path) -> None:
+    store = Store(tmp_path / "tester.sqlite3")
+    store.create("legacy", "grader", BASE_URL, datetime.now(UTC))
+    store.finish_setup("legacy", True)
+    store.begin_run("legacy", "grader")
+    recorded = TestResult(test_id="old-id", outcome="pass", message="Recorded before upgrade")
+    store.save_progress("legacy", [recorded])
+    with TestClient(create_app(settings(tmp_path))) as client:
+        report = SuiteReport.model_validate_json(
+            client.get("/test/report", params={"session_id": "legacy"}, headers=AUTH).content
+        )
+    assert report.results == [recorded] and report.coverage.system.covered is None
+    assert store.get("legacy").state == SessionState.ABORTED
+
+
+def test_setup_validates_suite_before_contacting_target(
+    make_client: Callable[..., Any], tmp_path: Path
+) -> None:
+    bad = tmp_path / "bad.json"
+    bad.write_text("{}", encoding="utf-8")
+    client, fake = make_client(fixture_manifest_path=bad)
+    response = client.post("/test/setup", json={"target_url": BASE_URL}, headers=AUTH)
+    assert response.status_code == 500 and response.json()["source"] == "tester"
+    assert fake.requests == []
+
+
+def test_late_dns_cannot_send_or_repeat_setup_after_timeout(
+    make_client: Callable[..., Any], tmp_path: Path
+) -> None:
+    import time
+
+    gate = threading.Event()
+    exited = threading.Event()
+    fake = small_fake()
+
+    def slow_resolver(*args: object, **kwargs: object) -> list[Any]:
+        gate.wait(2)
+        exited.set()
+        return address_resolver()(*args, **kwargs)
+
+    services = ServicesForTester(
+        settings=settings(tmp_path, tester_setup_timeout_seconds=0.05),
+        transport=fake.transport(),
+        resolver=slow_resolver,
+    )
+    with TestClient(create_app(services=services)) as client:
+        started = time.monotonic()
+        response = client.post("/test/setup", json={"target_url": BASE_URL}, headers=AUTH)
+        assert response.status_code == 500 and response.json()["source"] == "communication"
+        assert time.monotonic() - started < 0.7
+        gate.set()
+        assert exited.wait(1)
+    assert fake.requests == []
+    failed = Store(tmp_path / "tester.sqlite3").cleanup_candidates(BASE_URL, failed_only=True)
+    assert len(failed) == 1
+
+
+def test_encrypted_zip_is_real_and_password_required() -> None:
+    import io
+    import zipfile
+
+    from tester.suite.workbooks import ZIP_FIXTURE_PASSWORD, clean_workbook, hostile_workbooks
+
+    with (
+        zipfile.ZipFile(io.BytesIO(hostile_workbooks()["encrypted_zip.xlsx"])) as encrypted,
+        zipfile.ZipFile(io.BytesIO(clean_workbook())) as original,
+    ):
+        for info in encrypted.infolist():
+            assert info.flag_bits & 1
+            with pytest.raises(RuntimeError):
+                encrypted.read(info)
+            assert encrypted.read(info, pwd=ZIP_FIXTURE_PASSWORD) == original.read(info.filename)
+
+
+def test_integrity_error_is_not_a_successful_hash_check(make_client: Callable[..., Any]) -> None:
+    fake = small_fake()
+    original = fake.read
+
+    def corrupt(path: str, subject: str) -> httpx.Response:
+        response = original(path, subject)
+        if response.status_code == 200 and "/audits/" not in path:
+            return fake.project_error(500, "SOURCE_INTEGRITY_FAILED")
+        return response
+
+    fake.read = corrupt  # type: ignore[method-assign]
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-VERSION-VALID"] == ("error", "system")
+    assert outcomes(report)["P3-SOURCE-HASH"] == ("error", "system")
+    assert report.coverage.system.covered == 6
+
+
+def test_invalid_coverage_schema_is_fail_with_paired_nulls(make_client: Callable[..., Any]) -> None:
+    client, _ = make_client(
+        small_fake(code_coverage={"covered": 60, "total": 50, "basis": "Invalid"})
+    )
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-CODE-REPORT"] == ("fail", None)
+    assert report.coverage.code.covered is None and report.coverage.code.total is None
+
+
+def test_wrong_system_report_session_is_fail_with_paired_nulls(
+    make_client: Callable[..., Any],
+) -> None:
+    fake = small_fake()
+    original = fake.instructor
+
+    def wrong(request: httpx.Request, path: str) -> httpx.Response:
+        response = original(request, path)
+        if path == "/test/report" and response.status_code == 200:
+            return httpx.Response(200, json=response.json() | {"session_id": "other-session"})
+        return response
+
+    fake.instructor = wrong  # type: ignore[method-assign]
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-CODE-REPORT"] == ("fail", None)
+    assert report.coverage.code.covered is None
+
+
+def test_first_unknown_id_failure_does_not_omit_other_id_cases(
+    make_client: Callable[..., Any],
+) -> None:
+    fake = small_fake()
+    original = fake.handle
+
+    def incorrect(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/api/v1/workbooks/unknown-workbook/versions/unknown-version":
+            return httpx.Response(200, json={})
+        return original(request)
+
+    fake.handle = incorrect  # type: ignore[method-assign]
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-NOT-FOUND"] == ("fail", None)
+    for test_id in ("P3-VERSION-MISMATCH", "P3-AUDIT-MISMATCH", "P3-AUDIT-UNKNOWN"):
+        assert outcomes(report)[test_id] == ("pass", None)
+
+
+def test_target_specific_tokens_and_base_prefix(
+    make_client: Callable[..., Any], tmp_path: Path
+) -> None:
+
+    prefix = BASE_URL + "/system"
+    tokens = {identity: "second-target-" + identity for identity in TOKENS}
+    fake = small_fake()
+    fake.subjects = {token: identity for identity, token in tokens.items()}
+    seen: list[httpx.Request] = []
+
+    def prefixed(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        assert request.url.path.startswith("/system/")
+        forwarded = httpx.Request(
+            request.method,
+            str(request.url).replace("/system/", "/", 1),
+            headers=request.headers,
+            content=request.content,
+        )
+        return fake.handle(forwarded)
+
+    config = settings(
+        tmp_path,
+        allowed_target_urls=[BASE_URL, prefix],
+        TARGET_AUTH_MAP_JSON=access_map() | {prefix: tokens},
+    )
+    services = ServicesForTester(
+        settings=config,
+        transport=httpx.MockTransport(prefixed),
+        resolver=address_resolver(),
+        sleep=lambda seconds: None,
+    )
+    with TestClient(create_app(services=services)) as client:
+        setup = client.post("/test/setup", json={"target_url": prefix}, headers=AUTH)
+        assert setup.status_code == 201
+        sid = setup.json()["session_id"]
+        run = client.post("/test/run", json={"session_id": sid}, headers=AUTH)
+        assert run.status_code == 200
+        report = SuiteReport.model_validate_json(run.content)
+    assert not any(r.outcome in (Outcome.FAIL, Outcome.ERROR) for r in report.results)
+    assert seen[0].headers["authorization"] == "Bearer " + tokens["test-admin"]
+    assert all(not any(token in report.model_dump_json() for token in tokens.values()) for _ in [0])
+
+
+def test_compressed_target_responses_are_decoded_once(make_client: Callable[..., Any]) -> None:
+    import gzip
+
+    fake = small_fake()
+    original = fake.handle
+
+    def compressed(request: httpx.Request) -> httpx.Response:
+        response = original(request)
+        return httpx.Response(
+            response.status_code,
+            headers={"Content-Type": "application/json", "Content-Encoding": "gzip"},
+            content=gzip.compress(response.content),
+        )
+
+    fake.handle = compressed  # type: ignore[method-assign]
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert not any(r.outcome in (Outcome.FAIL, Outcome.ERROR) for r in report.results)
+
+
+@pytest.mark.parametrize("failed", [False, True])
+def test_operator_cli_recovers_lost_run_and_blocks_failures(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    failed: bool,
+) -> None:
+    from app.contracts.models import CoverageMeasure, SuiteCoverage
+    from scripts import run_suite as cli
+    from tester.target import TargetClient
+
+    manifest = SuiteManifest.model_validate_json(MANIFEST.read_bytes())
+    code = CoverageMeasure(
+        covered=None, total=None, basis="Unit-test response; no target measurement"
+    )
+    report = SuiteReport(
+        session_id="cli-session",
+        target_url=BASE_URL,
+        results=[
+            TestResult(
+                test_id=t.test_id,
+                outcome="fail" if failed and t.test_id == "P3-HEALTH" else "pass",
+                message="Controlled CLI test response",
+            )
+            for t in manifest.tests
+        ],
+        coverage=SuiteCoverage(code=code, component=code, system=code),
+    )
+    requests: list[httpx.Request] = []
+    polls = [0]
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        if request.url.path == "/test/setup":
+            return httpx.Response(201, json={"session_id": "cli-session"})
+        if request.url.path == "/test/run":
+            raise httpx.ReadTimeout("response lost", request=request)
+        polls[0] += 1
+        if polls[0] == 1:
+            return httpx.Response(409, json={"message": "Still running", "source": "tester"})
+        return httpx.Response(200, content=report.model_dump_json())
+
+    monkeypatch.setattr(
+        cli,
+        "TargetClient",
+        lambda base, access, environment, deadline: TargetClient(
+            base,
+            access,
+            environment,
+            deadline,
+            transport=httpx.MockTransport(handle),
+            resolver=address_resolver(),
+        ),
+    )
+    monkeypatch.setattr(cli, "REPORT_POLL_SECONDS", 0)
+    monkeypatch.setenv("TEAM9_TESTER_TOKEN", OPERATOR)
+    output, record = tmp_path / "report.json", tmp_path / "record.json"
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "run_suite",
+            "--tester-url",
+            "http://127.0.0.1:8001",
+            "--target-url",
+            BASE_URL,
+            "--manifest",
+            str(MANIFEST),
+            "--output",
+            str(output),
+            "--record",
+            str(record),
+        ],
+    )
+    assert cli.main() == (1 if failed else 0)
+    assert len([r for r in requests if r.url.path == "/test/run"]) == 1
+    assert len([r for r in requests if r.url.path == "/test/setup"]) == 1
+    assert len([r for r in requests if r.url.path == "/test/report"]) == 2
+    assert output.read_bytes() == report.model_dump_json().encode()
+    assert json.loads(record.read_bytes())["counts"]["fail"] == int(failed)
+    assert OPERATOR not in capsys.readouterr().out and OPERATOR not in record.read_text()
+
+
+def test_duplicate_upload_resource_ids_are_rejected(make_client: Callable[..., Any]) -> None:
+    fake = small_fake()
+    original = fake.upload
+
+    def duplicate(request: httpx.Request, subject: str) -> httpx.Response:
+        response = original(request, subject)
+        if response.status_code == 202:
+            data = response.json()
+            data["versionId"] = data["workbookId"]
+            return httpx.Response(202, json=data)
+        return response
+
+    fake.upload = duplicate  # type: ignore[method-assign]
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    assert outcomes(report)["P3-UPLOAD-CLEAN"] == ("fail", None)
+    assert outcomes(report)["P3-AUDIT-CLEAN"] == ("skip", None)
+
+
+@pytest.mark.parametrize("field", ["createdAt", "startedAt"])
+def test_wire_timestamps_require_utc_z(make_client: Callable[..., Any], field: str) -> None:
+    fake = small_fake()
+    original = fake.read
+
+    def offset(path: str, subject: str) -> httpx.Response:
+        response = original(path, subject)
+        if response.status_code == 200 and field in response.json():
+            data = response.json()
+            data[field] = data[field].replace("Z", "+00:00")
+            return httpx.Response(200, json=data)
+        return response
+
+    fake.read = offset  # type: ignore[method-assign]
+    client, _ = make_client(fake)
+    report = SuiteReport.model_validate_json(run_once(client).content)
+    test_id = "P3-VERSION-VALID" if field == "createdAt" else "P3-AUDIT-CLEAN"
+    assert outcomes(report)[test_id] == ("fail", None)
+
+
+def test_non_object_version_body_is_schema_failure() -> None:
+    from app.contracts.models import VersionResponse
+
+    with pytest.raises(checks.CheckFailed, match="VersionResponse"):
+        checks.parse(httpx.Response(200, json=[]), VersionResponse, "Version")
+
+
+def test_interrupted_setup_queues_compensation_without_repeating_post(tmp_path: Path) -> None:
+    store = Store(tmp_path / "tester.sqlite3")
+    store.create("lost-setup", "grader", BASE_URL, datetime.now(UTC))
+    fake = small_fake()
+    services = ServicesForTester(
+        settings=settings(tmp_path), transport=fake.transport(), resolver=address_resolver()
+    )
+    with TestClient(create_app(services=services)) as client:
+        assert fake.requests == []
+        assert store.get("lost-setup").state == SessionState.SETUP_FAILED
+        assert store.cleanup_candidates(BASE_URL, failed_only=True) == ["lost-setup"]
+        assert (
+            client.post("/test/run", json={"session_id": "lost-setup"}, headers=AUTH).status_code
+            == 409
+        )
+        setup_session(client)
+    assert len(fake.requests) == 1
+    body = json.loads(fake.requests[0].content)
+    assert body["session_id"] != "lost-setup"
+    assert body["setup"] == {"cleanup_session_ids": ["lost-setup"]}

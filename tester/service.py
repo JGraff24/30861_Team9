@@ -16,6 +16,8 @@ from app.contracts.models import (
     Identifier,
     RunRequest,
     SetupResponse,
+    SuiteCoverage,
+    SuiteReport,
     TestEndpointError,
     TesterSetupRequest,
     TestResult,
@@ -24,7 +26,13 @@ from tester.config import TargetAuth, TesterSettings
 from tester.errors import TesterError, bad_request
 from tester.store import ENDED, TesterSessionState, TesterStore
 from tester.suite.checks import CHECKS, SuiteContext
-from tester.suite.manifest import LoadedSuite, SuiteConfigurationError, load_suite
+from tester.suite.manifest import (
+    LoadedSuite,
+    SuiteConfigurationError,
+    load_suite,
+    restore_suite,
+    snapshot_suite,
+)
 from tester.suite.runner import (
     CODE_UNAVAILABLE,
     build_report,
@@ -77,18 +85,32 @@ class TesterService:
 
     def setup(self, request: TesterSetupRequest, operator: str) -> SetupResponse:
         access = self._access(request.target_url)
+        deadline = self._clock() + self.settings.tester_setup_timeout_seconds
+        try:
+            suite = self.load_suite()
+        except SuiteConfigurationError:
+            raise TesterError(
+                500, "Tester suite configuration is unavailable.", ErrorSource.TESTER
+            ) from None
         session_id = str(uuid.uuid4())
-        self.store.create(session_id, operator, request.target_url, datetime.now(UTC))
+        # Failed preparations always receive deferred compensation. Optional cleanup of
+        # successfully retrieved namespaces remains an explicit operator setting.
+        cleanup = self.store.cleanup_candidates(
+            request.target_url, failed_only=not self.settings.tester_cleanup_prior_sessions
+        )
+        setup: dict[str, object] = {"cleanup_session_ids": cleanup} if cleanup else {}
+        self.store.create(
+            session_id,
+            operator,
+            request.target_url,
+            datetime.now(UTC),
+            plan=snapshot_suite(suite, self.settings.fixture_manifest_path),
+            setup=setup,
+        )
         ready = False
         try:
-            cleanup = (
-                self.store.cleanup_candidates(request.target_url)
-                if self.settings.tester_cleanup_prior_sessions
-                else []
-            )
-            setup = {"cleanup_session_ids": cleanup} if cleanup else {}
             with self._client(
-                request.target_url, access, self.settings.tester_setup_timeout_seconds
+                request.target_url, access, max(0, deadline - self._clock())
             ) as client:
                 try:
                     response = client.request(
@@ -121,10 +143,10 @@ class TesterService:
         except TesterError:
             raise
         except Exception:
-            logger.exception("Tester setup failed internally")
+            logger.error("Tester setup failed internally")
             raise TesterError(500, "Tester setup failed internally.", ErrorSource.TESTER) from None
         finally:
-            # A failed setup is never runnable; it is queued for opt-in namespace cleanup.
+            # A failed setup is never runnable; compensate through the next new setup.
             self.store.finish_setup(session_id, ready)
 
     def run(self, request: RunRequest, operator: str) -> bytes:
@@ -134,7 +156,13 @@ class TesterService:
                 409, "Session is not ready; each session runs once.", ErrorSource.TESTER
             )
         try:
-            suite = self.load_suite()
+            if session.plan is None:
+                raise SuiteConfigurationError(
+                    "legacy session has no stored plan; create a new session"
+                )
+            suite = restore_suite(session.plan)
+            if {test.check for test in suite.manifest.tests} - set(CHECKS):
+                raise SuiteConfigurationError("stored plan uses checks unavailable in this release")
             access = self._access(session.target_url)
         except (SuiteConfigurationError, TesterError) as exc:
             logger.error("Run refused before consuming session: %s", exc)
@@ -145,11 +173,14 @@ class TesterService:
             ) from None
         self.store.begin_run(request.session_id, operator)
         results_so_far: list[TestResult] = []
+        markers_so_far: dict[str, dict[str, list[str]]] = {}
 
-        def progress(results: list[TestResult]) -> None:
+        def progress(results: list[TestResult], markers: dict[str, dict[str, list[str]]]) -> None:
             results_so_far[:] = results
-            self.store.save_progress(request.session_id, results)
+            markers_so_far.update(markers)
+            self.store.save_progress(request.session_id, results, markers)
 
+        ctx: SuiteContext | None = None
         try:
             with self._client(
                 session.target_url, access, self.settings.tester_run_timeout_seconds
@@ -161,7 +192,9 @@ class TesterService:
                 outcome = run_suite(ctx, session.target_url, progress)
             report, aborted, message = outcome.report, outcome.aborted, outcome.abort_message
         except Exception:
-            logger.exception("Tester aborted the suite")
+            logger.error("Tester aborted the suite")
+            if ctx is not None:
+                markers_so_far.update(ctx.markers)
             results = interrupted_results(
                 suite, results_so_far, "The tester failed internally during this test."
             )
@@ -170,7 +203,9 @@ class TesterService:
                 total=None,
                 basis=CODE_UNAVAILABLE.format(reason="tester aborted before retrieval"),
             )
-            report = build_report(suite, request.session_id, session.target_url, results, code)
+            report = build_report(
+                suite, request.session_id, session.target_url, results, code, markers_so_far
+            )
             aborted, message = True, "Tester aborted the suite after an internal failure."
         body = report.model_dump_json().encode("utf-8")
         # Store first: a lost response is recovered from GET /test/report.
@@ -194,13 +229,9 @@ class TesterService:
         """Close runs a previous tester process left RUNNING, keeping completed outcomes."""
         if not self.store.exists():
             return
+        self.store.recover_preparing()
         running = self.store.running_sessions()
         if not running:
-            return
-        try:
-            suite = self.load_suite()
-        except SuiteConfigurationError:
-            logger.error("Cannot rebuild interrupted reports: suite configuration unavailable")
             return
         code = CoverageMeasure(
             covered=None,
@@ -208,10 +239,31 @@ class TesterService:
             basis=CODE_UNAVAILABLE.format(reason="tester process stopped during the suite"),
         )
         for session in running:
-            results = interrupted_results(
-                suite, session.results, "The tester process stopped during this test."
-            )
-            report = build_report(suite, session.session_id, session.target_url, results, code)
+            if session.plan is None:
+                # Pre-snapshot releases cannot reconstruct unknown unexecuted tests.
+                # Retain their recorded outcomes and disclose that limitation explicitly.
+                unknown = CoverageMeasure(
+                    covered=None,
+                    total=None,
+                    basis=(
+                        "Legacy session has no saved plan/markers; "
+                        "completeness cannot be reconstructed."
+                    ),
+                )
+                report = SuiteReport(
+                    session_id=session.session_id,
+                    target_url=session.target_url,
+                    results=session.results,
+                    coverage=SuiteCoverage(code=code, component=unknown, system=unknown),
+                )
+            else:
+                suite = restore_suite(session.plan, read_fixtures=False)
+                results = interrupted_results(
+                    suite, session.results, "The tester process stopped during this test."
+                )
+                report = build_report(
+                    suite, session.session_id, session.target_url, results, code, session.markers
+                )
             self.store.finish_run(
                 session.session_id, report.model_dump_json().encode("utf-8"), aborted=True
             )

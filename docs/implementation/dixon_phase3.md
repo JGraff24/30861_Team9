@@ -1,384 +1,306 @@
-# Dixon Phase 3 implementation: independent tester, suite, fixtures, CI
+# Dixon Phase 3 implementation
 
-Recorded 2026-10-14 (America/Indianapolis) on branch `phase3/dixon`, cut from the merged
-foundation `ffa6947` (merge of PR #1), and published as draft PR #2. Built with Claude Code
-against Dixon's Phase 3 handoff and the shared contract. See
-[../evidence/dixon_phase3.md](../evidence/dixon_phase3.md) for the run log.
+Updated 2026-10-14 on `phase3/dixon`, based on foundation `ffa6947`. The current working-tree
+changes extend the original Dixon implementation at `9a76499`; they have not been committed,
+pushed, merged or deployed by this Codex session. Historical Claude Code evidence remains in
+[the evidence log](../evidence/dixon_phase3.md). The final requirement audit is
+[dixon_handoff_verification.md](../evidence/dixon_handoff_verification.md).
 
 ## Delivered boundary
 
-**Implemented (local, verified):**
+The independent tester implements authenticated `POST /test/setup`, `POST /test/run` and
+`GET /test/report`. It calls only explicitly approved system URLs through HTTP, using private
+per-target credentials. It imports shared DTOs/settings, never the target engine or storage.
+A wheel includes its fixture manifest, independent expectations and thirteen synthetic files.
+A wheel loaded outside the checkout was verified to expose all three routes and load all 51
+planned cases without importing `tests/support/` or contacting a target.
 
-- Instructor tester endpoints `POST /test/setup`, `POST /test/run` and `GET /test/report`, with
-  `{message, source}` errors, operator bearer authentication and per-operator session ownership.
-- Single-use sessions: atomic `READY -> RUNNING` consumption. Repeat, concurrent and post-abort
-  runs get 409. A setup failure leaves no runnable session.
-- Immutable report storage in a separate SQLite database. The report is stored before the
-  response is sent, and `GET /test/report` returns byte-identical JSON.
-- Abort handling: completed outcomes are kept, the interrupted test is error/`tester`, and the
-  rest skip. A run left `RUNNING` by a crashed process is closed the same way at next startup.
-- A target HTTP client with an exact allowlist, a per-target access map, preserved base
-  prefixes, no redirects, `trust_env=False`, TLS verification and a DNS pre-check that rejects
-  metadata, link-local, unspecified, multicast and reserved addresses (plus loopback/private in
-  production). It has per-call and whole-suite deadlines, retries only GETs (at most 3) and never
-  retries POSTs.
-- A 30-test ordered Phase 3 suite (`tests/fixtures/manifest.json`, handoff-style IDs) covering
-  every delivered core operation's success and error paths, with component (C1-C6) and system
-  (eight AC portions) coverage. Target code coverage is copied from the system report, or
-  reported as paired nulls with a reason.
-- A **14-operation status artifact** and **sanitized run records** (`tester/suite/records.py`,
-  written by `scripts/run_suite.py --record`).
-- Three labeled synthetic fixtures with hand-authored expectations, plus runtime-generated
-  boundary inputs: 25,000,000 / 25,000,001 bytes, 50 / 51 worksheets, 250,000 / 250,001
-  nonempty cells, and a password-protected structure.
-- The tester's own `findingId` oracle, checked against the contract golden vector.
-- Contract tests against the committed catalog, live acceptance tests, an operator CLI, a live
-  self-check, and CI (push/PR checks plus an opt-in live-suite job).
+Sessions, setup payloads, frozen suite definitions, progress markers and immutable final report
+bytes are stored in a separate SQLite database. One tester API worker must own each store;
+startup recovery is intended for a stopped previous process, not overlapping deployments.
+The service runs suites in a server worker thread, so disconnecting the caller does not cancel
+the suite. The local live acceptance check actually exercised lost-response recovery.
 
-**Not implemented / not claimed:**
+The deployed suite contains 51 fixed cases. Unknown/mismatched IDs and audits two through five
+each have separate IDs and outcomes; an evaluable failure does not suppress later cases.
+`P3-AUDIT-FAILURE-ENVELOPE` skips unless a target audit actually reports `PROCESSING_FAILED`.
+A healthy fake produces 50 passes, one skip, component coverage 6/6 and partial system coverage
+7/8. The fake's code coverage 40/50 is a constant test value, never a real target measurement.
 
-- No run against the Team 9 system. Its business and test endpoints don't exist yet (Jackson,
-  Dylan and Ryan). Every full-suite result so far is against the **test-only fake target** in
-  `tests/support/`.
-- No AWS deployment, HTTPS endpoint, registry URL or cross-team run with Team 12. The live CI job
-  has never run because no tester is deployed.
-- Branch protection is not configured.
-- Team 12 shared fixtures have not been delivered. There has been no two-person manual
-  expectation review and no Excel repair-warning check of the synthetic files.
-- Message/recommendation prose is checked for presence (1-500 characters), not meaning;
-  reviewing meaning is a human task.
-- Tester UI checks and the live UI integration checks are pending Ryan's UI.
+The real Team 9 system API/engine/worker/UI/test interface are not integrated on this branch.
+There is no AWS deployment, HTTPS evidence, live CI run or Team 12 cross-test from this session.
+Shared fixtures, two-member oracle review, Excel repair-warning checks, meaningful-prose review,
+and the five real-world workbook/precision experiment require human or pod inputs. These are
+pending, not fabricated. Remediation, history, downloads, scheduling and deletion are future
+system operations; the tester lists their status without calling them as delivered features.
 
-## File and module map
+## Files and interfaces
 
-| Path | Purpose |
+| Files | Actual role |
 |---|---|
-| `tester/main.py` | App factory, routes, bearer security, OpenAPI cleanup (no unused 422), crash recovery on startup |
-| `tester/service.py` | Setup, run and report lifecycle; forwards system setup errors; opt-in prior-namespace cleanup |
-| `tester/store.py` | SQLite session/report store (WAL, `BEGIN IMMEDIATE`); created lazily on first use |
-| `tester/target.py` | `TargetClient`, the only network path to a target; address policy, deadlines, retries |
-| `tester/auth.py` | Operator token SHA256 lookup with constant-time comparison |
-| `tester/errors.py` | `TesterError` and handlers: 400 for invalid requests, 500 `tester` for unexpected failures |
-| `tester/config.py` | Existing settings plus `TESTER_CLEANUP_PRIOR_SESSIONS` (default false) |
-| `tester/suite/checks.py` | 30 black-box checks and their outcome signals |
-| `tester/suite/runner.py` | Ordered execution, outcome mapping, coverage, aborted-report building |
-| `tester/suite/manifest.py` | Manifest (tests, catalogs, 14 operations, pending confirmations) and expectations models; fixture SHA256 checks |
-| `tester/suite/records.py` | Operation-status artifact and sanitized run record built from a stored report |
-| `tester/suite/identity.py` | Independent `findingId` implementation |
-| `tester/suite/workbooks.py` | Deterministic OOXML builder: synthetic fixtures, byte/sheet/cell boundaries, protected structure |
-| `tests/fixtures/manifest.json`, `expectations.json`, `synthetic/*.xlsx`, `README.md`, `.gitattributes` | Suite plan, catalogs, fixtures, inventory and review status |
-| `tests/unit/test_tester.py` | 46 tester unit tests against the injected fake transport |
-| `tests/contract/test_tester_contract.py` | 6 tests validating tester responses against `docs/contracts/tester.openapi.json` |
-| `tests/acceptance/test_live_tester.py` | Live black-box checks of a running tester; skipped unless configured |
-| `tests/support/fake_system.py`, `fake_target_app.py` | **Test-only** contract-following fake target (MockTransport and ASGI) |
-| `scripts/run_suite.py` | Operator CLI: setup, one run, report polling after a lost response, `--output` report, `--record` run record |
-| `scripts/tester_selfcheck.py` | Starts the real tester and the fake target as processes and runs the CLI and acceptance tests |
-| `scripts/make_synthetic_fixtures.py` | Writes or `--check`s committed fixture bytes |
-| `.github/workflows/ci.yml` | Ubuntu + Windows checks, dependency audit, opt-in `live-suite` job |
+| `tester/main.py`, `auth.py`, `errors.py` | Factory/routes, operator bearer hash lookup, ownership, instructor errors and OpenAPI |
+| `tester/service.py`, `store.py` | Setup/run/report lifecycle, SQLite transactions, saved plans and recovery |
+| `tester/config.py`, `target.py` | Exact approved base URLs, private target tokens, address policy, bounded HTTP calls |
+| `tester/suite/manifest.py` | Typed plan/catalogs, prerequisites/parameters, independent fixture hashes, snapshot/restore |
+| `tester/suite/checks.py`, `identity.py` | HTTP assertions and the tester's independent finding-ID oracle |
+| `tester/suite/workbooks.py` | Explicit OOXML fixtures, limits, hostile packages and encrypted ZIP generator |
+| `tester/suite/runner.py`, `records.py` | Ordered results, actual assertion markers, reports and all-operation/AC evidence |
+| `tests/fixtures/manifest.json`, `expectations.json` | Stable cases, six components/eight ACs, fourteen operations, independent expectations |
+| `tests/unit/test_tester.py`, `test_tester_deadlines.py` | Controlled transports, fault responses, persistence/concurrency/recovery, actual streaming sockets |
+| `tests/contract/`, `tests/acceptance/` | DTO/OpenAPI conformance and opt-in deployed lifecycle/lost-response checks |
+| `tests/support/` | Explicit test-only fake target; not part of the deployed system |
+| `scripts/run_suite.py`, `tester_selfcheck.py` | Operator workflow, lost-response polling, sanitized artifacts, local process verification |
+| `.github/workflows/ci.yml` | Ubuntu/Windows checks, dependency audit, opt-in live suite |
 
-### Shared files changed (Jackson to review)
+Exposed bodies are the instructor shapes: setup `{target_url}` → 201 `{session_id}`;
+run `{session_id}` → 200 complete `SuiteReport`, or 500 `{message, source: tester}` on abort;
+report query `session_id` → 200 exactly the stored JSON bytes. Invalid input is 400, invalid
+operator credentials 401, foreign ownership 403, unknown sessions 404, and unready/consumed
+sessions 409. Graders have no required fixture/auth/catalog/setup fields beyond the handoff.
 
-| File | Change | Why |
-|---|---|---|
-| `tests/unit/test_foundation.py` | Windows loopback socketpair allowance in the no-network guard; the tester now asserts its three routes and 401 instead of empty paths/404 | Failed on Windows before any feature work; the tester now has routes |
-| `tests/contract/test_schemas.py` | UTF-8 reads; per-service implemented path sets | Profile hash failed on Windows (cp1252); the tester now has routes |
-| `scripts/export_schemas.py` | Per-catalog status string; keeps route-level `components` (security schemes) | The tester catalog now documents real routes and bearer security |
-| `scripts/smoke_foundation.py` | Per-service expected paths/statuses | Same |
-| `.env.example` | `TESTER_CLEANUP_PRIOR_SESSIONS=false` | New tester setting |
-| `docs/contracts/tester.openapi.json` | Regenerated | Real tester paths |
-
-`docs/contracts/phase3.md` line 7 still says both catalogs have empty paths. That's Jackson's
-file, so it was left unchanged. Suggested wording: "tester.openapi.json lists the implemented
-instructor tester endpoints; system.openapi.json paths remain empty until system routes exist."
-README tester commands are also left to Jackson; suggested commands are under
-[Commands](#commands).
-
-## Interfaces
-
-**Exposed (HTTP, separate process, default port 8001):** `POST /test/setup {target_url}` →
-201 `{session_id}`; `POST /test/run {session_id}` → 200 `SuiteReport` or 500 `{message,
-source:"tester"}`; `GET /test/report?session_id=` → 200 stored report. Errors: 400 invalid, 401
-credential, 403 other operator's session, 404 unknown, 409 not ready / already used / not
-ended, 500 failure. The authoritative shapes are in `docs/contracts/tester.openapi.json`.
-
-**Consumed (target system over HTTP only):** `POST {target}/test/setup` and
-`GET {target}/test/report` with the test-admin token. Project calls `/api/v1/health`,
-`/api/v1/workbooks`, `/versions/{id}` and `/audits/{id}` use the userA/userB tokens (or none,
-for the 401 tests) plus `X-Test-Session`. The tester never imports system modules or reads
-system storage; it imports only shared DTOs from `app/contracts/models.py` and settings types
-from `app/config.py` (no `app.audit`, `app.storage` or `app.workbooks`).
+Consumed endpoints are target `/test/setup` and `/test/report` with the test-admin credential,
+and the four Phase 3 project operations `/api/v1/health`, `/api/v1/workbooks`, version and audit
+GETs. Project calls carry `X-Test-Session` and the appropriate user token, or no token for
+negative authentication cases. URLs preserve base prefixes; TLS verification remains enabled;
+redirects and environment proxies are disabled. Operator/target tokens are not stored in the
+session plan or reports. Configuration uses secret fields and private environment maps.
 
 ## State and invariants
 
 ```mermaid
 stateDiagram-v2
-  [*] --> PREPARING: POST /test/setup (UUID created)
-  PREPARING --> READY: system 201 with the same session_id
-  PREPARING --> SETUP_FAILED: forwarded error / communication / tester failure
-  READY --> RUNNING: POST /test/run (atomic, exactly once)
-  RUNNING --> COMPLETE: report stored, then 200
-  RUNNING --> ABORTED: deadline or tester failure (report stored, then 500)
-  RUNNING --> ABORTED: process restart recovery
-  SETUP_FAILED --> [*]
-  COMPLETE --> [*]
-  ABORTED --> [*]
+  [*] --> PREPARING: UUID and frozen plan/setup stored
+  PREPARING --> READY: target returns 201 with same ID
+  PREPARING --> SETUP_FAILED: target/communication/tester failure
+  READY --> RUNNING: atomic one-time claim
+  RUNNING --> COMPLETE: immutable report stored before 200
+  RUNNING --> ABORTED: outcomes retained, interrupted error, remaining skips
+  RUNNING --> ABORTED: startup recovery from saved plan
+  COMPLETE --> COMPLETE: report reads only
+  ABORTED --> ABORTED: report reads only
 ```
 
-- A report is written exactly once (`report IS NULL` guard) and returned as stored bytes.
-- `begin_run` checks ownership and state, then transitions, in one `BEGIN IMMEDIATE` transaction.
-- Results are saved after every test, so crash recovery keeps completed outcomes.
-- The suite is validated (manifest, expectations, fixture SHA256, target access) **before** the
-  session is consumed, so a configuration error leaves it `READY`.
-- The run executes in a server worker thread, not tied to the client connection. A dropped
-  client doesn't cancel it, and the report is still stored for `GET /test/report`. (By design;
-  not covered by an automated disconnect test.)
-- Coverage: a component/AC counts only when a test declaring it reached pass or fail (its
-  qualifying assertion executed). Error and skip results earn nothing. Target code coverage is
-  paired nulls with a reason whenever it can't be retrieved and validated, and earlier outcomes
-  are kept.
-- Tokens exist only in `TargetAuth` (`SecretStr`) and Authorization headers. They never appear
-  in reports, run records, error bodies, exception messages or logs (asserted by tests).
+`BEGIN IMMEDIATE` protects state changes. The final update requires `RUNNING` and a null report;
+concurrent, repeated and post-abort runs are rejected. Reports survive target cleanup and never
+rerun the suite. Progress stores results and executed markers after each test. Recovery uses
+saved test IDs rather than current-manifest positions and reads no fixture files or target URLs.
 
-## Models
+The saved plan contains the manifest, expectations and fixture-root path, not file contents or
+credentials. Before a run is consumed, saved fixtures must still match their original hashes
+and all saved checks must exist. A missing/tampered fixture leaves the session READY with 500.
+Changing the live manifest/expectations after setup cannot alter that session's planned suite.
+Interrupted PREPARING sessions become SETUP_FAILED with compensation queued, without
+replaying setup. Old databases receive additive columns. Legacy RUNNING sessions without a saved plan become
+ABORTED with retained recorded outcomes and honest null completeness; unknowable remaining
+tests are not invented. Legacy READY sessions need a new setup because no plan was retained.
+
+Failed target preparation always queues compensating `cleanup_session_ids` for the next **new**
+setup. The setup POST that timed out is never repeated. The request uses the same target-specific
+admin identity, and a failed cleanup remains pending. An operator may additionally enable
+cleanup of successfully retrieved namespaces. No ordinary-user deletion route is introduced.
+If no later setup occurs, failed namespaces remain pending for operator/pod cleanup; this is
+explicit deferred compensation through the contract's available mechanism.
 
 ```mermaid
 flowchart TD
-  Operator["Grader/operator"] -->|Bearer operator token| API["tester/main.py routes"]
-  API --> Auth["tester/auth.py"]
-  API --> Service["tester/service.py TesterService"]
-  Service --> Store["tester/store.py SQLite (TESTER_DB_PATH)"]
-  Service --> Suite["tester/suite/manifest.py load_suite"]
-  Suite --> Files["tests/fixtures manifest, expectations, synthetic/*.xlsx"]
-  Service --> Runner["tester/suite/runner.py"]
-  Runner --> Checks["tester/suite/checks.py"]
-  Checks --> Identity["tester/suite/identity.py"]
-  Checks --> Builder["tester/suite/workbooks.py boundary files"]
-  Checks --> Client["tester/target.py TargetClient"]
-  Service --> Client
-  Client -->|HTTP only| Target["Target system base URL (allowlisted)"]
-  CLI["scripts/run_suite.py"] -->|HTTP| API
-  CLI --> Records["tester/suite/records.py run record + operation status"]
+  API[tester routes and operator auth] --> Service[TesterService]
+  Service --> Store[SQLite sessions, plan, setup, progress, report]
+  Service --> Plan[Saved manifest and independent expectations]
+  Plan --> Runner[Fixed ordered suite]
+  Runner --> Checks[HTTP assertions and independent identity oracle]
+  Checks --> HTTP[Bounded TargetClient]
+  HTTP --> Target[Approved target system]
+  Checks --> Markers[Executed qualifying assertions]
+  Target --> Code[Declared coverage report test]
+  Markers --> Report[Immutable SuiteReport]
+  Code --> Report
+  Report --> Store
+  CLI[Operator CLI] --> API
+  CLI --> Evidence[Run record, 14 operations and partial AC status]
 ```
 
 ```mermaid
 sequenceDiagram
   participant Operator
   participant Tester
+  participant Store
   participant Target
-  Operator->>Tester: POST /test/setup {target_url}
-  Tester->>Target: POST /test/setup {session_id, setup:{}} (test-admin)
-  Target-->>Tester: 201 {session_id}
-  Tester-->>Operator: 201 {session_id}
-  Operator->>Tester: POST /test/run {session_id}
-  loop 30 planned tests in manifest order
-    Tester->>Target: project calls (userA/userB/none + X-Test-Session), audit polling
-    Tester->>Tester: save progress
+  Operator->>Tester: setup with approved target_url
+  Tester->>Store: save UUID, setup and frozen plan
+  Tester->>Target: setup once with admin token
+  Target-->>Tester: 201 same ID
+  Tester->>Store: READY
+  Operator->>Tester: run once
+  Tester->>Store: atomically claim RUNNING
+  loop 51 planned cases
+    Tester->>Target: bounded request/assertion when prerequisites exist
+    Tester->>Store: results and executed markers
   end
-  Tester->>Target: GET /test/report (code coverage)
-  Tester->>Tester: store final report bytes
-  Tester-->>Operator: 200 same bytes
-  Operator->>Tester: GET /test/report (recovery)
-  Tester-->>Operator: 200 same bytes
+  Note over Tester,Target: Coverage GET occurs inside P3-CODE-REPORT, once
+  Tester->>Store: save immutable report and terminal state
+  Tester-->>Operator: report or tester abort error
+  Operator->>Tester: report GET after a lost response
+  Tester-->>Operator: stored bytes; no rerun
 ```
 
-## Suite and traceability
+## Timing and execution evidence
 
-Operations: 1 health, 2 upload, 4 version, 5 audit. "S" means the test checks the success
-path, "E" the error path.
+System setup calls have a 30-second total request budget, tester setup 45 seconds, uploads
+35 seconds, ordinary GETs 10 seconds, audit polling 75 seconds, and suites 600 seconds. GET
+transport retries share a call's total budget, with at most three retries; POSTs are never
+retried. A bounded daemon owns DNS/socket work while the suite caller waits against an absolute
+wall deadline. Deadlines are also checked before sending, while reading/evaluating responses,
+and between tests. Poll requests use the remaining polling budget. Responses are bounded to
+2 MiB and decompressed exactly once. Larger target responses are reported as unavailable;
+this defensive tester limit is a disclosed implementation default, not pod approval.
 
-| Test ID | Check | Op (path) | Components | ACs |
-|---|---|---|---|---|
-| P3-HEALTH | 200 + `HealthResponse`, apiVersion, ruleset | 1 (S) | none | none |
-| P3-AUTH-UPLOAD | No token → 401, strict envelope (no IDs) | 2 (E) | C1 | AC-15 |
-| P3-AUTH-UPLOAD-INVALID | Unknown token → 401 | 2 (E) | C1 | AC-15 |
-| P3-INPUT-MISSING-FILE | No `file` field → 400 | 2 (E) | C2 | AC-02 |
-| P3-INPUT-CSV / -XLS | CSV and .xls → 415 | 2 (E) | C2 | AC-02 |
-| P3-INPUT-XLSM | Named .xlsm → 422 `MACRO_ENABLED_WORKBOOK_UNSUPPORTED` | 2 (E) | C2 | AC-02 |
-| P3-INPUT-CORRUPT | Corrupt .xlsx → 422, no IDs | 2 (E) | C2 | AC-02, AC-14 |
-| P3-INPUT-PROTECTED | Password-protected structure → 422 | 2 (E) | C2 | AC-02 |
-| P3-INPUT-BYTES-OVER / -AT | 25,000,001 bytes → 413; exactly 25,000,000 → 202 | 2 (E / S) | C2 | AC-02 / AC-01 |
-| P3-INPUT-SHEETS-OVER / -AT | 51 worksheets → 422; exactly 50 → 202 | 2 (E / S) | C2 | AC-02 / AC-01 |
-| P3-INPUT-CELLS-OVER / -AT | 250,001 nonempty cells → 422; exactly 250,000 → 202 | 2 (E / S) | C2 | AC-02 / AC-01 |
-| P3-UPLOAD-CLEAN / -SEEDED | Fixtures accepted with three IDs | 2 (S) | C2, C3 | AC-01 |
-| P3-VERSION-VALID | IDs, fileName, SHA256 equals the tester's own hash | 4 (S) | C3 | AC-01 |
-| P3-VERSION-UNAUTHENTICATED | No token → 401 | 4 (E) | C1 | AC-15 |
-| P3-AUDIT-CLEAN | Terminal `AUDIT_COMPLETE`, no findings | 5 (S) | C4, C5 | AC-04 |
-| P3-AUDIT-SEEDED | Exactly six expected findings: ID, rule, category, worksheet, target, class, order | 5 (S) | C4, C5 | AC-04, AC-05 |
-| P3-SOURCE-HASH | SHA256 unchanged after the audit; version reflects it | 4 (S) | C3 | AC-03 |
-| P3-VERSION-FOREIGN | User B → 403 on user A's version | 4 (E) | C1 | AC-15 |
-| P3-AUDIT-UNAUTHENTICATED | No token → 401 | 5 (E) | C1 | AC-15 |
-| P3-AUDIT-FOREIGN | User B → 403 on user A's audit | 5 (E) | C1 | AC-15 |
-| P3-NOT-FOUND | Unknown / mismatched version and audit IDs → 404 | 4, 5 (E) | C3, C5 | none |
-| P3-DETERMINISM | Five separate uploads of identical bytes → identical findings | 2, 5 (S) | C4 | AC-18 |
-| P3-SESSION-UNKNOWN | Unknown `X-Test-Session` → 400 | — | C6 | none |
-| P3-SESSION-DUPLICATE | Duplicate system setup → 409 | — | C6 | none |
-| P3-CODE-REPORT | System report: counts/basis or paired nulls | — | C6 | none |
+Python cannot forcibly terminate a blocked DNS/native socket thread. A late worker checks the
+expired deadline before sending after DNS and closes its own connection when it can resume;
+it cannot change the session, results or report. A timed-out POST can have an uncertain target
+outcome. Normal bounded SQLite persistence/finalization follows the stop so the report is
+recoverable; a failed disk or process crash cannot be promised a successful response. Network
+calls have no unbounded response waits. Use egress restrictions against the documented DNS
+rebind gap between address validation and HTTPX's connection lookup.
 
-**Oracle rationale:** the expected findings, targets, classifications and rejections in
-`tests/fixtures/expectations.json` were written by hand from the object definitions in
-`tester/suite/workbooks.py` and the audit policy. Expected `findingId`s come from the tester's own
-hash implementation; nothing is derived from the system's engine.
+Use client/proxy read timeouts of at least 630 seconds. After a lost run response, poll report
+GET at one second with a deadline; never repeat run/upload/setup POSTs. A fresh session is needed
+for a new suite. The CLI writes evidence before returning nonzero for fail/error outcomes;
+expected observation skips alone do not fail CI. A report/manifest mismatch refuses to fabricate
+operation or AC evidence; supply the matching tester plan version.
 
-**Where failure paths are covered:** every error path the contract defines for operations
-1/2/4/5 that a black-box client can trigger is in the suite above. Health 503, upload 500
-(storage/init failure), audit `PROCESSING_FAILED` and `SOURCE_INTEGRITY_FAILED` can't be forced
-on a healthy target without an agreed protected mechanism. They belong to the owners'
-dependency-injected unit tests: health/storage faults (Jackson), engine failures (Dylan) and
-runner timeouts (Ryan). Tester-behavior tests (setup errors, single use, concurrency, recovery,
-abort, timeouts, URL/access controls, coverage available/unavailable) are in
-`tests/unit/test_tester.py`, `tests/contract/test_tester_contract.py` and `tests/acceptance/`.
+## Suite, oracles and traceability
 
-**Operation catalog:** all 14 operations in `manifest.json` (name, method, path, related REQ IDs)
-are copied from Phase 2 specification Q5.1. Operations 1, 2, 4 and 5 are Phase 3 scope; 3 and 6-14
-are future phases. Phase 2's common status codes and Operation 2 define 422 for password-protected
-workbooks and for exceeding a documented processing limit, which the protected, worksheet and
-cell tests assert.
+The complete authoritative rows, prerequisites, qualifying assertions, parameters, operation
+numbers and AC/REQ mappings are in `tests/fixtures/manifest.json`. Business REQ mappings remain
+the original Phase 2 operation catalog. All fourteen operation rows are emitted; future rows
+are unimplemented/untested. Operation conformance is scoped to the listed evidence, with
+missing/error/skip cases remaining incomplete or untested, never silently yes.
 
-**Operation status and run records:** `scripts/run_suite.py --record FILE` writes a JSON record
-with these fields:
-- `recorded_at`, the tester and target URLs, `target_revision` (operator-supplied; `unknown` by
-  default and never inferred), `session_id` and `report_sha256`;
-- counts for run/pass/fail/error/skip and `not_passed`, each entry with
-  `classification: "unclassified"` for the operator to set to system/test/specification;
-- coverage and `pending_confirmation`;
-- `operation_status`, with one row for each of the 14 operations:
-  - `implemented`: "observed responding", "not observed" or "not delivered in Phase 3";
-  - `success_conformance` and `error_conformance`: yes, no, incomplete or untested;
-  - the evidence test IDs.
+| Cases | Independent assertions | Trace |
+|---|---|---|
+| Health and auth | Health schema/ruleset; absent/invalid token rejection | Op 1/2; C1; AC-15 |
+| Clean/seeded uploads and audits | IDs/status schemas; exact rule/category/location/classification/finding ID/order | Op 2/5; C2-C5; AC-01/04/05 |
+| Version/source hash | Actual response IDs/fileName; tester's fixture byte hash before/after audit; latest audit/status | Op 4; C3; AC-01/03 |
+| Missing/corrupt/CSV/xls/xlsm/protected/bounds | Expected statuses and strict error envelopes; at/over byte/sheet/cell limits | Op 2; C2; AC-01/02 |
+| ZIP/XML/macros/encrypted ZIP | Traversal, duplicate paths, DTD/entity declaration, macro parts in xlsx, genuine encrypted ZIP rejected | Op 2; C2; AC-02 |
+| Unicode/repeated IDs/multiple drawings | Explicit whitespace policy and zero-width exclusion; duplicate-ID XML targets/limitation; hidden drawing objects | Op 2/5; C2-C5; AC-01/04/05 |
+| Unknown/mismatched/foreign resources | Separate 404 cases; unauthenticated/foreign-owner 401/403 | Op 4/5; C1/C3/C5; AC-15 |
+| Determinism | Five separate uploads; semantic finding fields plus same-target message/recommendation text identical | Op 2/5; C4; AC-18 |
+| Observed controlled audit failure | PROCESSING_FAILED timestamp/error/no partial findings; otherwise skip | Op 5; C5; AC-14 |
+| Sessions and code report | Unknown session, duplicate setup; actual coverage counts/basis or paired nulls | C6 |
 
-## Configuration (names only)
+Expected fixture findings are authored from explicit OOXML object/sheet definitions and the
+handoff, not an engine run. `identity.py` independently implements the compact UTF-8 SHA256
+algorithm and golden/Unicode vectors. Cross-team semantic comparisons do not require identical
+prose between teams; determinism within one target does require stable prose. Presence/length
+is validated by the shared schema; correctness of prose meaning requires manual review.
 
-`TESTER_ROOT_PATH`, `TESTER_DB_PATH`, `TESTER_OPERATOR_TOKEN_HASHES_JSON`, `ALLOWED_TARGET_URLS`,
-`TARGET_AUTH_MAP_JSON` (keys `userA`, `userB`, `reviewer`, `test-admin`), `FIXTURE_MANIFEST_PATH`,
-`TESTER_SETUP_TIMEOUT_SECONDS` (45), `TESTER_RUN_TIMEOUT_SECONDS` (600),
-`TESTER_CLEANUP_PRIOR_SESSIONS` (false), `APP_ENV`. The operator configures access before any
-grader call. Graders supply only `target_url`.
+Coverage markers are recorded at the assertions/calls they qualify. An assertion mismatch can
+still exercise an AC. An earlier HTTP failure does not grant later hash/finding assertions;
+a skip earns nothing. Earlier markers are preserved even if a later request prevents finishing
+a case. Component/system counts are unions over the six/eight declared catalogs. A code report
+failure has its own planned outcome and paired nulls; no hidden second retrieval can overwrite
+an earlier measurement. `acceptance_status` in the run record discloses per-AC result evidence
+and partial scope, rather than claiming completion from a percentage.
 
-## Commands
+A version hash alone cannot independently prove that a dishonest target read its stored bytes;
+the target contract requires that check. Actual integrated storage-preservation evidence still
+belongs to the system owners. Tester pytest coverage is never substituted for target coverage.
+
+Local fault tests exercise tester handling of health 500/503, upload/storage-style 500/503,
+PROCESSING_FAILED timeout responses, source integrity 500, communication failures, schema
+mismatches, tester defects, deadline aborts and coverage unavailability. These tests demonstrate
+tester classification/report retention, not real system fault handling. Once integrated,
+Jackson/Dylan/Ryan's dependency-injected system tests must prove their actual failure paths.
+
+## Configuration and commands
+
+Configuration names: `APP_ENV`, `TESTER_ROOT_PATH`, `TESTER_DB_PATH`,
+`TESTER_OPERATOR_TOKEN_HASHES_JSON`, `ALLOWED_TARGET_URLS`, `TARGET_AUTH_MAP_JSON`,
+`FIXTURE_MANIFEST_PATH`, `TESTER_SETUP_TIMEOUT_SECONDS`, `TESTER_RUN_TIMEOUT_SECONDS`,
+`TESTER_CLEANUP_PRIOR_SESSIONS`. The target map has `userA`, `userB`, `reviewer`, `test-admin`.
+No default credential authorizes an operator. Store raw target tokens only in protected config;
+provision matching test-admin/user identities on each target before grader setup.
 
 ```sh
 uv sync --locked --group dev
 uv run uvicorn tester.main:create_app --factory --host 127.0.0.1 --port 8001
+uv run python -m scripts.tester_selfcheck --evidence-dir docs/evidence/dixon_local_selfcheck
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy app tester
+uv run pytest tests/unit tests/contract
+uv run python -m scripts.export_schemas --check
+uv run python -m scripts.check_identity
+uv run python -m scripts.make_synthetic_fixtures --check
 ```
 
-### Raw remote calls
+For public deployments use HTTPS; configure prefix stripping/root_path and persistent private
+SQLite separately from the system. AWS infrastructure, Docker/Compose, DNS/certificates and
+system assembly remain Jackson's deployment boundary. The tester wheel includes its fixture
+assets; source checkouts use the repository fixtures. A private manifest may instead point to
+Team 12 shared inputs with independent reviewed expectations.
 
-`$TESTER` is the tester base URL and `$TOKEN` the operator token. Both are placeholders; never
-put real tokens in documents or shell history.
+Exact remote calls use `$TESTER`/`$TOKEN` placeholders from protected configuration:
 
 ```sh
 curl -sS -X POST "$TESTER/test/setup" -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" -d '{"target_url":"https://HOST/system"}'
-# -> 201 {"session_id":"<uuid>"}
-
 curl -sS -X POST "$TESTER/test/run" -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" -d '{"session_id":"<uuid>"}' --max-time 630
-# -> 200 full SuiteReport, or 500 {"message":...,"source":"tester"} after an abort
-
 curl -sS "$TESTER/test/report?session_id=<uuid>" -H "Authorization: Bearer $TOKEN"
-# -> 200 the stored report (byte-identical), or 409 while the suite has not ended
 ```
-
-### Timeouts and recovery
-
-- Setup takes at most 45 s (the system setup call is 30 s of that). Don't retry a setup whose
-  response was lost; start a new setup instead.
-- The suite takes at most 600 s, including coverage retrieval. Use a client and proxy read
-  timeout of at least **630 s** for `/test/run`.
-- If the run response is lost, **never POST run again**. Poll `GET /test/report` at 1 s until 200
-  (409 means still running). `scripts/run_suite.py` does this automatically.
-- Inside the suite: each GET has 10 s with up to 3 transport retries; each upload has 35 s and
-  no retry; each accepted workbook's audit is polled for up to 75 s.
-- To run again, create a new session; every session runs once.
-
-### Operator CLI and checks
 
 ```sh
-TEAM9_TESTER_TOKEN=... uv run python -m scripts.run_suite --tester-url http://127.0.0.1:8001 --target-url http://127.0.0.1:8000 --target-revision unknown --output report.json --record run-record.json
+uv run python -m scripts.run_suite --tester-url http://127.0.0.1:8001 --target-url http://127.0.0.1:8000 --target-revision unknown --output report.json --record run-record.json
 ```
 
-Live acceptance against any deployed tester: set `TEAM9_TESTER_URL`, `TEAM9_TARGET_URL` and
-`TEAM9_TESTER_TOKEN`, then run `uv run pytest tests/acceptance`. Local self-check (real processes,
-test-only fake target): `uv run python -m scripts.tester_selfcheck`.
+Read the operator token from `TEAM9_TESTER_TOKEN`, never a command-line credential. Live
+acceptance also needs `TEAM9_TESTER_URL` and `TEAM9_TARGET_URL`. GitHub's manual live job needs
+protected `TEAM9_TESTER_URL`/`TEAM9_TESTER_TOKEN` secrets and approved target/revision inputs.
+A target SHA is supplied from pod documentation; unknown stays unknown.
 
-**Opt-in CI live run:** set repository secrets `TEAM9_TESTER_URL` and `TEAM9_TESTER_TOKEN`, then
-start the `ci` workflow manually (Actions → ci → Run workflow) with `target_url` and
-`target_revision`. It runs the acceptance tests and the full suite and uploads `report.json` and
-`run-record.json`, which contain no credentials. The tester must be reachable from GitHub's
-runners.
+## Verification and integration gaps
 
-## Verification results (2026-10-14, Windows 11, CPython 3.12.15, uv 0.13.1)
+See the dated evidence log and final handoff matrix for exact executed checks. CI defines
+blocking lint/format/types/unit/contract/lock/schema/identity/fixture/smoke/self-check/audit jobs;
+no new GitHub Actions run or branch-protection configuration was initiated here. Historical
+evidence reports protection unconfigured; current remote settings were not checked.
 
-| Command | Result |
+| Limitation | Severity / workaround / phase |
 |---|---|
-| `uv sync --locked --group dev` | OK, 84 packages |
-| `uv run ruff check .` / `ruff format --check .` | Passed / 48 files formatted |
-| `uv run mypy app tester` | Passed, 32 source files, strict |
-| `uv run pytest tests/unit tests/contract` | 193 passed (141 foundation + 46 tester unit + 6 tester contract); 1 existing Starlette/HTTPX deprecation warning |
-| `uv run pytest` | 193 passed, 3 skipped (live acceptance unconfigured) |
-| `export_schemas --check`, `check_identity`, `make_synthetic_fixtures --check` | Passed |
-| `scripts.smoke_foundation` | Both processes: docs 200, routes and unauthenticated statuses OK |
-| `scripts.tester_selfcheck` (30-test suite) | Run 200 in 11.7 s; 30 run, 30 pass; acceptance 3 passed. **Target was the test-only fake.** |
-| pip-audit, locked runtime + measurement extra | No known vulnerabilities found |
-| GitHub Actions on PR #2 | Ubuntu, Windows and dependency-audit pass after the fixture fix; see the evidence log |
+| Real Team 9/AWS/Team 12 runs pending | High evidence gap; owners integrate/provision approved URLs and access; Phase 3 |
+| Actual system fault paths/source integrity not implemented here | High integration gap; owner tests and real full-suite run; Phase 3 |
+| Shared/manual fixture/prose/Excel review pending | Medium; Team 12 supplies files and two pod members review; Phase 3 |
+| DNS pre-check/connect rebind gap | Medium; restrict production egress; Phase 3 deployment |
+| Late native DNS/socket work cannot be forcibly killed | Medium; bounded caller, no retry/state mutation, controlled cleanup queue; deployment monitoring |
+| Office CFB encryption and additional unsupported-object/ambiguous decorative fixtures | Medium remaining fixture scope; add independently reviewed files; Phase 3/4 |
+| One process per tester SQLite store | Medium; avoid overlapping startup recovery; use separate stores for independent services |
+| 2 MiB response bound and cleanup defaults need pod confirmation | Low; explicit profile/default documentation; Phase 3 |
+| Existing Starlette/HTTPX deprecation warning | Low; coordinate dependency/test-client migration; maintenance |
 
-## Limitations and defects
-
-| Item | Severity | Workaround | Target |
-|---|---|---|---|
-| No run against the real Team 9 system or Team 12 | High (evidence gap) | Run `scripts/run_suite.py --record` once system endpoints exist and URLs/tokens are provisioned | Phase 3 integration |
-| DNS pre-check can be bypassed by rebinding between check and connect | Medium | Restrict tester egress at the network/security-group layer in AWS | Phase 3 deployment |
-| Synthetic fixtures not reviewed by two members or opened in Excel | Medium | Pod review; add Team 12 files under `tests/fixtures/shared/` | Phase 3 |
-| Server-side faults (health 503, upload 500, PROCESSING_FAILED, integrity 500) not black-box testable | Medium | Owner fault-injection tests; agree a protected mechanism if needed | Phase 3/5 |
-| Error code strings (other than the `.xlsm` code) aren't asserted; `.xlsm` 415-vs-422 conflicts in Phase 2 | Low | Listed in `pending_confirmation`; confirm with Team 12 | Phase 3 |
-| Encrypted (not just password-protected) packages aren't in the suite, though AC-02 lists them | Low | Add a CFB-encrypted fixture (needs an encryption tool) | Phase 3 |
-| `TESTER_CLEANUP_PRIOR_SESSIONS` semantics need pod confirmation | Low | Leave off until confirmed | Phase 3 |
-| A tester crash between storing the report and responding can lose the response | Low | Disclosed; `GET /test/report` recovers it | Inherent |
-| Client-disconnect survival is by design but has no automated test | Low | Verify during the first deployed run | Phase 3 |
-| Starlette TestClient/HTTPX deprecation warning | Low | Coordinate a test-client migration with Jackson | Maintenance |
-| Each run uploads about 60 MB in total: two ~25 MB files, two ~7 MB cell-limit files, plus small ones | Low | Expected; accepted data is session-tagged for the target's cleanup | — |
-
-## Deviations from the handoff
-
-- Branch `phase3/dixon` (chosen by Dixon) instead of `feature/phase3-tester-ci`.
-- Added `TESTER_CLEANUP_PRIOR_SESSIONS` (off by default) to meet the "failed setup must
-  compensate" obligation through the only agreed mechanism, `cleanup_session_ids`, without
-  making an unconfirmed convention the default.
-- Tester sessions store the operator, target and per-test results. The setup body is always
-  `{}` (or the cleanup list) and the plan is the versioned manifest, so neither is stored per
-  session.
-- Fixtures are stored ZIPs (no DEFLATE) with a fixed creator OS, so committed bytes are
-  identical on every platform.
-- Two Windows defects in the bootstrap tests were fixed (UTF-8 reads and the socketpair guard).
-
-## Phase 4/5 extension points
-
-- New checks: add a function to `CHECKS` and a manifest entry with components, ACs, operations
-  and path. Planned-but-undelivered entries use `"phase": "future"` to report a skip without
-  earning coverage.
-- Operation catalog: when an operation is delivered, set its `phase3` flag in `manifest.json` and
-  add tests that declare it; the status artifact picks it up automatically.
-- Team 12 fixtures: add `"origin": "team12"` entries; `load_suite` verifies hashes automatically.
-- Remediation/history tests can reuse `TargetClient`, `poll_audit` and the workbook builder.
+Narrow shared-file changes include wheel fixture packaging in `pyproject.toml`, current-status
+corrections in README/contract introduction and `.env.example` cleanup wording. Jackson should
+review these integration hooks. DTO wire schemas and system modules were not rewritten.
+The branch name differs from the handoff starter. Deferred compensation uses later setup
+because no standalone cleanup endpoint exists. All fixtures remain provisional synthetic inputs.
 
 ## Next Codex prompt
 
 ```text
-Read README.md, docs/contracts/phase3.md (and any newer accepted contract),
-docs/implementation/dixon_phase3.md, docs/evidence/dixon_phase3.md and
-tests/fixtures/README.md completely. Inspect the current branch, history and the
-actual tester/ code before editing. Extend the independent HTTP-only tester for the
-Phase 4 operations that the pod has actually approved (for example remediation,
-audit report download or version history): add one manifest entry per behavior with
-operations/path/components/ACs, a check in tester/suite/checks.py, hand-authored
-expectations, and fill the matching operation rows (name/method/path/REQ IDs from the
-specification, never invented). Keep every Phase 3 test unchanged as a regression;
-change Phase 3 expectations only with a documented contract change. Never import
-system modules beyond app/contracts and app/config, and never derive expectations
-from the engine. Run uv sync --locked --group dev, ruff check, ruff format --check,
-mypy app tester, pytest tests/unit tests/contract, scripts.export_schemas --check,
-scripts.make_synthetic_fixtures --check and scripts.tester_selfcheck. Record real
-runs with scripts/run_suite.py --record (target revision from pod documentation)
-in docs/evidence/dixon_phase3.md. Do not push, merge, deploy or claim cross-team
-results unless separately authorized and actually executed.
+Read the actual branch, AGENTS.md, docs/contracts/phase3.md, the latest accepted pod
+contract, docs/implementation/dixon_phase3.md, docs/evidence/dixon_handoff_verification.md
+and tests/fixtures/README.md before editing. Integrate the approved real Team 9 system
+and independently reviewed Team 12 fixtures, then run the unchanged Phase 3 suite over
+local real HTTP and approved deployed URLs with protected per-target access. Preserve
+saved-plan recovery, single-use sessions, explicit assertion markers, all per-case
+outcomes, same-target prose determinism and one planned coverage retrieval. Record
+actual reports/operation/AC status with unknown target revisions left unknown. Extend
+Phase 4 only for pod-approved remediation/reports/history operations, keeping every
+Phase 3 behavior as regression coverage and independent oracles. Add independently
+reviewed Office CFB and unsupported-object fixtures without deriving expectations
+from the engine. Run locked uv sync, Ruff, mypy, unit/contract tests, schemas, identities,
+fixture checks, wheel verification and the real local self-check. Update models and
+honest evidence; never invent deployment, manual review, precision or cross-team results.
+Do not push, merge, provision paid resources or change shared scope without authorization.
 ```

@@ -4,7 +4,13 @@ import argparse
 import hashlib
 from pathlib import Path
 
-from tester.suite.workbooks import CORRUPT_BYTES, clean_workbook, seeded_workbook
+from tester.suite.workbooks import (
+    CORRUPT_BYTES,
+    clean_workbook,
+    edge_workbooks,
+    hostile_workbooks,
+    seeded_workbook,
+)
 
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "synthetic"
 
@@ -14,6 +20,8 @@ def fixtures() -> dict[str, bytes]:
         "clean.xlsx": clean_workbook(),
         "seeded_issues.xlsx": seeded_workbook(),
         "corrupt.xlsx": CORRUPT_BYTES,
+        **edge_workbooks(),
+        **hostile_workbooks(),
     }
 
 

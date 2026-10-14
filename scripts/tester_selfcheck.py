@@ -4,6 +4,7 @@ This proves the tester's HTTP behavior end to end. It is not evidence about the 
 AWS or Team 12. Starts its own processes on 8000/8001 and stops only those.
 """
 
+import argparse
 import hashlib
 import json
 import os
@@ -36,6 +37,13 @@ def wait_ready(port: int, process: subprocess.Popen[bytes]) -> None:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--evidence-dir", type=Path, help="retain sanitized fake-target report/record"
+    )
+    args = parser.parse_args()
+    if args.evidence_dir:
+        args.evidence_dir.mkdir(parents=True, exist_ok=True)
     for port in (8000, 8001):
         with socket.socket() as probe:
             probe.bind(("127.0.0.1", port))  # refuse occupied ports
@@ -81,7 +89,8 @@ def main() -> int:
                 "TEAM9_TESTER_URL": "http://127.0.0.1:8001",
                 "TEAM9_TARGET_URL": BASE_URL,
             }
-            report_path = Path(state) / "report.json"
+            report_path = (args.evidence_dir or Path(state)) / "report.json"
+            record_path = (args.evidence_dir or Path(state)) / "run-record.json"
             suite = subprocess.run(
                 [
                     sys.executable,
@@ -93,10 +102,15 @@ def main() -> int:
                     BASE_URL,
                     "--output",
                     str(report_path),
+                    "--record",
+                    str(record_path),
                 ],
                 cwd=REPO,
                 env=child,
             )
+            if report_path.exists():
+                report = json.loads(report_path.read_bytes())
+                assert not any(r["outcome"] in ("fail", "error") for r in report["results"])
             acceptance = subprocess.run(
                 [
                     sys.executable,

@@ -40,6 +40,8 @@ class PlannedTest(ContractModel):
     operations: list[OperationNumber] = Field(default_factory=list)
     path: Literal["success", "error"] | None = None
     phase: Literal["3", "future"] = "3"
+    prerequisites: list[NonemptyText] = Field(default_factory=list)
+    parameters: dict[str, str | int] = Field(default_factory=dict)
 
 
 class Operation(ContractModel):
@@ -71,7 +73,11 @@ class SuiteManifest(ContractModel):
         ids = [test.test_id for test in self.tests]
         if not ids or len(ids) != len(set(ids)):
             raise ValueError("planned test IDs must be present and unique")
+        preceding: set[str] = set()
         for test in self.tests:
+            if set(test.prerequisites) - preceding:
+                raise ValueError(f"{test.test_id}: prerequisites must precede the test")
+            preceding.add(test.test_id)
             if bool(test.operations) != (test.path is not None):
                 raise ValueError(f"{test.test_id}: operations and path are declared together")
         return self
@@ -145,10 +151,19 @@ def load_suite(manifest_path: Path, known_checks: set[str]) -> LoadedSuite:
     unknown = {test.check for test in manifest.tests} - known_checks
     if unknown:
         raise SuiteConfigurationError(f"manifest names unknown checks: {sorted(unknown)}")
+    for name in ("clean", "seeded_issues", "corrupt"):
+        if name not in expectations.fixtures:
+            raise SuiteConfigurationError(f"required fixture {name} is missing")
+    return load_fixture_bytes(manifest, expectations, expectations_path.parent)
+
+
+def load_fixture_bytes(
+    manifest: SuiteManifest, expectations: Expectations, fixture_root: Path
+) -> LoadedSuite:
     data = {}
     for name, fixture in expectations.fixtures.items():
-        path = (expectations_path.parent / fixture.file).resolve()
-        if expectations_path.parent.resolve() not in path.parents:
+        path = (fixture_root / fixture.file).resolve()
+        if fixture_root.resolve() not in path.parents:
             raise SuiteConfigurationError(f"fixture {name} is outside the fixture directory")
         try:
             content = path.read_bytes()
@@ -158,3 +173,27 @@ def load_suite(manifest_path: Path, known_checks: set[str]) -> LoadedSuite:
             raise SuiteConfigurationError(f"fixture {name} does not match its recorded SHA256")
         data[name] = content
     return LoadedSuite(manifest, expectations, data)
+
+
+def snapshot_suite(suite: LoadedSuite, manifest_path: Path) -> str:
+    return json.dumps(
+        {
+            "manifest": suite.manifest.model_dump(mode="json"),
+            "expectations": suite.expectations.model_dump(mode="json"),
+            "fixture_root": str(
+                (manifest_path.parent / suite.manifest.expectations).parent.resolve()
+            ),
+        }
+    )
+
+
+def restore_suite(snapshot: str, *, read_fixtures: bool = True) -> LoadedSuite:
+    try:
+        saved = json.loads(snapshot)
+        manifest = SuiteManifest.model_validate(saved["manifest"])
+        expectations = Expectations.model_validate(saved["expectations"])
+        if read_fixtures:
+            return load_fixture_bytes(manifest, expectations, Path(saved["fixture_root"]))
+        return LoadedSuite(manifest, expectations, {})
+    except (ValueError, KeyError, TypeError) as exc:
+        raise SuiteConfigurationError("stored suite plan is invalid") from exc
