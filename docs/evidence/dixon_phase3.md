@@ -39,7 +39,7 @@ percentages.
 | Area | Evidence | Status |
 |---|---|---|
 | Delivered scope | Implementation doc "Delivered boundary" | Local only |
-| All 14 operation statuses | `operation_status` in each run record (`scripts/run_suite.py --record`); catalog in `tests/fixtures/manifest.json` | Generator done; ops 3/6-14 names/paths and REQ IDs pending from the Phase 2 spec; Jackson consolidates |
+| All 14 operation statuses | `operation_status` in each run record (`scripts/run_suite.py --record`); catalog in `tests/fixtures/manifest.json` | Generator done; all 14 operations (name, method, path, REQ IDs) copied from Phase 2 Q5.1; Jackson consolidates |
 | Test-ID to AC map with oracle rationale | Implementation doc "Suite and traceability"; `tests/fixtures/manifest.json`; `tests/fixtures/README.md` | Done; manual review pending |
 | Regression and static checks, CI | Commands table in the implementation doc; `.github/workflows/ci.yml` | Local passes recorded; CI link pending a push |
 | Deployed-run results | This log | Pending integration and deployment |
@@ -56,8 +56,9 @@ percentages.
   `cleanup_session_ids` on the next setup).
 - Whether an unreferenced-ancillary-chunk PNG padding approach is an acceptable way to hit the
   exact 25,000,000-byte boundary for both teams' validators.
-- The HTTP status for worksheet/cell limit violations and password-protected structures (the
-  tester expects 422; only the byte limit has a contract status, 413).
+- Resolved from the Phase 2 specification: worksheet/cell limit violations and password-protected
+  structures are 422 (Operation 2 error responses and the common status codes). Still open:
+  `.xlsm` is 415 under "not an .xlsx" but 422 under "macro-enabled"; the tester expects 422.
 - The full list is in `pending_confirmation` in `tests/fixtures/manifest.json` and is copied
   into every run record.
 

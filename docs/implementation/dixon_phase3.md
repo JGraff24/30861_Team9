@@ -45,10 +45,6 @@ against Dixon's Phase 3 handoff and the shared contract. See
 - Branch protection is not configured.
 - Team 12 shared fixtures have not been delivered. There has been no two-person manual
   expectation review and no Excel repair-warning check of the synthetic files.
-- Operations 3 and 6-14 are listed in the status artifact but not described. Their names,
-  paths and REQ IDs come from the Phase 2 specification (R1), which isn't in the repository, so
-  they are left null instead of invented. The same applies to REQ IDs for operations 1, 2, 4
-  and 5.
 - Message/recommendation prose is checked for presence (1-500 characters), not meaning;
   reviewing meaning is a human task.
 - Tester UI checks and the live UI integration checks are pending Ryan's UI.
@@ -232,6 +228,12 @@ runner timeouts (Ryan). Tester-behavior tests (setup errors, single use, concurr
 abort, timeouts, URL/access controls, coverage available/unavailable) are in
 `tests/unit/test_tester.py`, `tests/contract/test_tester_contract.py` and `tests/acceptance/`.
 
+**Operation catalog:** all 14 operations in `manifest.json` (name, method, path, related REQ IDs)
+are copied from Phase 2 specification Q5.1. Operations 1, 2, 4 and 5 are Phase 3 scope; 3 and 6-14
+are future phases. Phase 2's common status codes and Operation 2 define 422 for password-protected
+workbooks and for exceeding a documented processing limit, which the protected, worksheet and
+cell tests assert.
+
 **Operation status and run records:** `scripts/run_suite.py --record FILE` writes a JSON record
 with these fields:
 - `recorded_at`, the tester and target URLs, `target_revision` (operator-supplied; `unknown` by
@@ -325,11 +327,11 @@ runners.
 | Item | Severity | Workaround | Target |
 |---|---|---|---|
 | No run against the real Team 9 system or Team 12 | High (evidence gap) | Run `scripts/run_suite.py --record` once system endpoints exist and URLs/tokens are provisioned | Phase 3 integration |
-| Operations 3/6-14 and all REQ IDs not described in the status artifact | Medium | Copy names/paths/REQ IDs from the Phase 2 spec (R1) into `manifest.json` | Phase 3 |
 | DNS pre-check can be bypassed by rebinding between check and connect | Medium | Restrict tester egress at the network/security-group layer in AWS | Phase 3 deployment |
 | Synthetic fixtures not reviewed by two members or opened in Excel | Medium | Pod review; add Team 12 files under `tests/fixtures/shared/` | Phase 3 |
 | Server-side faults (health 503, upload 500, PROCESSING_FAILED, integrity 500) not black-box testable | Medium | Owner fault-injection tests; agree a protected mechanism if needed | Phase 3/5 |
-| Limit/protection rejection statuses (422) and error codes are Team 9 defaults | Low | Listed in `pending_confirmation`; confirm with Team 12 | Phase 3 |
+| Error code strings (other than the `.xlsm` code) aren't asserted; `.xlsm` 415-vs-422 conflicts in Phase 2 | Low | Listed in `pending_confirmation`; confirm with Team 12 | Phase 3 |
+| Encrypted (not just password-protected) packages aren't in the suite, though AC-02 lists them | Low | Add a CFB-encrypted fixture (needs an encryption tool) | Phase 3 |
 | `TESTER_CLEANUP_PRIOR_SESSIONS` semantics need pod confirmation | Low | Leave off until confirmed | Phase 3 |
 | A tester crash between storing the report and responding can lose the response | Low | Disclosed; `GET /test/report` recovers it | Inherent |
 | Client-disconnect survival is by design but has no automated test | Low | Verify during the first deployed run | Phase 3 |
@@ -354,8 +356,8 @@ runners.
 - New checks: add a function to `CHECKS` and a manifest entry with components, ACs, operations
   and path. Planned-but-undelivered entries use `"phase": "future"` to report a skip without
   earning coverage.
-- Operation catalog: when an operation is delivered, set `phase3`/name/method/path/REQ IDs in
-  `manifest.json`; the status artifact picks it up automatically.
+- Operation catalog: when an operation is delivered, set its `phase3` flag in `manifest.json` and
+  add tests that declare it; the status artifact picks it up automatically.
 - Team 12 fixtures: add `"origin": "team12"` entries; `load_suite` verifies hashes automatically.
 - Remediation/history tests can reuse `TargetClient`, `poll_audit` and the workbook builder.
 

@@ -611,7 +611,9 @@ def test_run_record_reports_all_operations_without_secrets(
     assert status[5]["error_conformance"] == "yes"
     assert status[4]["implemented"] == "observed responding"
     assert status[3]["implemented"] == "not delivered in Phase 3"
-    assert status[3]["success_conformance"] == "untested" and status[3]["name"] is None
+    assert status[3]["success_conformance"] == "untested"
+    assert (status[3]["method"], status[3]["path"]) == ("POST", "/api/v1/workbooks/{workbookId}/versions")
+    assert status[1]["requirements"] == ["REQ-15"]
     serialized = json.dumps(record)
     for secret in [*TOKENS.values(), OPERATOR]:
         assert secret not in serialized

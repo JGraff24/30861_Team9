@@ -1,5 +1,5 @@
 {
-  "manifest_version": "1.1.0",
+  "manifest_version": "1.2.0",
   "ruleset_version": "1.0.0",
   "expectations": "expectations.json",
   "components": {
@@ -21,26 +21,24 @@
     "AC-18": "Five audits of the same bytes produce identical findings (determinism portion)"
   },
   "operations": [
-    {"number": 1, "name": "Health", "method": "GET", "path": "/api/v1/health", "requirements": [], "phase3": true, "note": "Method/path from docs/contracts/phase3.md. REQ IDs: pending, copy from the Phase 2 specification (R1)."},
-    {"number": 2, "name": "Initial upload", "method": "POST", "path": "/api/v1/workbooks", "requirements": [], "phase3": true, "note": "Method/path from docs/contracts/phase3.md. REQ IDs: pending, copy from the Phase 2 specification (R1)."},
-    {"number": 3, "name": null, "method": null, "path": null, "requirements": [], "phase3": false, "note": "Not delivered in Phase 3. Name/method/path pending: copy from the Phase 2 specification (R1); not invented here."},
-    {"number": 4, "name": "Version", "method": "GET", "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}", "requirements": [], "phase3": true, "note": "Method/path from docs/contracts/phase3.md. REQ IDs: pending, copy from the Phase 2 specification (R1)."},
-    {"number": 5, "name": "Audit", "method": "GET", "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}", "requirements": [], "phase3": true, "note": "Method/path from docs/contracts/phase3.md. REQ IDs: pending, copy from the Phase 2 specification (R1)."},
-    {"number": 6, "name": null, "method": null, "path": null, "requirements": [], "phase3": false, "note": "Not delivered in Phase 3. Name/method/path pending: copy from the Phase 2 specification (R1); not invented here."},
-    {"number": 7, "name": null, "method": null, "path": null, "requirements": [], "phase3": false, "note": "Not delivered in Phase 3. Name/method/path pending: copy from the Phase 2 specification (R1); not invented here."},
-    {"number": 8, "name": null, "method": null, "path": null, "requirements": [], "phase3": false, "note": "Not delivered in Phase 3. Name/method/path pending: copy from the Phase 2 specification (R1); not invented here."},
-    {"number": 9, "name": null, "method": null, "path": null, "requirements": [], "phase3": false, "note": "Not delivered in Phase 3. Name/method/path pending: copy from the Phase 2 specification (R1); not invented here."},
-    {"number": 10, "name": null, "method": null, "path": null, "requirements": [], "phase3": false, "note": "Not delivered in Phase 3. Name/method/path pending: copy from the Phase 2 specification (R1); not invented here."},
-    {"number": 11, "name": null, "method": null, "path": null, "requirements": [], "phase3": false, "note": "Not delivered in Phase 3. Name/method/path pending: copy from the Phase 2 specification (R1); not invented here."},
-    {"number": 12, "name": null, "method": null, "path": null, "requirements": [], "phase3": false, "note": "Not delivered in Phase 3. Name/method/path pending: copy from the Phase 2 specification (R1); not invented here."},
-    {"number": 13, "name": null, "method": null, "path": null, "requirements": [], "phase3": false, "note": "Not delivered in Phase 3. Name/method/path pending: copy from the Phase 2 specification (R1); not invented here."},
-    {"number": 14, "name": null, "method": null, "path": null, "requirements": [], "phase3": false, "note": "Not delivered in Phase 3. Name/method/path pending: copy from the Phase 2 specification (R1); not invented here."}
+    {"number": 1, "name": "Check service availability", "method": "GET", "path": "/api/v1/health", "requirements": ["REQ-15"], "phase3": true, "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3."},
+    {"number": 2, "name": "Upload an initial workbook", "method": "POST", "path": "/api/v1/workbooks", "requirements": ["REQ-01", "REQ-02", "REQ-03", "REQ-04", "REQ-11", "REQ-13"], "phase3": true, "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3."},
+    {"number": 3, "name": "Upload a new workbook version", "method": "POST", "path": "/api/v1/workbooks/{workbookId}/versions", "requirements": ["REQ-03", "REQ-10", "REQ-11", "REQ-13", "REQ-14"], "phase3": false, "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."},
+    {"number": 4, "name": "Retrieve a workbook version", "method": "GET", "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}", "requirements": ["REQ-03", "REQ-11", "REQ-14"], "phase3": true, "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3."},
+    {"number": 5, "name": "Retrieve an audit and its findings", "method": "GET", "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}", "requirements": ["REQ-04", "REQ-05", "REQ-06", "REQ-10", "REQ-11", "REQ-13"], "phase3": true, "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3."},
+    {"number": 6, "name": "Trigger a new audit", "method": "POST", "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits", "requirements": ["REQ-04", "REQ-10", "REQ-11", "REQ-12", "REQ-13"], "phase3": false, "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."},
+    {"number": 7, "name": "Submit remediation decisions", "method": "POST", "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/remediations", "requirements": ["REQ-06", "REQ-07", "REQ-08", "REQ-09", "REQ-10", "REQ-13"], "phase3": false, "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."},
+    {"number": 8, "name": "Retrieve remediation status", "method": "GET", "path": "/api/v1/remediations/{remediationId}", "requirements": ["REQ-08", "REQ-09", "REQ-10", "REQ-11", "REQ-13"], "phase3": false, "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."},
+    {"number": 9, "name": "Download the remediated workbook", "method": "GET", "path": "/api/v1/outputs/{outputId}/workbook", "requirements": ["REQ-08", "REQ-09", "REQ-13", "REQ-14"], "phase3": false, "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."},
+    {"number": 10, "name": "Retrieve version and audit history", "method": "GET", "path": "/api/v1/workbooks/{workbookId}/history", "requirements": ["REQ-10", "REQ-11", "REQ-14"], "phase3": false, "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."},
+    {"number": 11, "name": "Configure periodic auditing and reminders", "method": "PUT", "path": "/api/v1/workbooks/{workbookId}/schedule", "requirements": ["REQ-12", "REQ-14"], "phase3": false, "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."},
+    {"number": 12, "name": "Retrieve notification records", "method": "GET", "path": "/api/v1/workbooks/{workbookId}/notifications", "requirements": ["REQ-12", "REQ-13", "REQ-14"], "phase3": false, "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."},
+    {"number": 13, "name": "Advance the test clock", "method": "POST", "path": "/api/v1/test/clock", "requirements": ["REQ-12", "REQ-15"], "phase3": false, "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."},
+    {"number": 14, "name": "Delete a workbook", "method": "DELETE", "path": "/api/v1/workbooks/{workbookId}", "requirements": ["REQ-12", "REQ-14"], "phase3": false, "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."}
   ],
   "pending_confirmation": [
     "X-Test-Session on project calls (including health) and unknown session -> 400.",
     "Named .xlsm -> 422 MACRO_ENABLED_WORKBOOK_UNSUPPORTED; other unsupported types -> 415.",
-    "Worksheet and nonempty-cell limit violations -> 422; byte limit -> 413.",
-    "Password-protected workbook/worksheet structure -> 422.",
     "Error code strings other than MACRO_ENABLED_WORKBOOK_UNSUPPORTED are not asserted.",
     "Component catalog C1-C6 and the eight Phase 3 AC portions as coverage denominators."
   ],
