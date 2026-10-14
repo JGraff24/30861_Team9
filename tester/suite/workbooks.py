@@ -272,6 +272,8 @@ def build_workbook(sheets: list[Sheet], image_padding: int = 0) -> bytes:
             # Stored, not deflated: zlib builds differ across platforms, and padded boundary
             # files need an exact, predictable size.
             info.compress_type = zipfile.ZIP_STORED
+            # ZipInfo defaults "version made by" to the host OS; pin it for identical bytes.
+            info.create_system = 0
             archive.writestr(info, package.parts[name])
     return buffer.getvalue()
 

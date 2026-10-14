@@ -18,7 +18,7 @@ actual local run unless it is marked **pending**.
 | **pending** | `scripts/run_suite.py` | Integrated local Team 9 system | System endpoints not implemented yet |
 | **pending** | Same | Team 9 on AWS | No deployment or URL |
 | **pending** | Team 12 tester → Team 9 system, and Team 9 tester → Team 12 system | Cross-team | URLs and access provisioning not available |
-| **pending** | GitHub Actions `ci` | Pushed branch | Branch not pushed |
+| 2026-10-14 | GitHub Actions `ci`, first run on PR #2 | Pushed branch | dependency-audit passed; checks (ubuntu) failed: 1 failed, 188 passed (fixture `create_system` byte); fixed in the next commit |
 
 The fake target's 40/50 code coverage is a constant in `tests/support/fake_system.py`; it is
 not a measurement of any real code. Self-check results show the tester's own behavior and
@@ -77,6 +77,9 @@ the self-check. Tests cover the failure paths, not just the passing path.
 3. The fixtures were first DEFLATE-compressed. That output depends on the zlib build, so the
    committed bytes could differ between Windows and Linux CI. They were switched to stored
    entries and a fixed PNG `IDAT` stream.
+4. The first CI run (PR #2) failed on Ubuntu: `zipfile.ZipInfo` records the host OS in the
+   "version made by" byte (0 on Windows, 3 on Linux), so the generator's output didn't match the
+   committed bytes. The fix pins `create_system = 0`; the committed fixtures are unchanged.
 
 **Reflection (Dixon to write):** _Personal reflection on agentic engineering is the student's own
 and has not been drafted here._
