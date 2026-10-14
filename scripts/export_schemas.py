@@ -1,4 +1,4 @@
-"""Export/check foundation OpenAPI catalogs. Pending routes remain absent."""
+"""Export/check OpenAPI catalogs. Only implemented routes appear; pending routes stay absent."""
 
 import argparse
 import json
@@ -26,6 +26,10 @@ from tester.config import TesterSettings
 from tester.main import create_app as create_tester
 
 CONTRACT_DIR = Path(__file__).resolve().parents[1] / "docs" / "contracts"
+STATUS = {
+    "system": "DTO catalog only; all feature endpoints pending",
+    "tester": "Instructor tester endpoints implemented: /test/setup, /test/run, /test/report",
+}
 
 
 def schema_documents() -> dict[str, dict[str, object]]:
@@ -52,8 +56,9 @@ def schema_documents() -> dict[str, dict[str, object]]:
             [(model, "serialization") for model in models],
             ref_template="#/components/schemas/{model}",
         )
-        document["components"] = {"schemas": schemas["$defs"]}
-        document["x-foundation-status"] = "DTO catalog only; all feature endpoints pending"
+        # Keep route-level components (security schemes); DTO schemas come from the models.
+        document["components"] = {**document.get("components", {}), "schemas": schemas["$defs"]}
+        document["x-foundation-status"] = STATUS[name]
         document["x-team9-contract-profile"] = "1.0.0"
         document["x-instructor-interface-version"] = "0.4.2"
         documents[name] = document
@@ -72,7 +77,7 @@ def main() -> None:
                 raise SystemExit(f"stale schema catalog: {path}")
         else:
             path.write_text(expected, encoding="utf-8")
-        print(f"{name}: {'checked' if args.check else 'exported'} foundation schema catalog")
+        print(f"{name}: {'checked' if args.check else 'exported'} schema catalog")
 
 
 if __name__ == "__main__":

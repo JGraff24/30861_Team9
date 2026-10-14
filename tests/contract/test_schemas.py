@@ -1,4 +1,4 @@
-"""DTO catalogs describe pending wire shapes, never pretend delivered endpoints."""
+"""Catalogs describe agreed wire shapes and list only routes that are actually implemented."""
 
 import hashlib
 import json
@@ -10,13 +10,18 @@ from app.contracts.models import CoverageMeasure, TestResult
 from scripts.check_identity import check_vectors
 from scripts.export_schemas import CONTRACT_DIR, schema_documents
 
+IMPLEMENTED_PATHS = {
+    "system": set(),
+    "tester": {"/test/setup", "/test/run", "/test/report"},
+}
 
-def test_openapi_catalogs_are_valid_current_and_have_no_feature_routes() -> None:
+
+def test_openapi_catalogs_are_valid_current_and_list_only_implemented_routes() -> None:
     for name, expected in schema_documents().items():
         stored = json.loads((CONTRACT_DIR / f"{name}.openapi.json").read_text(encoding="utf-8"))
         assert stored == expected
         validate(stored)
-        assert stored["paths"] == {}
+        assert set(stored["paths"]) == IMPLEMENTED_PATHS[name]
         assert stored["openapi"] == "3.1.1"
         assert stored["x-instructor-interface-version"] == "0.4.2"
         for schema in stored["components"]["schemas"].values():

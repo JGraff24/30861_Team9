@@ -44,17 +44,24 @@ def test_factories_do_not_contact_network_or_write_storage(monkeypatch: pytest.M
 
     monkeypatch.setattr(socket, "getaddrinfo", blocked)
     monkeypatch.setattr(socket.socket, "connect", blocked_connect)
-    for factory, pending in (
-        (create_system, ["/api/v1/health", "/api/v1/workbooks", "/test/setup", "/test/report"]),
-        (create_tester, ["/test/setup", "/test/run", "/test/report"]),
-    ):
-        application = factory()
-        with TestClient(application) as client:
-            assert client.get("/docs").status_code == 200
-            assert client.get("/openapi.json").json()["paths"] == {}
-            for path in pending:
-                assert client.get(path).status_code == 404
-                assert client.post(path, json={}).status_code == 404
+    with TestClient(create_system()) as client:
+        assert client.get("/docs").status_code == 200
+        assert client.get("/openapi.json").json()["paths"] == {}
+        for path in ["/api/v1/health", "/api/v1/workbooks", "/test/setup", "/test/report"]:
+            assert client.get(path).status_code == 404
+            assert client.post(path, json={}).status_code == 404
+    # The tester's instructor endpoints exist; without operator credentials they refuse
+    # before any target call or storage write.
+    with TestClient(create_tester()) as client:
+        assert client.get("/docs").status_code == 200
+        assert set(client.get("/openapi.json").json()["paths"]) == {
+            "/test/setup",
+            "/test/run",
+            "/test/report",
+        }
+        assert client.post("/test/setup", json={"target_url": "x"}).status_code == 401
+        assert client.post("/test/run", json={"session_id": "x"}).status_code == 401
+        assert client.get("/test/report", params={"session_id": "x"}).status_code == 401
     assert not Path("state").exists()
 
 

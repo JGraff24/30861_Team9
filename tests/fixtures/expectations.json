@@ -1,0 +1,43 @@
+{
+  "ruleset_version": "1.0.0",
+  "manual_review": "Pending. Expectations were authored by Dixon from the fixture definitions in tester/suite/workbooks.py and the audit policy in docs/contracts/phase3.md; no two-member pod review has been performed yet.",
+  "fixtures": {
+    "clean": {
+      "kind": "accepted",
+      "file": "synthetic/clean.xlsx",
+      "sha256": "e1de45e415b8552304a69050a86c5d605ab07eeaf96cef0c92dde6ba2d63e35e",
+      "origin": "synthetic",
+      "upload_name": "clean.xlsx",
+      "notes": "Synthetic stand-in for Team 12 clean.xlsx. Sheets Budget and Notes; Budget has a picture (id 2), a shape (id 3) and a chart (id 4), each with a nonblank title and description and no decorative marker.",
+      "expected_status": "AUDIT_COMPLETE",
+      "findings": []
+    },
+    "seeded_issues": {
+      "kind": "accepted",
+      "file": "synthetic/seeded_issues.xlsx",
+      "sha256": "6e54efe60ce3a45530f364168557ea7ceb085a454b3c02fe5927ab715b00d223",
+      "origin": "synthetic",
+      "upload_name": "seeded_issues.xlsx",
+      "notes": "Synthetic stand-in for Team 12 seeded_issues.xlsx. Sheet1 (sheetId 1, sheet1.xml) holds drawing1.xml: Picture 1 (id 2) has a title but no descr; Rectangle 2 (id 3) has a whitespace-only title; Chart 3 (id 4) is natively decorative; Group 4 (id 5) has both fields and contains Picture 5 (id 6) whose descr is U+00A0 plus a space. Expenses (sheetId 2) is descriptive. Hidden sheet2 (sheetId 3) is stored in sheet3.xml. Sheet0 (sheetId 4) is excluded by the zero suffix.",
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Sheet1", "target": "xl/drawings/drawing1.xml#id=2", "classification": "REQUIRES_USER_INPUT"},
+        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Sheet1", "target": "xl/drawings/drawing1.xml#id=3", "classification": "REQUIRES_USER_INPUT"},
+        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Sheet1", "target": "xl/drawings/drawing1.xml#id=4", "classification": "MANUAL_REVIEW"},
+        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Sheet1", "target": "xl/drawings/drawing1.xml#id=6", "classification": "REQUIRES_USER_INPUT"},
+        {"ruleId": "WORKSHEET_NAME", "category": "WORKSHEET_NAME", "worksheet": "Sheet1", "target": "xl/worksheets/sheet1.xml#sheetId=1", "classification": "REQUIRES_USER_INPUT"},
+        {"ruleId": "WORKSHEET_NAME", "category": "WORKSHEET_NAME", "worksheet": "sheet2", "target": "xl/worksheets/sheet3.xml#sheetId=3", "classification": "REQUIRES_USER_INPUT"}
+      ]
+    },
+    "corrupt": {
+      "kind": "rejected",
+      "file": "synthetic/corrupt.xlsx",
+      "sha256": "c51c63778cc8b7337c98ea4a62ee51d3abb17b537b28a64cfeffc0ef9d292265",
+      "origin": "synthetic",
+      "upload_name": "corrupt.xlsx",
+      "notes": "Synthetic stand-in for Team 12 corrupt.xlsx: a local file header signature followed by unreadable bytes. The error code is not yet agreed, so only status and envelope are asserted.",
+      "http_status": 422,
+      "error_code": null
+    }
+  }
+}

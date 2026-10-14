@@ -80,6 +80,9 @@ class TesterSettings(EnvironmentSettings):
     fixture_manifest_path: Path = Path("tests/fixtures/manifest.json")
     tester_setup_timeout_seconds: PositiveSeconds = 45
     tester_run_timeout_seconds: PositiveSeconds = 600
+    # Team 9 default awaiting pod confirmation: ask the target to clean namespaces from
+    # failed setups and retrieved reports on the next setup. Off unless explicitly enabled.
+    tester_cleanup_prior_sessions: bool = False
 
     @model_validator(mode="after")
     def approved_url_shapes(self) -> Self:

@@ -8,6 +8,16 @@ import time
 
 import httpx
 
+EXPECTED_PATHS = {
+    "app.main:create_app": set(),
+    "tester.main:create_app": {"/test/setup", "/test/run", "/test/report"},
+}
+# System feature routes are still pending (404); tester routes require an operator token (401).
+EXPECTED_STATUS = {
+    "app.main:create_app": {"/api/v1/health": 404, "/test/setup": 404, "/test/report": 404},
+    "tester.main:create_app": {"/api/v1/health": 404, "/test/report?session_id=x": 401},
+}
+
 
 def main() -> None:
     processes: list[subprocess.Popen[bytes]] = []
@@ -51,15 +61,15 @@ def main() -> None:
                             raise TimeoutError(f"{module} startup deadline exceeded")
                         time.sleep(0.1)
                     if (
-                        response.json()["paths"] != {}
+                        set(response.json()["paths"]) != EXPECTED_PATHS[module]
                         or response.json()["openapi"] != "3.1.1"
                         or client.get("/docs").status_code != 200
                     ):
-                        raise RuntimeError(f"{module} has an unexpected foundation schema/docs")
-                    for path in ("/api/v1/health", "/test/setup", "/test/report"):
-                        if client.get(path).status_code != 404:
-                            raise RuntimeError(f"{module} unexpectedly implements {path}")
-                print(f"{module}: port {port}; docs 200; paths empty; pending routes 404")
+                        raise RuntimeError(f"{module} has an unexpected schema/docs")
+                    for path, status in EXPECTED_STATUS[module].items():
+                        if client.get(path).status_code != status:
+                            raise RuntimeError(f"{module} {path} did not return {status}")
+                print(f"{module}: port {port}; docs 200; routes and unauthenticated statuses OK")
     finally:
         for process in processes:
             process.terminate()
