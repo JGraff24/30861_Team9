@@ -67,6 +67,11 @@ class SystemSettings(EnvironmentSettings):
         exclude=True,
     )
     enable_code_measurement: bool = False
+    engine_factory: NonemptyText | None = None
+    runner_factory: NonemptyText | None = None
+    session_service_factory: NonemptyText | None = None
+    test_router_factory: NonemptyText | None = None
+    ui_router_factory: NonemptyText | None = None
     validation_timeout_seconds: PositiveSeconds = 30
     audit_timeout_seconds: PositiveSeconds = 60
     queue_timeout_seconds: PositiveSeconds = 15
@@ -77,6 +82,10 @@ class SystemSettings(EnvironmentSettings):
             raise ValueError("S3 selection requires S3_BUCKET and AWS_REGION")
         if self.app_env == AppEnvironment.PRODUCTION and self.deployment_sha == "unknown":
             raise ValueError("production requires a supplied DEPLOYMENT_SHA")
+        if self.audit_timeout_seconds > 60 or self.validation_timeout_seconds > 30:
+            raise ValueError("audit/validation deadlines cannot exceed 60/30 seconds")
+        if self.app_env == AppEnvironment.PRODUCTION and not self.system_token_hashes:
+            raise ValueError("production requires configured token hashes")
         if self.deployment_sha != "unknown":
             import re
 

@@ -1,4 +1,4 @@
-"""Export/check foundation OpenAPI catalogs. Pending routes remain absent."""
+"""Export actual system routes and the still-pending tester DTO catalog."""
 
 import argparse
 import json
@@ -52,8 +52,12 @@ def schema_documents() -> dict[str, dict[str, object]]:
             [(model, "serialization") for model in models],
             ref_template="#/components/schemas/{model}",
         )
-        document["components"] = {"schemas": schemas["$defs"]}
-        document["x-foundation-status"] = "DTO catalog only; all feature endpoints pending"
+        document.setdefault("components", {}).setdefault("schemas", {}).update(schemas["$defs"])
+        document["x-foundation-status"] = (
+            "Project service routes delivered; teammate integration pending"
+            if name == "system"
+            else "DTO catalog only; all feature endpoints pending"
+        )
         document["x-team9-contract-profile"] = "1.0.0"
         document["x-instructor-interface-version"] = "0.4.2"
         documents[name] = document
@@ -72,7 +76,7 @@ def main() -> None:
                 raise SystemExit(f"stale schema catalog: {path}")
         else:
             path.write_text(expected, encoding="utf-8")
-        print(f"{name}: {'checked' if args.check else 'exported'} foundation schema catalog")
+        print(f"{name}: {'checked' if args.check else 'exported'} schema catalog")
 
 
 if __name__ == "__main__":

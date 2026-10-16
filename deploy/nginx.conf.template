@@ -1,0 +1,30 @@
+# Render SERVER_NAME using scripts/prepare_deploy.py. A real trusted certificate is required.
+server {
+    listen 443 ssl;
+    server_name ${SERVER_NAME};
+    ssl_certificate /etc/nginx/tls/fullchain.pem;
+    ssl_certificate_key /etc/nginx/tls/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    client_max_body_size 26m;
+    client_body_timeout 45s;
+    # Credential-bearing requests and query data do not belong in proxy access logs.
+    access_log off;
+    location = /system { return 308 /system/; }
+    location /system/ {
+        proxy_pass http://system:8000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 90s;
+        proxy_send_timeout 90s;
+    }
+    location = /tester { return 308 /tester/; }
+    location /tester/ {
+        proxy_pass http://tester:8001/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 660s;
+        proxy_send_timeout 660s;
+    }
+}

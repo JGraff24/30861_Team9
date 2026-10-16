@@ -1,22 +1,30 @@
-"""Check two real local factory processes, then stop only the processes started here."""
+"""Smoke the actual system service and pending tester on separate local processes."""
 
+import os
 import socket
 import subprocess
 import sys
 import tempfile
 import time
+from pathlib import Path
 
 import httpx
 
 
 def main() -> None:
     processes: list[subprocess.Popen[bytes]] = []
-    try:
-        for module, port in (("app.main:create_app", 8000), ("tester.main:create_app", 8001)):
-            # Refuse an occupied port before starting; do not touch an existing server.
-            with socket.socket() as probe:
-                probe.bind(("127.0.0.1", port))
-            with tempfile.TemporaryFile() as log:
+    with tempfile.TemporaryDirectory(prefix="team9-smoke-") as directory:
+        try:
+            for module, port in (("app.main:create_app", 8000), ("tester.main:create_app", 8001)):
+                with socket.socket() as probe:
+                    probe.bind(("127.0.0.1", port))
+                environment = {
+                    "PATH": os.defpath,
+                    "PYTHONPATH": str(Path.cwd()),
+                    "HOME": directory,
+                    "METADATA_DB_PATH": directory + "/system.sqlite3",
+                    "BLOB_ROOT": directory + "/sources",
+                }
                 process = subprocess.Popen(
                     [
                         sys.executable,
@@ -28,9 +36,12 @@ def main() -> None:
                         "127.0.0.1",
                         "--port",
                         str(port),
+                        "--no-access-log",
                     ],
-                    stdout=log,
-                    stderr=log,
+                    env=environment,
+                    cwd=directory,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
                 )
                 processes.append(process)
                 deadline = time.monotonic() + 15
@@ -39,8 +50,7 @@ def main() -> None:
                 ) as client:
                     while True:
                         if process.poll() is not None:
-                            log.seek(0)
-                            raise RuntimeError(log.read().decode("utf-8", errors="replace"))
+                            raise RuntimeError(f"{module} exited during startup")
                         try:
                             response = client.get("/openapi.json")
                             if response.status_code == 200:
@@ -50,25 +60,25 @@ def main() -> None:
                         if time.monotonic() > deadline:
                             raise TimeoutError(f"{module} startup deadline exceeded")
                         time.sleep(0.1)
-                    if (
-                        response.json()["paths"] != {}
-                        or response.json()["openapi"] != "3.1.1"
-                        or client.get("/docs").status_code != 200
-                    ):
-                        raise RuntimeError(f"{module} has an unexpected foundation schema/docs")
-                    for path in ("/api/v1/health", "/test/setup", "/test/report"):
-                        if client.get(path).status_code != 404:
-                            raise RuntimeError(f"{module} unexpectedly implements {path}")
-                print(f"{module}: port {port}; docs 200; paths empty; pending routes 404")
-    finally:
-        for process in processes:
-            process.terminate()
-        for process in processes:
-            try:
-                process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                process.kill()
-                process.wait()
+                    expected = 4 if port == 8000 else 0
+                    assert len(response.json()["paths"]) == expected
+                    assert response.json()["openapi"] == "3.1.1"
+                    assert client.get("/docs").status_code == 200
+                    if port == 8000:
+                        # Intentional: this smoke does not configure missing teammate modules.
+                        assert client.get("/api/v1/health").status_code == 503
+                        assert client.post("/api/v1/workbooks").status_code == 401
+                    assert client.get("/test/report").status_code == 404
+                print(f"{module}: port {port}; docs 200; {expected} actual route paths checked")
+        finally:
+            for process in processes:
+                process.terminate()
+            for process in processes:
+                try:
+                    process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
 
 
 if __name__ == "__main__":

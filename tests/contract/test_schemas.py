@@ -11,12 +11,16 @@ from scripts.check_identity import check_vectors
 from scripts.export_schemas import CONTRACT_DIR, schema_documents
 
 
-def test_openapi_catalogs_are_valid_current_and_have_no_feature_routes() -> None:
+def test_openapi_catalogs_are_valid_current_and_reflect_delivered_routes() -> None:
     for name, expected in schema_documents().items():
         stored = json.loads((CONTRACT_DIR / f"{name}.openapi.json").read_text())
         assert stored == expected
         validate(stored)
-        assert stored["paths"] == {}
+        assert len(stored["paths"]) == (4 if name == "system" else 0)
+        assert "/test/setup" not in stored["paths"]
+        if name == "system":
+            assert stored["components"]["securitySchemes"]["BearerAuth"]["scheme"] == "bearer"
+            assert stored["paths"]["/api/v1/workbooks"]["post"]["security"] == [{"BearerAuth": []}]
         assert stored["openapi"] == "3.1.1"
         assert stored["x-instructor-interface-version"] == "0.4.2"
         for schema in stored["components"]["schemas"].values():

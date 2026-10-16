@@ -1,0 +1,41 @@
+name: team9-development
+x-system: &system
+  build:
+    context: ..
+    dockerfile: deploy/Dockerfile
+    target: runtime
+  image: team9-system:local
+  env_file: ${TEAM9_ENV_FILE:-../.env.local}
+  environment: &system-env
+    APP_ENV: development
+    METADATA_DB_PATH: /service/state/system.sqlite3
+    BLOB_BACKEND: filesystem
+    BLOB_ROOT: /service/state/sources
+  init: true
+  restart: unless-stopped
+  volumes:
+    - system-data:/service/state
+services:
+  system:
+    <<: *system
+    ports: ["127.0.0.1:8000:8000"]
+  worker:
+    <<: *system
+    command: ["python", "-m", "app.jobs.worker"]
+  tester:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: runtime
+    image: team9-system:local
+    env_file: ${TEAM9_ENV_FILE:-../.env.local}
+    environment:
+      APP_ENV: development
+      TESTER_DB_PATH: /service/tester-state/tester.sqlite3
+    command: ["uvicorn", "tester.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8001", "--no-access-log"]
+    init: true
+    ports: ["127.0.0.1:8001:8001"]
+    volumes: ["tester-data:/service/tester-state"]
+volumes:
+  system-data:
+  tester-data:

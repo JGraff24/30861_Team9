@@ -1,20 +1,23 @@
 # 30861_Team9
 
-ADA Excel Hub — Phase 3 repository foundation.
+Excel accessibility hub, Phase 3 service implementation on `feature/phase3-service`.
 
-This branch delivers Python packages, shared contracts, typed configuration, injection ports,
-two minimal FastAPI factories and foundation checks. All business and instructor endpoints,
-authentication, workbook parsing/auditing, persistence, worker, testing suite and UI are pending.
-Framework docs are runnable. No placeholder route claims successful business functionality.
+Jackson's four project routes, bearer authentication, SQLite persistence, immutable local/S3
+storage and separate durable worker are implemented and tested. Dylan's workbook/audit engine,
+Ryan's measurement runner/session service/UI/test routers and Dixon's tester suite are not in
+this checkout. Default health therefore returns **503**; uploads with a valid user credential
+return 503 until a real runner is configured. Test doubles exist only in `tests/`.
+No AWS deployment, public URL, full workbook acceptance result or cross-team pass is claimed.
 
-## Local setup
+See [actual implementation](docs/implementation/jackson_phase3.md),
+[test evidence and all 14 operation statuses](docs/evidence/jackson_phase3.md), and
+[deployment runbook](deploy/README.md). The [shared contract](docs/contracts/phase3.md)
+remains the Team 9 default requiring Team 12 confirmation.
 
-Use Python 3.12 and uv 0.13.1. `pyproject.toml` pins resolver-selected direct dependencies;
-`uv.lock` pins transitive versions and artifact hashes. Do not maintain a second pip/Poetry workflow.
-If uv is already installed at the required version, skip its installation below. pip is used here
-only to install the uv tool, never to resolve application dependencies.
+## Local setup and processes
 
-macOS/Linux (requires an installed Python with venv support):
+Use Python 3.12 and uv 0.13.1. Direct versions and artifact hashes are already pinned in
+`pyproject.toml`/`uv.lock`. To install the uv tool if missing:
 
 ```sh
 python3 -m venv .uv-tool
@@ -22,104 +25,116 @@ python3 -m venv .uv-tool
 export PATH="$PWD/.uv-tool/bin:$PATH"
 uv python install 3.12
 uv sync --locked --group dev
-cp -n .env.example .env
 ```
 
-Windows PowerShell:
-
-```powershell
-py -m venv .uv-tool
-.\.uv-tool\Scripts\python.exe -m pip install uv==0.13.1
-$env:Path = "$PWD\.uv-tool\Scripts;$env:Path"
-uv python install 3.12
-uv sync --locked --group dev
-if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-```
-
-Both settings classes read `.env`. Environment variables take precedence. Empty credential maps
-authorize no users; no AWS credentials are required for the foundation. Do not source a private
-environment into an untrusted shell or log tokens. See [.env.example](.env.example) for the entire
-settings catalog and [contract profile](docs/contracts/phase3.md) for typed JSON map shapes.
-
-Run in two terminals from the repository root:
-
-```sh
-uv run uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000
-uv run uvicorn tester.main:create_app --factory --host 127.0.0.1 --port 8001
-```
-
-Visit `http://127.0.0.1:8000/docs` and `http://127.0.0.1:8001/docs`. Both have empty OpenAPI paths.
-Feature URLs return framework 404 because they have no handlers. The startup log explicitly
-identifies pending integrations. There is no worker command yet; Jackson will provide it with
-the durable worker implementation. Stop each server with Ctrl+C.
-
-Optional local credential scaffolding for later feature integrations:
+On Windows use `.uv-tool\Scripts\python.exe` and add `.uv-tool\Scripts` to PATH.
+The service execution guard currently targets POSIX; use Linux/WSL for API+worker execution.
+Both settings classes read `.env`; environment variables take precedence. No credential is
+valid by default. For private loopback development credentials:
 
 ```sh
 uv run python -m scripts.create_dev_tokens --local-only
 ```
 
-This exclusively creates ignored `.env.local`, with POSIX mode 0600; never overwrites an existing
-file, never prints tokens, refuses `APP_ENV=production`, and configures only loopback access.
-To use it locally, pass `_env_file=".env.local"` when constructing settings, or copy the needed
-entries privately to `.env`. On Windows, restrict the file ACL to your user. These credentials
-do not enable pending authentication or test endpoints. Test-interface/measurement flags stay
-false unless explicitly set for an approved test deployment. Never deploy this local file.
+This creates ignored `.env.local` with mode 0600, refuses production and overwrites, and prints
+no tokens. If `.env` does not exist, copy the generated file to `.env` privately (preserve 0600).
+Do not put credentials in commands, Git, images or evidence. Add real integration factory paths
+as documented below. The generator's flags remain disabled until explicitly enabled.
 
-coverage.py is a dev dependency and an optional `measurement` runtime extra. An enabled future
-deployment installs `uv sync --locked --no-dev --extra measurement`; the foundation does not
-collect workbook-execution measurements.
+Run in three terminals from the repository root:
+
+```sh
+./scripts/run_system.sh
+./scripts/run_worker.sh
+./scripts/run_tester.sh
+```
+
+Equivalent commands:
+
+```sh
+uv run --locked uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000 --no-access-log
+uv run --locked python -m app.jobs.worker
+uv run --locked uvicorn tester.main:create_app --factory --host 127.0.0.1 --port 8001 --no-access-log
+```
+
+System docs: `http://127.0.0.1:8000/docs`; tester docs: `http://127.0.0.1:8001/docs`.
+The worker exits with an explicit configuration error until engine and runner are installed.
+The tester currently exposes framework docs only. Stop processes with Ctrl+C. State under
+`state/` survives restart; do not delete it to restart the service.
+
+## Integrating teammate modules
+
+`app/contracts/ports.py` remains the common API. Inject dependencies into `create_app` or
+configure server-owned `module:factory` paths; paths are never accepted from HTTP callers:
+
+| Environment input | Factory signature |
+|---|---|
+| `ENGINE_FACTORY` | `factory() -> WorkbookEngine` |
+| `RUNNER_FACTORY` | `factory(*, engine, enable_code_measurement) -> EngineRunner` |
+| `SESSION_SERVICE_FACTORY` | `factory(*, repository, blob_store, settings) -> SessionService` |
+| `TEST_ROUTER_FACTORY` | `create_router(services) -> APIRouter`, attached only when testing enabled |
+| `UI_ROUTER_FACTORY` | `create_router(services) -> APIRouter` |
+
+These are integration hooks, not claims that those factories already exist. Confirm/adapt the
+small factory signatures when Dylan/Ryan merge. The runner and engine must serialize as trusted
+Python configuration without live sockets/DB connections/secrets. The parent guard gives the
+runner only bounded source bytes, shared DTOs, revision/namespace/limits and a minimal child
+environment. Ryan still owns measurement and his execution runner implementation.
+
+The four paths in [system OpenAPI](docs/contracts/system.openapi.json) are actual service paths:
+public health; authenticated POST `/api/v1/workbooks`; GET
+`/api/v1/workbooks/{workbookId}/versions/{versionId}` and its `/audits/{auditId}`.
+Project failures have the shared error envelope and generated `X-Request-ID`.
+Reviewer grants are explicit; test-admin credentials cannot access ordinary project operations.
+Version GET rereads/hashes source bytes. There are no remediation, history, ordinary deletion
+or downloadable report endpoints. No finding means only that the implemented checks found none.
 
 ## Verification
 
 ```sh
 uv sync --locked --group dev
-uv run ruff check .
-uv run mypy app tester
-uv run pytest tests/unit tests/contract
-uv run python -m scripts.export_schemas --check
-uv run python -m scripts.check_identity
-uv run python -m scripts.smoke_foundation
+uv lock --check
+uv run --locked ruff check .
+uv run --locked ruff format --check .
+uv run --locked mypy app tester scripts
+uv run --locked pytest -q
+uv run --locked python -m scripts.export_schemas --check
+uv run --locked python -m scripts.check_identity
+uv run --locked python -m scripts.smoke_foundation
 ```
 
-Contract tests validate both OpenAPI catalogs and independent JSON payloads. Generate catalogs
-after coordinated DTO changes with `uv run python -m scripts.export_schemas`, then review the diff.
-Their schemas describe agreed wire shapes; their empty paths reflect actual foundation delivery.
-Cross-field constraints such as covered<=total and chronological audit completion also require
-Pydantic validation; JSON Schema cannot express every relational check.
-
-Audit locked runtime dependencies, including the optional measurement extra (POSIX):
+The live-process test and smoke need permission to bind loopback sockets. A Linux-only test
+checks actual `RLIMIT_AS` enforcement and skips on macOS; it must pass on the production image
+before deployment. Runtime dependency scanning needs network access:
 
 ```sh
 uv export --locked --no-dev --extra measurement --no-emit-project --format requirements-txt --output-file /tmp/team9-runtime-requirements.txt > /dev/null
-uv run pip-audit --require-hashes --disable-pip --cache-dir /tmp/team9-audit-cache -r /tmp/team9-runtime-requirements.txt
+uv run --locked pip-audit --require-hashes --disable-pip --cache-dir /tmp/team9-audit-cache -r /tmp/team9-runtime-requirements.txt
 ```
 
-On PowerShell replace the temporary path with `$env:TEMP\team9-runtime-requirements.txt`, the
-cache path with `$env:TEMP\team9-audit-cache`, and `> /dev/null` with `| Out-Null`.
-To scan dev/build tools too, omit `--no-dev` and add `--group dev` to the export.
-Scanning needs network access; report failures honestly. CI and branch protection are not configured.
+Generate schemas after compatible DTO/route changes with `uv run python -m scripts.export_schemas`.
+The system catalog combines actual routes with shared serialization schemas; tester paths stay
+empty until Dixon delivers them. Unit tests inject narrow doubles and do not prove real workbook
+rules, runtime coverage or deployed acceptance. No new dependencies were needed in this branch.
 
-## Ownership and integration
+## Ownership and deployment
 
-| Owner | Implementation directories | Continuation document to write |
+| Owner | Implementation | Continuation |
 |---|---|---|
-| Jackson | `app/api`, `app/auth`, `app/storage`, `app/jobs`, `app/services`, `deploy`, assembly | `docs/implementation/jackson_phase3.md` |
-| Dylan | `app/workbooks`, `app/audit`, owner unit tests | `docs/implementation/dylan_phase3.md` |
-| Ryan | `app/test_interface`, `app/measurement`, `app/ui`, templates/static, owner tests | `docs/implementation/ryan_phase3.md` |
-| Dixon | `tester`, `tests/contract`, `tests/acceptance`, fixture manifests, CI | `docs/implementation/dixon_phase3.md` |
+| Jackson | API/auth/storage/jobs/services/assembly/deploy | [jackson_phase3.md](docs/implementation/jackson_phase3.md) |
+| Dylan | workbooks/audit | `docs/implementation/dylan_phase3.md` pending |
+| Ryan | test interface/measurement/UI | `docs/implementation/ryan_phase3.md` pending |
+| Dixon | tester/contract/acceptance/CI/fixtures | `docs/implementation/dixon_phase3.md` pending |
 
-Jackson coordinates `app/main.py`, `app/config.py`, `app/contracts`, dependency files and README.
-Owners use `WorkbookEngine`, `Repository`, `BlobStore`, `EngineRunner`, `SessionService`,
-`CodeMeasurementStore`, `AuthService` and `SystemServices` from [ports.py](app/contracts/ports.py).
-Feature routers will export `create_router(services)`. Test fakes belong only inside tests.
+Bootstrap is merged at `ffa6947`; its [implementation record](docs/implementation/bootstrap_phase3.md)
+is historical. Jackson coordinates shared contracts/settings/dependencies. Teammate implementation
+packages and tester were preserved. Existing bootstrap assertions were updated only where the
+foundation's empty-route assumptions changed.
 
-Review and merge the foundation before all four owners branch from its merged commit. Develop
-independently; final integration needs Dylan's engine and Ryan's runner/session services, Jackson's
-storage/worker/assembly, then Dixon's live HTTP suite and UI checks. Owner unit success does not
-prove whole-system readiness. See [bootstrap implementation](docs/implementation/bootstrap_phase3.md)
-for actual models, outcomes, limitations and exact sharing steps. Each owner must write their
-own implementation and evidence documents when delivering their features.
-
-AWS is the selected target, with EC2/SQLite/S3 as Team 9 defaults requiring pod confirmation.
-No deployment resources, public URLs or cross-team results are delivered by this bootstrap.
+Development Compose: `docker compose -f deploy/compose.yaml up --build` (private `.env.local`
+required). Named volumes retain system/tester state independently. Containers need their own
+approved target URL mapping, for example the explicitly configured Docker system base URL;
+loopback inside tester refers to tester itself. Production uses the standalone production Compose
+file, EC2, EBS metadata and private S3; it exposes only HTTPS. See the runbook for inputs,
+preflight gates, TLS, IAM, releases, backups, scoped resets and rollback. Cloud provisioning,
+Git push/merge and external messaging have not been performed.

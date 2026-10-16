@@ -364,6 +364,7 @@ class VersionRecord(ContractModel):
     status: VersionStatus
     latest_audit_id: Identifier | None
     source_version_id: Identifier | None
+    validated: ValidatedWorkbook | None = None
 
 
 class AuditRecord(ContractModel):
