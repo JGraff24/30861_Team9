@@ -3,8 +3,10 @@
 ADA Excel Hub — Phase 3 repository foundation.
 
 This branch delivers Python packages, shared contracts, typed configuration, injection ports,
-two minimal FastAPI factories and foundation checks. All business and instructor endpoints,
-authentication, workbook parsing/auditing, persistence, worker, testing suite and UI are pending.
+two minimal FastAPI factories and foundation checks. Ryan's injectable testing routes,
+persistent-session orchestration, measured runner and upload/results UI are now available.
+The foundation factories remain unassembled: business endpoints, authentication, engine,
+persistence and worker require teammate integration.
 Framework docs are runnable. No placeholder route claims successful business functionality.
 
 ## Local setup
@@ -69,6 +71,20 @@ false unless explicitly set for an approved test deployment. Never deploy this l
 coverage.py is a dev dependency and an optional `measurement` runtime extra. An enabled future
 deployment installs `uv sync --locked --no-dev --extra measurement`; the foundation does not
 collect workbook-execution measurements.
+
+## Ryan's delivered modules
+
+Register `app.test_interface.routes:create_router` and `app.ui.routes:create_router` through
+Jackson's assembly. Construct `app.test_interface.service:PersistentSessionService` with
+repository/blob/settings and `app.measurement.runner:MeasuredEngineRunner` with the trusted
+engine and measurement flag. No shared assembly/config/dependency files were changed here.
+See [Ryan's implementation](docs/implementation/ryan_phase3.md),
+[design decisions](docs/implementation/ryan_design_decisions.md) and
+[verification evidence](docs/evidence/ryan_phase3.md) for exact factory configuration,
+current teammate PR compatibility, scope and pending human/deployment evidence.
+Owner regression command: `uv run pytest tests/ryan tests/unit tests/contract`.
+The optional Chromium script is `tests/ryan/browser_ui.py`; Playwright is test tooling,
+not an application dependency.
 
 ## Verification
 
