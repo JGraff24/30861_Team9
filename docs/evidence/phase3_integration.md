@@ -83,7 +83,14 @@ runtime dependency audit passed. Windows passed 234 portable tests, lint/types a
 checks, then exposed a smoke-script startup defect: its stripped environment omitted
 Windows runtime variables. The smoke script now preserves only SystemRoot/WINDIR/TEMP/TMP
 from the OS environment on Windows, while keeping application credentials excluded.
-Local smoke/lint/types passed after that correction. The follow-up CI result is recorded below.
+Local smoke/lint/types passed after that correction.
+
+[Follow-up integration CI run](https://github.com/JGraff24/30861_Team9/actions/runs/39040853751)
+on `4a9722e0aa0d1c2b4d31317c0427bfed9ca2060b`: **Ubuntu checks passed, Windows checks
+passed, dependency audit passed**. Both process smoke checks and fake-target tester self-checks
+passed; Linux also repeated the full real API/worker/tester checkpoint. The separate external
+live-suite job correctly skipped because this push did not invoke an operator-configured deployment run.
+The subsequent evidence-only commit changes no application or test behavior.
 
 ## Delivered boundary and remaining evidence
 
