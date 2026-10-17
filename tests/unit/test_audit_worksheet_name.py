@@ -1,10 +1,10 @@
 """Dylan: WORKSHEET_NAME detection, including hidden sheets and leading-zero suffixes."""
 
 import pytest
-from ooxml_builder import Sheet, Workbook
 
 from app.audit.engine import OoxmlWorkbookEngine
 from app.contracts.models import ProcessingLimits
+from tests.unit.ooxml_builder import Sheet, Workbook
 
 ENGINE = OoxmlWorkbookEngine()
 

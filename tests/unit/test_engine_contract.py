@@ -6,7 +6,12 @@ import json
 import re
 
 import pytest
-from ooxml_builder import (
+from pydantic import ValidationError
+
+from app.audit.engine import AuditInputError, OoxmlWorkbookEngine
+from app.contracts.models import AuditEvaluation, Finding, ProcessingLimits, ValidatedWorkbook
+from app.contracts.ports import WorkbookEngine
+from tests.unit.ooxml_builder import (
     Drawing,
     Sheet,
     Workbook,
@@ -18,11 +23,6 @@ from ooxml_builder import (
     pic,
     shape,
 )
-from pydantic import ValidationError
-
-from app.audit.engine import AuditInputError, OoxmlWorkbookEngine
-from app.contracts.models import AuditEvaluation, Finding, ProcessingLimits, ValidatedWorkbook
-from app.contracts.ports import WorkbookEngine
 
 ENGINE = OoxmlWorkbookEngine()
 

@@ -4,7 +4,11 @@ import hashlib
 import zipfile
 
 import pytest
-from ooxml_builder import (
+
+from app.audit.engine import OoxmlWorkbookEngine
+from app.contracts.errors import WorkbookValidationError
+from app.contracts.models import ProcessingLimits
+from tests.unit.ooxml_builder import (
     MAIN,
     REL,
     Sheet,
@@ -14,10 +18,6 @@ from ooxml_builder import (
     simple_workbook,
     zip_parts,
 )
-
-from app.audit.engine import OoxmlWorkbookEngine
-from app.contracts.errors import WorkbookValidationError
-from app.contracts.models import ProcessingLimits
 
 ENGINE = OoxmlWorkbookEngine()
 LIMITS = ProcessingLimits()

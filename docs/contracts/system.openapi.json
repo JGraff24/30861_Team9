@@ -2,7 +2,7 @@
   "openapi": "3.1.1",
   "info": {
     "title": "Team 9 system",
-    "description": "Phase 3 project service with explicit teammate integration configuration.",
+    "description": "Integrated Phase 3 workbook auditing and testing service.",
     "version": "0.3.0"
   },
   "paths": {
@@ -515,6 +515,237 @@
           }
         ]
       }
+    },
+    "/test/setup": {
+      "post": {
+        "summary": "Setup",
+        "operationId": "setup_test_setup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$defs": {
+                  "JsonValue": {}
+                },
+                "properties": {
+                  "session_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z0-9_-]+$",
+                    "title": "Session Id"
+                  },
+                  "setup": {
+                    "additionalProperties": {
+                      "$ref": "#/$defs/JsonValue"
+                    },
+                    "type": "object",
+                    "title": "Setup"
+                  }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "session_id"
+                ],
+                "title": "SystemSetupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetupResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/test/report": {
+      "get": {
+        "summary": "Report",
+        "operationId": "report_test_report_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemReport"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestEndpointError"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            }
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -619,6 +850,80 @@
           "PROCESSING_FAILED"
         ],
         "title": "AuditStatus",
+        "type": "string"
+      },
+      "CoverageMeasure": {
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "covered": {
+                "type": "null"
+              },
+              "total": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "covered": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "properties": {
+          "covered": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Covered"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "basis": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Basis",
+            "type": "string"
+          }
+        },
+        "required": [
+          "covered",
+          "total",
+          "basis"
+        ],
+        "title": "CoverageMeasure",
+        "type": "object"
+      },
+      "ErrorSource": {
+        "enum": [
+          "tester",
+          "system",
+          "communication",
+          "unknown"
+        ],
+        "title": "ErrorSource",
         "type": "string"
       },
       "Finding": {
@@ -767,6 +1072,77 @@
         "title": "ProjectError",
         "type": "object"
       },
+      "SetupResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Session Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "title": "SetupResponse",
+        "type": "object"
+      },
+      "SystemCoverage": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/CoverageMeasure"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "SystemCoverage",
+        "type": "object"
+      },
+      "SystemReport": {
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/SystemCoverage"
+          }
+        },
+        "required": [
+          "session_id",
+          "coverage"
+        ],
+        "title": "SystemReport",
+        "type": "object"
+      },
+      "TestEndpointError": {
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Message",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ErrorSource"
+          }
+        },
+        "required": [
+          "message",
+          "source"
+        ],
+        "title": "TestEndpointError",
+        "type": "object"
+      },
       "UploadResponse": {
         "additionalProperties": false,
         "properties": {
@@ -900,131 +1276,6 @@
         "title": "VersionStatus",
         "type": "string"
       },
-      "CoverageMeasure": {
-        "additionalProperties": false,
-        "oneOf": [
-          {
-            "properties": {
-              "covered": {
-                "type": "null"
-              },
-              "total": {
-                "type": "null"
-              }
-            }
-          },
-          {
-            "properties": {
-              "covered": {
-                "type": "integer"
-              },
-              "total": {
-                "type": "integer"
-              }
-            }
-          }
-        ],
-        "properties": {
-          "covered": {
-            "anyOf": [
-              {
-                "minimum": 0,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Covered"
-          },
-          "total": {
-            "anyOf": [
-              {
-                "minimum": 0,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Total"
-          },
-          "basis": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Basis",
-            "type": "string"
-          }
-        },
-        "required": [
-          "covered",
-          "total",
-          "basis"
-        ],
-        "title": "CoverageMeasure",
-        "type": "object"
-      },
-      "ErrorSource": {
-        "enum": [
-          "tester",
-          "system",
-          "communication",
-          "unknown"
-        ],
-        "title": "ErrorSource",
-        "type": "string"
-      },
-      "SetupResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "session_id": {
-            "maxLength": 64,
-            "minLength": 1,
-            "pattern": "^[A-Za-z0-9_-]+$",
-            "title": "Session Id",
-            "type": "string"
-          }
-        },
-        "required": [
-          "session_id"
-        ],
-        "title": "SetupResponse",
-        "type": "object"
-      },
-      "SystemCoverage": {
-        "additionalProperties": false,
-        "properties": {
-          "code": {
-            "$ref": "#/components/schemas/CoverageMeasure"
-          }
-        },
-        "required": [
-          "code"
-        ],
-        "title": "SystemCoverage",
-        "type": "object"
-      },
-      "SystemReport": {
-        "additionalProperties": false,
-        "properties": {
-          "session_id": {
-            "maxLength": 64,
-            "minLength": 1,
-            "pattern": "^[A-Za-z0-9_-]+$",
-            "title": "Session Id",
-            "type": "string"
-          },
-          "coverage": {
-            "$ref": "#/components/schemas/SystemCoverage"
-          }
-        },
-        "required": [
-          "session_id",
-          "coverage"
-        ],
-        "title": "SystemReport",
-        "type": "object"
-      },
       "SystemSetupRequest": {
         "additionalProperties": false,
         "properties": {
@@ -1047,26 +1298,6 @@
           "session_id"
         ],
         "title": "SystemSetupRequest",
-        "type": "object"
-      },
-      "TestEndpointError": {
-        "additionalProperties": false,
-        "properties": {
-          "message": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Message",
-            "type": "string"
-          },
-          "source": {
-            "$ref": "#/components/schemas/ErrorSource"
-          }
-        },
-        "required": [
-          "message",
-          "source"
-        ],
-        "title": "TestEndpointError",
         "type": "object"
       }
     },
@@ -1096,9 +1327,9 @@
       13,
       14
     ],
-    "integration-note": "Health is 503 until required engine and runner are configured."
+    "integration-note": "Health checks storage and configured engine/runner availability."
   },
-  "x-foundation-status": "Project service routes delivered; teammate integration pending",
+  "x-foundation-status": "Integrated Phase 3 project and system testing routes delivered",
   "x-team9-contract-profile": "1.0.0",
   "x-instructor-interface-version": "0.4.2"
 }

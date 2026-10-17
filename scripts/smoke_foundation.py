@@ -1,4 +1,4 @@
-"""Smoke the actual system service and pending tester on separate local processes."""
+"""Smoke the integrated system and independent tester on separate local processes."""
 
 import os
 import socket
@@ -60,15 +60,15 @@ def main() -> None:
                         if time.monotonic() > deadline:
                             raise TimeoutError(f"{module} startup deadline exceeded")
                         time.sleep(0.1)
-                    expected = 4 if port == 8000 else 0
+                    expected = 4 if port == 8000 else 3
                     assert len(response.json()["paths"]) == expected
                     assert response.json()["openapi"] == "3.1.1"
                     assert client.get("/docs").status_code == 200
                     if port == 8000:
-                        # Intentional: this smoke does not configure missing teammate modules.
-                        assert client.get("/api/v1/health").status_code == 503
+                        # Concrete defaults assemble all four owner modules.
+                        assert client.get("/api/v1/health").status_code == 200
                         assert client.post("/api/v1/workbooks").status_code == 401
-                    assert client.get("/test/report").status_code == 404
+                    assert client.get("/test/report").status_code == (404 if port == 8000 else 401)
                 print(f"{module}: port {port}; docs 200; {expected} actual route paths checked")
         finally:
             for process in processes:

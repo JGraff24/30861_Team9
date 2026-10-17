@@ -86,9 +86,14 @@ class PersistentSessionService:
         if session_id in cleanup:
             raise ProjectException(400, "INVALID_SETUP", "Cannot clean the new session.")
         # Check ownership before any cleanup, then atomically reserve the new ID.
+        existing_cleanup: list[str] = []
         for old in cleanup:
             assert isinstance(old, str)
-            self._owner(old, principal)
+            # A lost setup response may mean preparation never reached this system.
+            # Missing namespaces have nothing to delete; do not poison future setups.
+            if self.repository.get_test_session(old) is not None:
+                self._owner(old, principal)
+                existing_cleanup.append(old)
         session = TestSession(
             session_id=session_id,
             owner_subject=principal.subject,
@@ -100,8 +105,7 @@ class PersistentSessionService:
         )
         self.repository.create_test_session(session)
         try:
-            for old in cleanup:
-                assert isinstance(old, str)
+            for old in existing_cleanup:
                 self.cleanup(old, principal)
             if not self.blob_store.health():
                 raise StorageError("Source store unavailable")

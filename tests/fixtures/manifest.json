@@ -1,0 +1,1194 @@
+{
+  "manifest_version": "1.4.0",
+  "ruleset_version": "1.0.0",
+  "expectations": "expectations.json",
+  "components": {
+    "C1": "Authentication and access",
+    "C2": "Upload and validation",
+    "C3": "Source storage and version metadata",
+    "C4": "Rule engine",
+    "C5": "Jobs and audit-result API",
+    "C6": "System session and coverage interface"
+  },
+  "acceptance": {
+    "AC-01": "Supported files accepted with IDs; upper limits (intake)",
+    "AC-02": "Invalid, unsupported and over-limit inputs rejected (intake)",
+    "AC-03": "Real source hash unchanged after auditing (audit-only portion)",
+    "AC-04": "Both rules detect exact seeded issues; clean fixture has no findings (two-rule portion)",
+    "AC-05": "Required finding fields, classifications and locations (two-rule portion)",
+    "AC-14": "Controlled upload/audit/storage failures (delivered-operation portion)",
+    "AC-15": "Authentication and basic owner isolation (delivered-operation portion)",
+    "AC-18": "Five audits of the same bytes produce identical findings (determinism portion)"
+  },
+  "operations": [
+    {
+      "number": 1,
+      "name": "Check service availability",
+      "method": "GET",
+      "path": "/api/v1/health",
+      "requirements": [
+        "REQ-15"
+      ],
+      "phase3": true,
+      "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3."
+    },
+    {
+      "number": 2,
+      "name": "Upload an initial workbook",
+      "method": "POST",
+      "path": "/api/v1/workbooks",
+      "requirements": [
+        "REQ-01",
+        "REQ-02",
+        "REQ-03",
+        "REQ-04",
+        "REQ-11",
+        "REQ-13"
+      ],
+      "phase3": true,
+      "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3."
+    },
+    {
+      "number": 3,
+      "name": "Upload a new workbook version",
+      "method": "POST",
+      "path": "/api/v1/workbooks/{workbookId}/versions",
+      "requirements": [
+        "REQ-03",
+        "REQ-10",
+        "REQ-11",
+        "REQ-13",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."
+    },
+    {
+      "number": 4,
+      "name": "Retrieve a workbook version",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}",
+      "requirements": [
+        "REQ-03",
+        "REQ-11",
+        "REQ-14"
+      ],
+      "phase3": true,
+      "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3."
+    },
+    {
+      "number": 5,
+      "name": "Retrieve an audit and its findings",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}",
+      "requirements": [
+        "REQ-04",
+        "REQ-05",
+        "REQ-06",
+        "REQ-10",
+        "REQ-11",
+        "REQ-13"
+      ],
+      "phase3": true,
+      "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3."
+    },
+    {
+      "number": 6,
+      "name": "Trigger a new audit",
+      "method": "POST",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits",
+      "requirements": [
+        "REQ-04",
+        "REQ-10",
+        "REQ-11",
+        "REQ-12",
+        "REQ-13"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."
+    },
+    {
+      "number": 7,
+      "name": "Submit remediation decisions",
+      "method": "POST",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/remediations",
+      "requirements": [
+        "REQ-06",
+        "REQ-07",
+        "REQ-08",
+        "REQ-09",
+        "REQ-10",
+        "REQ-13"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."
+    },
+    {
+      "number": 8,
+      "name": "Retrieve remediation status",
+      "method": "GET",
+      "path": "/api/v1/remediations/{remediationId}",
+      "requirements": [
+        "REQ-08",
+        "REQ-09",
+        "REQ-10",
+        "REQ-11",
+        "REQ-13"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."
+    },
+    {
+      "number": 9,
+      "name": "Download the remediated workbook",
+      "method": "GET",
+      "path": "/api/v1/outputs/{outputId}/workbook",
+      "requirements": [
+        "REQ-08",
+        "REQ-09",
+        "REQ-13",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."
+    },
+    {
+      "number": 10,
+      "name": "Retrieve version and audit history",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/history",
+      "requirements": [
+        "REQ-10",
+        "REQ-11",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."
+    },
+    {
+      "number": 11,
+      "name": "Configure periodic auditing and reminders",
+      "method": "PUT",
+      "path": "/api/v1/workbooks/{workbookId}/schedule",
+      "requirements": [
+        "REQ-12",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."
+    },
+    {
+      "number": 12,
+      "name": "Retrieve notification records",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/notifications",
+      "requirements": [
+        "REQ-12",
+        "REQ-13",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."
+    },
+    {
+      "number": 13,
+      "name": "Advance the test clock",
+      "method": "POST",
+      "path": "/api/v1/test/clock",
+      "requirements": [
+        "REQ-12",
+        "REQ-15"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."
+    },
+    {
+      "number": 14,
+      "name": "Delete a workbook",
+      "method": "DELETE",
+      "path": "/api/v1/workbooks/{workbookId}",
+      "requirements": [
+        "REQ-12",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3."
+    }
+  ],
+  "pending_confirmation": [
+    "X-Test-Session on project calls (including health) and unknown session -> 400.",
+    "Named .xlsm -> 422 MACRO_ENABLED_WORKBOOK_UNSUPPORTED; other unsupported types -> 415.",
+    "Error code strings other than MACRO_ENABLED_WORKBOOK_UNSUPPORTED are not asserted.",
+    "Component catalog C1-C6 and the eight Phase 3 AC portions as coverage denominators."
+  ],
+  "tests": [
+    {
+      "test_id": "P3-HEALTH",
+      "check": "health",
+      "description": "Public health returns HealthResponse with the expected ruleset.",
+      "qualifying_assertion": "Status 200 and HealthResponse schema evaluated.",
+      "components": [],
+      "acceptance": [],
+      "operations": [
+        1
+      ],
+      "path": "success"
+    },
+    {
+      "test_id": "P3-AUTH-UPLOAD",
+      "check": "upload_without_token",
+      "description": "Upload without a bearer token is rejected with no accepted IDs.",
+      "qualifying_assertion": "401 status and strict project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [
+        "AC-15"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-AUTH-UPLOAD-INVALID",
+      "check": "upload_invalid_token",
+      "description": "Upload with an unknown bearer token is rejected.",
+      "qualifying_assertion": "401 status and project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [
+        "AC-15"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-INPUT-MISSING-FILE",
+      "check": "upload_missing_file",
+      "description": "Multipart upload without the file field returns 400.",
+      "qualifying_assertion": "400 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-INPUT-CSV",
+      "check": "upload_csv",
+      "description": "CSV upload returns 415.",
+      "qualifying_assertion": "415 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-INPUT-MISSING-EXTENSION",
+      "check": "upload_no_extension",
+      "description": "Missing filename extension returns 415.",
+      "qualifying_assertion": "415 status and strict project error envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-INPUT-XLS",
+      "check": "upload_xls",
+      "description": "Legacy .xls upload returns 415.",
+      "qualifying_assertion": "415 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-INPUT-XLSM",
+      "check": "upload_xlsm",
+      "description": "Named .xlsm upload returns 422 MACRO_ENABLED_WORKBOOK_UNSUPPORTED.",
+      "qualifying_assertion": "422 status, envelope and code evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-INPUT-CORRUPT",
+      "check": "upload_corrupt",
+      "description": "Corrupt workbook returns 422 with no accepted identifiers.",
+      "qualifying_assertion": "Status and strict project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-INPUT-PROTECTED",
+      "check": "upload_protected",
+      "description": "Workbook with password-protected structure returns 422.",
+      "qualifying_assertion": "422 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-INPUT-BYTES-OVER",
+      "check": "upload_over_limit",
+      "description": "An upload of 25,000,001 bytes returns 413.",
+      "qualifying_assertion": "413 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-INPUT-BYTES-AT",
+      "check": "upload_at_limit",
+      "description": "A valid workbook of exactly 25,000,000 bytes is accepted.",
+      "qualifying_assertion": "202 status and UploadResponse evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success"
+    },
+    {
+      "test_id": "P3-INPUT-SHEETS-OVER",
+      "check": "upload_worksheets_over",
+      "description": "A valid workbook with 51 worksheets returns 422.",
+      "qualifying_assertion": "422 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-INPUT-SHEETS-AT",
+      "check": "upload_worksheets_at",
+      "description": "A valid workbook with exactly 50 worksheets is accepted.",
+      "qualifying_assertion": "202 status and UploadResponse evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success"
+    },
+    {
+      "test_id": "P3-INPUT-CELLS-OVER",
+      "check": "upload_cells_over",
+      "description": "A valid workbook with 250,001 nonempty cells returns 422.",
+      "qualifying_assertion": "422 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-INPUT-CELLS-AT",
+      "check": "upload_cells_at",
+      "description": "A valid workbook with exactly 250,000 nonempty cells is accepted.",
+      "qualifying_assertion": "202 status and UploadResponse evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success"
+    },
+    {
+      "test_id": "P3-UPLOAD-CLEAN",
+      "check": "upload_clean",
+      "description": "Clean fixture is accepted with three PROCESSING identifiers.",
+      "qualifying_assertion": "202 status and UploadResponse evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success"
+    },
+    {
+      "test_id": "P3-UPLOAD-SEEDED",
+      "check": "upload_seeded",
+      "description": "Seeded fixture is accepted with three PROCESSING identifiers.",
+      "qualifying_assertion": "202 status and UploadResponse evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success"
+    },
+    {
+      "test_id": "P3-VERSION-VALID",
+      "check": "version_clean",
+      "description": "Version metadata matches the upload and the tester's own SHA256.",
+      "qualifying_assertion": "VersionResponse identifiers, fileName and sha256 evaluated.",
+      "components": [
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        4
+      ],
+      "path": "success",
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN"
+      ]
+    },
+    {
+      "test_id": "P3-VERSION-UNAUTHENTICATED",
+      "check": "version_unauthenticated",
+      "description": "Version read without a bearer token returns 401.",
+      "qualifying_assertion": "401 status and project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [
+        "AC-15"
+      ],
+      "operations": [
+        4
+      ],
+      "path": "error",
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN"
+      ]
+    },
+    {
+      "test_id": "P3-AUDIT-CLEAN",
+      "check": "audit_clean",
+      "description": "Clean fixture audit completes with no findings.",
+      "qualifying_assertion": "Terminal AuditResponse status and findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN"
+      ]
+    },
+    {
+      "test_id": "P3-AUDIT-SEEDED",
+      "check": "audit_seeded",
+      "description": "Seeded audit returns exactly the expected findings in contract order.",
+      "qualifying_assertion": "Terminal status and finding identity/fields/order evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-SOURCE-HASH",
+      "check": "hash_after_audit",
+      "description": "Source SHA256 is unchanged after auditing.",
+      "qualifying_assertion": "Post-audit VersionResponse sha256 and latestAuditId evaluated.",
+      "components": [
+        "C3"
+      ],
+      "acceptance": [
+        "AC-03"
+      ],
+      "operations": [
+        4
+      ],
+      "path": "success",
+      "prerequisites": [
+        "P3-AUDIT-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-VERSION-FOREIGN",
+      "check": "foreign_owner_forbidden",
+      "description": "User B cannot read user A's version.",
+      "qualifying_assertion": "403 status and project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [
+        "AC-15"
+      ],
+      "operations": [
+        4
+      ],
+      "path": "error",
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-AUDIT-UNAUTHENTICATED",
+      "check": "audit_unauthenticated",
+      "description": "Audit read without a bearer token returns 401.",
+      "qualifying_assertion": "401 status and project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [
+        "AC-15"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "error",
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN"
+      ]
+    },
+    {
+      "test_id": "P3-AUDIT-FOREIGN",
+      "check": "audit_foreign_owner",
+      "description": "User B cannot read user A's audit.",
+      "qualifying_assertion": "403 status and project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [
+        "AC-15"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "error",
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-VERSION-REVIEWER",
+      "check": "reviewer_version",
+      "description": "Explicitly granted reviewer reads user A's version.",
+      "qualifying_assertion": "Authorized reviewer 200 status, strict schema, resource IDs and returned metadata evaluated.",
+      "components": [
+        "C1",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-15"
+      ],
+      "operations": [
+        4
+      ],
+      "path": "success",
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-AUDIT-REVIEWER",
+      "check": "reviewer_audit",
+      "description": "Explicitly granted reviewer reads user A's audit.",
+      "qualifying_assertion": "Authorized reviewer 200 status, strict schema, resource IDs and returned metadata evaluated.",
+      "components": [
+        "C1",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-15"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-NOT-FOUND",
+      "check": "unknown_resources",
+      "description": "version-unknown returns 404.",
+      "qualifying_assertion": "404 status and project error envelope evaluated.",
+      "components": [
+        "C3"
+      ],
+      "acceptance": [],
+      "operations": [
+        4
+      ],
+      "path": "error",
+      "parameters": {
+        "case": "version-unknown"
+      },
+      "prerequisites": []
+    },
+    {
+      "test_id": "P3-VERSION-MISMATCH",
+      "check": "unknown_resources",
+      "description": "version-mismatch returns 404.",
+      "qualifying_assertion": "404 status and project error envelope evaluated.",
+      "components": [
+        "C3"
+      ],
+      "acceptance": [],
+      "operations": [
+        4
+      ],
+      "path": "error",
+      "parameters": {
+        "case": "version-mismatch"
+      },
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN",
+        "P3-UPLOAD-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-AUDIT-MISMATCH",
+      "check": "unknown_resources",
+      "description": "audit-mismatch returns 404.",
+      "qualifying_assertion": "404 status and project error envelope evaluated.",
+      "components": [
+        "C5"
+      ],
+      "acceptance": [],
+      "operations": [
+        5
+      ],
+      "path": "error",
+      "parameters": {
+        "case": "audit-mismatch"
+      },
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN",
+        "P3-UPLOAD-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-AUDIT-UNKNOWN",
+      "check": "unknown_resources",
+      "description": "audit-unknown returns 404.",
+      "qualifying_assertion": "404 status and project error envelope evaluated.",
+      "components": [
+        "C5"
+      ],
+      "acceptance": [],
+      "operations": [
+        5
+      ],
+      "path": "error",
+      "parameters": {
+        "case": "audit-unknown"
+      },
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN",
+        "P3-UPLOAD-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-DETERMINISM",
+      "check": "determinism",
+      "description": "Audit 2 matches the first of five uploads.",
+      "qualifying_assertion": "Semantic findings and within-target message/recommendation compared.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-18"
+      ],
+      "operations": [
+        2,
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "run": 2
+      },
+      "prerequisites": [
+        "P3-AUDIT-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-DETERMINISM-3",
+      "check": "determinism",
+      "description": "Audit 3 matches the first of five uploads.",
+      "qualifying_assertion": "Semantic findings and within-target message/recommendation compared.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-18"
+      ],
+      "operations": [
+        2,
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "run": 3
+      },
+      "prerequisites": [
+        "P3-AUDIT-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-DETERMINISM-4",
+      "check": "determinism",
+      "description": "Audit 4 matches the first of five uploads.",
+      "qualifying_assertion": "Semantic findings and within-target message/recommendation compared.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-18"
+      ],
+      "operations": [
+        2,
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "run": 4
+      },
+      "prerequisites": [
+        "P3-AUDIT-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-DETERMINISM-5",
+      "check": "determinism",
+      "description": "Audit 5 matches the first of five uploads.",
+      "qualifying_assertion": "Semantic findings and within-target message/recommendation compared.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-18"
+      ],
+      "operations": [
+        2,
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "run": 5
+      },
+      "prerequisites": [
+        "P3-AUDIT-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-SESSION-UNKNOWN",
+      "check": "unknown_session_header",
+      "description": "A project call naming an unknown X-Test-Session returns 400.",
+      "qualifying_assertion": "400 status and project envelope evaluated.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": [],
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ]
+    },
+    {
+      "test_id": "P3-SESSION-DUPLICATE",
+      "check": "system_setup_duplicate",
+      "description": "Repeating system setup with an existing session_id returns 409.",
+      "qualifying_assertion": "409 status and TestEndpointError evaluated.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": []
+    },
+    {
+      "test_id": "P3-UPLOAD-UNICODE",
+      "check": "edge_upload",
+      "description": "unicode accepted.",
+      "qualifying_assertion": "202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "unicode"
+      }
+    },
+    {
+      "test_id": "P3-AUDIT-UNICODE",
+      "check": "edge_audit",
+      "description": "unicode exact findings and limitations.",
+      "qualifying_assertion": "Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "unicode"
+      },
+      "prerequisites": [
+        "P3-UPLOAD-UNICODE"
+      ]
+    },
+    {
+      "test_id": "P3-UPLOAD-REPEATED-IDS",
+      "check": "edge_upload",
+      "description": "repeated_ids accepted.",
+      "qualifying_assertion": "202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "repeated_ids"
+      }
+    },
+    {
+      "test_id": "P3-AUDIT-REPEATED-IDS",
+      "check": "edge_audit",
+      "description": "repeated_ids exact findings and limitations.",
+      "qualifying_assertion": "Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "repeated_ids"
+      },
+      "prerequisites": [
+        "P3-UPLOAD-REPEATED-IDS"
+      ]
+    },
+    {
+      "test_id": "P3-UPLOAD-MULTIPLE-DRAWINGS",
+      "check": "edge_upload",
+      "description": "multiple_drawings accepted.",
+      "qualifying_assertion": "202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "multiple_drawings"
+      }
+    },
+    {
+      "test_id": "P3-AUDIT-MULTIPLE-DRAWINGS",
+      "check": "edge_audit",
+      "description": "multiple_drawings exact findings and limitations.",
+      "qualifying_assertion": "Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "multiple_drawings"
+      },
+      "prerequisites": [
+        "P3-UPLOAD-MULTIPLE-DRAWINGS"
+      ]
+    },
+    {
+      "test_id": "P3-INPUT-ZIP-TRAVERSAL",
+      "check": "rejected_fixture",
+      "description": "zip_traversal rejects with no accepted IDs.",
+      "qualifying_assertion": "Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error",
+      "parameters": {
+        "fixture": "zip_traversal"
+      }
+    },
+    {
+      "test_id": "P3-INPUT-ZIP-DUPLICATE",
+      "check": "rejected_fixture",
+      "description": "zip_duplicate rejects with no accepted IDs.",
+      "qualifying_assertion": "Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error",
+      "parameters": {
+        "fixture": "zip_duplicate"
+      }
+    },
+    {
+      "test_id": "P3-INPUT-XML-DTD",
+      "check": "rejected_fixture",
+      "description": "xml_dtd rejects with no accepted IDs.",
+      "qualifying_assertion": "Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error",
+      "parameters": {
+        "fixture": "xml_dtd"
+      }
+    },
+    {
+      "test_id": "P3-INPUT-MACRO-PARTS",
+      "check": "rejected_fixture",
+      "description": "macro_parts rejects with no accepted IDs.",
+      "qualifying_assertion": "Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error",
+      "parameters": {
+        "fixture": "macro_parts"
+      }
+    },
+    {
+      "test_id": "P3-INPUT-ENCRYPTED-ZIP",
+      "check": "rejected_fixture",
+      "description": "encrypted_zip rejects with no accepted IDs.",
+      "qualifying_assertion": "Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error",
+      "parameters": {
+        "fixture": "encrypted_zip"
+      }
+    },
+    {
+      "test_id": "P3-INPUT-PROTECTED-SHEET",
+      "check": "rejected_fixture",
+      "description": "protected_sheet separately rejected.",
+      "qualifying_assertion": "Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error",
+      "parameters": {
+        "fixture": "protected_sheet"
+      }
+    },
+    {
+      "test_id": "P3-INPUT-PROTECTED-STRUCTURE",
+      "check": "rejected_fixture",
+      "description": "protected_structure separately rejected.",
+      "qualifying_assertion": "Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "error",
+      "parameters": {
+        "fixture": "protected_structure"
+      }
+    },
+    {
+      "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+      "check": "controlled_failure",
+      "description": "Validate any observed controlled target audit failure; skip if none occurred.",
+      "qualifying_assertion": "Observed PROCESSING_FAILED timestamp/error/no-partial-findings evaluated.",
+      "components": [
+        "C5"
+      ],
+      "acceptance": [
+        "AC-14"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "error"
+    },
+    {
+      "test_id": "P3-CODE-REPORT",
+      "check": "system_report",
+      "description": "System report returns this session's code coverage (counts and basis, or paired nulls).",
+      "qualifying_assertion": "200 status and SystemReport evaluated.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": []
+    }
+  ]
+}

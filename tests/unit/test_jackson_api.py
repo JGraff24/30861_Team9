@@ -308,7 +308,12 @@ def test_testing_namespace_isolation(services: SystemServices) -> None:
 
 def test_missing_integrations_are_unavailable(tmp_path: Path) -> None:
     settings = SystemSettings(
-        _env_file=None, metadata_db_path=tmp_path / "db", blob_root=tmp_path / "blobs"
+        _env_file=None,
+        metadata_db_path=tmp_path / "db",
+        blob_root=tmp_path / "blobs",
+        engine_factory=None,
+        runner_factory=None,
+        session_service_factory=None,
     )
     app = create_app(settings)
     assert not tmp_path.joinpath("db").exists()  # factory has no writes

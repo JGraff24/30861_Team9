@@ -9,11 +9,11 @@ import struct
 import zipfile
 
 import pytest
-from ooxml_builder import Sheet, Workbook, cell_rows, simple_workbook, zip_parts
 
 from app.audit.engine import OoxmlWorkbookEngine
 from app.contracts.errors import WorkbookValidationError
 from app.contracts.models import ProcessingLimits
+from tests.unit.ooxml_builder import Sheet, Workbook, cell_rows, simple_workbook, zip_parts
 
 ENGINE = OoxmlWorkbookEngine()
 DEFAULTS = ProcessingLimits()

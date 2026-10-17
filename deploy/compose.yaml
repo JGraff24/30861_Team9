@@ -3,7 +3,7 @@ x-system: &system
   build:
     context: ..
     dockerfile: deploy/Dockerfile
-    target: runtime
+    target: ${TEAM9_BUILD_TARGET:-runtime}
   image: team9-system:local
   env_file: ${TEAM9_ENV_FILE:-../.env.local}
   environment: &system-env
@@ -26,7 +26,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile
-      target: runtime
+      target: ${TEAM9_BUILD_TARGET:-runtime}
     image: team9-system:local
     env_file: ${TEAM9_ENV_FILE:-../.env.local}
     environment:

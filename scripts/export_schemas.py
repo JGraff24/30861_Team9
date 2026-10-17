@@ -1,4 +1,4 @@
-"""Export actual system routes and the still-pending tester DTO catalog."""
+"""Export actual system and tester routes with the shared DTO catalog."""
 
 import argparse
 import json
@@ -44,7 +44,11 @@ def schema_documents() -> dict[str, dict[str, object]]:
     documents = {}
     for name, application, models in (
         # Catalog generation uses documented local defaults, independent of private env inputs.
-        ("system", create_system(SystemSettings.model_construct()), system_models),
+        (
+            "system",
+            create_system(SystemSettings.model_construct(enable_test_interface=True)),
+            system_models,
+        ),
         ("tester", create_tester(TesterSettings.model_construct()), tester_models),
     ):
         document = application.openapi()
@@ -54,9 +58,9 @@ def schema_documents() -> dict[str, dict[str, object]]:
         )
         document.setdefault("components", {}).setdefault("schemas", {}).update(schemas["$defs"])
         document["x-foundation-status"] = (
-            "Project service routes delivered; teammate integration pending"
+            "Integrated Phase 3 project and system testing routes delivered"
             if name == "system"
-            else "DTO catalog only; all feature endpoints pending"
+            else "Independent tester setup/run/report delivered"
         )
         document["x-team9-contract-profile"] = "1.0.0"
         document["x-instructor-interface-version"] = "0.4.2"

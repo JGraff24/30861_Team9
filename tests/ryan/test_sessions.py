@@ -114,6 +114,14 @@ def test_failure_and_cleanup_resume(context):
     assert repo.sessions["old"].cleanup_error is None
 
 
+def test_cleanup_of_setup_that_never_reached_system_does_not_block_new_session(context):
+    repo, blobs, service, admin = context
+    ready = service.prepare("new", admin, {"cleanup_session_ids": ["lost-setup"]})
+    assert ready.state == SessionState.READY
+    assert "lost-setup" not in repo.sessions
+    blobs.delete_test_source.assert_not_called()
+
+
 def client(context, enabled=True):
     repo, blobs, service, admin = context
     auth = Mock()

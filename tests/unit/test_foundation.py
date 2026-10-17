@@ -34,8 +34,16 @@ def test_factories_do_not_contact_network_or_write_storage(monkeypatch: pytest.M
     def blocked(*args: object, **kwargs: object) -> None:
         raise AssertionError("factories must not contact network")
 
+    original_connect = socket.socket.connect
+
+    def blocked_connect(self: socket.socket, address: object) -> None:
+        # Windows implements the event loop socketpair using loopback TCP.
+        if os.name == "nt" and isinstance(address, tuple) and address[0] in {"127.0.0.1", "::1"}:
+            return original_connect(self, address)
+        raise AssertionError("factories must not contact network")
+
     monkeypatch.setattr(socket, "getaddrinfo", blocked)
-    monkeypatch.setattr(socket.socket, "connect", blocked)
+    monkeypatch.setattr(socket.socket, "connect", blocked_connect)
     for factory in (create_system, create_tester):
         application = factory()
         assert application.openapi()
@@ -43,10 +51,10 @@ def test_factories_do_not_contact_network_or_write_storage(monkeypatch: pytest.M
     with TestClient(create_system()) as client:
         assert client.get("/docs").status_code == 200
         assert len(client.get("/openapi.json").json()["paths"]) == 4
-        assert client.get("/api/v1/health").status_code == 503
+        assert client.get("/api/v1/health").status_code == 200
     with TestClient(create_tester()) as client:
-        assert client.get("/openapi.json").json()["paths"] == {}
-        assert client.get("/test/report").status_code == 404
+        assert len(client.get("/openapi.json").json()["paths"]) == 3
+        assert client.get("/test/report").status_code == 401
 
 
 def test_injected_ports_are_retained_and_initialized_at_lifespan() -> None:

@@ -1,4 +1,5 @@
 import pickle
+import sys
 from pathlib import Path
 
 import pytest
@@ -55,7 +56,13 @@ def test_disabled_and_non_session():
         ("timeout", "timeout"),
         ("invalid", "invalid_result"),
         ("bad_ipc", "invalid_result"),
-        ("memory", "crash"),
+        pytest.param(
+            "memory",
+            "crash",
+            marks=pytest.mark.skipif(
+                sys.platform != "linux", reason="RLIMIT_AS enforcement requires Linux"
+            ),
+        ),
     ],
 )
 def test_failures(mode, kind):

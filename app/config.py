@@ -67,11 +67,13 @@ class SystemSettings(EnvironmentSettings):
         exclude=True,
     )
     enable_code_measurement: bool = False
-    engine_factory: NonemptyText | None = None
-    runner_factory: NonemptyText | None = None
-    session_service_factory: NonemptyText | None = None
-    test_router_factory: NonemptyText | None = None
-    ui_router_factory: NonemptyText | None = None
+    engine_factory: NonemptyText | None = "app.audit.engine:OoxmlWorkbookEngine"
+    runner_factory: NonemptyText | None = "app.measurement.runner:MeasuredEngineRunner"
+    session_service_factory: NonemptyText | None = (
+        "app.test_interface.service:PersistentSessionService"
+    )
+    test_router_factory: NonemptyText | None = "app.test_interface.routes:create_router"
+    ui_router_factory: NonemptyText | None = "app.ui.routes:create_router"
     validation_timeout_seconds: PositiveSeconds = 30
     audit_timeout_seconds: PositiveSeconds = 60
     queue_timeout_seconds: PositiveSeconds = 15

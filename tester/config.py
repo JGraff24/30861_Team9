@@ -77,9 +77,18 @@ class TesterSettings(EnvironmentSettings):
         repr=False,
         exclude=True,
     )
-    fixture_manifest_path: Path = Path("tests/fixtures/manifest.json")
+    fixture_manifest_path: Path = Field(
+        default_factory=lambda: (
+            Path(__file__).resolve().parent / "fixtures" / "manifest.json"
+            if (Path(__file__).resolve().parent / "fixtures" / "manifest.json").exists()
+            else Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "manifest.json"
+        )
+    )
     tester_setup_timeout_seconds: PositiveSeconds = 45
     tester_run_timeout_seconds: PositiveSeconds = 600
+    # Failed setups are always compensated on the next setup. This flag additionally
+    # enables cleanup of successfully retrieved reports' target namespaces.
+    tester_cleanup_prior_sessions: bool = False
 
     @model_validator(mode="after")
     def approved_url_shapes(self) -> Self:

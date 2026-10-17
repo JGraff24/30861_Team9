@@ -31,7 +31,7 @@ choosing. Budget alerts do not cap spending. Confirm EC2 hours, gp3 capacity, sn
 capacity/requests, public IPv4, internet egress, registry, TLS/DNS and any NAT/endpoint charges.
 Use current regional prices; no numeric monthly price or free-tier eligibility is asserted.
 
-The application integrations must be merged and configured first. Run the real local checkpoint:
+The four application modules are integrated. Repeat the local checkpoint before release:
 setup → authenticated clean/seeded upload → separate worker completion → version/audit reads →
 real measured coverage → retained tester report. No fakes may be configured in a release image.
 Run Linux memory enforcement in that image. The Docker image excludes tests, so the local unit
@@ -39,8 +39,8 @@ suite must be run in a Linux development checkout/container with tests mounted a
 
 ## Local Compose
 
-From the repository root, create the private local credentials file, complete real integration
-settings, and configure the tester's exact Docker target/access map privately. Then:
+From the repository root, create the private local credentials file, enable testing/measurement as needed,
+and configure the tester's exact Docker target/access map privately. Then:
 
 ```sh
 docker compose -f deploy/compose.yaml config --quiet
@@ -51,10 +51,12 @@ docker compose -f deploy/compose.yaml restart system worker
 docker compose -f deploy/compose.yaml down
 ```
 
-No `down -v`: that removes durable volumes. The worker's missing-integration error is expected
-until real factories are configured. Readiness `/api/v1/health` is 503 in the current checkout.
-Enable the measurement Docker target only when measurement is configured, for both API and
-worker. The tester remains Dixon's unfinished foundation in this branch.
+No `down -v`: that removes durable volumes. Concrete factories are selected by default;
+health returns 200 when storage and required integrations are available. Use
+`TEAM9_BUILD_TARGET=measurement` for development Compose when enabling code measurement.
+The tester is implemented and its manifest/fixtures are included in the installed wheel.
+The Docker build copies fixture inputs before packaging and runs the installed wheel so
+package-relative fixture/UI paths resolve. Images and Compose still require Docker validation.
 
 ## Render and review before provisioning
 
@@ -109,8 +111,8 @@ requires lifecycle/cleanup/retention design and cost review.
 ## Build, TLS, release and startup
 
 Record a reviewed source SHA and immutable release tag → SHA → image digest mapping in
-`docs/evidence/jackson_phase3.md` when a real release is made. The implementation is on
-`feature/phase3-service`, based on `ffa6947`; use the PR head for review. No release tag/digest is invented. Build for the
+`docs/evidence/jackson_phase3.md` when a real release is made. The integrated source is tracked in `docs/evidence/phase3_integration.md`; use the reviewed
+merged commit for a release. No release tag/digest is invented. Build for the
 selected EC2 architecture using the locked dependencies, scan the image, and place it in the
 approved private registry. Supply `TEAM9_IMAGE` as an immutable tag/digest, never mutable latest.
 

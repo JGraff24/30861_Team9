@@ -7,6 +7,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --locked --no-dev --no-install-project
 COPY app ./app
 COPY tester ./tester
+COPY tests/fixtures ./tests/fixtures
 RUN uv sync --locked --no-dev --no-editable
 
 FROM python:3.12-slim AS runtime
@@ -14,8 +15,7 @@ RUN groupadd --gid 10001 service && useradd --uid 10001 --gid 10001 --no-create-
     && mkdir -p /service/state /service/tester-state && chown -R service:service /service
 WORKDIR /service
 COPY --from=build /service/.venv ./.venv
-COPY --from=build /service/app ./app
-COPY --from=build /service/tester ./tester
+# Run the installed wheel so its bundled tester fixtures and UI assets resolve correctly.
 ENV PATH="/service/.venv/bin:$PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 USER 10001:10001
 EXPOSE 8000

@@ -3,7 +3,10 @@
 import hashlib
 
 import pytest
-from ooxml_builder import (
+
+from app.audit.engine import OoxmlWorkbookEngine
+from app.contracts.models import AuditEvaluation, Finding, ProcessingLimits
+from tests.unit.ooxml_builder import (
     Drawing,
     Sheet,
     Workbook,
@@ -17,9 +20,6 @@ from ooxml_builder import (
     pic,
     shape,
 )
-
-from app.audit.engine import OoxmlWorkbookEngine
-from app.contracts.models import AuditEvaluation, Finding, ProcessingLimits
 
 ENGINE = OoxmlWorkbookEngine()
 D1 = "xl/drawings/drawing1.xml"

@@ -1,0 +1,231 @@
+{
+  "ruleset_version": "1.0.0",
+  "manual_review": "Pending. Expectations were authored by Dixon from the fixture definitions in tester/suite/workbooks.py and the audit policy in docs/contracts/phase3.md; no two-member pod review has been performed yet.",
+  "fixtures": {
+    "clean": {
+      "kind": "accepted",
+      "file": "synthetic/clean.xlsx",
+      "sha256": "e1de45e415b8552304a69050a86c5d605ab07eeaf96cef0c92dde6ba2d63e35e",
+      "origin": "synthetic",
+      "upload_name": "clean.xlsx",
+      "notes": "Synthetic stand-in for Team 12 clean.xlsx. Sheets Budget and Notes; Budget has a picture (id 2), a shape (id 3) and a chart (id 4), each with a nonblank title and description and no decorative marker.",
+      "expected_status": "AUDIT_COMPLETE",
+      "findings": []
+    },
+    "seeded_issues": {
+      "kind": "accepted",
+      "file": "synthetic/seeded_issues.xlsx",
+      "sha256": "6e54efe60ce3a45530f364168557ea7ceb085a454b3c02fe5927ab715b00d223",
+      "origin": "synthetic",
+      "upload_name": "seeded_issues.xlsx",
+      "notes": "Synthetic stand-in for Team 12 seeded_issues.xlsx. Sheet1 (sheetId 1, sheet1.xml) holds drawing1.xml: Picture 1 (id 2) has a title but no descr; Rectangle 2 (id 3) has a whitespace-only title; Chart 3 (id 4) is natively decorative; Group 4 (id 5) has both fields and contains Picture 5 (id 6) whose descr is U+00A0 plus a space. Expenses (sheetId 2) is descriptive. Hidden sheet2 (sheetId 3) is stored in sheet3.xml. Sheet0 (sheetId 4) is excluded by the zero suffix.",
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=2",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=3",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=4",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=6",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "WORKSHEET_NAME",
+          "category": "WORKSHEET_NAME",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "WORKSHEET_NAME",
+          "category": "WORKSHEET_NAME",
+          "worksheet": "sheet2",
+          "target": "xl/worksheets/sheet3.xml#sheetId=3",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ]
+    },
+    "corrupt": {
+      "kind": "rejected",
+      "file": "synthetic/corrupt.xlsx",
+      "sha256": "c51c63778cc8b7337c98ea4a62ee51d3abb17b537b28a64cfeffc0ef9d292265",
+      "origin": "synthetic",
+      "upload_name": "corrupt.xlsx",
+      "notes": "Synthetic stand-in for Team 12 corrupt.xlsx: a local file header signature followed by unreadable bytes. The error code is not yet agreed, so only status and envelope are asserted.",
+      "http_status": 422,
+      "error_code": null
+    },
+    "unicode": {
+      "kind": "accepted",
+      "file": "synthetic/unicode.xlsx",
+      "sha256": "5d938a482bcb0f0bf84df3bfd9cc6dfedf7f0c57a0f9ac3357ef9b15520e1efd",
+      "origin": "synthetic",
+      "upload_name": "unicode.xlsx",
+      "notes": "Provisional hand-authored edge case; pod/Excel review pending.",
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": " Sheet01 ",
+          "target": "xl/drawings/drawing1.xml#id=7",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": " Sheet01 ",
+          "target": "xl/drawings/drawing1.xml#id=8",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "WORKSHEET_NAME",
+          "category": "WORKSHEET_NAME",
+          "worksheet": " Sheet01 ",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ]
+    },
+    "repeated_ids": {
+      "kind": "accepted",
+      "file": "synthetic/repeated_ids.xlsx",
+      "sha256": "680d7d50899bfb4d2178acaafecbf9741f46fb0a9bdff1fb374670c50c813883",
+      "origin": "synthetic",
+      "upload_name": "repeated_ids.xlsx",
+      "notes": "Provisional hand-authored edge case; pod/Excel review pending.",
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Expenses",
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[1]/pic[1]/nvPicPr[1]/cNvPr[1]",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Expenses",
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[2]/pic[1]/nvPicPr[1]/cNvPr[1]",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ]
+    },
+    "multiple_drawings": {
+      "kind": "accepted",
+      "file": "synthetic/multiple_drawings.xlsx",
+      "sha256": "52fb02a37099b7ab9a0787e7858d36340155a1c5682dc7000fe35fa79ef2eb27",
+      "origin": "synthetic",
+      "upload_name": "multiple_drawings.xlsx",
+      "notes": "Provisional hand-authored edge case; pod/Excel review pending.",
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Expenses",
+          "target": "xl/drawings/drawing1.xml#id=7",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Hidden costs",
+          "target": "xl/drawings/drawing2.xml#id=8",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ]
+    },
+    "zip_traversal": {
+      "kind": "rejected",
+      "file": "synthetic/zip_traversal.xlsx",
+      "sha256": "8643e444288c01475000843f03d8621e6c59660eb8a45974392a7e2ce3880ebc",
+      "origin": "synthetic",
+      "upload_name": "zip_traversal.xlsx",
+      "notes": "Provisional hostile-input fixture. encrypted_zip sets encryption flags; it is not a genuine Excel encrypted document.",
+      "http_status": 422,
+      "error_code": null
+    },
+    "zip_duplicate": {
+      "kind": "rejected",
+      "file": "synthetic/zip_duplicate.xlsx",
+      "sha256": "dd10f96a1ca5f1dac9caa59396acb6929f862b1ab7fd1123ccb2c110fdf9a98d",
+      "origin": "synthetic",
+      "upload_name": "zip_duplicate.xlsx",
+      "notes": "Provisional hostile-input fixture. encrypted_zip sets encryption flags; it is not a genuine Excel encrypted document.",
+      "http_status": 422,
+      "error_code": null
+    },
+    "xml_dtd": {
+      "kind": "rejected",
+      "file": "synthetic/xml_dtd.xlsx",
+      "sha256": "accad3c326749fcc2e1fc1aa77999d7a5bf74c9cb9fbc7e2244ae374947c4843",
+      "origin": "synthetic",
+      "upload_name": "xml_dtd.xlsx",
+      "notes": "Provisional hostile-input fixture. encrypted_zip sets encryption flags; it is not a genuine Excel encrypted document.",
+      "http_status": 422,
+      "error_code": null
+    },
+    "macro_parts": {
+      "kind": "rejected",
+      "file": "synthetic/macro_parts.xlsx",
+      "sha256": "0b2819c85a29d598707f08a43371133fae7db386be8233c3a536d86e576663fe",
+      "origin": "synthetic",
+      "upload_name": "macro_parts.xlsx",
+      "notes": "Provisional hostile-input fixture. encrypted_zip sets encryption flags; it is not a genuine Excel encrypted document.",
+      "http_status": 422,
+      "error_code": null
+    },
+    "encrypted_zip": {
+      "kind": "rejected",
+      "file": "synthetic/encrypted_zip.xlsx",
+      "sha256": "cde084966c1c048cfd860b82f492087521816a1bca32c9342cb5589d6782dd06",
+      "origin": "synthetic",
+      "upload_name": "encrypted_zip.xlsx",
+      "notes": "Provisional genuine ZipCrypto-encrypted OOXML ZIP with a fixed fixture-only password. This is not Office CFB encryption.",
+      "http_status": 422,
+      "error_code": null
+    },
+    "protected_sheet": {
+      "kind": "rejected",
+      "file": "synthetic/protected_sheet.xlsx",
+      "sha256": "390e3ea3f9f3768c52fddf67c146ff569e3a1fa81da1d9e0a3c888c56419e3dc",
+      "origin": "synthetic",
+      "upload_name": "protected_sheet.xlsx",
+      "notes": "Provisional isolated worksheet/structure protection metadata; tests each rejection policy separately.",
+      "http_status": 422,
+      "error_code": null
+    },
+    "protected_structure": {
+      "kind": "rejected",
+      "file": "synthetic/protected_structure.xlsx",
+      "sha256": "3b611ae68cd84e2bbffc17ad086886732e7409c689ec2e6bc6416de28758bc11",
+      "origin": "synthetic",
+      "upload_name": "protected_structure.xlsx",
+      "notes": "Provisional isolated worksheet/structure protection metadata; tests each rejection policy separately.",
+      "http_status": 422,
+      "error_code": null
+    }
+  }
+}

@@ -1,0 +1,824 @@
+{
+  "recorded_at": "2026-10-14T19:45:47.864614Z",
+  "tester_url": "http://127.0.0.1:8001",
+  "target_url": "http://127.0.0.1:8000",
+  "target_revision": "unknown",
+  "session_id": "20f45afb-009c-45ac-bac8-2148346cdba2",
+  "report_sha256": "b6964beb603e60af667e2dbbf681633c66897de48852677f56b56f020bf46159",
+  "manifest_version": "1.4.0",
+  "counts": {
+    "run": 52,
+    "planned": 53,
+    "pass": 52,
+    "fail": 0,
+    "error": 0,
+    "skip": 1
+  },
+  "not_passed": [
+    {
+      "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+      "outcome": "skip",
+      "message": "Not executed: an observed controlled audit failure produced no usable result.",
+      "classification": "unclassified"
+    }
+  ],
+  "coverage": {
+    "code": {
+      "covered": 40,
+      "total": 50,
+      "basis": "Fake audit/validation lines."
+    },
+    "component": {
+      "covered": 6,
+      "total": 6,
+      "basis": "Phase 3 component catalog C1-C6 in tests/fixtures/manifest.json; a component counts when a recorded qualifying call/assertion executes, regardless of its final outcome."
+    },
+    "system": {
+      "covered": 7,
+      "total": 8,
+      "basis": "Phase 3 portions of AC-01/02/03/04/05/14/15/18 in tests/fixtures/manifest.json; an AC counts only when its predeclared assertion executes. This measures partial scope; AC-14 requires an observed controlled failure, not ordinary corrupt-input rejection."
+    }
+  },
+  "operation_status": [
+    {
+      "number": 1,
+      "name": "Check service availability",
+      "method": "GET",
+      "path": "/api/v1/health",
+      "requirements": [
+        "REQ-15"
+      ],
+      "phase3": true,
+      "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3.",
+      "implemented": "observed responding",
+      "success_conformance": "yes",
+      "error_conformance": "untested",
+      "evidence": [
+        {
+          "test_id": "P3-HEALTH",
+          "path": "success",
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Upload an initial workbook",
+      "method": "POST",
+      "path": "/api/v1/workbooks",
+      "requirements": [
+        "REQ-01",
+        "REQ-02",
+        "REQ-03",
+        "REQ-04",
+        "REQ-11",
+        "REQ-13"
+      ],
+      "phase3": true,
+      "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3.",
+      "implemented": "observed responding",
+      "success_conformance": "yes",
+      "error_conformance": "yes",
+      "evidence": [
+        {
+          "test_id": "P3-AUTH-UPLOAD",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUTH-UPLOAD-INVALID",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-MISSING-FILE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CSV",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-MISSING-EXTENSION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XLS",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XLSM",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CORRUPT",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-BYTES-OVER",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-BYTES-AT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-SHEETS-OVER",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-SHEETS-AT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CELLS-OVER",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CELLS-AT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-CLEAN",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-SEEDED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-3",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-4",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-5",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-UNICODE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-REPEATED-IDS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-MULTIPLE-DRAWINGS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ZIP-TRAVERSAL",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ZIP-DUPLICATE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XML-DTD",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-MACRO-PARTS",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ENCRYPTED-ZIP",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED-SHEET",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED-STRUCTURE",
+          "path": "error",
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Upload a new workbook version",
+      "method": "POST",
+      "path": "/api/v1/workbooks/{workbookId}/versions",
+      "requirements": [
+        "REQ-03",
+        "REQ-10",
+        "REQ-11",
+        "REQ-13",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3.",
+      "implemented": "not delivered in Phase 3",
+      "success_conformance": "untested",
+      "error_conformance": "untested",
+      "evidence": []
+    },
+    {
+      "number": 4,
+      "name": "Retrieve a workbook version",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}",
+      "requirements": [
+        "REQ-03",
+        "REQ-11",
+        "REQ-14"
+      ],
+      "phase3": true,
+      "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3.",
+      "implemented": "observed responding",
+      "success_conformance": "yes",
+      "error_conformance": "yes",
+      "evidence": [
+        {
+          "test_id": "P3-VERSION-VALID",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-SOURCE-HASH",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-FOREIGN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-REVIEWER",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-NOT-FOUND",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-MISMATCH",
+          "path": "error",
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Retrieve an audit and its findings",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}",
+      "requirements": [
+        "REQ-04",
+        "REQ-05",
+        "REQ-06",
+        "REQ-10",
+        "REQ-11",
+        "REQ-13"
+      ],
+      "phase3": true,
+      "note": "Phase 2 specification Q5.1 (R1). Delivered scope in Phase 3.",
+      "implemented": "observed responding",
+      "success_conformance": "yes",
+      "error_conformance": "incomplete",
+      "evidence": [
+        {
+          "test_id": "P3-AUDIT-CLEAN",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-SEEDED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-FOREIGN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-REVIEWER",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-MISMATCH",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-UNKNOWN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-3",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-4",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-5",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-UNICODE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-REPEATED-IDS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-MULTIPLE-DRAWINGS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+          "path": "error",
+          "outcome": "skip"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Trigger a new audit",
+      "method": "POST",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits",
+      "requirements": [
+        "REQ-04",
+        "REQ-10",
+        "REQ-11",
+        "REQ-12",
+        "REQ-13"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3.",
+      "implemented": "not delivered in Phase 3",
+      "success_conformance": "untested",
+      "error_conformance": "untested",
+      "evidence": []
+    },
+    {
+      "number": 7,
+      "name": "Submit remediation decisions",
+      "method": "POST",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/remediations",
+      "requirements": [
+        "REQ-06",
+        "REQ-07",
+        "REQ-08",
+        "REQ-09",
+        "REQ-10",
+        "REQ-13"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3.",
+      "implemented": "not delivered in Phase 3",
+      "success_conformance": "untested",
+      "error_conformance": "untested",
+      "evidence": []
+    },
+    {
+      "number": 8,
+      "name": "Retrieve remediation status",
+      "method": "GET",
+      "path": "/api/v1/remediations/{remediationId}",
+      "requirements": [
+        "REQ-08",
+        "REQ-09",
+        "REQ-10",
+        "REQ-11",
+        "REQ-13"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3.",
+      "implemented": "not delivered in Phase 3",
+      "success_conformance": "untested",
+      "error_conformance": "untested",
+      "evidence": []
+    },
+    {
+      "number": 9,
+      "name": "Download the remediated workbook",
+      "method": "GET",
+      "path": "/api/v1/outputs/{outputId}/workbook",
+      "requirements": [
+        "REQ-08",
+        "REQ-09",
+        "REQ-13",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3.",
+      "implemented": "not delivered in Phase 3",
+      "success_conformance": "untested",
+      "error_conformance": "untested",
+      "evidence": []
+    },
+    {
+      "number": 10,
+      "name": "Retrieve version and audit history",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/history",
+      "requirements": [
+        "REQ-10",
+        "REQ-11",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3.",
+      "implemented": "not delivered in Phase 3",
+      "success_conformance": "untested",
+      "error_conformance": "untested",
+      "evidence": []
+    },
+    {
+      "number": 11,
+      "name": "Configure periodic auditing and reminders",
+      "method": "PUT",
+      "path": "/api/v1/workbooks/{workbookId}/schedule",
+      "requirements": [
+        "REQ-12",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3.",
+      "implemented": "not delivered in Phase 3",
+      "success_conformance": "untested",
+      "error_conformance": "untested",
+      "evidence": []
+    },
+    {
+      "number": 12,
+      "name": "Retrieve notification records",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/notifications",
+      "requirements": [
+        "REQ-12",
+        "REQ-13",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3.",
+      "implemented": "not delivered in Phase 3",
+      "success_conformance": "untested",
+      "error_conformance": "untested",
+      "evidence": []
+    },
+    {
+      "number": 13,
+      "name": "Advance the test clock",
+      "method": "POST",
+      "path": "/api/v1/test/clock",
+      "requirements": [
+        "REQ-12",
+        "REQ-15"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3.",
+      "implemented": "not delivered in Phase 3",
+      "success_conformance": "untested",
+      "error_conformance": "untested",
+      "evidence": []
+    },
+    {
+      "number": 14,
+      "name": "Delete a workbook",
+      "method": "DELETE",
+      "path": "/api/v1/workbooks/{workbookId}",
+      "requirements": [
+        "REQ-12",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "note": "Phase 2 specification Q5.1 (R1). Future phase; not delivered in Phase 3.",
+      "implemented": "not delivered in Phase 3",
+      "success_conformance": "untested",
+      "error_conformance": "untested",
+      "evidence": []
+    }
+  ],
+  "acceptance_status": {
+    "AC-01": {
+      "scope": "Supported files accepted with IDs; upper limits (intake)",
+      "evidence": [
+        {
+          "test_id": "P3-INPUT-BYTES-AT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-SHEETS-AT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CELLS-AT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-CLEAN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-SEEDED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-VALID",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-UNICODE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-REPEATED-IDS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-MULTIPLE-DRAWINGS",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "partial Phase 3 scope; outcomes do not prove every boundary"
+    },
+    "AC-02": {
+      "scope": "Invalid, unsupported and over-limit inputs rejected (intake)",
+      "evidence": [
+        {
+          "test_id": "P3-INPUT-MISSING-FILE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CSV",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-MISSING-EXTENSION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XLS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XLSM",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CORRUPT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-BYTES-OVER",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-SHEETS-OVER",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CELLS-OVER",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ZIP-TRAVERSAL",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ZIP-DUPLICATE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XML-DTD",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-MACRO-PARTS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ENCRYPTED-ZIP",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED-SHEET",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED-STRUCTURE",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "partial Phase 3 scope; outcomes do not prove every boundary"
+    },
+    "AC-03": {
+      "scope": "Real source hash unchanged after auditing (audit-only portion)",
+      "evidence": [
+        {
+          "test_id": "P3-SOURCE-HASH",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "partial Phase 3 scope; outcomes do not prove every boundary"
+    },
+    "AC-04": {
+      "scope": "Both rules detect exact seeded issues; clean fixture has no findings (two-rule portion)",
+      "evidence": [
+        {
+          "test_id": "P3-AUDIT-CLEAN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-SEEDED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-UNICODE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-REPEATED-IDS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-MULTIPLE-DRAWINGS",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "partial Phase 3 scope; outcomes do not prove every boundary"
+    },
+    "AC-05": {
+      "scope": "Required finding fields, classifications and locations (two-rule portion)",
+      "evidence": [
+        {
+          "test_id": "P3-AUDIT-SEEDED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-UNICODE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-REPEATED-IDS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-MULTIPLE-DRAWINGS",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "partial Phase 3 scope; outcomes do not prove every boundary"
+    },
+    "AC-14": {
+      "scope": "Controlled upload/audit/storage failures (delivered-operation portion)",
+      "evidence": [
+        {
+          "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+          "outcome": "skip"
+        }
+      ],
+      "completeness": "partial Phase 3 scope; outcomes do not prove every boundary"
+    },
+    "AC-15": {
+      "scope": "Authentication and basic owner isolation (delivered-operation portion)",
+      "evidence": [
+        {
+          "test_id": "P3-AUTH-UPLOAD",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUTH-UPLOAD-INVALID",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-UNAUTHENTICATED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-FOREIGN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-UNAUTHENTICATED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-FOREIGN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-REVIEWER",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-REVIEWER",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "partial Phase 3 scope; outcomes do not prove every boundary"
+    },
+    "AC-18": {
+      "scope": "Five audits of the same bytes produce identical findings (determinism portion)",
+      "evidence": [
+        {
+          "test_id": "P3-DETERMINISM",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-3",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-4",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-5",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "partial Phase 3 scope; outcomes do not prove every boundary"
+    }
+  },
+  "known_deviations": [
+    "Team 9 profile/defaults require pod confirmation.",
+    "Synthetic fixtures and message meaning require manual pod review.",
+    "Controlled system failures are exercised locally; AC-14 is skipped remotely unless observed."
+  ],
+  "pending_confirmation": [
+    "X-Test-Session on project calls (including health) and unknown session -> 400.",
+    "Named .xlsm -> 422 MACRO_ENABLED_WORKBOOK_UNSUPPORTED; other unsupported types -> 415.",
+    "Error code strings other than MACRO_ENABLED_WORKBOOK_UNSUPPORTED are not asserted.",
+    "Component catalog C1-C6 and the eight Phase 3 AC portions as coverage denominators."
+  ]
+}

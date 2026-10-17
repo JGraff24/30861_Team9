@@ -1,21 +1,21 @@
 # 30861_Team9
 
-Excel accessibility hub, Phase 3 service implementation on `feature/phase3-service`.
+Excel accessibility hub — integrated Phase 3.
 
-The four Phase 3 modules are being integrated: workbook validation and audits, measured
-execution and testing sessions, durable services and storage, and the independent tester.
-See docs/evidence/phase3_integration.md for the final review and verification results.
+The system accepts authenticated `.xlsx` uploads, retains immutable sources, runs durable
+asynchronous audits for missing alternative text and generic worksheet names, and exposes
+version/audit results through HTTP and a small upload/results UI. The independent tester
+provides setup, single-use runs and retained reports through the instructor interface.
+No findings means only that these two checks found no issues; it is not a compliance decision.
 
+See the [integration review and evidence](docs/evidence/phase3_integration.md),
+[shared contract](docs/contracts/phase3.md) and [deployment runbook](deploy/README.md).
+AWS deployment, public HTTPS and Team 12 cross-testing remain pending operator inputs.
+Remediation, history, downloadable reports, scheduling and ordinary deletion are future work.
 
-See [actual implementation](docs/implementation/jackson_phase3.md),
-[test evidence and all 14 operation statuses](docs/evidence/jackson_phase3.md), and
-[deployment runbook](deploy/README.md). The [shared contract](docs/contracts/phase3.md)
-remains the Team 9 default requiring Team 12 confirmation.
+## Local setup
 
-## Local setup and processes
-
-Use Python 3.12 and uv 0.13.1. Direct versions and artifact hashes are already pinned in
-`pyproject.toml`/`uv.lock`. To install the uv tool if missing:
+Use Python 3.12 and uv 0.13.1. Install uv if needed:
 
 ```sh
 python3 -m venv .uv-tool
@@ -25,19 +25,25 @@ uv python install 3.12
 uv sync --locked --group dev
 ```
 
-On Windows use `.uv-tool\Scripts\python.exe` and add `.uv-tool\Scripts` to PATH.
-The service execution guard currently targets POSIX; use Linux/WSL for API+worker execution.
+On Windows, use `.uv-tool\Scripts\python.exe` and add `.uv-tool\Scripts` to PATH.
+Run the system and worker on Linux/WSL or macOS; Linux enforces the process memory cap.
+The independent tester also has Windows CI checks. Use one system API, one durable worker
+and one tester API process with separate persistent SQLite stores.
+
 Both settings classes read `.env`; environment variables take precedence. No credential is
-valid by default. For private loopback development credentials:
+valid by default. Generate private loopback development credentials explicitly:
 
 ```sh
 uv run python -m scripts.create_dev_tokens --local-only
 ```
 
-This creates ignored `.env.local` with mode 0600, refuses production and overwrites, and prints
-no tokens. If `.env` does not exist, copy the generated file to `.env` privately (preserve 0600).
-Do not put credentials in commands, Git, images or evidence. Add real integration factory paths
-as documented below. The generator's flags remain disabled until explicitly enabled.
+This creates ignored `.env.local` with POSIX mode 0600 and refuses overwrites/production.
+Copy it privately to `.env` if that file does not exist, preserving its permissions.
+The target token map includes user A/B, reviewer and test-admin credentials; the local operator
+token is stored in the private file. Do not put credentials in commands, Git, images or evidence.
+For the tester workflow, explicitly set `ENABLE_TEST_INTERFACE=true` and optionally
+`ENABLE_CODE_MEASUREMENT=true` in the private configuration. The generator leaves both disabled.
+Use ordinary user credentials in the UI, available at `http://127.0.0.1:8000/`.
 
 Run in three terminals from the repository root:
 
@@ -56,97 +62,92 @@ uv run --locked uvicorn tester.main:create_app --factory --host 127.0.0.1 --port
 ```
 
 System docs: `http://127.0.0.1:8000/docs`; tester docs: `http://127.0.0.1:8001/docs`.
-The worker exits with an explicit configuration error until engine and runner are installed.
-The tester currently exposes framework docs only. Stop processes with Ctrl+C. State under
-`state/` survives restart; do not delete it to restart the service.
+State under `state/` survives restart. Stop processes with Ctrl+C.
 
-## Integrating teammate modules
+## Assembly and routes
 
-`app/contracts/ports.py` remains the common API. Inject dependencies into `create_app` or
-configure server-owned `module:factory` paths; paths are never accepted from HTTP callers:
+Concrete server-owned defaults now assemble the four owners' implementations:
 
-| Environment input | Factory signature |
+| Setting | Default factory |
 |---|---|
-| `ENGINE_FACTORY` | `factory() -> WorkbookEngine` |
-| `RUNNER_FACTORY` | `factory(*, engine, enable_code_measurement) -> EngineRunner` |
-| `SESSION_SERVICE_FACTORY` | `factory(*, repository, blob_store, settings) -> SessionService` |
-| `TEST_ROUTER_FACTORY` | `create_router(services) -> APIRouter`, attached only when testing enabled |
-| `UI_ROUTER_FACTORY` | `create_router(services) -> APIRouter` |
+| `ENGINE_FACTORY` | `app.audit.engine:OoxmlWorkbookEngine` |
+| `RUNNER_FACTORY` | `app.measurement.runner:MeasuredEngineRunner` |
+| `SESSION_SERVICE_FACTORY` | `app.test_interface.service:PersistentSessionService` |
+| `TEST_ROUTER_FACTORY` | `app.test_interface.routes:create_router` |
+| `UI_ROUTER_FACTORY` | `app.ui.routes:create_router` |
 
-These are integration hooks, not claims that those factories already exist. Confirm/adapt the
-small factory signatures when Dylan/Ryan merge. The runner and engine must serialize as trusted
-Python configuration without live sockets/DB connections/secrets. The parent guard gives the
-runner only bounded source bytes, shared DTOs, revision/namespace/limits and a minimal child
-environment. Ryan still owns measurement and his execution runner implementation.
+Explicit injected services remain available for tests. Factory overrides are trusted server
+configuration. No HTTP caller selects a factory. Disabled/missing integrations fail explicitly.
+Coverage is optional at runtime: install `uv sync --locked --no-dev --extra measurement` when
+enabled, or build the Docker `measurement` target for both system and worker.
 
-The four paths in [system OpenAPI](docs/contracts/system.openapi.json) are actual service paths:
-public health; authenticated POST `/api/v1/workbooks`; GET
-`/api/v1/workbooks/{workbookId}/versions/{versionId}` and its `/audits/{auditId}`.
-Project failures have the shared error envelope and generated `X-Request-ID`.
-Reviewer grants are explicit; test-admin credentials cannot access ordinary project operations.
-Version GET rereads/hashes source bytes. There are no remediation, history, ordinary deletion
-or downloadable report endpoints. No finding means only that the implemented checks found none.
+The four project operations are public GET `/api/v1/health`, authenticated POST
+`/api/v1/workbooks`, GET `/api/v1/workbooks/{workbookId}/versions/{versionId}` and its
+`/audits/{auditId}`. Version retrieval rereads and hashes the source. Owner/reviewer permission
+checks precede content reads; test-admin credentials have testing powers only.
 
-## Ryan's delivered modules
-
-Register `app.test_interface.routes:create_router` and `app.ui.routes:create_router` through
-Jackson's assembly. Construct `app.test_interface.service:PersistentSessionService` with
-repository/blob/settings and `app.measurement.runner:MeasuredEngineRunner` with the trusted
-engine and measurement flag. No shared assembly/config/dependency files were changed here.
-See [Ryan's implementation](docs/implementation/ryan_phase3.md),
-[design decisions](docs/implementation/ryan_design_decisions.md) and
-[verification evidence](docs/evidence/ryan_phase3.md) for exact factory configuration,
-current teammate PR compatibility, scope and pending human/deployment evidence.
-Owner regression command: `uv run pytest tests/ryan tests/unit tests/contract`.
-The optional Chromium script is `tests/ryan/browser_ui.py`; Playwright is test tooling,
-not an application dependency.
+With the test interface enabled, the system also exposes POST `/test/setup` and GET
+`/test/report`. The tester exposes POST `/test/setup`, POST `/test/run`, and GET `/test/report`.
+Configure its exact `ALLOWED_TARGET_URLS`, `TARGET_AUTH_MAP_JSON` and operator hashes privately.
+Never retry uncertain setup/upload/run POSTs; recover a lost run response by reading its report.
 
 ## Verification
 
 ```sh
 uv sync --locked --group dev
 uv lock --check
-uv run --locked ruff check .
-uv run --locked ruff format --check .
-uv run --locked mypy app tester scripts
-uv run --locked pytest -q
-uv run --locked python -m scripts.export_schemas --check
-uv run --locked python -m scripts.check_identity
-uv run --locked python -m scripts.smoke_foundation
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy app tester scripts
+uv run pytest -q
+uv run python -m scripts.export_schemas --check
+uv run python -m scripts.check_identity
+uv run python -m scripts.make_synthetic_fixtures --check
+uv run python -m scripts.smoke_foundation
+uv run python -m scripts.integration_selfcheck --evidence-dir /tmp/team9-integration-evidence
 ```
 
-The live-process test and smoke need permission to bind loopback sockets. A Linux-only test
-checks actual `RLIMIT_AS` enforcement and skips on macOS; it must pass on the production image
-before deployment. Runtime dependency scanning needs network access:
+The integration self-check uses random temporary loopback ports, isolated databases and private
+credentials. It tests the real engine/API/worker, restart persistence, the 53-case tester suite,
+report retention and four live tester acceptance checks. It contacts no AWS or Team 12 endpoint.
+Two Linux memory-limit tests skip on macOS. Live acceptance tests skip in an ordinary pytest run;
+the integration self-check configures and runs them. CI runs the full suite and real integration
+on Linux; portable tester/schema checks also run on Windows.
+
+The separate `scripts.tester_selfcheck` uses a labeled fake target to test the tester itself.
+Synthetic fixture expectations still need human pod review. Browser automation lives in
+`tests/ryan/browser_ui.py` and requires optional Playwright tooling; automated API results do
+not establish manual keyboard/screen-reader conformance.
+
+Runtime dependency scanning (requires network):
 
 ```sh
 uv export --locked --no-dev --extra measurement --no-emit-project --format requirements-txt --output-file /tmp/team9-runtime-requirements.txt > /dev/null
-uv run --locked pip-audit --require-hashes --disable-pip --cache-dir /tmp/team9-audit-cache -r /tmp/team9-runtime-requirements.txt
+uv run pip-audit --require-hashes --disable-pip --cache-dir /tmp/team9-audit-cache -r /tmp/team9-runtime-requirements.txt
 ```
 
-Generate schemas after compatible DTO/route changes with `uv run python -m scripts.export_schemas`.
-The system catalog combines actual routes with shared serialization schemas; tester paths stay
-empty until Dixon delivers them. Unit tests inject narrow doubles and do not prove real workbook
-rules, runtime coverage or deployed acceptance. No new dependencies were needed in this branch.
+For an approved target, set `TEAM9_TESTER_TOKEN` privately and run:
+
+```sh
+uv run python -m scripts.run_suite --tester-url http://127.0.0.1:8001 --target-url http://127.0.0.1:8000 --target-revision unknown --output report.json --record run-record.json
+```
 
 ## Ownership and deployment
 
 | Owner | Implementation | Continuation |
 |---|---|---|
 | Jackson | API/auth/storage/jobs/services/assembly/deploy | [jackson_phase3.md](docs/implementation/jackson_phase3.md) |
-| Dylan | workbooks/audit | `docs/implementation/dylan_phase3.md` pending |
-| Ryan | test interface/measurement/UI | `docs/implementation/ryan_phase3.md` pending |
-| Dixon | tester/contract/acceptance/CI/fixtures | `docs/implementation/dixon_phase3.md` pending |
+| Dylan | workbooks/audit | [dylan_phase3.md](docs/implementation/dylan_phase3.md) |
+| Ryan | test interface/measurement/UI | [ryan_phase3.md](docs/implementation/ryan_phase3.md) |
+| Dixon | tester/contract/acceptance/CI/fixtures | [dixon_phase3.md](docs/implementation/dixon_phase3.md) |
 
-Bootstrap is merged at `ffa6947`; its [implementation record](docs/implementation/bootstrap_phase3.md)
-is historical. Jackson coordinates shared contracts/settings/dependencies. Teammate implementation
-packages and tester were preserved. Existing bootstrap assertions were updated only where the
-foundation's empty-route assumptions changed.
+Owner documents retain their historical verification context. The integration record supersedes
+statements that other modules are absent. Shared serialization remains the Team 9 1.0.0 profile;
+Team 12 confirmation items remain listed in the contract.
 
-Development Compose: `docker compose -f deploy/compose.yaml up --build` (private `.env.local`
-required). Named volumes retain system/tester state independently. Containers need their own
-approved target URL mapping, for example the explicitly configured Docker system base URL;
-loopback inside tester refers to tester itself. Production uses the standalone production Compose
-file, EC2, EBS metadata and private S3; it exposes only HTTPS. See the runbook for inputs,
-preflight gates, TLS, IAM, releases, backups, scoped resets and rollback. Cloud provisioning,
-Git push/merge and external messaging have not been performed.
+Development Compose: `docker compose -f deploy/compose.yaml up --build` with private `.env.local`.
+Configure the tester target/access map for `http://system:8000`; container loopback refers to
+itself. Use `TEAM9_BUILD_TARGET=measurement` when enabling coverage. Named volumes preserve
+system/tester state independently. Production templates prepare EC2/EBS/private S3 and HTTPS;
+operator input and separate deployment authorization are required. See the deployment runbook
+for IAM, TLS, release mapping, backups, resets and rollback.

@@ -98,7 +98,7 @@ def create_app(
     application = FastAPI(
         title="Team 9 system",
         version="0.3.0",
-        description="Phase 3 project service with explicit teammate integration configuration.",
+        description="Integrated Phase 3 workbook auditing and testing service.",
         root_path=container.settings.api_root_path,
         lifespan=lifespan,
     )
@@ -219,7 +219,7 @@ def create_app(
         document["x-operation-status"] = {
             "delivered-service-routes": [1, 2, 4, 5],
             "pending-business-operations": [3, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-            "integration-note": "Health is 503 until required engine and runner are configured.",
+            "integration-note": "Health checks storage and configured engine/runner availability.",
         }
         return document
 

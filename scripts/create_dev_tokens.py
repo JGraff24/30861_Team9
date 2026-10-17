@@ -1,4 +1,4 @@
-"""Opt-in private local credentials for future implementations; never auto-run."""
+"""Opt-in private local credentials; never auto-run."""
 
 import argparse
 import hashlib
@@ -60,7 +60,7 @@ def main() -> None:
         output.write("# PRIVATE local credentials. Do not commit or use on a deployed host.\n")
         for key, value in values.items():
             output.write(f"{key}='{value}'\n")
-    print("Private local environment written; feature authentication remains pending.")
+    print("Private local environment written; testing/measurement remain disabled by default.")
 
 
 if __name__ == "__main__":
