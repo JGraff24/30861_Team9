@@ -25,6 +25,12 @@ def main() -> None:
                     "METADATA_DB_PATH": directory + "/system.sqlite3",
                     "BLOB_ROOT": directory + "/sources",
                 }
+                # Windows' Python launcher needs SystemRoot to start the interpreter.
+                # Preserve OS runtime inputs without inheriting application credentials.
+                if os.name == "nt":
+                    for name in ("SystemRoot", "WINDIR", "TEMP", "TMP"):
+                        if value := os.environ.get(name):
+                            environment[name] = value
                 process = subprocess.Popen(
                     [
                         sys.executable,

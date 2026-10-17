@@ -74,6 +74,17 @@ application modules, and stops only its own processes. Final live source commit:
 the tested commit, working-tree status, checkpoint and all 14 operation statuses. A documentation
 commit after the tested source commit does not change the runtime implementation.
 
+## Remote CI verification
+
+[First integration CI run](https://github.com/JGraff24/30861_Team9/actions/runs/39040548545):
+Linux full regressions (including both memory-cap tests), real integration checkpoint,
+schema/identity/fixture checks, process smoke, fake-target tester self-check and the
+runtime dependency audit passed. Windows passed 234 portable tests, lint/types and catalog
+checks, then exposed a smoke-script startup defect: its stripped environment omitted
+Windows runtime variables. The smoke script now preserves only SystemRoot/WINDIR/TEMP/TMP
+from the OS environment on Windows, while keeping application credentials excluded.
+Local smoke/lint/types passed after that correction. The follow-up CI result is recorded below.
+
 ## Delivered boundary and remaining evidence
 
 Business operations 1/2/4/5 are delivered; 3/6/7/8/9/10/11/12/13/14 remain future work. Both
@@ -82,7 +93,7 @@ testing endpoints remain explicitly gated. The UI shell was served through the r
 owner HTTP tests passed. Playwright is unavailable here; no new browser/manual accessibility
 claim is made. The framework emits an existing TestClient/httpx deprecation warning.
 
-Docker is unavailable on this host. Container builds/Compose, Linux enforcement, AWS/S3 with
+Docker is unavailable on this host. Container builds/Compose, image-level Linux enforcement, AWS/S3 with
 real role credentials, valid public TLS, Team 12 contract confirmation and both cross-testing
 directions remain pending. Deployment templates are prepared, not deployed. Five reviewed
 real-world workbooks, two-person expectation review and Excel Accessibility Checker/preservation
