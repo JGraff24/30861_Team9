@@ -29,7 +29,7 @@ resolves the overlapping README, contracts, schema tooling and foundation tests.
 | #5 + #2 | High: deferred cleanup after a setup that never reached the system made every subsequent setup fail on an unknown namespace. | Unknown earlier namespaces are idempotent no-ops. Existing-owner authorization and active-job checks remain enforced. Added regression; session tests passed. |
 | #5 | Medium: system testing routes had default response documentation despite returning instructor schemas/statuses. | Added setup 201/report 200 schemas, request/query descriptions, bearer requirements and instructor error envelopes; regenerated and validated catalogs. |
 | #2 + #3 | High: Docker build omitted forced-included fixture files, and copied source packages would shadow installed bundled assets. | Build copies fixture inputs; runtime imports the installed wheel. Wheel contains UI/fixtures and loads the 53-case suite and real measured engine from outside the checkout. Docker execution remains pending. |
-| #2 + #5 | Medium: CI excluded `tests/ryan` and lacked a real integrated-system checkpoint. | Linux CI runs full pytest plus the new real integration command; Windows retains portable tester/schema checks. |
+| #2 + #5 | Medium: CI excluded `tests/ryan` and lacked a real integrated-system checkpoint. | Linux CI runs full pytest plus the new real integration command; Windows retains portable tester/schema checks; static typing targets the supported Linux deployment runtime. |
 | All | Bootstrap-era docs/tests still reported missing teammates and empty route catalogs. | Updated current README/profile/runbook, smoke checks, schema catalogs and unavailable-integration tests. Historical owner evidence is retained with its original context. |
 
 Review also checked authentication/ownership before source reads, nested-ID matching, bounded
@@ -45,7 +45,7 @@ Executed on macOS, Python 3.12.15, uv 0.13.1:
 
 - Locked sync and lock consistency: passed with the existing lock; no dependency additions.
 - Ruff check and format: passed.
-- Strict mypy `app tester scripts`: passed.
+- Strict mypy `app tester scripts` and Linux deployment platform: passed.
 - Full pytest: **515 passed, 6 skipped**. Four unconfigured live acceptance cases were run
   separately by the integration command; two genuine memory-cap tests require Linux.
 - OpenAPI validation/current catalogs, identity vectors and synthetic fixture checks: passed.

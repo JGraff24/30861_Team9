@@ -47,8 +47,8 @@ jobs:
         run: uv run ruff check .
       - name: Format
         run: uv run ruff format --check .
-      - name: Types
-        run: uv run mypy app tester scripts
+      - name: Types (Linux deployment target)
+        run: uv run mypy --platform linux app tester scripts
       - name: Full regression suite (Linux service runtime)
         if: runner.os == 'Linux'
         run: uv run pytest -q
