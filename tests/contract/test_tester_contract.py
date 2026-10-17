@@ -59,7 +59,55 @@ def test_success_bodies_match_catalog(client: TestClient) -> None:
     assert run.status_code == 200 and run.headers["content-type"] == "application/json"
     validator("SuiteReport").validate(run.json())
     report = client.get("/test/report", params={"session_id": session_id}, headers=AUTH)
+    assert report.status_code == 200
     assert report.content == run.content
+    repeated = client.get("/test/report", params={"session_id": session_id}, headers=AUTH)
+    assert repeated.status_code == 200 and repeated.content == report.content
+
+
+def test_report_query_is_required_nonnullable_and_preserves_identifier_constraints(
+    client: TestClient,
+) -> None:
+    for catalog in (CATALOG, client.get("/openapi.json").json()):
+        operation = catalog["paths"]["/test/report"]["get"]
+        parameter = next(p for p in operation["parameters"] if p["name"] == "session_id")
+        assert parameter["in"] == "query" and parameter["required"] is True
+        schema = parameter["schema"]
+        assert schema["type"] == "string"
+        assert schema["minLength"] == 1 and schema["maxLength"] == 64
+        assert schema["pattern"] == r"^[A-Za-z0-9_-]+$"
+        assert not Draft202012Validator(schema).is_valid(None)
+
+
+@pytest.mark.parametrize("session_id", [None, "", " ", "bad id!", "a" * 65, "é"])
+def test_report_invalid_query_uses_instructor_400(
+    client: TestClient, session_id: str | None
+) -> None:
+    params = {} if session_id is None else {"session_id": session_id}
+    response = client.get("/test/report", params=params, headers=AUTH)
+    assert response.status_code == 400
+    validator("TestEndpointError").validate(response.json())
+    assert set(response.json()) == {"message", "source"}
+    assert response.json()["source"] == "tester"
+
+
+@pytest.mark.parametrize("session_id", ["unknown", "a", "A0_-" * 16])
+def test_report_valid_unknown_query_returns_404(client: TestClient, session_id: str) -> None:
+    response = client.get("/test/report", params={"session_id": session_id}, headers=AUTH)
+    assert response.status_code == 404
+    validator("TestEndpointError").validate(response.json())
+    assert response.json()["source"] == "tester"
+
+
+@pytest.mark.parametrize("session_id", [None, "", "bad id!"])
+def test_report_query_validation_preserves_authentication(
+    client: TestClient, session_id: str | None
+) -> None:
+    params = {} if session_id is None else {"session_id": session_id}
+    response = client.get("/test/report", params=params)
+    assert response.status_code == 401
+    validator("TestEndpointError").validate(response.json())
+    assert response.json()["source"] == "tester"
 
 
 @pytest.mark.parametrize(

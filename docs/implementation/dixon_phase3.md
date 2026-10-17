@@ -289,6 +289,37 @@ review these integration hooks. DTO wire schemas and system modules were not rew
 The branch name differs from the handoff starter. Deferred compensation uses later setup
 because no standalone cleanup endpoint exists. All fixtures remain provisional synthetic inputs.
 
+## Report query correction — 2026-10-17
+
+`GET /test/report` now declares `session_id: Annotated[Identifier, Query()]` without a
+default. Its OpenAPI parameter is required and non-nullable, retaining the shared 1–64
+character ASCII letter/digit/underscore/hyphen constraints. The existing validation handler
+returns HTTP 400 with `{message, source:"tester"}`; authentication, service lookup and report
+serialization are unchanged. Regenerated `docs/contracts/tester.openapi.json` with
+`python -m scripts.export_schemas`; the system catalog did not change.
+
+Regressions check both generated and committed schemas; missing, empty, whitespace,
+malformed, non-ASCII and overlength IDs; valid unknown IDs at the length boundaries;
+authentication precedence; and repeated byte-identical retrieval of a stored report.
+
+Actual local verification: **121 passed**, with the existing Starlette/HTTPX deprecation
+warning, using `pytest -q tests/unit/test_tester.py tests/unit/test_tester_deadlines.py
+tests/contract tests/ryan/test_sessions.py`. `ruff check .`, `ruff format --check .`,
+`mypy app tester scripts`, and `python -m scripts.export_schemas --check` all passed.
+No dependencies, project endpoints or report fields changed; nothing was pushed or merged.
+
+Also retrieved and reviewed the current [instructor common-interface specification](https://docs.google.com/document/d/1GhEVTw3a2tNJY2arfDyWgWS94kVYfgC7/edit)
+through its text export. The reviewed tester/system endpoint sets, setup ID echo, single-use
+runs, error/status conventions, stored-report format and coverage fields agree with the
+specified common interface and are exercised by the tests above. Deployment/other-team
+access was not tested in this correction.
+
+One pre-existing strict-reading caveat remains: the instructor says report lookups should
+not change state, while `TesterService.report` calls `TesterStore.mark_retrieved` to set
+cleanup bookkeeping. It leaves the stored report bytes and session run state unchanged.
+That internal side effect was preserved to keep this query correction focused; it should
+be reviewed separately if the instructor's state rule includes cleanup metadata.
+
 ## Next Codex prompt
 
 ```text

@@ -15,6 +15,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.contracts.models import (
+    Identifier,
     RunRequest,
     SetupResponse,
     SuiteReport,
@@ -119,7 +120,7 @@ def create_app(
         return Response(service.run(request, subject), media_type="application/json")
 
     @application.get("/test/report", responses=REPORT, response_class=JSONResponse)
-    def report(subject: Operator, session_id: Annotated[str | None, Query()] = None) -> Response:
+    def report(subject: Operator, session_id: Annotated[Identifier, Query()]) -> Response:
         return Response(service.report(session_id, subject), media_type="application/json")
 
     return application
