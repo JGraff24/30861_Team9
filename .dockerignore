@@ -1,0 +1,15 @@
+.git
+.venv
+.env
+.env.*
+!.env.example
+state
+dist
+build
+__pycache__
+*.pyc
+*.log
+.coverage*
+.pytest_cache
+.mypy_cache
+.ruff_cache

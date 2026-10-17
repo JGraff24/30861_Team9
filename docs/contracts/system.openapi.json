@@ -1,11 +1,522 @@
 {
   "openapi": "3.1.1",
   "info": {
-    "title": "Team 9 system foundation",
-    "description": "Bootstrap only. Health, upload, version, audit, test interface and UI pending.",
-    "version": "0.1.0"
+    "title": "Team 9 system",
+    "description": "Phase 3 project service with explicit teammate integration configuration.",
+    "version": "0.3.0"
   },
-  "paths": {},
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workbooks": {
+      "post": {
+        "summary": "Upload",
+        "operationId": "upload_api_v1_workbooks_post",
+        "parameters": [
+          {
+            "name": "x-test-session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Test-Session"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workbooks/{workbookId}/versions/{versionId}": {
+      "get": {
+        "summary": "Version",
+        "operationId": "version_api_v1_workbooks__workbookId__versions__versionId__get",
+        "parameters": [
+          {
+            "name": "workbookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Workbookid"
+            }
+          },
+          {
+            "name": "versionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Versionid"
+            }
+          },
+          {
+            "name": "x-test-session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Test-Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}": {
+      "get": {
+        "summary": "Audit",
+        "operationId": "audit_api_v1_workbooks__workbookId__versions__versionId__audits__auditId__get",
+        "parameters": [
+          {
+            "name": "workbookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Workbookid"
+            }
+          },
+          {
+            "name": "versionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Versionid"
+            }
+          },
+          {
+            "name": "auditId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Auditid"
+            }
+          },
+          {
+            "name": "x-test-session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Test-Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    }
+  },
   "components": {
     "schemas": {
       "AuditResponse": {
@@ -108,80 +619,6 @@
           "PROCESSING_FAILED"
         ],
         "title": "AuditStatus",
-        "type": "string"
-      },
-      "CoverageMeasure": {
-        "additionalProperties": false,
-        "oneOf": [
-          {
-            "properties": {
-              "covered": {
-                "type": "null"
-              },
-              "total": {
-                "type": "null"
-              }
-            }
-          },
-          {
-            "properties": {
-              "covered": {
-                "type": "integer"
-              },
-              "total": {
-                "type": "integer"
-              }
-            }
-          }
-        ],
-        "properties": {
-          "covered": {
-            "anyOf": [
-              {
-                "minimum": 0,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Covered"
-          },
-          "total": {
-            "anyOf": [
-              {
-                "minimum": 0,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Total"
-          },
-          "basis": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Basis",
-            "type": "string"
-          }
-        },
-        "required": [
-          "covered",
-          "total",
-          "basis"
-        ],
-        "title": "CoverageMeasure",
-        "type": "object"
-      },
-      "ErrorSource": {
-        "enum": [
-          "tester",
-          "system",
-          "communication",
-          "unknown"
-        ],
-        "title": "ErrorSource",
         "type": "string"
       },
       "Finding": {
@@ -330,101 +767,6 @@
         "title": "ProjectError",
         "type": "object"
       },
-      "SetupResponse": {
-        "additionalProperties": false,
-        "properties": {
-          "session_id": {
-            "maxLength": 64,
-            "minLength": 1,
-            "pattern": "^[A-Za-z0-9_-]+$",
-            "title": "Session Id",
-            "type": "string"
-          }
-        },
-        "required": [
-          "session_id"
-        ],
-        "title": "SetupResponse",
-        "type": "object"
-      },
-      "SystemCoverage": {
-        "additionalProperties": false,
-        "properties": {
-          "code": {
-            "$ref": "#/components/schemas/CoverageMeasure"
-          }
-        },
-        "required": [
-          "code"
-        ],
-        "title": "SystemCoverage",
-        "type": "object"
-      },
-      "SystemReport": {
-        "additionalProperties": false,
-        "properties": {
-          "session_id": {
-            "maxLength": 64,
-            "minLength": 1,
-            "pattern": "^[A-Za-z0-9_-]+$",
-            "title": "Session Id",
-            "type": "string"
-          },
-          "coverage": {
-            "$ref": "#/components/schemas/SystemCoverage"
-          }
-        },
-        "required": [
-          "session_id",
-          "coverage"
-        ],
-        "title": "SystemReport",
-        "type": "object"
-      },
-      "SystemSetupRequest": {
-        "additionalProperties": false,
-        "properties": {
-          "session_id": {
-            "maxLength": 64,
-            "minLength": 1,
-            "pattern": "^[A-Za-z0-9_-]+$",
-            "title": "Session Id",
-            "type": "string"
-          },
-          "setup": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/JsonValue"
-            },
-            "title": "Setup",
-            "type": "object"
-          }
-        },
-        "required": [
-          "session_id"
-        ],
-        "title": "SystemSetupRequest",
-        "type": "object"
-      },
-      "TestEndpointError": {
-        "additionalProperties": false,
-        "properties": {
-          "message": {
-            "minLength": 1,
-            "pattern": "\\S",
-            "title": "Message",
-            "type": "string"
-          },
-          "source": {
-            "$ref": "#/components/schemas/ErrorSource"
-          }
-        },
-        "required": [
-          "message",
-          "source"
-        ],
-        "title": "TestEndpointError",
-        "type": "object"
-      },
       "UploadResponse": {
         "additionalProperties": false,
         "properties": {
@@ -557,10 +899,206 @@
         ],
         "title": "VersionStatus",
         "type": "string"
+      },
+      "CoverageMeasure": {
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "covered": {
+                "type": "null"
+              },
+              "total": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "covered": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "properties": {
+          "covered": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Covered"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "basis": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Basis",
+            "type": "string"
+          }
+        },
+        "required": [
+          "covered",
+          "total",
+          "basis"
+        ],
+        "title": "CoverageMeasure",
+        "type": "object"
+      },
+      "ErrorSource": {
+        "enum": [
+          "tester",
+          "system",
+          "communication",
+          "unknown"
+        ],
+        "title": "ErrorSource",
+        "type": "string"
+      },
+      "SetupResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Session Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "title": "SetupResponse",
+        "type": "object"
+      },
+      "SystemCoverage": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/CoverageMeasure"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "SystemCoverage",
+        "type": "object"
+      },
+      "SystemReport": {
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/SystemCoverage"
+          }
+        },
+        "required": [
+          "session_id",
+          "coverage"
+        ],
+        "title": "SystemReport",
+        "type": "object"
+      },
+      "SystemSetupRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "session_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "setup": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Setup",
+            "type": "object"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "title": "SystemSetupRequest",
+        "type": "object"
+      },
+      "TestEndpointError": {
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Message",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ErrorSource"
+          }
+        },
+        "required": [
+          "message",
+          "source"
+        ],
+        "title": "TestEndpointError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
       }
     }
   },
-  "x-foundation-status": "DTO catalog only; all feature endpoints pending",
+  "x-operation-status": {
+    "delivered-service-routes": [
+      1,
+      2,
+      4,
+      5
+    ],
+    "pending-business-operations": [
+      3,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "integration-note": "Health is 503 until required engine and runner are configured."
+  },
+  "x-foundation-status": "Project service routes delivered; teammate integration pending",
   "x-team9-contract-profile": "1.0.0",
   "x-instructor-interface-version": "0.4.2"
 }

@@ -32,32 +32,33 @@ def isolated_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
 
 def test_factories_do_not_contact_network_or_write_storage(monkeypatch: pytest.MonkeyPatch) -> None:
     def blocked(*args: object, **kwargs: object) -> None:
-        raise AssertionError("foundation must not contact network")
+        raise AssertionError("factories must not contact network")
 
     monkeypatch.setattr(socket, "getaddrinfo", blocked)
     monkeypatch.setattr(socket.socket, "connect", blocked)
-    for factory, pending in (
-        (create_system, ["/api/v1/health", "/api/v1/workbooks", "/test/setup", "/test/report"]),
-        (create_tester, ["/test/setup", "/test/run", "/test/report"]),
-    ):
+    for factory in (create_system, create_tester):
         application = factory()
-        with TestClient(application) as client:
-            assert client.get("/docs").status_code == 200
-            assert client.get("/openapi.json").json()["paths"] == {}
-            for path in pending:
-                assert client.get(path).status_code == 404
-                assert client.post(path, json={}).status_code == 404
+        assert application.openapi()
     assert not Path("state").exists()
+    with TestClient(create_system()) as client:
+        assert client.get("/docs").status_code == 200
+        assert len(client.get("/openapi.json").json()["paths"]) == 4
+        assert client.get("/api/v1/health").status_code == 503
+    with TestClient(create_tester()) as client:
+        assert client.get("/openapi.json").json()["paths"] == {}
+        assert client.get("/test/report").status_code == 404
 
 
-def test_injected_ports_are_retained_without_invocation() -> None:
+def test_injected_ports_are_retained_and_initialized_at_lifespan() -> None:
     settings = SystemSettings()
     repository = Mock(spec=Repository)
     services = SystemServices(settings=settings, repository=repository)
     application = create_system(services=services)
+    assert repository.mock_calls == []
     with TestClient(application):
         assert application.state.services is services
-    assert repository.mock_calls == []
+    repository.initialize.assert_called_once_with()
+    repository.recover_stale_jobs.assert_called_once()
     assert "repository" not in services.missing_integrations
     assert "runner" in services.missing_integrations
     assert create_system(settings, repository=repository).state.services.repository is repository

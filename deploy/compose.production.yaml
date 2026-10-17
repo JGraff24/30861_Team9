@@ -1,0 +1,52 @@
+# Standalone production topology. Do not combine with development port bindings.
+name: team9-production
+x-system: &system
+  image: ${TEAM9_IMAGE:?Set immutable image tag or digest}
+  env_file: ${TEAM9_ENV_FILE:?Set absolute private environment file}
+  environment: &system-env
+    APP_ENV: production
+    DEPLOYMENT_SHA: ${DEPLOYMENT_SHA:?Set source release SHA}
+    API_ROOT_PATH: /system
+    METADATA_DB_PATH: /service/state/system.sqlite3
+    BLOB_BACKEND: s3
+    S3_BUCKET: ${S3_BUCKET:?Set existing private source bucket}
+    AWS_REGION: ${AWS_REGION:?Set deployment region}
+    AWS_SHARED_CREDENTIALS_FILE: /nonexistent
+    AWS_CONFIG_FILE: /nonexistent
+  init: true
+  restart: unless-stopped
+  read_only: true
+  tmpfs: ["/tmp:size=256m,mode=1777"]
+  volumes: ["${EBS_DATA_DIR:?Set mounted persistent EBS data directory}/system:/service/state"]
+  networks: [private]
+services:
+  system:
+    <<: *system
+  worker:
+    <<: *system
+    command: ["python", "-m", "app.jobs.worker"]
+  tester:
+    image: ${TEAM9_IMAGE:?Set immutable image tag or digest}
+    env_file: ${TEAM9_ENV_FILE:?Set absolute private environment file}
+    environment:
+      APP_ENV: production
+      TESTER_ROOT_PATH: /tester
+      TESTER_DB_PATH: /service/tester-state/tester.sqlite3
+      AWS_EC2_METADATA_DISABLED: "true"
+    command: ["uvicorn", "tester.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8001", "--no-access-log"]
+    init: true
+    restart: unless-stopped
+    read_only: true
+    tmpfs: ["/tmp:size=256m,mode=1777"]
+    volumes: ["${EBS_DATA_DIR:?Set mounted persistent EBS data directory}/tester:/service/tester-state"]
+    networks: [private]
+  proxy:
+    image: nginx:stable-alpine
+    ports: ["443:443"]
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${TLS_CERT_DIR:?Set directory containing fullchain.pem and privkey.pem}:/etc/nginx/tls:ro
+    restart: unless-stopped
+    networks: [private]
+networks:
+  private:

@@ -1,0 +1,14 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {"Sid": "RequireTLS", "Effect": "Deny", "Principal": "*", "Action": "s3:*",
+     "Resource": ["arn:aws:s3:::${S3_BUCKET}", "arn:aws:s3:::${S3_BUCKET}/*"],
+     "Condition": {"Bool": {"aws:SecureTransport": "false"}}},
+    {"Sid": "RequireAES256", "Effect": "Deny", "Principal": "*", "Action": "s3:PutObject",
+     "Resource": "arn:aws:s3:::${S3_BUCKET}/sources/*",
+     "Condition": {"StringNotEquals": {"s3:x-amz-server-side-encryption": "AES256"}}},
+    {"Sid": "RequireCreateOnly", "Effect": "Deny", "Principal": "*", "Action": "s3:PutObject",
+     "Resource": "arn:aws:s3:::${S3_BUCKET}/sources/*",
+     "Condition": {"StringNotEquals": {"s3:if-none-match": "*"}}}
+  ]
+}
