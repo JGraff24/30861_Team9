@@ -1,0 +1,178 @@
+{
+  "source_sha256": "4b67bcffb16b8f21b72465324b224f6d9ca54d6c84dbee68f795f986c0d904fa",
+  "source_unchanged": true,
+  "outputs_directory": "temporary (not committed)",
+  "results": [
+    {
+      "edit": "baseline (no edit)",
+      "openpyxl": {
+        "output_sha256": "6ace687edd5efde9cd355d584d3da90f8d45875509f6271c1d179159372fbf45",
+        "hash_changed": true,
+        "approved_differences_present": true,
+        "missing_approved": [],
+        "unexplained_differences": [
+          "Sheet1!B3 value '10' -> None",
+          "Expenses!A1 value '20' -> None",
+          "drawing objects changed (count delta -2)",
+          "  object Picture id=2 'Picture 1' missing",
+          "  object Chart id=3 'Chart 1' missing",
+          "  object Shape id=4 'Note' missing",
+          "  object Chart id=1 'Chart 1' only after",
+          "relationship types ['chart', 'drawing', 'image', 'officeDocument', 'worksheet'] -> ['chart', 'core-properties', 'drawing', 'extended-properties', 'officeDocument', 'styles', 'theme', 'worksheet']",
+          "parts removed ['xl/media/image1.png']",
+          "parts added ['docProps/app.xml', 'docProps/core.xml', 'xl/styles.xml', 'xl/theme/theme1.xml']"
+        ],
+        "stale_references": [],
+        "semantically_safe": false,
+        "excel_open_without_repair": "PENDING (manual check not performed)"
+      },
+      "targeted": {
+        "output_sha256": "4b67bcffb16b8f21b72465324b224f6d9ca54d6c84dbee68f795f986c0d904fa",
+        "hash_changed": false,
+        "approved_differences_present": true,
+        "missing_approved": [],
+        "unexplained_differences": [],
+        "stale_references": [],
+        "semantically_safe": true,
+        "excel_open_without_repair": "PENDING (manual check not performed)"
+      }
+    },
+    {
+      "edit": "alt-text insertion on Picture 1 (id=2)",
+      "openpyxl": {
+        "status": "unsupported: openpyxl exposes no cNvPr title/descr API for pictures"
+      },
+      "targeted": {
+        "output_sha256": "88aea6ac8aade442b35e92bc40e7d5c71bea7978f9352ea7230593713db0f4b4",
+        "hash_changed": true,
+        "approved_differences_present": true,
+        "missing_approved": [],
+        "unexplained_differences": [],
+        "stale_references": [],
+        "semantically_safe": true,
+        "excel_open_without_repair": "PENDING (manual check not performed)"
+      }
+    },
+    {
+      "edit": "worksheet rename Sheet1 -> Revenue (name only)",
+      "openpyxl": {
+        "output_sha256": "9a59eca344e70d4f4ef4c6637e9dba5a71304bce7bd208dec0b14cfb8986d7b8",
+        "hash_changed": true,
+        "approved_differences_present": true,
+        "missing_approved": [],
+        "unexplained_differences": [
+          "Sheet1!B3 value '10' -> None",
+          "Expenses!A1 value '20' -> None",
+          "drawing objects changed (count delta -2)",
+          "  object Picture id=2 'Picture 1' missing",
+          "  object Chart id=3 'Chart 1' missing",
+          "  object Shape id=4 'Note' missing",
+          "  object Chart id=1 'Chart 1' only after",
+          "relationship types ['chart', 'drawing', 'image', 'officeDocument', 'worksheet'] -> ['chart', 'core-properties', 'drawing', 'extended-properties', 'officeDocument', 'styles', 'theme', 'worksheet']",
+          "parts removed ['xl/media/image1.png']",
+          "parts added ['docProps/app.xml', 'docProps/core.xml', 'xl/styles.xml', 'xl/theme/theme1.xml']"
+        ],
+        "stale_references": [
+          "Expenses!A1 references missing sheet 'Sheet1'",
+          "definedName Totals@None references missing sheet 'Sheet1'"
+        ],
+        "semantically_safe": false,
+        "excel_open_without_repair": "PENDING (manual check not performed)"
+      },
+      "targeted": {
+        "output_sha256": "c5077726475926ccb3eb20cd92c365839bd7444e190f49ba1187b5a892d64ec8",
+        "hash_changed": true,
+        "approved_differences_present": true,
+        "missing_approved": [],
+        "unexplained_differences": [],
+        "stale_references": [
+          "Expenses!A1 references missing sheet 'Sheet1'",
+          "definedName Totals@None references missing sheet 'Sheet1'"
+        ],
+        "semantically_safe": false,
+        "excel_open_without_repair": "PENDING (manual check not performed)"
+      }
+    },
+    {
+      "edit": "worksheet rename Sheet1 -> Revenue (name + formula/defined-name references)",
+      "targeted": {
+        "output_sha256": "13257fd365a88e8087b23cb1f2e951c1851823cf707d803a5f010a5583316353",
+        "hash_changed": true,
+        "approved_differences_present": true,
+        "missing_approved": [],
+        "unexplained_differences": [],
+        "stale_references": [],
+        "semantically_safe": true,
+        "excel_open_without_repair": "PENDING (manual check not performed)"
+      }
+    },
+    {
+      "edit": "hyperlink text A4 'Click here' -> 'Expenses summary'",
+      "openpyxl": {
+        "output_sha256": "cc35e596a1124f757b7f1a0eede84778609f01a1c3bec3ae51daeed2a9f7830b",
+        "hash_changed": true,
+        "approved_differences_present": true,
+        "missing_approved": [],
+        "unexplained_differences": [
+          "Sheet1!B3 value '10' -> None",
+          "Expenses!A1 value '20' -> None",
+          "drawing objects changed (count delta -2)",
+          "  object Picture id=2 'Picture 1' missing",
+          "  object Chart id=3 'Chart 1' missing",
+          "  object Shape id=4 'Note' missing",
+          "  object Chart id=1 'Chart 1' only after",
+          "relationship types ['chart', 'drawing', 'image', 'officeDocument', 'worksheet'] -> ['chart', 'core-properties', 'drawing', 'extended-properties', 'officeDocument', 'styles', 'theme', 'worksheet']",
+          "parts removed ['xl/media/image1.png']",
+          "parts added ['docProps/app.xml', 'docProps/core.xml', 'xl/styles.xml', 'xl/theme/theme1.xml']"
+        ],
+        "stale_references": [],
+        "semantically_safe": false,
+        "excel_open_without_repair": "PENDING (manual check not performed)"
+      },
+      "targeted": {
+        "output_sha256": "a8e8dda21496fdcb0da7b6758096cdfee6f61de83edee846f91a4a89a79b9efe",
+        "hash_changed": true,
+        "approved_differences_present": true,
+        "missing_approved": [],
+        "unexplained_differences": [],
+        "stale_references": [],
+        "semantically_safe": true,
+        "excel_open_without_repair": "PENDING (manual check not performed)"
+      }
+    },
+    {
+      "edit": "header-row text: add C1 'Notes'",
+      "openpyxl": {
+        "output_sha256": "26fd214375ca8a2738cb4161fa7be8998d4c715e7afa3ca31be518824d2d8cd9",
+        "hash_changed": true,
+        "approved_differences_present": true,
+        "missing_approved": [],
+        "unexplained_differences": [
+          "Sheet1!B3 value '10' -> None",
+          "Expenses!A1 value '20' -> None",
+          "drawing objects changed (count delta -2)",
+          "  object Picture id=2 'Picture 1' missing",
+          "  object Chart id=3 'Chart 1' missing",
+          "  object Shape id=4 'Note' missing",
+          "  object Chart id=1 'Chart 1' only after",
+          "relationship types ['chart', 'drawing', 'image', 'officeDocument', 'worksheet'] -> ['chart', 'core-properties', 'drawing', 'extended-properties', 'officeDocument', 'styles', 'theme', 'worksheet']",
+          "parts removed ['xl/media/image1.png']",
+          "parts added ['docProps/app.xml', 'docProps/core.xml', 'xl/styles.xml', 'xl/theme/theme1.xml']"
+        ],
+        "stale_references": [],
+        "semantically_safe": false,
+        "excel_open_without_repair": "PENDING (manual check not performed)"
+      },
+      "targeted": {
+        "output_sha256": "56732b65aa0eda13296492388e56e1dc41113999f706269308f881f8d678237b",
+        "hash_changed": true,
+        "approved_differences_present": true,
+        "missing_approved": [],
+        "unexplained_differences": [],
+        "stale_references": [],
+        "semantically_safe": true,
+        "excel_open_without_repair": "PENDING (manual check not performed)"
+      }
+    }
+  ]
+}
