@@ -69,7 +69,7 @@ uv run python -m scripts.integration_selfcheck --evidence-dir /tmp/team9-integra
 ```
 
 The script creates only private temporary local state and random credentials, uses real
-application modules, and stops only its own processes. Tracked sanitized artifacts live in
+application modules, and stops only its own processes. Final live source commit: `f41c3bcb89fc6bb86439b2afa8c5d5bb31e46e1c` (clean runtime source). Tracked sanitized artifacts live in
 `docs/evidence/phase3_local_integration/report.json` and `run-record.json`; the latter records
 the tested commit, working-tree status, checkpoint and all 14 operation statuses. A documentation
 commit after the tested source commit does not change the runtime implementation.
