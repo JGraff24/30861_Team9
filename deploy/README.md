@@ -1,13 +1,24 @@
-# Planned AWS deployment and local operation
+# AWS deployment and local operation
+
+The existing AWS deployment serves the website at
+https://3.139.178.70.sslip.io/system/ and the tester API documentation at
+https://3.139.178.70.sslip.io/tester/docs. For shared class application credentials and
+instructions, use the [Team 9 Class Access Guide (PDF)](../docs/Team9_Class_Access_Guide.pdf).
+
+The hosted tester approves both `https://3.139.178.70.sslip.io/system` and
+`https://13.184.14.226.sslip.io`. Their target credentials are configured privately on the
+host. Callers authenticate to Team 9's tester with its operator token and select the exact
+system base URL in `target_url`; Team 12's target tokens are not tester operator credentials.
 
 For CI-gated updates of the existing AWS host, see [automatic deployment setup](AUTODEPLOY.md).
-The status below records the original deployment preparation; it does not describe the
-subsequent operator-led AWS setup or claim the new automatic deployment has run.
+Automatic deployment preserves private host configuration. Changing target URLs or tokens
+requires a private configuration update and tester recreation after active suites finish,
+using the existing Compose inputs and persistent tester storage.
 
-Status: local source/configuration preparation only. No EC2/S3/EBS/IAM/budget resources created,
-no real DNS/certificate configured, and no public deployment tested. Docker is unavailable on
-the implementation host; YAML/JSON rendering was checked, images and Compose were not executed.
-Do not promote this planned topology to an actual deployment model before verification.
+The sections below retain the original provisioning and local-operation guidance. The
+original preparation validated YAML/JSON locally without running Docker; it predates the
+existing operator-led AWS deployment. Provisioning templates are not instructions to
+replace or recreate the current AWS resources.
 
 ## Files and prerequisites
 
@@ -60,7 +71,8 @@ health returns 200 when storage and required integrations are available. Use
 `TEAM9_BUILD_TARGET=measurement` for development Compose when enabling code measurement.
 The tester is implemented and its manifest/fixtures are included in the installed wheel.
 The Docker build copies fixture inputs before packaging and runs the installed wheel so
-package-relative fixture/UI paths resolve. Images and Compose still require Docker validation.
+package-relative fixture/UI paths resolve. Validate local image/Compose changes separately
+before applying them to the existing deployment.
 
 ## Render and review before provisioning
 

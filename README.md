@@ -10,8 +10,49 @@ No findings means only that these two checks found no issues; it is not a compli
 
 See the [integration review and evidence](docs/evidence/phase3_integration.md),
 [shared contract](docs/contracts/phase3.md) and [deployment runbook](deploy/README.md).
-AWS deployment, public HTTPS and Team 12 cross-testing remain pending operator inputs.
+The system and tester are deployed on AWS over HTTPS. The hosted tester is configured
+to test both Team 9's and Team 12's systems; see the access guide below.
 Remediation, history, downloadable reports, scheduling and ordinary deletion are future work.
+
+## Hosted access
+
+Read the [Team 9 Class Access Guide (PDF)](docs/Team9_Class_Access_Guide.pdf), updated
+October 18, 2026, for shared class application tokens, website instructions and the hosted
+tester workflow. These credentials apply to the deployed instance; local installations
+use their own generated credentials.
+
+| Service | URL |
+|---|---|
+| Website | https://3.139.178.70.sslip.io/system/ |
+| System base URL | https://3.139.178.70.sslip.io/system |
+| System API documentation | https://3.139.178.70.sslip.io/system/docs |
+| Tester base URL | https://3.139.178.70.sslip.io/tester |
+| Tester API documentation | https://3.139.178.70.sslip.io/tester/docs |
+
+For website uploads, enter the guide's **userA** token in **User access token** without
+a `Bearer` prefix, select an `.xlsx` workbook and choose **Upload and check**.
+
+For hosted testing, open the tester API documentation and **Authorize** with Team 9's
+**operator** token without a `Bearer` prefix. Execute `POST /test/setup` with one of
+these exact approved targets:
+
+```json
+{"target_url":"https://13.184.14.226.sslip.io"}
+```
+
+Use `https://3.139.178.70.sslip.io/system` as `target_url` for a Team 9 self-test.
+Team 12's target credentials are configured privately on the server; keep using Team 9's
+operator token to authenticate to Team 9's tester. The setup body needs no token fields.
+
+Require setup to return 201, retain its `session_id`, then execute `POST /test/run` once
+with `{"session_id":"PASTE_RETURNED_SESSION_ID"}`. Retrieve the stored report through
+`GET /test/report` with the same session ID. Use a client read timeout of at least
+630 seconds. After a lost run response, retrieve the report rather than repeating the
+run POST; poll 409 report responses within a deadline. Do not automatically retry an
+uncertain setup POST. Each prepared session runs once.
+
+For reciprocal testing, Team 12 uses its own tester and operator token, targeting
+`https://3.139.178.70.sslip.io/system` with Team 9's system credentials.
 
 ## Local setup
 
@@ -40,7 +81,8 @@ uv run python -m scripts.create_dev_tokens --local-only
 This creates ignored `.env.local` with POSIX mode 0600 and refuses overwrites/production.
 Copy it privately to `.env` if that file does not exist, preserving its permissions.
 The target token map includes user A/B, reviewer and test-admin credentials; the local operator
-token is stored in the private file. Do not put credentials in commands, Git, images or evidence.
+token is stored in the private file. Keep these generated local credentials out of commands,
+Git, images and evidence.
 For the tester workflow, explicitly set `ENABLE_TEST_INTERFACE=true` and optionally
 `ENABLE_CODE_MEASUREMENT=true` in the private configuration. The generator leaves both disabled.
 Use ordinary user credentials in the UI, available at `http://127.0.0.1:8000/`.
@@ -148,6 +190,7 @@ Team 12 confirmation items remain listed in the contract.
 Development Compose: `docker compose -f deploy/compose.yaml up --build` with private `.env.local`.
 Configure the tester target/access map for `http://system:8000`; container loopback refers to
 itself. Use `TEAM9_BUILD_TARGET=measurement` when enabling coverage. Named volumes preserve
-system/tester state independently. Production templates prepare EC2/EBS/private S3 and HTTPS;
-operator input and separate deployment authorization are required. See the deployment runbook
-for IAM, TLS, release mapping, backups, resets and rollback.
+system/tester state independently. The existing production deployment uses EC2, persistent
+storage, private S3 and HTTPS. See the deployment runbook for operation and the original
+provisioning templates, and [automatic deployment](deploy/AUTODEPLOY.md) for CI-gated updates
+of the existing host. Additional provisioning requires separate operator authorization.
