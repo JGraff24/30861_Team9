@@ -188,6 +188,12 @@ Inventory details:
   `x:ClientData ObjectType="Note"` are counted into one limitation per part (they are cell
   comments). Every other top-level `v:` element becomes a MANUAL_REVIEW finding. An
   unreadable VML part produces one part-level MANUAL_REVIEW whose target is the bare part path.
+- Rich-value cells (pod contract 1.1 §7): a worksheet `<c>` with a `vm` attribute holds a
+  value-metadata rich value, such as a Place-in-Cell picture, an `IMAGE()` result or a linked
+  data type. The sheet scan records each one (up to 1,000 per sheet; the rest are counted in
+  a limitation) and the audit emits one MANUAL_REVIEW ALT_TEXT finding per cell with one
+  limitation per sheet. `xl/metadata.xml` and `xl/richData/*` are not resolved, so linked
+  data types are also sent to review. Nothing external is fetched.
 - The visible chart title, shape text, object name and file names are never read as alt text.
 
 Messages and recommendations are fixed templates. Object names are shown collapsed, trimmed
@@ -214,6 +220,10 @@ findingId = lower(hex(SHA256(UTF8(json.dumps(
   `mc:Choice` appear as steps. One limitation is added per part and reason.
 - Unsupported targets: `<part>#xml=<path to the element>` (for VML, a sheet `picture`, an
   unresolved `drawing`, or a `contentPart`), or the bare `<part>` for an unreadable VML part.
+- Rich-value cell target: `<sheet part>#cell=<r>`, for example `xl/worksheets/sheet1.xml#cell=B2`,
+  when `r` is a well-formed A1 reference (1–3 letters, 1–7 digits). Otherwise
+  `#xml=/worksheet[1]/sheetData[1]/row[n]/c[m]`. **Pending pod agreement** alongside the
+  `#xml=` grammar open item in the pod contract.
 - Identical bytes give identical findings regardless of upload filename, IDs or time. New
   bytes or a new ruleset version give new IDs.
 
@@ -290,6 +300,7 @@ cross-team tests, Excel manual checks, `pip-audit` (no dependency changes were m
 | L8 | Worksheet-level protection rejection may refuse workbooks users consider ordinary | Medium (policy) | Documented policy | Pod confirmation |
 | L9 | U+000B/U+000C in alt text cannot be represented in XML 1.0; such parts are rejected as malformed | Info | none | none |
 | L10 | No in-engine timeout; relies on the runner hard-kill | Medium if the runner is missing | Jackson's runner | Integration |
+| L11 | Rich-value cells are not resolved through `xl/metadata.xml`/`xl/richData`, so linked data types (Stocks, Geography) are also MANUAL_REVIEW; no Excel-authored in-cell picture fixture yet; the independent tester suite has no rich-value case | Low | Disclosed finding + limitation | Phase 4: resolve `_localImage` structures; Dixon adds a tester case |
 
 ## Deviations from the handoff
 
@@ -322,7 +333,7 @@ cross-team tests, Excel manual checks, `pip-audit` (no dependency changes were m
 Rejection code table and `details` shape; protection policy; empty file = 422; extension
 checked before size; group containers as objects; first-Choice policy; VML notes as a
 limitation; `#xml=` paths for unsupported elements and a bare part path for unreadable VML;
-treating missing decorative `val` as ambiguous; Strict OOXML acceptance; counting chartsheets
+treating missing decorative `val` as ambiguous; `#cell=` targets for rich-value cells; Strict OOXML acceptance; counting chartsheets
 as worksheets in `worksheet_parts` and the 50-sheet limit.
 
 ## Phase 4/5 extension points

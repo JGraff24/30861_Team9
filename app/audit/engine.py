@@ -114,7 +114,37 @@ def _sheet_inventories(package: OoxmlPackage, sheet: SheetInfo) -> list[DrawingI
             inventories.append(inventory_drawing(package, rel.resolved))
         else:
             inventories.append(inventory_vml(package, rel.resolved))
+    if sheet.rich_value_cells or sheet.rich_value_cells_omitted:
+        inventories.append(_rich_value_inventory(sheet))
     return inventories
+
+
+def _rich_value_inventory(sheet: SheetInfo) -> DrawingInventory:
+    """Cells with value metadata: in-cell pictures, IMAGE() results or linked data types.
+
+    Their rich-value parts are not resolved, so each cell is sent to manual review.
+    """
+    limitation = (
+        f"Worksheet part {sheet.part} has cells with rich values (such as in-cell pictures); "
+        "their contents were not inspected."
+    )
+    unsupported = [
+        UnsupportedObject(
+            sheet.part,
+            cell.path,
+            f"In-cell picture or rich value{f' in {cell.ref}' if cell.ref else ''}",
+            limitation,
+            cell.ref,
+        )
+        for cell in sheet.rich_value_cells
+    ]
+    extra = []
+    if sheet.rich_value_cells_omitted:
+        extra.append(
+            f"Worksheet part {sheet.part} has {sheet.rich_value_cells_omitted} more rich-value "
+            "cell(s) beyond the listed limit; review them manually."
+        )
+    return DrawingInventory([], unsupported, extra)
 
 
 def _unsupported(part: str, path: XmlPath, label: str, detail: str) -> DrawingInventory:

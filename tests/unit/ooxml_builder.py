@@ -347,3 +347,61 @@ def simple_workbook(
             for i, name in enumerate(names, start=1)
         ]
     )
+
+
+RICH_DATA_NS = "http://schemas.microsoft.com/office/spreadsheetml/2017/richdata"
+RICH_DATA_REL_NS = "http://schemas.microsoft.com/office/spreadsheetml/2022/richvaluerel"
+
+
+def rich_value_parts(images: int = 1) -> dict[str, bytes]:
+    """Place-in-Cell picture parts as Excel writes them: metadata, rich values and media.
+
+    The audit only relies on the cells' vm attributes; these parts make the package
+    realistic and must still pass the every-XML-part safety scan.
+    """
+    blocks = "".join(f'<bk><rc t="1" v="{i}"/></bk>' for i in range(images))
+    metadata = (
+        f'{DECL}<metadata xmlns="{MAIN}" xmlns:xlrd="{RICH_DATA_NS}">'
+        '<metadataTypes count="1"><metadataType name="XLRICHVALUE" minSupportedVersion="120000"/>'
+        f'</metadataTypes><futureMetadata name="XLRICHVALUE" count="{images}">'
+        + "".join(
+            f'<bk><extLst><ext uri="{{3e2802c4-a4d2-4d8b-9148-e3be6c30e623}}">'
+            f'<xlrd:rvb i="{i}"/></ext></extLst></bk>'
+            for i in range(images)
+        )
+        + f'</futureMetadata><valueMetadata count="{images}">{blocks}</valueMetadata></metadata>'
+    )
+    values = (
+        f'{DECL}<rvData xmlns="{RICH_DATA_NS}" count="{images}">'
+        + "".join(f'<rv s="0"><v>{i}</v><v>5</v></rv>' for i in range(images))
+        + "</rvData>"
+    )
+    structures = (
+        f'{DECL}<rvStructures xmlns="{RICH_DATA_NS}" count="1"><s t="_localImage">'
+        '<k n="_rvRel:LocalImageIdentifier" t="i"/><k n="CalcOrigin" t="i"/></s></rvStructures>'
+    )
+    rels = (
+        f'{DECL}<richValueRels xmlns="{RICH_DATA_REL_NS}" xmlns:r="{REL}">'
+        + "".join(f'<rel r:id="rIdImg{i}"/>' for i in range(images))
+        + "</richValueRels>"
+    )
+    parts = {
+        "xl/metadata.xml": metadata.encode(),
+        "xl/richData/rdrichvalue.xml": values.encode(),
+        "xl/richData/rdrichvaluestructure.xml": structures.encode(),
+        "xl/richData/richValueRel.xml": rels.encode(),
+        "xl/richData/_rels/richValueRel.xml.rels": rels_xml(
+            "".join(
+                f'<Relationship Id="rIdImg{i}" Type="{REL}/image" '
+                f'Target="../media/cellimage{i}.png"/>'
+                for i in range(images)
+            )
+        ),
+    }
+    parts.update({f"xl/media/cellimage{i}.png": PNG_1X1 for i in range(images)})
+    return parts
+
+
+def rich_cell(ref: str | None, index: int) -> str:
+    """A cell holding rich value `index` (Excel stores #VALUE! as the fallback value)."""
+    return f'<c{attr("r", ref)} t="e" vm="{index + 1}"><v>#VALUE!</v></c>'

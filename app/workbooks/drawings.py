@@ -72,6 +72,7 @@ class UnsupportedObject:
     element_path: XmlPath  # () means the whole part
     label: str
     limitation: str
+    cell_ref: str | None = None  # set for rich-value cells; targets use #cell= when present
 
 
 @dataclass

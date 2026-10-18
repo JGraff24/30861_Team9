@@ -4,7 +4,13 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 
-from app.audit.identity import finding_id, object_target, worksheet_target, xml_target
+from app.audit.identity import (
+    cell_target,
+    finding_id,
+    object_target,
+    worksheet_target,
+    xml_target,
+)
 from app.contracts.models import Finding, FindingCategory, FindingClassification
 from app.workbooks.drawings import DrawingInventory, DrawingObject, UnsupportedObject
 from app.workbooks.structure import SheetInfo
@@ -190,7 +196,12 @@ def _object_finding(
 
 
 def _unsupported_finding(context: RuleContext, worksheet: str, item: UnsupportedObject) -> Finding:
-    target = xml_target(item.part, item.element_path) if item.element_path else item.part
+    if item.cell_ref is not None:
+        target = cell_target(item.part, item.cell_ref)
+    elif item.element_path:
+        target = xml_target(item.part, item.element_path)
+    else:
+        target = item.part
     return context.finding(
         ALT_TEXT,
         FindingCategory.NON_TEXT_CONTENT,

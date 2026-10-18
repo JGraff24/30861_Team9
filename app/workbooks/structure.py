@@ -3,6 +3,7 @@
 Validation and audit share this scan so both see the same name-to-part map.
 """
 
+import re
 from dataclasses import dataclass, field
 from typing import Literal
 from xml.etree.ElementTree import Element
@@ -54,6 +55,20 @@ class SheetReference:
     rel_id: str | None
 
 
+#: Rich-value cells recorded per sheet; any beyond this are counted, not listed.
+MAX_RICH_VALUE_CELLS_PER_SHEET = 1_000
+#: An A1-style cell reference (Excel's grid is at most XFD1048576).
+CELL_REF = re.compile(r"[A-Za-z]{1,3}[0-9]{1,7}", re.ASCII)
+
+
+@dataclass(frozen=True)
+class RichValueCell:
+    """A cell carrying value metadata (vm), e.g. a Place-in-Cell picture or IMAGE() result."""
+
+    ref: str | None  # the cell's r attribute when present and well-formed
+    path: tuple[tuple[str, int], ...]  # one-based element path to the <c> element
+
+
 @dataclass
 class SheetInfo:
     name: str
@@ -64,6 +79,8 @@ class SheetInfo:
     nonempty_cells: int = 0
     references: list[SheetReference] = field(default_factory=list)
     root_name: str = ""
+    rich_value_cells: list[RichValueCell] = field(default_factory=list)
+    rich_value_cells_omitted: int = 0
 
 
 @dataclass
@@ -199,6 +216,8 @@ class _SheetScanner:
         self.cell_budget = cell_budget
         self.cells_in_open_c = 0
         self.sibling_counts: dict[str, int] = {}
+        self.row_counts: dict[str, int] = {}
+        self.cell_counts: dict[str, int] = {}
 
     def on_start(self, elem: Element, stack: list[Element]) -> None:
         name = local_name(elem.tag)
@@ -209,6 +228,13 @@ class _SheetScanner:
             return
         if name == "c":
             self.cells_in_open_c += 1
+        if len(stack) == 2 and local_name(stack[1].tag) == "sheetData":
+            self.row_counts[name] = self.row_counts.get(name, 0) + 1
+            self.cell_counts = {}
+        elif len(stack) == 3 and local_name(stack[1].tag) == "sheetData":
+            self.cell_counts[name] = self.cell_counts.get(name, 0) + 1
+            if name == "c" and elem.get("vm") is not None:
+                self._record_rich_value(elem, stack)
         if len(stack) != 1:
             return
         index = self.sibling_counts.get(name, 0) + 1
@@ -217,6 +243,22 @@ class _SheetScanner:
             errors.protected("worksheet")
         if name in SHEET_REFERENCE_ELEMENTS:
             self.sheet.references.append(SheetReference(name, index, r_attr(elem, "id")))
+
+    def _record_rich_value(self, cell: Element, stack: list[Element]) -> None:
+        if len(self.sheet.rich_value_cells) >= MAX_RICH_VALUE_CELLS_PER_SHEET:
+            self.sheet.rich_value_cells_omitted += 1
+            return
+        row = local_name(stack[2].tag)
+        path = (
+            (self.sheet.root_name, 1),
+            ("sheetData", self.sibling_counts.get("sheetData", 1)),
+            (row, self.row_counts[row]),
+            ("c", self.cell_counts["c"]),
+        )
+        ref = cell.get("r")
+        self.sheet.rich_value_cells.append(
+            RichValueCell(ref if ref is not None and CELL_REF.fullmatch(ref) else None, path)
+        )
 
     def _protected(self, elem: Element) -> bool:
         if _has_secret_attribute(elem):
