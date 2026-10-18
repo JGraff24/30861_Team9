@@ -108,7 +108,7 @@ uv run python -m scripts.integration_selfcheck --evidence-dir /tmp/team9-integra
 ```
 
 The integration self-check uses random temporary loopback ports, isolated databases and private
-credentials. It tests the real engine/API/worker, restart persistence, the 53-case tester suite,
+credentials. It tests the real engine/API/worker, restart persistence, the 64-case tester suite,
 report retention and four live tester acceptance checks. It contacts no AWS or Team 12 endpoint.
 Two Linux memory-limit tests skip on macOS. Live acceptance tests skip in an ordinary pytest run;
 the integration self-check configures and runs them. CI runs the full suite and real integration

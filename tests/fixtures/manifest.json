@@ -1,5 +1,5 @@
 {
-  "manifest_version": "1.4.0",
+  "manifest_version": "1.5.0",
   "ruleset_version": "1.0.0",
   "expectations": "expectations.json",
   "components": {
@@ -430,6 +430,22 @@
       "test_id": "P3-INPUT-SHEETS-AT",
       "check": "upload_worksheets_at",
       "description": "A valid workbook with exactly 50 worksheets is accepted.",
+      "qualifying_assertion": "202 status and UploadResponse evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success"
+    },
+    {
+      "test_id": "P3-INPUT-SHEETS-CHARTSHEET",
+      "check": "upload_worksheets_chartsheet",
+      "description": "A valid workbook with exactly 50 worksheets plus one chartsheet is accepted; chartsheets do not count toward the worksheet limit (pod contract 1.1).",
       "qualifying_assertion": "202 status and UploadResponse evaluated.",
       "components": [
         "C2"
@@ -1029,6 +1045,225 @@
       },
       "prerequisites": [
         "P3-UPLOAD-MULTIPLE-DRAWINGS"
+      ]
+    },
+    {
+      "test_id": "P3-UPLOAD-IN-CELL-PICTURE",
+      "check": "edge_upload",
+      "description": "in_cell_picture (in-cell picture with rich-data and cell-image parts) accepted.",
+      "qualifying_assertion": "202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "in_cell_picture"
+      }
+    },
+    {
+      "test_id": "P3-AUDIT-IN-CELL-PICTURE",
+      "check": "edge_audit",
+      "description": "in_cell_picture (in-cell picture with rich-data and cell-image parts) exact findings per pod contract 1.1.",
+      "qualifying_assertion": "Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "in_cell_picture"
+      },
+      "prerequisites": [
+        "P3-UPLOAD-IN-CELL-PICTURE"
+      ]
+    },
+    {
+      "test_id": "P3-UPLOAD-IMAGE-FORMULA",
+      "check": "edge_upload",
+      "description": "image_formula (IMAGE() formula cell) accepted.",
+      "qualifying_assertion": "202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "image_formula"
+      }
+    },
+    {
+      "test_id": "P3-AUDIT-IMAGE-FORMULA",
+      "check": "edge_audit",
+      "description": "image_formula (IMAGE() formula cell) exact findings per pod contract 1.1.",
+      "qualifying_assertion": "Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "image_formula"
+      },
+      "prerequisites": [
+        "P3-UPLOAD-IMAGE-FORMULA"
+      ]
+    },
+    {
+      "test_id": "P3-UPLOAD-FORM-CONTROLS",
+      "check": "edge_upload",
+      "description": "form_controls (form control and OLE object in AlternateContent, drawing AlternateContent, group container) accepted.",
+      "qualifying_assertion": "202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "form_controls"
+      }
+    },
+    {
+      "test_id": "P3-AUDIT-FORM-CONTROLS",
+      "check": "edge_audit",
+      "description": "form_controls (form control and OLE object in AlternateContent, drawing AlternateContent, group container) exact findings per pod contract 1.1.",
+      "qualifying_assertion": "Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "form_controls"
+      },
+      "prerequisites": [
+        "P3-UPLOAD-FORM-CONTROLS"
+      ]
+    },
+    {
+      "test_id": "P3-UPLOAD-VML-COMMENTS",
+      "check": "edge_upload",
+      "description": "vml_comments (legacy VML comment notes) accepted.",
+      "qualifying_assertion": "202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "vml_comments"
+      }
+    },
+    {
+      "test_id": "P3-AUDIT-VML-COMMENTS",
+      "check": "edge_audit",
+      "description": "vml_comments (legacy VML comment notes) exact findings per pod contract 1.1.",
+      "qualifying_assertion": "Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "vml_comments"
+      },
+      "prerequisites": [
+        "P3-UPLOAD-VML-COMMENTS"
+      ]
+    },
+    {
+      "test_id": "P3-UPLOAD-INACTIVE-PROTECTION",
+      "check": "edge_upload",
+      "description": "inactive_protection (stored sheet password with sheet=\"0\") accepted.",
+      "qualifying_assertion": "202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "inactive_protection"
+      }
+    },
+    {
+      "test_id": "P3-AUDIT-INACTIVE-PROTECTION",
+      "check": "edge_audit",
+      "description": "inactive_protection (stored sheet password with sheet=\"0\") exact findings per pod contract 1.1.",
+      "qualifying_assertion": "Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04"
+      ],
+      "operations": [
+        5
+      ],
+      "path": "success",
+      "parameters": {
+        "fixture": "inactive_protection"
+      },
+      "prerequisites": [
+        "P3-UPLOAD-INACTIVE-PROTECTION"
       ]
     },
     {

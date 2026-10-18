@@ -30,15 +30,17 @@
       "validation": {"worksheetCount": 1, "nonemptyCellCount": 6,
         "worksheetParts": {"Summary": "xl/worksheets/sheet1.xml"}},
       "findings": [
-        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Summary", "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[1]/pic[1]/nvPicPr[1]/cNvPr[1]", "classification": "REQUIRES_USER_INPUT", "seed": "duplicate id 4, missing both"},
-        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Summary", "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[3]/sp[1]/nvSpPr[1]/cNvPr[1]", "classification": "REQUIRES_USER_INPUT", "seed": "shape without id, missing both"},
-        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Summary", "target": "xl/drawings/vmlDrawing1.vml#xml=/xml[1]/shape[2]", "classification": "MANUAL_REVIEW", "seed": "legacy VML button (unsupported representation)"}
+        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Summary", "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[1]/pic[1]", "classification": "MANUAL_REVIEW", "seed": "duplicate id 4, missing both: ambiguous id is MANUAL_REVIEW (pod contract 1.1 section 7)"},
+        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Summary", "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[2]/pic[1]", "classification": "MANUAL_REVIEW", "seed": "duplicate id 4, described: still an ambiguous id"},
+        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Summary", "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[3]/sp[1]", "classification": "MANUAL_REVIEW", "seed": "shape without id: ambiguous id"},
+        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Summary", "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[4]/AlternateContent[1]", "classification": "MANUAL_REVIEW", "seed": "mc:AlternateContent: reviewed as one representation, neither branch inspected"},
+        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Summary", "target": "xl/drawings/vmlDrawing1.vml#id=_x0000_s1025", "classification": "MANUAL_REVIEW", "seed": "legacy VML comment note shape (all VML shapes are reviewed)"},
+        {"ruleId": "ALT_TEXT", "category": "NON_TEXT_CONTENT", "worksheet": "Summary", "target": "xl/drawings/vmlDrawing1.vml#id=_x0000_s1026", "classification": "MANUAL_REVIEW", "seed": "legacy VML button (unsupported representation)"}
       ],
       "limitations": [
-        "1 cell comment note shape(s) in legacy VML part xl/drawings/vmlDrawing1.vml were treated as cell comments, not drawing objects, and were not checked for alt text.",
-        "Drawing part xl/drawings/drawing1.xml has duplicated object IDs; affected objects use XML element path targets (#xml=).",
-        "Drawing part xl/drawings/drawing1.xml has missing object IDs; affected objects use XML element path targets (#xml=).",
-        "Legacy VML Button object in xl/drawings/vmlDrawing1.vml: VML alt text is not interpreted (partial support)."
+        "Alternate content in xl/drawings/drawing1.xml: alternative representations are reviewed.",
+        "Drawing object with a missing or duplicate id in xl/drawings/drawing1.xml: not inspected.",
+        "Legacy VML part xl/drawings/vmlDrawing1.vml: VML objects are not interpreted (partial support)."
       ]
     },
     "corrupt.xlsx": {

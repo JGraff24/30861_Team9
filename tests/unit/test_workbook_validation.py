@@ -417,10 +417,7 @@ def test_error_details_never_echo_entry_names() -> None:
     [
         '<workbookProtection lockStructure="1"/>',
         '<workbookProtection lockWindows="true"/>',
-        '<workbookProtection workbookAlgorithmName="SHA-512" workbookHashValue="x" '
-        'workbookSaltValue="y"/>',
-        '<workbookProtection workbookPassword="CC1A"/>',
-        '<fileSharing userName="a" reservationPassword="CC1A"/>',
+        '<workbookProtection lockRevision="1" workbookPassword="CC1A"/>',
     ],
 )
 def test_protected_workbook_structures_are_rejected(head: str) -> None:
@@ -431,9 +428,19 @@ def test_protected_workbook_structures_are_rejected(head: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "head", ['<workbookProtection lockStructure="0"/>', '<fileSharing readOnlyRecommended="1"/>']
+    "head",
+    [
+        "<workbookProtection/>",
+        '<workbookProtection lockStructure="0"/>',
+        '<workbookProtection workbookAlgorithmName="SHA-512" workbookHashValue="x" '
+        'workbookSaltValue="y"/>',
+        '<workbookProtection workbookPassword="CC1A"/>',
+        '<fileSharing readOnlyRecommended="1"/>',
+        '<fileSharing userName="a" reservationPassword="CC1A"/>',
+    ],
 )
-def test_unlocked_protection_elements_are_accepted(head: str) -> None:
+def test_inactive_protection_elements_are_accepted(head: str) -> None:
+    """Pod contract 1.1 §4: only active locks reject; stored passwords alone do not."""
     wb = simple_workbook("Data")
     wb.workbook_head = head
     assert validate(wb.build()).worksheet_count == 1
@@ -444,8 +451,7 @@ def test_unlocked_protection_elements_are_accepted(head: str) -> None:
     [
         '<sheetProtection sheet="1" objects="1"/>',
         '<sheetProtection sheet="true"/>',
-        '<sheetProtection password="CC1A" sheet="0"/>',
-        '<sheetProtection algorithmName="SHA-512" hashValue="x" saltValue="y" spinCount="1"/>',
+        '<sheetProtection password="CC1A" sheet="1"/>',
     ],
 )
 def test_protected_worksheets_are_rejected(tail: str) -> None:
@@ -453,6 +459,33 @@ def test_protected_worksheets_are_rejected(tail: str) -> None:
     wb.sheets[1].state = "hidden"
     wb.sheets[1].tail = tail
     assert rejection(wb.build()).details == {"scope": "worksheet"}
+
+
+@pytest.mark.parametrize(
+    "tail",
+    [
+        '<sheetProtection password="CC1A" sheet="0"/>',
+        '<sheetProtection algorithmName="SHA-512" hashValue="x" saltValue="y" spinCount="1"/>',
+    ],
+)
+def test_inactive_sheet_protection_is_accepted(tail: str) -> None:
+    wb = simple_workbook("Data")
+    wb.sheets[0].tail = tail
+    assert validate(wb.build()).worksheet_count == 1
+
+
+def test_protected_chartsheet_is_accepted() -> None:
+    wb = simple_workbook("Data")
+    wb.sheets.append(
+        Sheet(
+            "Chart",
+            "xl/chartsheets/sheet1.xml",
+            "2",
+            kind="chartsheet",
+            tail='<sheetProtection content="1" objects="1"/>',
+        )
+    )
+    assert validate(wb.build()).worksheet_count == 1
 
 
 def test_sheet_protection_off_is_accepted() -> None:

@@ -70,6 +70,13 @@ def test_worksheets_above_default_limit_are_rejected() -> None:
     assert limit_of(data, DEFAULTS) == (422, "WORKBOOK_LIMIT_EXCEEDED", "max_worksheets")
 
 
+def test_chartsheets_do_not_count_toward_worksheet_limit() -> None:
+    """Pod contract 1.1 §4: the limit is more than 50 worksheets."""
+    wb = simple_workbook(*(f"Tab {i}" for i in range(50)))
+    wb.sheets.append(Sheet("Chart", "xl/chartsheets/sheet1.xml", "51", kind="chartsheet"))
+    assert ENGINE.validate(wb.build(), "book.xlsx", DEFAULTS).worksheet_count == 50
+
+
 def test_hidden_sheets_count_toward_worksheet_limit() -> None:
     wb = simple_workbook("A", "B", "C")
     wb.sheets[2].state = "veryHidden"
@@ -211,3 +218,19 @@ def test_actual_xml_bytes_are_measured_when_declared_size_is_understated() -> No
         ENGINE.validate(bytes(data), "book.xlsx", limits)
     # zipfile stops at the declared size, so the stream ends early: either way it is rejected.
     assert caught.value.code in {"INVALID_WORKBOOK", "WORKBOOK_LIMIT_EXCEEDED"}
+
+
+def test_service_accepts_engine_result_for_worksheets_plus_chartsheet() -> None:
+    """Regression: 50 worksheets + 1 chartsheet passed the engine but the API returned 500."""
+    from app.contracts.errors import ProjectException
+    from app.services.projects import verify_validation
+
+    wb = simple_workbook(*(f"Tab {i}" for i in range(50)))
+    wb.sheets.append(Sheet("Chart", "xl/chartsheets/sheet1.xml", "51", kind="chartsheet"))
+    data = wb.build()
+    validated = ENGINE.validate(data, "book.xlsx", DEFAULTS)
+    assert (validated.worksheet_count, len(validated.worksheet_parts)) == (50, 51)
+    verify_validation(data, validated, DEFAULTS)
+    too_many = validated.model_copy(update={"worksheet_count": 52})
+    with pytest.raises(ProjectException):
+        verify_validation(data, too_many, DEFAULTS)

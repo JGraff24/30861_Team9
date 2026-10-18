@@ -19,13 +19,19 @@ expected targets/classifications and rejection status for every fixture.
 | xml_dtd / macro_parts | Matching synthetic files | Synthetic | Entity/DTD declaration / macro part in .xlsx → 422 |
 | protected_sheet / protected_structure | Matching synthetic files | Synthetic | Worksheet-only and workbook-structure-only protection rejected separately |
 | encrypted_zip | `synthetic/encrypted_zip.xlsx` | Synthetic | Genuine ZipCrypto-encrypted OOXML ZIP → 422; fixed fixture-only password |
+| in_cell_picture | `synthetic/in_cell_picture.xlsx` | Synthetic (pod contract 1.1) | `vm` cell → sheetData `#xml=` review; each `xl/richData/*` part and `xl/cellimages.xml` → `__WORKBOOK__` `<part>#xml=/` review |
+| image_formula | `synthetic/image_formula.xlsx` | Synthetic (pod contract 1.1) | `_xlfn.IMAGE()` cell → sheetData `#xml=` review; a SUM cell is not |
+| form_controls | `synthetic/form_controls.xlsx` | Synthetic (pod contract 1.1) | Control and OLE objects nested in `mc:AlternateContent` → sheet `#xml=` reviews; drawing `mc:AlternateContent` at root and inside an anchor → one review each; undescribed group container → no finding |
+| vml_comments | `synthetic/vml_comments.xlsx` | Synthetic (pod contract 1.1) | Two comment-note VML shapes → `vmlDrawing1.vml#id=<id>` reviews; shapetype ignored |
+| inactive_protection | `synthetic/inactive_protection.xlsx` | Synthetic (pod contract 1.1) | Stored sheet password with `sheet="0"` → accepted, no findings |
 
 Generated at run time by `tester/suite/workbooks.py`, not committed: the 25,000,000 / 25,000,001-byte
 uploads (P3-INPUT-BYTES-AT / -OVER), 50 / 51 worksheets (P3-INPUT-SHEETS-AT / -OVER), 250,000 /
-250,001 nonempty cells (P3-INPUT-CELLS-AT / -OVER) and a password-protected structure
+250,001 nonempty cells (P3-INPUT-CELLS-AT / -OVER), 50 worksheets plus one chartsheet
+(P3-INPUT-SHEETS-CHARTSHEET) and a password-protected structure
 (P3-INPUT-PROTECTED). `manifest.json` also holds the 14-operation catalog used by run records.
 
-All thirteen committed files are **provisional synthetic fixtures**; the original three are
+All eighteen committed files are **provisional synthetic fixtures**; the original three are
 stand-ins. Team 12's shared `clean.xlsx`,
 `seeded_issues.xlsx` and `corrupt.xlsx` have not been delivered. When they arrive, add them under
 `shared/` with `"origin": "team12"` entries and their own independently reviewed expectations; do
@@ -74,9 +80,11 @@ need separate runs. No expectation may be derived from the target engine. The si
 and eight AC catalogs remain Team 9 defaults awaiting pod confirmation.
 
 
-Manifest 1.4.0 has 53 cases, including `P3-VERSION-REVIEWER` and `P3-AUDIT-REVIEWER`.
+Manifest 1.5.0 has 64 cases, including `P3-VERSION-REVIEWER` and `P3-AUDIT-REVIEWER`, and
+eleven pod contract 1.1 cases (`P3-INPUT-SHEETS-CHARTSHEET` plus an upload/audit pair for each
+of the five fixtures above).
 The configured reviewer must be explicitly granted access to userA and authorized for the test
 session on the target; reviewer role alone is not access. Expected findings and repeatability
 are independent: any valid correctly identified completed seeded audit supplies the comparison
 baseline, even if its detection accuracy fails the oracle. Invalid/missing/failed audits still
-cause repeatability skips. The healthy local fake yields 52 passes and one observation skip.
+cause repeatability skips. The healthy local fake yields 63 passes and one observation skip.

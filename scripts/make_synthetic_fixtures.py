@@ -9,6 +9,7 @@ from tester.suite.workbooks import (
     clean_workbook,
     edge_workbooks,
     hostile_workbooks,
+    pod_contract_workbooks,
     seeded_workbook,
 )
 
@@ -22,6 +23,7 @@ def fixtures() -> dict[str, bytes]:
         "corrupt.xlsx": CORRUPT_BYTES,
         **edge_workbooks(),
         **hostile_workbooks(),
+        **pod_contract_workbooks(),
     }
 
 

@@ -1,7 +1,6 @@
 """ALT_TEXT and WORKSHEET_NAME rules. Presence checks only; no content-quality inference."""
 
 import re
-from collections import Counter
 from dataclasses import dataclass
 
 from app.audit.identity import finding_id, object_target, worksheet_target, xml_target
@@ -28,7 +27,6 @@ WHITESPACE_CODE_POINTS = (
 )
 WHITESPACE = "".join(chr(code_point) for code_point in WHITESPACE_CODE_POINTS)
 GENERIC_SHEET_NAME = re.compile(r"^sheet([0-9]+)$", re.IGNORECASE | re.ASCII)
-_ID_PATTERN = re.compile(r"^[0-9]+$", re.ASCII)
 _NAME_LIMIT = 80
 
 
@@ -93,35 +91,6 @@ def worksheet_name_findings(context: RuleContext, sheet: SheetInfo) -> list[Find
             "Rename the worksheet with a descriptive name that identifies its content.",
         )
     ]
-
-
-def _object_targets(objects: list[DrawingObject]) -> tuple[list[str], list[str]]:
-    """Targets per object (same order) plus limitations for unusual ID metadata."""
-    usable = Counter(
-        obj.object_id
-        for obj in objects
-        if obj.object_id is not None and _ID_PATTERN.match(obj.object_id)
-    )
-    targets: list[str] = []
-    reasons: set[tuple[str, str]] = set()
-    for obj in objects:
-        object_id = obj.object_id
-        if object_id is not None and _ID_PATTERN.match(object_id) and usable[object_id] == 1:
-            targets.append(object_target(obj.part, object_id))
-            continue
-        if object_id is None or not object_id:
-            reasons.add((obj.part, "missing"))
-        elif not _ID_PATTERN.match(object_id):
-            reasons.add((obj.part, "invalid"))
-        else:
-            reasons.add((obj.part, "duplicated"))
-        targets.append(xml_target(obj.part, obj.cnvpr_path))
-    limitations = [
-        f"Drawing part {part} has {reason} object IDs; affected objects use XML element "
-        "path targets (#xml=)."
-        for part, reason in sorted(reasons)
-    ]
-    return targets, limitations
 
 
 def _object_label(obj: DrawingObject) -> str:
@@ -190,7 +159,14 @@ def _object_finding(
 
 
 def _unsupported_finding(context: RuleContext, worksheet: str, item: UnsupportedObject) -> Finding:
-    target = xml_target(item.part, item.element_path) if item.element_path else item.part
+    if item.object_id is not None:
+        target = object_target(item.part, item.object_id)
+    elif item.part_root:
+        target = f"{item.part}#xml=/"
+    elif item.element_path:
+        target = xml_target(item.part, item.element_path)
+    else:
+        target = item.part
     return context.finding(
         ALT_TEXT,
         FindingCategory.NON_TEXT_CONTENT,
@@ -208,9 +184,8 @@ def alt_text_findings(
     """One finding per object at most. Decorative objects never get a missing-fields finding."""
     findings: list[Finding] = []
     limitations = list(inventory.limitations)
-    targets, id_limitations = _object_targets(inventory.objects)
-    limitations.extend(id_limitations)
-    for obj, target in zip(inventory.objects, targets, strict=True):
+    for obj in inventory.objects:
+        target = object_target(obj.part, obj.object_id)
         finding, limitation = _object_finding(context, worksheet, obj, target)
         if finding is not None:
             findings.append(finding)

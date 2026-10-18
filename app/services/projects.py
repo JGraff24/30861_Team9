@@ -45,8 +45,9 @@ def verify_validation(data: bytes, validated: ValidatedWorkbook, limits: Process
     if not (
         validated.source_sha256 == sha256(data)
         and validated.size_bytes == len(data) <= limits.max_file_bytes
-        and 1 <= validated.worksheet_count <= limits.max_worksheets
-        and validated.worksheet_count == len(parts) == len(set(parts))
+        and 1 <= len(parts) == len(set(parts))
+        # Worksheets only; chartsheets are in worksheet_parts but not in the count.
+        and 0 <= validated.worksheet_count <= min(len(parts), limits.max_worksheets)
         and validated.nonempty_cell_count <= limits.max_nonempty_cells
         and all(
             not PurePosixPath(p).is_absolute()

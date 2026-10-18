@@ -364,12 +364,15 @@ def test_post_is_never_retried(make_client: Callable[..., Any]) -> None:
     fake.drop_paths.add("/api/v1/workbooks")
     client.post("/test/run", json={"session_id": session_id}, headers=AUTH)
     uploads = [r for r in fake.requests if r.url.path == "/api/v1/workbooks"]
-    planned_uploads = 27  # original 16 + ten extra fixtures + missing extension; determinism skips
+    # Original 16 + ten extra fixtures + missing extension + five pod contract 1.1 fixtures
+    # + 50 worksheets with a chartsheet; determinism skips.
+    planned_uploads = 33
     assert len(uploads) == planned_uploads
 
 
 def test_audit_that_never_finishes_fails_within_deadline(make_client: Callable[..., Any]) -> None:
-    client, _ = make_client(small_fake(processing_polls=10**6))
+    # Ten polled audits x 75 s exceed the 600 s suite budget; isolate the per-audit deadline.
+    client, _ = make_client(small_fake(processing_polls=10**6), tester_run_timeout_seconds=1200)
     session_id = setup_session(client)
     report = SuiteReport.model_validate_json(
         client.post("/test/run", json={"session_id": session_id}, headers=AUTH).content
@@ -611,7 +614,8 @@ def test_run_record_reports_all_operations_without_secrets(
     make_client: Callable[..., Any],
 ) -> None:
     def wrong_classification(findings: list[dict[str, str]]) -> list[dict[str, str]]:
-        return [f | {"classification": "MANUAL_REVIEW"} for f in findings]
+        swapped = {"MANUAL_REVIEW": "REQUIRES_USER_INPUT", "REQUIRES_USER_INPUT": "MANUAL_REVIEW"}
+        return [f | {"classification": swapped[f["classification"]]} for f in findings]
 
     client, _ = make_client(small_fake(mutate_findings=wrong_classification))
     body = run_once(client).content
@@ -627,12 +631,16 @@ def test_run_record_reports_all_operations_without_secrets(
     assert record["report_sha256"] == hashlib.sha256(body).hexdigest()
     assert record["counts"]["planned"] == len(manifest.tests)
     assert record["counts"]["run"] + record["counts"]["skip"] == len(manifest.tests)
-    assert record["counts"]["fail"] == 4 and record["counts"]["skip"] == 1
+    assert record["counts"]["fail"] == 8 and record["counts"]["skip"] == 1
     assert {item["test_id"] for item in record["not_passed"]} == {
         "P3-AUDIT-SEEDED",
         "P3-AUDIT-UNICODE",
         "P3-AUDIT-REPEATED-IDS",
         "P3-AUDIT-MULTIPLE-DRAWINGS",
+        "P3-AUDIT-IN-CELL-PICTURE",
+        "P3-AUDIT-IMAGE-FORMULA",
+        "P3-AUDIT-FORM-CONTROLS",
+        "P3-AUDIT-VML-COMMENTS",
         "P3-AUDIT-FAILURE-ENVELOPE",
     }
     assert all(item["classification"] == "unclassified" for item in record["not_passed"])
@@ -658,7 +666,12 @@ def test_limit_and_protection_workbooks() -> None:
     import re
     import zipfile
 
-    from tester.suite.workbooks import cells_workbook, protected_workbook, worksheets_workbook
+    from tester.suite.workbooks import (
+        cells_workbook,
+        inactive_protection_workbook,
+        protected_workbook,
+        worksheets_workbook,
+    )
 
     def parts(data: bytes) -> dict[str, bytes]:
         package = zipfile.ZipFile(io.BytesIO(data))
@@ -668,6 +681,12 @@ def test_limit_and_protection_workbooks() -> None:
     assert b"workbookProtection" in protected["xl/workbook.xml"]
     assert b"sheetProtection" in protected["xl/worksheets/sheet1.xml"]
     assert parts(worksheets_workbook(51))["xl/workbook.xml"].count(b"<sheet ") == 51
+    with_chart = parts(worksheets_workbook(50, chartsheet=True))
+    assert with_chart["xl/workbook.xml"].count(b"<sheet ") == 51
+    assert sum(name.startswith("xl/worksheets/sheet") for name in with_chart) == 50
+    assert with_chart["xl/chartsheets/sheet1.xml"].startswith(b"<?xml")
+    inactive = parts(inactive_protection_workbook())["xl/worksheets/sheet1.xml"]
+    assert b"sheetProtection" in inactive and b'sheet="0"' in inactive
     sheet = parts(cells_workbook(250_001))["xl/worksheets/sheet1.xml"].decode()
     assert len(re.findall(r"<c r=", sheet)) == 250_001
 

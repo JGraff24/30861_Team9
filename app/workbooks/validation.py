@@ -52,7 +52,7 @@ def validate_workbook(data: bytes, filename: str, limits: ProcessingLimits) -> V
     return ValidatedWorkbook(
         source_sha256=hashlib.sha256(data).hexdigest(),
         size_bytes=len(data),
-        worksheet_count=len(structure.sheets),
+        worksheet_count=structure.worksheet_count,
         nonempty_cell_count=structure.nonempty_cells,
         worksheet_parts=structure.worksheet_parts,
     )

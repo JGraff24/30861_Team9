@@ -7,6 +7,7 @@ import pytest
 from app.audit.engine import OoxmlWorkbookEngine
 from app.contracts.models import AuditEvaluation, Finding, ProcessingLimits
 from tests.unit.ooxml_builder import (
+    REL,
     Drawing,
     Sheet,
     Workbook,
@@ -18,6 +19,8 @@ from tests.unit.ooxml_builder import (
     drawing_xml,
     group,
     pic,
+    rels_name,
+    rels_xml,
     shape,
 )
 
@@ -232,12 +235,24 @@ def test_group_and_nested_children_are_inspected() -> None:
     ]
 
 
-def test_group_missing_metadata_is_its_own_finding() -> None:
+def test_group_container_without_metadata_has_no_finding_of_its_own() -> None:
+    """Pod contract 1.1 §7: group children are checked individually, not the container."""
     evaluation = audit_objects(
         anchor(group(cnvpr("30", "Group 1"), pic(cnvpr("31", "C", title="t", descr="d"))))
     )
-    assert summary(evaluation) == [("ALT_TEXT", WS_A, f"{D1}#id=30", INPUT)]
-    assert evaluation.findings[0].message.startswith('Group "Group 1"')
+    assert evaluation.findings == []
+    evaluation = audit_objects(anchor(group(cnvpr("30", "Group 1"), pic(cnvpr("31", "C")))))
+    assert summary(evaluation) == [("ALT_TEXT", WS_A, f"{D1}#id=31", INPUT)]
+
+
+def test_decorative_group_needs_confirmation() -> None:
+    evaluation = audit_objects(
+        anchor(group(cnvpr("30", "G", decorative="1"), pic(cnvpr("31", "C"))))
+    )
+    assert summary(evaluation) == [
+        ("ALT_TEXT", WS_A, f"{D1}#id=30", REVIEW),
+        ("ALT_TEXT", WS_A, f"{D1}#id=31", INPUT),
+    ]
 
 
 @pytest.mark.parametrize("kind", ["twoCellAnchor", "oneCellAnchor", "absoluteAnchor"])
@@ -300,57 +315,59 @@ def test_chartsheet_drawing_is_inspected() -> None:
 
 # -- identity fallbacks ----------------------------------------------------------------
 
-P1 = "/wsDr[1]/twoCellAnchor[1]/pic[1]/nvPicPr[1]/cNvPr[1]"
-P2 = "/wsDr[1]/twoCellAnchor[2]/pic[1]/nvPicPr[1]/cNvPr[1]"
+P1 = "/wsDr[1]/twoCellAnchor[1]/pic[1]"
+P2 = "/wsDr[1]/twoCellAnchor[2]/pic[1]"
 
 
-def test_duplicate_ids_use_indexed_xml_paths_for_every_occurrence() -> None:
+def test_duplicate_ids_are_manual_review_at_indexed_object_paths() -> None:
+    """Pod contract 1.1 §7: ambiguous IDs are MANUAL_REVIEW at the object's #xml= path."""
     evaluation = audit_objects(
         anchor(pic(cnvpr("4", "First"))),
-        anchor(pic(cnvpr("4", "Second"))),
+        anchor(pic(cnvpr("4", "Second", title="t", descr="d"))),
         anchor(pic(cnvpr("5", "Unique"))),
     )
     assert summary(evaluation) == [
         ("ALT_TEXT", WS_A, f"{D1}#id=5", INPUT),
-        ("ALT_TEXT", WS_A, f"{D1}#xml={P1}", INPUT),
-        ("ALT_TEXT", WS_A, f"{D1}#xml={P2}", INPUT),
+        ("ALT_TEXT", WS_A, f"{D1}#xml={P1}", REVIEW),
+        ("ALT_TEXT", WS_A, f"{D1}#xml={P2}", REVIEW),
     ]
-    assert evaluation.limitations == [
-        f"Drawing part {D1} has duplicated object IDs; affected objects use XML element path "
-        "targets (#xml=)."
-    ]
+    assert any("missing or duplicate id" in item for item in evaluation.limitations)
 
 
 def test_duplicate_id_between_group_and_child_is_disambiguated() -> None:
     evaluation = audit_objects(anchor(group(cnvpr("8", "G"), shape(cnvpr("8", "S")))))
-    assert [f.target for f in evaluation.findings] == [
-        f"{D1}#xml=/wsDr[1]/twoCellAnchor[1]/grpSp[1]/nvGrpSpPr[1]/cNvPr[1]",
-        f"{D1}#xml=/wsDr[1]/twoCellAnchor[1]/grpSp[1]/sp[1]/nvSpPr[1]/cNvPr[1]",
+    assert summary(evaluation) == [
+        ("ALT_TEXT", WS_A, f"{D1}#xml=/wsDr[1]/twoCellAnchor[1]/grpSp[1]", REVIEW),
+        ("ALT_TEXT", WS_A, f"{D1}#xml=/wsDr[1]/twoCellAnchor[1]/grpSp[1]/sp[1]", REVIEW),
     ]
 
 
-@pytest.mark.parametrize(
-    "object_id,reason", [(None, "missing"), ("", "missing"), ("x7", "invalid")]
-)
-def test_missing_or_invalid_id_uses_xml_path(object_id: str | None, reason: str) -> None:
-    evaluation = audit_objects(anchor(pic(cnvpr(object_id, "P"))))
-    assert only(evaluation).target == f"{D1}#xml={P1}"
-    assert evaluation.limitations == [
-        f"Drawing part {D1} has {reason} object IDs; affected objects use XML element path "
-        "targets (#xml=)."
-    ]
+@pytest.mark.parametrize("object_id", [None, ""])
+def test_missing_id_is_manual_review_even_when_described(object_id: str | None) -> None:
+    evaluation = audit_objects(anchor(pic(cnvpr(object_id, "P", title="t", descr="d"))))
+    finding = only(evaluation)
+    assert (finding.target, finding.classification.value) == (f"{D1}#xml={P1}", REVIEW)
+
+
+def test_non_numeric_unique_id_is_still_a_stable_target() -> None:
+    assert only(audit_objects(anchor(pic(cnvpr("x7", "P"))))).target == f"{D1}#id=x7"
 
 
 # -- alternate content and unsupported representations ---------------------------------
 
 
-def test_alternate_content_inspects_choice_not_fallback() -> None:
+def test_alternate_content_is_one_manual_review_at_its_element() -> None:
+    """Pod contract 1.1 §7: alternative representations are ambiguous; neither is inspected."""
     choice = chart(cnvpr("40", "Slicer-like", title="Region filter", descr="Filters region"))
-    fallback = shape(cnvpr("40", "Fallback rectangle"))  # would be flagged if inspected
-    assert audit_objects(anchor(alternate(choice, fallback))).findings == []
+    fallback = shape(cnvpr("41", "Fallback rectangle"))
+    finding = only(audit_objects(anchor(alternate(choice, fallback))))
+    assert (finding.target, finding.classification.value) == (
+        f"{D1}#xml=/wsDr[1]/twoCellAnchor[1]/AlternateContent[1]",
+        REVIEW,
+    )
 
 
-def test_alternate_content_without_choice_uses_fallback() -> None:
+def test_alternate_content_without_choice_is_still_manual_review() -> None:
     xml = drawing_xml(
         anchor(
             '<mc:AlternateContent xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">'
@@ -360,7 +377,9 @@ def test_alternate_content_without_choice_uses_fallback() -> None:
     evaluation = audit_workbook(
         Workbook([Sheet(WS_A, "xl/worksheets/sheet1.xml", "1", drawing=Drawing(D1, xml))])
     )
-    assert only(evaluation).target == f"{D1}#id=41"
+    finding = only(evaluation)
+    assert finding.target == f"{D1}#xml=/wsDr[1]/twoCellAnchor[1]/AlternateContent[1]"
+    assert finding.classification.value == REVIEW
 
 
 def test_content_part_is_disclosed_manual_review() -> None:
@@ -372,7 +391,7 @@ def test_content_part_is_disclosed_manual_review() -> None:
         REVIEW,
     )
     assert evaluation.limitations == [
-        f"Ink or content part object in {D1}: alt text metadata is not inspected."
+        f"Ink or content part object in {D1}: alt text is not inspected."
     ]
 
 
@@ -397,16 +416,31 @@ VML = (
 )
 
 
-def test_legacy_vml_objects_are_manual_review_and_notes_disclosed() -> None:
+def test_every_legacy_vml_shape_is_manual_review_by_unique_id() -> None:
+    """Pod contract 1.1 §7: legacy VML (comment notes included) is MANUAL_REVIEW, #id= targets."""
     vml_part = "xl/drawings/vmlDrawing1.vml"
     wb = Workbook([Sheet(WS_A, "xl/worksheets/sheet1.xml", "1", vml_part=vml_part, vml_xml=VML)])
     evaluation = audit_workbook(wb)
     assert summary(evaluation) == [
-        ("ALT_TEXT", WS_A, f"{vml_part}#xml=/xml[1]/rect[1]", REVIEW),
-        ("ALT_TEXT", WS_A, f"{vml_part}#xml=/xml[1]/shape[2]", REVIEW),
+        ("ALT_TEXT", WS_A, f"{vml_part}#id=_x0000_s1025", REVIEW),
+        ("ALT_TEXT", WS_A, f"{vml_part}#id=_x0000_s1026", REVIEW),
     ]
-    assert any("1 cell comment note shape(s)" in item for item in evaluation.limitations)
-    assert any("Legacy VML Pict object" in item for item in evaluation.limitations)
+
+
+def test_vml_shapes_without_unique_ids_use_paths_and_empty_vml_reviews_the_reference() -> None:
+    vml_part = "xl/drawings/vmlDrawing1.vml"
+    shapes = VML.replace('id="_x0000_s1026"', 'id="_x0000_s1025"')
+    wb = Workbook([Sheet(WS_A, "xl/worksheets/sheet1.xml", "1", vml_part=vml_part, vml_xml=shapes)])
+    assert [f.target for f in audit_workbook(wb).findings] == [
+        f"{vml_part}#xml=/xml[1]/shape[1]",
+        f"{vml_part}#xml=/xml[1]/shape[2]",
+    ]
+    empty = '<xml xmlns:v="urn:schemas-microsoft-com:vml"><v:rect id="r1"/></xml>'
+    wb = Workbook([Sheet(WS_A, "xl/worksheets/sheet1.xml", "1", vml_part=vml_part, vml_xml=empty)])
+    assert (
+        only(audit_workbook(wb)).target
+        == "xl/worksheets/sheet1.xml#xml=/worksheet[1]/legacyDrawing[1]"
+    )
 
 
 def test_unreadable_vml_is_one_part_level_manual_review() -> None:
@@ -437,3 +471,51 @@ def test_unresolved_drawing_reference_is_manual_review() -> None:
 def test_messages_are_bounded_for_huge_names() -> None:
     finding = only(audit_objects(anchor(pic(cnvpr("2", "N" * 5_000)))))
     assert len(finding.message) <= 500 and len(finding.recommendation) <= 500
+
+
+# -- pod contract 1.1 §7 unsupported representations (aligned with Team 12) -------------
+
+
+def test_non_chart_graphic_frame_is_manual_review_by_id() -> None:
+    smart_art = (
+        f"<xdr:graphicFrame><xdr:nvGraphicFramePr>{cnvpr('2', 'Diagram', 'T', 'D')}"
+        "<xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr><xdr:xfrm/><a:graphic>"
+        '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/diagram">'
+        '<dgm:relIds xmlns:dgm="http://schemas.openxmlformats.org/drawingml/2006/diagram" '
+        'r:dm="rIdChart"/></a:graphicData></a:graphic></xdr:graphicFrame>'
+    )
+    finding = only(audit_objects(anchor(smart_art)))
+    assert (finding.target, finding.classification.value) == (f"{D1}#id=2", REVIEW)
+
+
+def test_object_with_external_content_is_manual_review_by_id() -> None:
+    rels = rels_xml(
+        f'<Relationship Id="rIdImg" Type="{REL}/image" Target="../media/image1.png"/>'
+        f'<Relationship Id="rIdChart" Type="{REL}/chart" Target="../charts/chart1.xml"/>'
+        f'<Relationship Id="rIdExt" Type="{REL}/image" Target="https://example.invalid/x.png" '
+        'TargetMode="External"/>'
+    )
+    sheet = Sheet(
+        WS_A,
+        "xl/worksheets/sheet1.xml",
+        "1",
+        drawing=Drawing(D1, drawing_xml(anchor(pic(cnvpr("2", "P", "T", "D"), "rIdExt")))),
+    )
+    wb = Workbook([sheet], extra_parts={rels_name(D1): rels})
+    finding = only(audit_workbook(wb))
+    assert (finding.target, finding.classification.value) == (f"{D1}#id=2", REVIEW)
+
+
+def test_form_controls_and_ole_objects_are_manual_review_wherever_nested() -> None:
+    tail = (
+        '<mc:AlternateContent xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">'
+        '<mc:Choice Requires="x14"><controls><control shapeId="1" r:id="rIdC" name="Check 1"/>'
+        "</controls></mc:Choice></mc:AlternateContent>"
+        '<oleObjects><oleObject progId="Word.Document.12" shapeId="2" r:id="rIdO"/></oleObjects>'
+    )
+    wb = Workbook([Sheet(WS_A, "xl/worksheets/sheet1.xml", "1", tail=tail)])
+    root = "xl/worksheets/sheet1.xml#xml=/worksheet[1]"
+    assert summary(audit_workbook(wb)) == [
+        ("ALT_TEXT", WS_A, f"{root}/AlternateContent[1]/Choice[1]/controls[1]/control[1]", REVIEW),
+        ("ALT_TEXT", WS_A, f"{root}/oleObjects[1]/oleObject[1]", REVIEW),
+    ]
