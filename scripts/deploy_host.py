@@ -344,12 +344,20 @@ def main() -> None:
     parser.add_argument("repository")
     args = parser.parse_args()
     if os.geteuid() != 0:
-        raise SystemExit("Run through SSM as root")
+        raise SystemExit("Run as root on the deployment host")
     os.umask(0o077)
     signal.signal(signal.SIGTERM, interrupted)
     with Path("/opt/team9/config/deploy.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        Deployment(Path("/opt/team9"), args.repository, args.sha).update()
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            print("Another deployment is active; deferring this attempt.", flush=True)
+            raise SystemExit(75) from None
+        try:
+            Deployment(Path("/opt/team9"), args.repository, args.sha).update()
+        except TimeoutError as error:
+            print("Deployment deferred: " + str(error), flush=True)
+            raise SystemExit(75) from error
 
 
 if __name__ == "__main__":

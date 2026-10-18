@@ -1,128 +1,130 @@
-# Automatic deployment to the existing AWS server
+# Automatic updates on the existing AWS host
 
-The `deploy` workflow deploys a successful **push CI** run for the latest `main` commit.
-Pull requests and feature branches cannot deploy. Manual runs of `deploy` also require
-successful push CI for the current main SHA. An unset `AWS_DEPLOY_ROLE_ARN` disables
-deployment, so merging the workflow alone does not change the running site.
+The EC2 host checks public GitHub `main` every two minutes. When its SHA differs from
+the deployed SHA, it requires successful **push CI for that exact commit** before updating.
+Failed/pending CI, pull requests and feature branches cannot deploy.
 
-The implementation has local regression checks. AWS OIDC, SSM command execution and a
-complete automatic release still need verification against the actual AWS account.
+This uses the existing EC2 server and HTTPS egress. It does not require another AWS role,
+OIDC provider, AWS access key, GitHub token, SSH port or container registry. The initial
+OIDC design was replaced after this AWS project's service control policy explicitly denied
+IAM OIDC-provider access. No change to that policy is needed.
 
-Local verification on October 18, 2026: **552 passed, 6 skipped** in the full regression
-suite, including 24 new deployment checks. Ruff lint/format, strict mypy, schema freshness,
-actionlint 1.7.12 and cfn-lint all passed. Skips were four opt-in live acceptance checks
-and two Linux-only memory enforcement checks on macOS. The host script's Python 3.9 syntax
-was checked; a real container deployment and OIDC/SSM execution are not claimed by those tests.
+Installation and the first real automatic release still require verification on the host.
 
-## One-time AWS setup
+Local verification on October 18, 2026: **555 passed, 6 skipped**, including 27 deployment
+checks. Ruff lint/format, strict mypy, schema freshness and installer shell syntax passed.
+Both Python deployment scripts were checked for Python 3.9 syntax. The six skips were four
+opt-in live acceptance checks and two Linux-only memory enforcement checks on macOS.
 
-Use the existing AWS account **629807611072**, region **us-east-2**, and EC2 instance
-**i-0922ebb45b0bed415**. Keep the existing `team9-phase3` stack.
+## One-time installation
 
-1. In IAM, check **Identity providers** for `token.actions.githubusercontent.com`.
-   If it exists, copy its ARN. Otherwise leave `ExistingGitHubOidcProviderArn` empty below.
-2. Open CloudFormation in us-east-2 and create a **new** stack named `team9-autodeploy`.
-   Upload [github-actions.aws.yaml](github-actions.aws.yaml).
-3. Keep the supplied instance and GitHub identity defaults. They were checked using
-   GitHub's public repository API on October 18, 2026:
-   owner `JGraff24` / ID `194822762`, repo `30861_Team9` / ID `1419357952`.
-   Supply the existing OIDC provider ARN only if step 1 found one.
-4. Acknowledge IAM resource creation and create the stack. Wait for `CREATE_COMPLETE`.
-5. Copy the stack Outputs into GitHub repository **Settings → Secrets and variables →
-   Actions → Variables** (repository variables, not application tokens):
-
-| CloudFormation output | GitHub variable |
-|---|---|
-| AWSDeployRoleArn | AWS_DEPLOY_ROLE_ARN |
-| AWSDeployDocument | AWS_DEPLOY_DOCUMENT |
-| AWSInstanceId | AWS_INSTANCE_ID |
-| AWSRegion | AWS_REGION |
-
-The role trusts this repository's immutable owner/repository IDs on `main`. GitHub uses
-these immutable subject claims by default for repositories created after July 15, 2026;
-this repository was created October 14, 2026. The role can send only this stack's deployment
-document to the selected instance and read SSM invocation results. It has no S3 write,
-EC2 provisioning or generic `AWS-RunShellScript` permission. No long-lived AWS access key
-or SSH key is required. The existing EC2 instance role continues to supply source-bucket access.
-
-The template does not create another EC2 server, bucket, data volume or security group.
-
-## Activate and verify
-
-Merge the changes after CI passes. With the four variables configured, the main push CI
-completion starts `deploy` automatically. If setup happens after that CI run, open
-**Actions → deploy → Run workflow → main** to deploy the already-tested current commit.
-Keep all deployment configuration reviewed on main; main workflows receive the AWS role.
-
-The existing host must have Docker/Compose, Git, curl, Python 3.9+, the `/data` EBS mount,
-trusted HTTPS, the current running containers, and these private files from the initial setup:
-
-```text
-/opt/team9/config/compose.env
-/opt/team9/config/runtime.env
-/opt/team9/repo/deploy/compose.production.yaml
-```
-
-Do not regenerate application tokens for a release. SSM runs the host script as root.
-The first automatic deployment needs no separate host-script installation: the restricted
-SSM document downloads it from the exact tested commit before invoking it.
-
-Watch the Actions deployment job and the printed SSM command ID. Success ends with
-`DEPLOYED <full SHA>` after verifying the three application images, four running services,
-public HTTPS system health, tester OpenAPI, and unauthenticated tester rejection.
-Then run the existing live suite when a fresh session is appropriate. The release check is
-a readiness check; it does not replace the full CI integration or claim a new 53-case live run.
-
-After a release, reconnect through Session Manager if desired:
+After the reviewed changes are merged and CI passes, open **EC2 → Instances →
+i-0922ebb45b0bed415 → Connect → SSM Session Manager**. Run the commands there.
+Use the full reviewed commit SHA, not the literal placeholder:
 
 ```sh
+TEAM9_BOOTSTRAP_SHA=FULL_REVIEWED_COMMIT_SHA
+curl --fail --location --max-time 60 \
+  "https://raw.githubusercontent.com/JGraff24/30861_Team9/$TEAM9_BOOTSTRAP_SHA/deploy/install_autodeploy.sh" \
+  -o /tmp/team9-install-autodeploy.sh
+sudo bash /tmp/team9-install-autodeploy.sh "$TEAM9_BOOTSTRAP_SHA" JGraff24/30861_Team9
+```
+
+The installer requires the existing `/data` EBS mount, running Docker/Compose, Git,
+curl, Python 3.9+, trusted public HTTPS, existing SQLite stores, and the initial private
+configuration at `/opt/team9/config/compose.env` and `/opt/team9/config/runtime.env`.
+It preserves application credentials. It installs:
+
+```text
+/opt/team9/automation/deploy_poll.py
+/etc/systemd/system/team9-autodeploy.service
+/etc/systemd/system/team9-autodeploy.timer
+/etc/systemd/system/docker.service.d/team9-data.conf
+```
+
+The Docker drop-in requires `/data` before container restart on boot. Reboot recovery
+itself still needs a separate host verification.
+
+Inspect installation and trigger the first check:
+
+```sh
+sudo systemctl list-timers --all team9-autodeploy.timer
+sudo systemctl start --no-block team9-autodeploy.service
+sudo journalctl -u team9-autodeploy.service -n 80 --no-pager
+```
+
+The timer can already be running its first check; systemd will not run two copies of
+the same service. Follow progress with `sudo journalctl -fu team9-autodeploy.service`.
+Leaving the log viewer does not stop deployment. A build can take several minutes.
+
+## How updates work
+
+1. Resolve main over public Git HTTPS. If it matches `DEPLOYMENT_SHA`, do nothing.
+2. Query public GitHub CI for that SHA, requiring the latest attempt to be completed
+   successfully, on main, from a push to this repository. While waiting, make at most
+   one CI API request per two-minute tick. An unchanged deployed main makes no REST call.
+3. Download the host deployment script from that exact tested commit. A host lock prevents
+   simultaneous deployers. Builds use fresh `/opt/team9/releases/<SHA>` checkouts and the
+   existing `measurement` Docker target with `team9-phase3:<SHA>` image tags.
+4. Require mounted storage and at least 2 GiB free on the root disk. Build and validate
+   before interrupting production. Verify that main has not advanced before activation.
+5. Wait up to 11 minutes for active tester setup/runs and queued/running audits. Take
+   online SQLite backups at `/data/deployment-backups/<time>-<SHA>/`.
+6. Atomically change only `TEAM9_IMAGE` and `DEPLOYMENT_SHA` in `compose.env`, then recreate
+   the system, worker, tester and nginx. Including nginx refreshes its upstream addresses.
+7. Require all four containers, the expected application image tags, public HTTPS system
+   health, tester schema, and unauthenticated tester rejection. Record the release in
+   `/opt/team9/config/deployment-state.json` only after those checks pass. Upgrade the
+   polling bootstrap from that successful release as well.
+
+The single-host activation briefly interrupts service. New requests racing that window can
+fail. The readiness check does not replace CI integration or claim a new full live-suite run.
+
+## Failure and recovery
+
+A failed build or preflight leaves the existing release running. Busy-host deferrals retry
+on a later timer tick. Failed activation restores the previous image and Compose environment,
+recreates the containers and checks recovery. A failed release SHA is recorded in
+`/opt/team9/config/deploy-failed.json` so the timer does not repeatedly build/restart it.
+New main commits are still eligible. To retry the same SHA after investigating:
+
+```sh
+sudo python3 /opt/team9/automation/deploy_poll.py JGraff24/30861_Team9 --retry
+```
+
+Database backups are retained but **not automatically restored**. An image rollback cannot
+guarantee compatibility after future incompatible schema migrations; those need a reviewed
+migration/recovery procedure. If rollback also fails, inspect the journal and backups first.
+
+Deployment status lives in the host journal and deployment-state file, not a GitHub deployment
+job. Green GitHub CI alone is not proof that the host updated:
+
+```sh
+sudo systemctl show team9-autodeploy.service -p Result -p ExecMainStatus
 sudo cat /opt/team9/config/deployment-state.json
-sudo docker compose --env-file /opt/team9/config/compose.env \
-  -f /opt/team9/repo/deploy/compose.production.yaml ps
 curl --connect-timeout 10 --max-time 30 \
   https://3.139.178.70.sslip.io/system/api/v1/health
 ```
 
-## Release and recovery behavior
+GitHub API/network failures leave production unchanged. This public repository supports
+anonymous CI status reads; private repositories would need a different access configuration.
+If the API rate limit is reached, later timer ticks retry after GitHub allows requests again.
 
-- GitHub serializes deployment jobs. A host file lock also refuses overlapping deployers,
-  including an SSM command left running after a workflow was manually cancelled.
-- The host requires `/data` to be mounted and at least 2 GiB free on the root filesystem.
-  It verifies main both before checkout/build and before taking the site down. A newer
-  main commit supersedes an older successful run, even when the newer commit is not yet green.
-- Source checkouts live at `/opt/team9/releases/<SHA>`. Images use `team9-phase3:<SHA>`
-  and the existing measurement build target. Build or validation failure leaves the old
-  release serving requests.
-- It waits up to 11 minutes for active tester setup/runs and queued/running audits, then
-  takes online SQLite backups on EBS at `/data/deployment-backups/<time>-<SHA>/`.
-  A database error, backup failure or busy timeout aborts before stopping containers.
-- Activation briefly interrupts the service. New requests racing the maintenance window
-  can fail; this is a single-host deployment, not a zero-downtime rollout.
-- It atomically updates only `TEAM9_IMAGE` and `DEPLOYMENT_SHA` in `compose.env`, then
-  recreates all services, including nginx so its upstream addresses are refreshed.
-  Runtime credentials, source bucket, EBS directories and TLS configuration are retained.
-- Failed activation restores the previous Compose environment and image, recreates its
-  containers and checks recovery. The workflow still fails so the update is not marked good.
-  Successful releases record the active and previous paths/images in `deployment-state.json`.
-- Databases are **not automatically restored** on rollback. Future incompatible schema
-  migrations require a reviewed migration/recovery procedure; reverting an image cannot
-  guarantee compatibility with a migrated database. If rollback also fails, inspect the SSM
-  output and retained backups before taking further action.
-- Images, checkouts and local database backups are retained. Monitor the 16 GiB root disk
-  and 20 GiB data volume and remove reviewed obsolete build artifacts as needed. These local
-  backups do not replace off-host disaster recovery. The script never runs `down -v` or
-  deletes EBS, S3 objects, application data or older backup directories.
-- Existing certificate renewal continues using its current Compose project name. Test
-  certificate renewal separately; automatic application deployment does not verify a new
-  ACME challenge or host reboot recovery.
+Images, checkouts and backups are retained. Monitor the 16 GiB root disk and 20 GiB data disk
+and remove reviewed obsolete build artifacts as needed. Local backups do not replace off-host
+disaster recovery. Deployment never deletes EBS, S3 objects, application data or old backups.
+Existing certificate renewal continues using the same Compose project name.
 
-If a deployment workflow is cancelled or times out, check its SSM command before retrying.
-The AWS command can continue after the GitHub job ends. Host locking prevents simultaneous
-activation, and superseded-SHA checks prevent an old queued build from replacing newer main.
+Disable future automatic checks with:
+
+```sh
+sudo systemctl disable --now team9-autodeploy.timer
+```
+
+An already-running deployment continues. Inspect its service/journal before maintenance.
 
 ## References
 
-- [GitHub OIDC with AWS](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws)
-- [GitHub OIDC subject formats](https://docs.github.com/en/actions/reference/security/oidc)
-- [SSM Run Command status](https://docs.aws.amazon.com/systems-manager/latest/userguide/monitor-commands.html)
-- [CloudFormation OIDC provider](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-iam-oidcprovider.html)
+- [AWS project managed policies](https://docs.aws.amazon.com/accounts/latest/reference/scps-and-rcps-for-projects.html)
+- [GitHub REST rate limits](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api)
+- [systemd timers](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html)

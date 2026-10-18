@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from scripts import deploy_aws, deploy_host
+from scripts import deploy_host, deploy_poll
 
 SHA = "a" * 40
 OLD = "b" * 40
@@ -32,22 +32,18 @@ def ci_run(**changes: Any) -> dict[str, Any]:
     }
 
 
-def github_responses(
-    monkeypatch: pytest.MonkeyPatch, runs: list[dict[str, Any]], head: str = SHA
-) -> None:
+def github_responses(monkeypatch: pytest.MonkeyPatch, runs: list[dict[str, Any]]) -> None:
     def response(path: str) -> dict[str, Any]:
-        if path.endswith("branches/main"):
-            return {"commit": {"sha": head}}
         assert "actions/workflows/ci.yml/runs?" in path
         assert "event=push" in path and "head_sha=" + SHA in path
         return {"workflow_runs": runs}
 
-    monkeypatch.setattr(deploy_aws, "github", response)
+    monkeypatch.setattr(deploy_poll, "github", response)
 
 
 def test_exact_successful_main_ci_is_eligible(monkeypatch: pytest.MonkeyPatch) -> None:
     github_responses(monkeypatch, [ci_run()])
-    assert deploy_aws.eligible(REPOSITORY, SHA)
+    assert deploy_poll.eligible(REPOSITORY, SHA)
 
 
 @pytest.mark.parametrize(
@@ -65,65 +61,17 @@ def test_failed_or_untrusted_ci_cannot_deploy(
     monkeypatch: pytest.MonkeyPatch, changes: dict[str, Any]
 ) -> None:
     github_responses(monkeypatch, [ci_run(**changes)])
-    with pytest.raises(RuntimeError):
-        deploy_aws.eligible(REPOSITORY, SHA)
+    assert not deploy_poll.eligible(REPOSITORY, SHA)
 
 
 def test_failed_rerun_overrides_earlier_success(monkeypatch: pytest.MonkeyPatch) -> None:
     github_responses(monkeypatch, [ci_run(), ci_run(run_attempt=2, conclusion="failure")])
-    with pytest.raises(RuntimeError, match="has not passed"):
-        deploy_aws.eligible(REPOSITORY, SHA)
+    assert not deploy_poll.eligible(REPOSITORY, SHA)
 
 
-def test_superseded_main_does_not_deploy(monkeypatch: pytest.MonkeyPatch) -> None:
-    github_responses(monkeypatch, [ci_run()], head=OLD)
-    assert not deploy_aws.eligible(REPOSITORY, SHA)
-
-
-@pytest.mark.parametrize(
-    "status,code", [("Success", 0), ("Failed", 1), ("Success", 1), ("TimedOut", -1)]
-)
-def test_ssm_result_is_checked(monkeypatch: pytest.MonkeyPatch, status: str, code: int) -> None:
-    calls: list[tuple[str, ...]] = []
-
-    def aws(region: str, *args: str) -> dict[str, Any]:
-        assert region == "us-east-2"
-        calls.append(args)
-        if args[1] == "send-command":
-            assert json.loads(args[args.index("--parameters") + 1]) == {"ReleaseSha": [SHA]}
-            assert "AWS-RunShellScript" not in args
-            return {"Command": {"CommandId": "command-1"}}
-        return {"Status": status, "ResponseCode": code}
-
-    monkeypatch.setattr(deploy_aws, "aws", aws)
-    if status == "Success" and code == 0:
-        deploy_aws.deploy("us-east-2", "i-0922ebb45b0bed415", "deployment-document", SHA)
-    else:
-        with pytest.raises(RuntimeError):
-            deploy_aws.deploy("us-east-2", "i-0922ebb45b0bed415", "deployment-document", SHA)
-    assert len(calls) == 2
-
-
-def test_ssm_retries_eventual_consistency_then_waits(monkeypatch: pytest.MonkeyPatch) -> None:
-    outcomes: list[Any] = [
-        subprocess.CalledProcessError(254, "aws", stderr="InvocationDoesNotExist"),
-        {"Status": "InProgress"},
-        {"Status": "Success", "ResponseCode": 0},
-    ]
-
-    def aws(region: str, *args: str) -> dict[str, Any]:
-        if args[1] == "send-command":
-            return {"Command": {"CommandId": "command-1"}}
-        result = outcomes.pop(0)
-        if isinstance(result, Exception):
-            raise result
-        assert isinstance(result, dict)
-        return result
-
-    monkeypatch.setattr(deploy_aws, "aws", aws)
-    monkeypatch.setattr(deploy_aws.time, "sleep", lambda seconds: None)
-    deploy_aws.deploy("us-east-2", "i-0922ebb45b0bed415", "deployment-document", SHA)
-    assert not outcomes
+def test_missing_ci_does_not_deploy(monkeypatch: pytest.MonkeyPatch) -> None:
+    github_responses(monkeypatch, [])
+    assert not deploy_poll.eligible(REPOSITORY, SHA)
 
 
 def test_release_env_preserves_all_other_inputs() -> None:
@@ -282,3 +230,139 @@ def test_busy_tester_defers_deployment_without_stopping_services(
 
 def test_host_script_parses_on_amazon_linux_python39() -> None:
     ast.parse(Path(deploy_host.__file__).read_text(), feature_version=(3, 9))
+    ast.parse(Path(deploy_poll.__file__).read_text(), feature_version=(3, 9))
+
+
+@pytest.fixture
+def poller(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    (tmp_path / "config").mkdir()
+    (tmp_path / "automation").mkdir()
+    (tmp_path / "config/compose.env").write_text("DEPLOYMENT_SHA='" + OLD + "'\n")
+    (tmp_path / "config/runtime.env").write_text("UNCHANGED=yes\n")
+    monkeypatch.setattr(
+        deploy_poll.subprocess,
+        "run",
+        lambda *a, **kw: subprocess.CompletedProcess(a, 0, SHA + "\trefs/heads/main\n"),
+    )
+    monkeypatch.setattr(deploy_poll, "eligible", lambda repository, sha: True)
+    from io import BytesIO
+
+    monkeypatch.setattr(
+        deploy_poll, "urlopen", lambda *a, **kw: BytesIO(b"# tested deployment script\n")
+    )
+    return tmp_path
+
+
+def test_current_release_needs_no_github_api(poller: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    (poller / "config/compose.env").write_text("DEPLOYMENT_SHA='" + SHA + "'\n")
+    monkeypatch.setattr(deploy_poll, "eligible", lambda *a: pytest.fail("No API call needed"))
+    deploy_poll.poll(poller, REPOSITORY)
+
+
+def test_poller_waits_for_ci_without_executing(
+    poller: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(deploy_poll, "eligible", lambda *a: False)
+    monkeypatch.setattr(deploy_poll, "execute", lambda *a: pytest.fail("CI must pass first"))
+    deploy_poll.poll(poller, REPOSITORY)
+
+
+def test_poller_pins_source_and_updates_bootstrap_after_readiness(
+    poller: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from io import BytesIO
+
+    def source(request: Any, timeout: int) -> BytesIO:
+        assert request.full_url.endswith("/" + SHA + "/scripts/deploy_host.py")
+        assert not request.has_header("Authorization")
+        return BytesIO(b"# tested deployment script\n")
+
+    def execute(candidate: Path, sha: str, repository: str) -> int:
+        assert candidate.read_text() == "# tested deployment script\n"
+        assert sha == SHA and repository == REPOSITORY
+        assert candidate.stat().st_mode & 0o777 == 0o600
+        (poller / "config/deployment-state.json").write_text(json.dumps({"sha": SHA}))
+        updated = poller / "releases" / SHA / "scripts/deploy_poll.py"
+        updated.parent.mkdir(parents=True)
+        updated.write_text("# updated polling bootstrap\n")
+        return 0
+
+    monkeypatch.setattr(deploy_poll, "urlopen", source)
+    monkeypatch.setattr(deploy_poll, "execute", execute)
+    deploy_poll.poll(poller, REPOSITORY)
+    assert (poller / "automation/deploy_poll.py").read_text() == "# updated polling bootstrap\n"
+    assert not list((poller / "config").glob("deploy-*.py"))
+    assert (poller / "config/runtime.env").read_text() == "UNCHANGED=yes\n"
+
+
+def test_failed_release_is_not_repeated_until_retry(
+    poller: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls = []
+
+    def execute(*args: Any) -> int:
+        calls.append(args)
+        return 1
+
+    monkeypatch.setattr(deploy_poll, "execute", execute)
+    with pytest.raises(RuntimeError, match="Deployment failed"):
+        deploy_poll.poll(poller, REPOSITORY)
+    deploy_poll.poll(poller, REPOSITORY)
+    assert len(calls) == 1
+    with pytest.raises(RuntimeError):
+        deploy_poll.poll(poller, REPOSITORY, retry=True)
+    assert len(calls) == 2
+
+
+def test_busy_host_is_retried_without_failed_release_marker(
+    poller: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(deploy_poll, "execute", lambda *a: 75)
+    deploy_poll.poll(poller, REPOSITORY)
+    assert not (poller / "config/deploy-failed.json").exists()
+
+
+def test_api_failure_never_executes_a_deployment(
+    poller: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def unavailable(*args: Any) -> bool:
+        raise OSError("GitHub unavailable")
+
+    monkeypatch.setattr(deploy_poll, "eligible", unavailable)
+    monkeypatch.setattr(
+        deploy_poll, "execute", lambda *a: pytest.fail("No deployment on API failure")
+    )
+    with pytest.raises(OSError):
+        deploy_poll.poll(poller, REPOSITORY)
+    assert not (poller / "config/deploy-failed.json").exists()
+
+
+@pytest.mark.parametrize("force_kill", [False, True])
+def test_deployment_timeout_allows_graceful_recovery_before_killing(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, force_kill: bool
+) -> None:
+    events = []
+
+    class Process:
+        def __enter__(self) -> Process:
+            return self
+
+        def __exit__(self, *args: Any) -> None:
+            pass
+
+        def wait(self, timeout: int | None = None) -> int:
+            events.append(("wait", timeout))
+            if timeout == 2400 or (timeout == 180 and force_kill):
+                raise subprocess.TimeoutExpired("deployer", timeout)
+            return 1
+
+        def terminate(self) -> None:
+            events.append(("terminate", None))
+
+        def kill(self) -> None:
+            events.append(("kill", None))
+
+    monkeypatch.setattr(deploy_poll.subprocess, "Popen", lambda *a, **kw: Process())
+    assert deploy_poll.execute(tmp_path / "candidate.py", SHA, REPOSITORY) == 124
+    assert events[:3] == [("wait", 2400), ("terminate", None), ("wait", 180)]
+    assert (("kill", None) in events) == force_kill
