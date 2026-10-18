@@ -1,5 +1,9 @@
 # Planned AWS deployment and local operation
 
+For CI-gated updates of the existing AWS host, see [automatic deployment setup](AUTODEPLOY.md).
+The status below records the original deployment preparation; it does not describe the
+subsequent operator-led AWS setup or claim the new automatic deployment has run.
+
 Status: local source/configuration preparation only. No EC2/S3/EBS/IAM/budget resources created,
 no real DNS/certificate configured, and no public deployment tested. Docker is unavailable on
 the implementation host; YAML/JSON rendering was checked, images and Compose were not executed.
