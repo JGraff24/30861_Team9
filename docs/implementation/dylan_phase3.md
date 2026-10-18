@@ -188,12 +188,8 @@ Inventory details:
   `x:ClientData ObjectType="Note"` are counted into one limitation per part (they are cell
   comments). Every other top-level `v:` element becomes a MANUAL_REVIEW finding. An
   unreadable VML part produces one part-level MANUAL_REVIEW whose target is the bare part path.
-- Rich-value cells (pod contract 1.1 §7): a worksheet `<c>` with a `vm` attribute holds a
-  value-metadata rich value, such as a Place-in-Cell picture, an `IMAGE()` result or a linked
-  data type. The sheet scan records each one (up to 1,000 per sheet; the rest are counted in
-  a limitation) and the audit emits one MANUAL_REVIEW ALT_TEXT finding per cell with one
-  limitation per sheet. `xl/metadata.xml` and `xl/richData/*` are not resolved, so linked
-  data types are also sent to review. Nothing external is fetched.
+- See "Pod contract 1.1 alignment" below: those rules supersede the object, VML, control,
+  cell-image and protection details in this section where they differ.
 - The visible chart title, shape text, object name and file names are never read as alt text.
 
 Messages and recommendations are fixed templates. Object names are shown collapsed, trimmed
@@ -220,16 +216,54 @@ findingId = lower(hex(SHA256(UTF8(json.dumps(
   `mc:Choice` appear as steps. One limitation is added per part and reason.
 - Unsupported targets: `<part>#xml=<path to the element>` (for VML, a sheet `picture`, an
   unresolved `drawing`, or a `contentPart`), or the bare `<part>` for an unreadable VML part.
-- Rich-value cell target: `<sheet part>#cell=<r>`, for example `xl/worksheets/sheet1.xml#cell=B2`,
-  when `r` is a well-formed A1 reference (1–3 letters, 1–7 digits). Otherwise
-  `#xml=/worksheet[1]/sheetData[1]/row[n]/c[m]`. **Pending pod agreement** alongside the
-  `#xml=` grammar open item in the pod contract.
 - Identical bytes give identical findings regardless of upload filename, IDs or time. New
   bytes or a new ruleset version give new IDs.
 
 Golden vectors are in [tests/unit/test_audit_identity.py](../../tests/unit/test_audit_identity.py).
 Their literal digests were computed with a standalone `python3 -I` stdlib one-liner, not with
 the production function.
+
+## Pod contract 1.1 alignment (2026-10-18)
+
+The pod shared API contract 1.1 (Team 12, October 18) was compared with Team 12's code
+(`Gus-ps/ECE30861`, branch `Gustavo`, commit `490b28d`) by running both implementations on the
+same 52 generated workbooks. Team 9 changed the following so the observable results match.
+The finding-ID recipe was already identical, so IDs now match byte for byte.
+
+Validation (contract §4):
+- The 50 limit counts worksheets only; chartsheets and dialogsheets do not count.
+- Only active protection rejects: `workbookProtection` lockStructure/lockWindows/lockRevision,
+  or worksheet `sheetProtection sheet="1"`. A stored password or hash without a lock,
+  `fileSharing` reservation passwords and chartsheet protection are accepted.
+
+ALT_TEXT (contract §7):
+- Missing or duplicate cNvPr ids (any nonempty unique id is usable, digits not required) are
+  MANUAL_REVIEW at the object element's path, e.g. `#xml=/wsDr[1]/twoCellAnchor[1]/pic[1]`,
+  even when the object is described. Duplicates are counted over every cNvPr in the part.
+- Group containers get no finding of their own; children are checked individually. A
+  decorative (or ambiguous decorative) group is one MANUAL_REVIEW.
+- `mc:AlternateContent` is one MANUAL_REVIEW at its element path; neither branch is inspected.
+- A `graphicFrame` that is not a single `c:chart` with a chart relationship (SmartArt, chartex,
+  other graphics) is MANUAL_REVIEW at `#id=`.
+- An object with an `r:link`/`r:embed` to an External relationship is MANUAL_REVIEW at `#id=`.
+- Sheet elements `legacyDrawing`, `legacyDrawingHF`, `picture`, `control` and `oleObject`, at
+  any depth (controls and OLE objects inside `mc:AlternateContent` included), point at a VML
+  part or are MANUAL_REVIEW at their sheet `#xml=` path.
+- Legacy VML: every `shape` element, comment notes included, is MANUAL_REVIEW at `#id=<id>`
+  when the id is unique, else its `#xml=` path. A VML part with no shapes reviews the
+  referencing sheet element. An unreadable VML part is one part-level review (Team 12 fails).
+- Cell images: a `<c>` with `vm` or an `IMAGE()` formula is MANUAL_REVIEW at
+  `#xml=/worksheet[1]/sheetData[1]/row[n]/c[m]` (up to 1,000 per sheet, the rest counted in a
+  limitation). Every `xl/richData/*` part and `xl/cellimages.xml` is also MANUAL_REVIEW with
+  worksheet `__WORKBOOK__` and target `<part>#xml=/` (contract §8 workbook-level location).
+- Dialogsheets are not audited by either rule.
+
+Deliberately kept: rejecting DTDs, duplicate ZIP entries, path traversal and decompression
+bombs (contract §4 allows additional unsafe-package 422s; Team 12 accepts these). The pinned
+shared packet in `docs/contracts/phase3.md` still describes the old cNvPr fallback path; the
+pod contract 1.1 supersedes it. Remaining Team 12 differences found: a sheet `picture` without
+a sheet relationships part makes Team 12's audit fail (KeyError); Team 12 ignores VML elements
+other than `shape` when a part also has shapes.
 
 ## Data and state invariants
 
@@ -293,14 +327,14 @@ cross-team tests, Excel manual checks, `pip-audit` (no dependency changes were m
 | L1 | Legacy VML shapes (form controls, OLE/ActiveX visuals, header/footer images) are MANUAL_REVIEW, not inspected; affects REQ-04 completeness | Medium | Disclosed finding + limitation | Phase 4: parse VML `alt`/`o:title` |
 | L2 | Ink `contentPart` not inspected | Low | MANUAL_REVIEW | Phase 4 |
 | L3 | SmartArt and charts are checked only through their `graphicFrame` cNvPr; inner diagram/chart parts are not read (by policy) | Low | none needed | Pod confirmation |
-| L4 | Group containers get their own finding as well as their children | Low (possible noise) | Pod decision | Confirm with Team 12 |
+| L4 | Resolved 2026-10-18: group containers no longer get their own finding (pod contract 1.1) | — | — | — |
 | L5 | `mc:AlternateContent` always takes the first Choice, regardless of `Requires` | Low | Deterministic | Phase 4 if a fixture disagrees |
-| L6 | Cell comment notes (VML `Note`) are disclosed as a limitation, not findings | Low | Disclosed | Pod confirmation |
+| L6 | Cell comment notes are now MANUAL_REVIEW findings like every VML shape (pod contract 1.1, matches Team 12); possible review noise | Low | Pod may narrow later | Pod confirmation |
 | L7 | No real Excel-authored drawing fixtures yet; synthetic and openpyxl inputs only | **High** for acceptance confidence | Run Team 12 files as soon as delivered | Phase 3 cross-testing |
 | L8 | Worksheet-level protection rejection may refuse workbooks users consider ordinary | Medium (policy) | Documented policy | Pod confirmation |
 | L9 | U+000B/U+000C in alt text cannot be represented in XML 1.0; such parts are rejected as malformed | Info | none | none |
 | L10 | No in-engine timeout; relies on the runner hard-kill | Medium if the runner is missing | Jackson's runner | Integration |
-| L11 | Rich-value cells are not resolved through `xl/metadata.xml`/`xl/richData`, so linked data types (Stocks, Geography) are also MANUAL_REVIEW; no Excel-authored in-cell picture fixture yet; the independent tester suite has no rich-value case | Low | Disclosed finding + limitation | Phase 4: resolve `_localImage` structures; Dixon adds a tester case |
+| L11 | Cell images are not resolved through `xl/metadata.xml`/`xl/richData`, so linked data types (Stocks, Geography) are also MANUAL_REVIEW, plus one workbook-level finding per rich-data part (matches Team 12); no Excel-authored in-cell picture fixture yet; the independent tester suite has no cell-image case | Low | Disclosed findings + limitation | Phase 4: resolve `_localImage`; Dixon adds a tester case |
 
 ## Deviations from the handoff
 
@@ -333,7 +367,7 @@ cross-team tests, Excel manual checks, `pip-audit` (no dependency changes were m
 Rejection code table and `details` shape; protection policy; empty file = 422; extension
 checked before size; group containers as objects; first-Choice policy; VML notes as a
 limitation; `#xml=` paths for unsupported elements and a bare part path for unreadable VML;
-treating missing decorative `val` as ambiguous; `#cell=` targets for rich-value cells; Strict OOXML acceptance; counting chartsheets
+treating missing decorative `val` as ambiguous; Strict OOXML acceptance; counting chartsheets
 as worksheets in `worksheet_parts` and the 50-sheet limit.
 
 ## Phase 4/5 extension points

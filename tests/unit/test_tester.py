@@ -611,7 +611,8 @@ def test_run_record_reports_all_operations_without_secrets(
     make_client: Callable[..., Any],
 ) -> None:
     def wrong_classification(findings: list[dict[str, str]]) -> list[dict[str, str]]:
-        return [f | {"classification": "MANUAL_REVIEW"} for f in findings]
+        swapped = {"MANUAL_REVIEW": "REQUIRES_USER_INPUT", "REQUIRES_USER_INPUT": "MANUAL_REVIEW"}
+        return [f | {"classification": swapped[f["classification"]]} for f in findings]
 
     client, _ = make_client(small_fake(mutate_findings=wrong_classification))
     body = run_once(client).content

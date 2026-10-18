@@ -40,18 +40,25 @@ SHEET_CONTENT_TYPES: dict[SheetKind, str] = {
     "dialogsheet": "application/vnd.openxmlformats-officedocument.spreadsheetml.dialogsheet+xml",
 }
 TRUE_VALUES = frozenset({"1", "true"})
-#: Children of a sheet root that reference drawing-like content, recorded for the audit.
-SHEET_REFERENCE_ELEMENTS = frozenset(
-    {"drawing", "legacyDrawing", "legacyDrawingHF", "picture", "oleObjects", "controls"}
+#: Sheet elements that reference drawing-like content, recorded for the audit. Drawings are
+#: read from direct children of the sheet root; the others are found at any depth (Excel
+#: nests controls and OLE objects inside mc:AlternateContent).
+DIRECT_REFERENCE_ELEMENTS = frozenset({"drawing"})
+NESTED_REFERENCE_ELEMENTS = frozenset(
+    {"legacyDrawing", "legacyDrawingHF", "picture", "control", "oleObject"}
 )
+#: IMAGE() in a cell formula, optionally with Excel's _xlfn. future-function prefix.
+IMAGE_FORMULA = re.compile(r"(?:^|[^A-Za-z0-9_])(?:_xlfn\.)?IMAGE\s*\(", re.IGNORECASE | re.ASCII)
+
+XmlPath = tuple[tuple[str, int], ...]
 
 
 @dataclass(frozen=True)
 class SheetReference:
-    """A direct child of the sheet root, with its one-based same-name sibling index."""
+    """A sheet element referencing drawing-like content, with its one-based element path."""
 
     element: str
-    index: int
+    path: XmlPath
     rel_id: str | None
 
 
@@ -63,10 +70,10 @@ CELL_REF = re.compile(r"[A-Za-z]{1,3}[0-9]{1,7}", re.ASCII)
 
 @dataclass(frozen=True)
 class RichValueCell:
-    """A cell carrying value metadata (vm), e.g. a Place-in-Cell picture or IMAGE() result."""
+    """A cell image: value metadata (vm, e.g. Place in Cell) or an IMAGE() formula."""
 
-    ref: str | None  # the cell's r attribute when present and well-formed
-    path: tuple[tuple[str, int], ...]  # one-based element path to the <c> element
+    ref: str | None  # the cell's r attribute when well-formed; used only in messages
+    path: XmlPath  # one-based element path to the <c> element
 
 
 @dataclass
@@ -87,6 +94,11 @@ class SheetInfo:
 class WorkbookStructure:
     workbook_part: str
     sheets: list[SheetInfo]
+
+    @property
+    def worksheet_count(self) -> int:
+        """Worksheets only; chartsheets and dialogsheets do not count toward the limit."""
+        return sum(sheet.kind == "worksheet" for sheet in self.sheets)
 
     @property
     def nonempty_cells(self) -> int:
@@ -129,19 +141,13 @@ def _truthy(value: str | None) -> bool:
     return value is not None and value.strip() in TRUE_VALUES
 
 
-def _has_secret_attribute(elem: Element) -> bool:
-    return any("password" in key.casefold() or "hashvalue" in key.casefold() for key in elem.attrib)
-
-
 def _check_workbook_protection(root: Element) -> None:
+    """Only active locks reject. A stored password or hash without a lock is inactive."""
     for child in root:
-        name = local_name(child.tag)
-        if name == "workbookProtection":
+        if local_name(child.tag) == "workbookProtection":
             locks = ("lockStructure", "lockWindows", "lockRevision")
-            if any(_truthy(child.get(lock)) for lock in locks) or _has_secret_attribute(child):
+            if any(_truthy(child.get(lock)) for lock in locks):
                 errors.protected("workbook")
-        elif name == "fileSharing" and _has_secret_attribute(child):
-            errors.protected("workbook")
 
 
 def _sheet_kind(rel: Relationship) -> SheetKind:
@@ -181,8 +187,6 @@ def read_workbook(package: OoxmlPackage, max_worksheets: int | None) -> Workbook
     ]
     if not sheet_elements:
         errors.invalid("no_sheets")
-    if max_worksheets is not None and len(sheet_elements) > max_worksheets:
-        errors.limit_exceeded("max_worksheets", max_worksheets)
     rels = package.relationships(workbook_part)
     sheets: list[SheetInfo] = []
     seen_names: set[str] = set()
@@ -205,53 +209,62 @@ def read_workbook(package: OoxmlPackage, max_worksheets: int | None) -> Workbook
         seen_names.add(name.casefold())
         seen_parts.add(part.casefold())
         sheets.append(SheetInfo(name, sheet_id, elem.get("state", "visible"), kind, part))
-    return WorkbookStructure(workbook_part, sheets)
+    structure = WorkbookStructure(workbook_part, sheets)
+    if max_worksheets is not None and structure.worksheet_count > max_worksheets:
+        errors.limit_exceeded("max_worksheets", max_worksheets)
+    return structure
 
 
 class _SheetScanner:
-    """Streaming sheet scan: nonempty cells, protection and drawing references."""
+    """Streaming sheet scan: nonempty cells, protection, drawing references and cell images."""
 
     def __init__(self, sheet: SheetInfo, cell_budget: int | None) -> None:
         self.sheet = sheet
         self.cell_budget = cell_budget
         self.cells_in_open_c = 0
-        self.sibling_counts: dict[str, int] = {}
+        # Element paths by depth, outside sheetData (cells use the counters below).
+        self.paths: list[XmlPath] = []
+        self.child_counts: list[dict[str, int]] = []
         self.row_counts: dict[str, int] = {}
         self.cell_counts: dict[str, int] = {}
 
     def on_start(self, elem: Element, stack: list[Element]) -> None:
         name = local_name(elem.tag)
-        if not stack:
+        depth = len(stack)
+        if not depth:
             self.sheet.root_name = name
             if name != self.sheet.kind or namespace(elem.tag) not in MAIN_NAMESPACES:
                 errors.invalid("sheet_root")
+            self.paths, self.child_counts = [((name, 1),)], [{}]
             return
         if name == "c":
             self.cells_in_open_c += 1
-        if len(stack) == 2 and local_name(stack[1].tag) == "sheetData":
-            self.row_counts[name] = self.row_counts.get(name, 0) + 1
-            self.cell_counts = {}
-        elif len(stack) == 3 and local_name(stack[1].tag) == "sheetData":
-            self.cell_counts[name] = self.cell_counts.get(name, 0) + 1
-            if name == "c" and elem.get("vm") is not None:
-                self._record_rich_value(elem, stack)
-        if len(stack) != 1:
+        in_sheet_data = depth >= 2 and local_name(stack[1].tag) == "sheetData"
+        if in_sheet_data:
+            if depth == 2:
+                self.row_counts[name] = self.row_counts.get(name, 0) + 1
+                self.cell_counts = {}
+            elif depth == 3:
+                self.cell_counts[name] = self.cell_counts.get(name, 0) + 1
             return
-        index = self.sibling_counts.get(name, 0) + 1
-        self.sibling_counts[name] = index
-        if name == "sheetProtection" and self._protected(elem):
+        siblings = self.child_counts[depth - 1]
+        siblings[name] = siblings.get(name, 0) + 1
+        path = (*self.paths[depth - 1], (name, siblings[name]))
+        del self.paths[depth:], self.child_counts[depth:]
+        self.paths.append(path)
+        self.child_counts.append({})
+        if depth == 1 and name == "sheetProtection" and self._protected(elem):
             errors.protected("worksheet")
-        if name in SHEET_REFERENCE_ELEMENTS:
-            self.sheet.references.append(SheetReference(name, index, r_attr(elem, "id")))
+        if name in NESTED_REFERENCE_ELEMENTS or (depth == 1 and name in DIRECT_REFERENCE_ELEMENTS):
+            self.sheet.references.append(SheetReference(name, path, r_attr(elem, "id")))
 
-    def _record_rich_value(self, cell: Element, stack: list[Element]) -> None:
+    def _record_cell_image(self, cell: Element, stack: list[Element]) -> None:
         if len(self.sheet.rich_value_cells) >= MAX_RICH_VALUE_CELLS_PER_SHEET:
             self.sheet.rich_value_cells_omitted += 1
             return
         row = local_name(stack[2].tag)
         path = (
-            (self.sheet.root_name, 1),
-            ("sheetData", self.sibling_counts.get("sheetData", 1)),
+            *self.paths[1],
             (row, self.row_counts[row]),
             ("c", self.cell_counts["c"]),
         )
@@ -261,11 +274,8 @@ class _SheetScanner:
         )
 
     def _protected(self, elem: Element) -> bool:
-        if _has_secret_attribute(elem):
-            return True
-        if self.sheet.kind == "chartsheet":
-            return _truthy(elem.get("content")) or _truthy(elem.get("objects"))
-        return _truthy(elem.get("sheet"))
+        """Only an active worksheet lock rejects; chartsheet protection is accepted."""
+        return self.sheet.kind == "worksheet" and _truthy(elem.get("sheet"))
 
     def on_end(self, elem: Element, stack: list[Element]) -> bool:
         if local_name(elem.tag) == "c":
@@ -274,8 +284,19 @@ class _SheetScanner:
                 self.sheet.nonempty_cells += 1
                 if self.cell_budget is not None and self.sheet.nonempty_cells > self.cell_budget:
                     raise _CellBudgetExceeded
+            if len(stack) == 3 and local_name(stack[1].tag) == "sheetData" and is_cell_image(elem):
+                self._record_cell_image(elem, stack)
             return False
         return self.cells_in_open_c > 0
+
+
+def is_cell_image(cell: Element) -> bool:
+    """Value metadata (Place in Cell pictures, linked data types) or an IMAGE() formula."""
+    if cell.get("vm") is not None:
+        return True
+    return any(
+        local_name(child.tag) == "f" and IMAGE_FORMULA.search(child.text or "") for child in cell
+    )
 
 
 class _CellBudgetExceeded(Exception):

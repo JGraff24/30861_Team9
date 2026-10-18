@@ -117,18 +117,9 @@ def test_expected_findings_for_mixed_workbook() -> None:
         ("ALT_TEXT", "Sheet1", f"{d1}#id=2", "REQUIRES_USER_INPUT"),
         ("ALT_TEXT", "Sheet1", f"{d1}#id=3", "REQUIRES_USER_INPUT"),
         ("ALT_TEXT", "Sheet1", f"{d1}#id=5", "MANUAL_REVIEW"),
-        (
-            "ALT_TEXT",
-            "Sheet1",
-            f"{d1}#xml=/wsDr[1]/twoCellAnchor[4]/pic[1]/nvPicPr[1]/cNvPr[1]",
-            "REQUIRES_USER_INPUT",
-        ),
-        (
-            "ALT_TEXT",
-            "Sheet1",
-            f"{d1}#xml=/wsDr[1]/twoCellAnchor[5]/pic[1]/nvPicPr[1]/cNvPr[1]",
-            "REQUIRES_USER_INPUT",
-        ),
+        # Duplicate ids: MANUAL_REVIEW at the object's indexed path (pod contract 1.1 §7).
+        ("ALT_TEXT", "Sheet1", f"{d1}#xml=/wsDr[1]/twoCellAnchor[4]/pic[1]", "MANUAL_REVIEW"),
+        ("ALT_TEXT", "Sheet1", f"{d1}#xml=/wsDr[1]/twoCellAnchor[5]/pic[1]", "MANUAL_REVIEW"),
         ("WORKSHEET_NAME", "Sheet1", "xl/worksheets/sheet1.xml#sheetId=1", "REQUIRES_USER_INPUT"),
         ("WORKSHEET_NAME", "sheet03", "xl/worksheets/sheet3.xml#sheetId=3", "REQUIRES_USER_INPUT"),
     ]

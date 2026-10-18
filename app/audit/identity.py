@@ -32,10 +32,6 @@ def object_target(part: str, object_id: str) -> str:
     return f"{part}#id={object_id}"
 
 
-def cell_target(part: str, cell_ref: str) -> str:
-    return f"{part}#cell={cell_ref}"
-
-
 def worksheet_target(part: str, sheet_id: str) -> str:
     return f"{part}#sheetId={sheet_id}"
 

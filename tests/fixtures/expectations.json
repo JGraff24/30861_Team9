@@ -113,22 +113,22 @@
       "sha256": "680d7d50899bfb4d2178acaafecbf9741f46fb0a9bdff1fb374670c50c813883",
       "origin": "synthetic",
       "upload_name": "repeated_ids.xlsx",
-      "notes": "Provisional hand-authored edge case; pod/Excel review pending.",
+      "notes": "Provisional hand-authored edge case; pod/Excel review pending. Duplicate ids are MANUAL_REVIEW at the object's indexed #xml= path (pod contract 1.1 section 7).",
       "expected_status": "REVIEW_REQUIRED",
       "findings": [
         {
           "ruleId": "ALT_TEXT",
           "category": "NON_TEXT_CONTENT",
           "worksheet": "Expenses",
-          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[1]/pic[1]/nvPicPr[1]/cNvPr[1]",
-          "classification": "REQUIRES_USER_INPUT"
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[1]/pic[1]",
+          "classification": "MANUAL_REVIEW"
         },
         {
           "ruleId": "ALT_TEXT",
           "category": "NON_TEXT_CONTENT",
           "worksheet": "Expenses",
-          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[2]/pic[1]/nvPicPr[1]/cNvPr[1]",
-          "classification": "REQUIRES_USER_INPUT"
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[2]/pic[1]",
+          "classification": "MANUAL_REVIEW"
         }
       ]
     },

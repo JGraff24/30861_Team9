@@ -70,6 +70,13 @@ def test_worksheets_above_default_limit_are_rejected() -> None:
     assert limit_of(data, DEFAULTS) == (422, "WORKBOOK_LIMIT_EXCEEDED", "max_worksheets")
 
 
+def test_chartsheets_do_not_count_toward_worksheet_limit() -> None:
+    """Pod contract 1.1 §4: the limit is more than 50 worksheets."""
+    wb = simple_workbook(*(f"Tab {i}" for i in range(50)))
+    wb.sheets.append(Sheet("Chart", "xl/chartsheets/sheet1.xml", "51", kind="chartsheet"))
+    assert ENGINE.validate(wb.build(), "book.xlsx", DEFAULTS).worksheet_count == 51
+
+
 def test_hidden_sheets_count_toward_worksheet_limit() -> None:
     wb = simple_workbook("A", "B", "C")
     wb.sheets[2].state = "veryHidden"
