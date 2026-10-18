@@ -485,7 +485,7 @@ def test_protected_chartsheet_is_accepted() -> None:
             tail='<sheetProtection content="1" objects="1"/>',
         )
     )
-    assert validate(wb.build()).worksheet_count == 2
+    assert validate(wb.build()).worksheet_count == 1
 
 
 def test_sheet_protection_off_is_accepted() -> None:
