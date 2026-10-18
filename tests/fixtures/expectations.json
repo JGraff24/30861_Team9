@@ -226,6 +226,165 @@
       "notes": "Provisional isolated worksheet/structure protection metadata; tests each rejection policy separately.",
       "http_status": 422,
       "error_code": null
+    },
+    "in_cell_picture": {
+      "kind": "accepted",
+      "file": "synthetic/in_cell_picture.xlsx",
+      "sha256": "63921a4e08cd90ee035afe125d94676dffabeaa7fd74aaf6c993fd7fe4088f1b",
+      "origin": "synthetic",
+      "upload_name": "in_cell_picture.xlsx",
+      "notes": "Pod contract 1.1 cell image. Product photos (sheet1.xml) row 2 cell B2 (second c) has vm=\"1\" (Place in Cell picture), so it is one MANUAL_REVIEW at its sheetData element path. Every xl/richData/* part (four rich-value parts plus xl/richData/_rels/richValueRel.xml.rels) and the WPS-style xl/cellimages.xml are each one workbook-level MANUAL_REVIEW (worksheet __WORKBOOK__, target <part>#xml=/). xl/metadata.xml and xl/media/image1.png are not cell-image parts. Pod/Excel review pending.",
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Product photos",
+          "target": "xl/worksheets/sheet1.xml#xml=/worksheet[1]/sheetData[1]/row[2]/c[2]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/cellimages.xml#xml=/",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/richData/_rels/richValueRel.xml.rels#xml=/",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/richData/rdRichValueTypes.xml#xml=/",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/richData/rdrichvalue.xml#xml=/",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/richData/rdrichvaluestructure.xml#xml=/",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/richData/richValueRel.xml#xml=/",
+          "classification": "MANUAL_REVIEW"
+        }
+      ]
+    },
+    "image_formula": {
+      "kind": "accepted",
+      "file": "synthetic/image_formula.xlsx",
+      "sha256": "edefdb8a4b567fe2ef4cb79e37aeb1b3c85116286c0d040ed8956b6a124effc5",
+      "origin": "synthetic",
+      "upload_name": "image_formula.xlsx",
+      "notes": "Pod contract 1.1 IMAGE() cell. Brand logos (sheet1.xml) row 2 cell B2 has an _xlfn.IMAGE(...) formula and no vm attribute: one MANUAL_REVIEW at its sheetData element path. C1's SUM formula is not an image. No rich-data parts. Pod/Excel review pending.",
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Brand logos",
+          "target": "xl/worksheets/sheet1.xml#xml=/worksheet[1]/sheetData[1]/row[2]/c[2]",
+          "classification": "MANUAL_REVIEW"
+        }
+      ]
+    },
+    "form_controls": {
+      "kind": "accepted",
+      "file": "synthetic/form_controls.xlsx",
+      "sha256": "53630b5946d30abdf056cfd12a6ebd124b19d6e9d318766e67f57af2dddcc53c",
+      "origin": "synthetic",
+      "upload_name": "form_controls.xlsx",
+      "notes": "Pod contract 1.1 controls/OLE/alternate content. Survey (sheet1.xml) nests an oleObject in mc:AlternateContent[1] (both the Choice and the Fallback copy are oleObject elements) and a form control in mc:AlternateContent[2]; each element is one MANUAL_REVIEW at its sheet #xml= path (their relationships point to ctrlProps/embeddings, not VML). drawing1.xml: mc:AlternateContent inside twoCellAnchor[1] and a root-level mc:AlternateContent are one MANUAL_REVIEW each at their element path, branches not inspected. Group 5 (id 5) has no title/descr but is a container with no finding of its own; its child shape (id 6) is described. Pod/Excel review pending.",
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Survey",
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/AlternateContent[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Survey",
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[1]/AlternateContent[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Survey",
+          "target": "xl/worksheets/sheet1.xml#xml=/worksheet[1]/AlternateContent[1]/Choice[1]/oleObjects[1]/AlternateContent[1]/Choice[1]/oleObject[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Survey",
+          "target": "xl/worksheets/sheet1.xml#xml=/worksheet[1]/AlternateContent[1]/Choice[1]/oleObjects[1]/AlternateContent[1]/Fallback[1]/oleObject[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Survey",
+          "target": "xl/worksheets/sheet1.xml#xml=/worksheet[1]/AlternateContent[2]/Choice[1]/controls[1]/AlternateContent[1]/Choice[1]/control[1]",
+          "classification": "MANUAL_REVIEW"
+        }
+      ]
+    },
+    "vml_comments": {
+      "kind": "accepted",
+      "file": "synthetic/vml_comments.xlsx",
+      "sha256": "dacd584e94b8647c37417ddae6714fa6e3a55471a7122ac7868f55578015029f",
+      "origin": "synthetic",
+      "upload_name": "vml_comments.xlsx",
+      "notes": "Pod contract 1.1 legacy VML. Review notes (sheet1.xml) has legacyDrawing rId2 -> xl/drawings/vmlDrawing1.vml holding two comment-note v:shape elements with unique ids _x0000_s1025 and _x0000_s1026: one MANUAL_REVIEW each at #id=<id>. The v:shapetype is not a shape. Pod/Excel review pending.",
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Review notes",
+          "target": "xl/drawings/vmlDrawing1.vml#id=_x0000_s1025",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Review notes",
+          "target": "xl/drawings/vmlDrawing1.vml#id=_x0000_s1026",
+          "classification": "MANUAL_REVIEW"
+        }
+      ]
+    },
+    "inactive_protection": {
+      "kind": "accepted",
+      "file": "synthetic/inactive_protection.xlsx",
+      "sha256": "1f01f6857964fb9d52c04bee2457ab06ed5c0128bc5f793d0418568d867e21d7",
+      "origin": "synthetic",
+      "upload_name": "inactive_protection.xlsx",
+      "notes": "Pod contract 1.1 \u00a74: Budget (sheet1.xml) stores a sheetProtection password hash with sheet=\"0\", which is not an active lock, so the upload is accepted. Descriptive name, no objects: no findings.",
+      "expected_status": "AUDIT_COMPLETE",
+      "findings": []
     }
   }
 }

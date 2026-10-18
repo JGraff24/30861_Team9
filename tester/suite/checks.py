@@ -464,6 +464,15 @@ def upload_worksheets_at(ctx: SuiteContext) -> str:
     return f"A workbook with exactly {WORKSHEET_LIMIT} worksheets was accepted with 202."
 
 
+def upload_worksheets_chartsheet(ctx: SuiteContext) -> str:
+    data = worksheets_workbook(WORKSHEET_LIMIT, chartsheet=True)
+    _limit_upload(ctx, data, "sheet-limit-chartsheet.xlsx", 202, "Worksheet limit + chartsheet")
+    return (
+        f"A workbook with exactly {WORKSHEET_LIMIT} worksheets and one chartsheet was accepted "
+        "with 202."
+    )
+
+
 def upload_cells_over(ctx: SuiteContext) -> str:
     data = cells_workbook(NONEMPTY_CELL_LIMIT + 1)
     _limit_upload(ctx, data, "too-many-cells.xlsx", 422, "Nonempty cell limit + 1")
@@ -682,6 +691,7 @@ CHECKS: dict[str, Callable[[SuiteContext], str]] = {
         upload_protected,
         upload_worksheets_over,
         upload_worksheets_at,
+        upload_worksheets_chartsheet,
         upload_cells_over,
         upload_cells_at,
         version_unauthenticated,

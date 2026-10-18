@@ -11,9 +11,9 @@ pushed, merged or deployed by this Codex session. Historical Claude Code evidenc
 The independent tester implements authenticated `POST /test/setup`, `POST /test/run` and
 `GET /test/report`. It calls only explicitly approved system URLs through HTTP, using private
 per-target credentials. It imports shared DTOs/settings, never the target engine or storage.
-A wheel includes its fixture manifest, independent expectations and thirteen synthetic files.
+A wheel includes its fixture manifest, independent expectations and eighteen synthetic files.
 A wheel loaded outside the checkout was verified to expose all three routes and load all 53
-planned cases without importing `tests/support/` or contacting a target.
+planned cases (manifest 1.4.0; 1.5.0 now has 64) without importing `tests/support/` or contacting a target.
 
 Sessions, setup payloads, frozen suite definitions, progress markers and immutable final report
 bytes are stored in a separate SQLite database. One tester API worker must own each store;
@@ -21,10 +21,10 @@ startup recovery is intended for a stopped previous process, not overlapping dep
 The service runs suites in a server worker thread, so disconnecting the caller does not cancel
 the suite. The local live acceptance check actually exercised lost-response recovery.
 
-The deployed suite contains 53 fixed cases. Unknown/mismatched IDs and audits two through five
+The suite contains 64 fixed cases (manifest 1.5.0). Unknown/mismatched IDs and audits two through five
 each have separate IDs and outcomes; an evaluable failure does not suppress later cases.
 `P3-AUDIT-FAILURE-ENVELOPE` skips unless a target audit actually reports `PROCESSING_FAILED`.
-A healthy fake produces 52 passes, one skip, component coverage 6/6 and partial system coverage
+A healthy fake produces 63 passes, one skip, component coverage 6/6 and partial system coverage
 7/8. The fake's code coverage 40/50 is a constant test value, never a real target measurement.
 
 The real Team 9 system API/engine/worker/UI/test interface are not integrated on this branch.
@@ -132,7 +132,7 @@ sequenceDiagram
   Tester->>Store: READY
   Operator->>Tester: run once
   Tester->>Store: atomically claim RUNNING
-  loop 53 planned cases
+  loop 64 planned cases
     Tester->>Target: bounded request/assertion when prerequisites exist
     Tester->>Store: results and executed markers
   end
@@ -319,6 +319,34 @@ not change state, while `TesterService.report` calls `TesterStore.mark_retrieved
 cleanup bookkeeping. It leaves the stored report bytes and session run state unchanged.
 That internal side effect was preserved to keep this query correction focused; it should
 be reviewed separately if the instructor's state rule includes cleanup metadata.
+
+## Pod contract 1.1 cases (2026-10-18)
+
+Manifest 1.5.0 adds eleven cases for the pod shared API contract 1.1 behaviors that the engine
+adopted (see "Pod contract 1.1 alignment" in [dylan_phase3.md](dylan_phase3.md)). The fixtures are built field by field in
+`tester/suite/workbooks.py` without importing `app/` or test helpers. Expected targets were
+written by hand from the contract text before the engine was run.
+
+| Cases | Fixture | Behavior | ACs |
+|---|---|---|---|
+| `P3-UPLOAD-/AUDIT-IN-CELL-PICTURE` | `in_cell_picture` | `vm` cell → one MANUAL_REVIEW at `sheet1.xml#xml=/worksheet[1]/sheetData[1]/row[2]/c[2]`; the four `xl/richData/*.xml` parts, `xl/richData/_rels/richValueRel.xml.rels` and `xl/cellimages.xml` → `__WORKBOOK__` `<part>#xml=/` | AC-01; AC-04, AC-05 |
+| `P3-UPLOAD-/AUDIT-IMAGE-FORMULA` | `image_formula` | `_xlfn.IMAGE()` cell with no `vm` → sheetData `#xml=` review; a SUM cell is not | AC-01; AC-04, AC-05 |
+| `P3-UPLOAD-/AUDIT-FORM-CONTROLS` | `form_controls` | `control` and both `oleObject` copies (Choice and Fallback) inside `mc:AlternateContent` → sheet `#xml=` reviews; drawing `mc:AlternateContent` at the root and inside an anchor → one review each; undescribed group with a described child → no finding | AC-01; AC-04, AC-05 |
+| `P3-UPLOAD-/AUDIT-VML-COMMENTS` | `vml_comments` | Two comment-note `v:shape`s → `vmlDrawing1.vml#id=_x0000_s1025/1026`; the `v:shapetype` is ignored | AC-01; AC-04, AC-05 |
+| `P3-UPLOAD-/AUDIT-INACTIVE-PROTECTION` | `inactive_protection` | Stored sheet password hash with `sheet="0"` → 202, `AUDIT_COMPLETE`, no findings | AC-01; AC-04 |
+| `P3-INPUT-SHEETS-CHARTSHEET` | generated | 50 worksheets plus one described chartsheet → 202 | AC-01 |
+
+The fake target now treats only `sheet="1"` as active sheet protection and counts worksheet
+parts only, matching the contract. With ten polled audits, a target whose audits never finish
+now needs 750 s of polling, which exceeds the 600 s suite budget. Such a run aborts at the suite
+deadline instead of reporting each audit as failed. The per-audit deadline unit test raises the
+run budget to keep testing the 75 s limit on its own.
+
+Real-system result (`scripts.integration_selfcheck`, 2026-10-18): on the first run, all ten new
+fixture cases passed but `P3-INPUT-SHEETS-CHARTSHEET` returned HTTP 500. `validate_workbook`
+counted the chartsheet as a worksheet (51), and `verify_validation` rejected counts over 50
+with `ENGINE_RESULT_INVALID`. After the engine fix in `fda7fb2` (worksheets-only count), the
+self-check reports 63 pass, 1 expected skip (`P3-AUDIT-FAILURE-ENVELOPE`) and 0 fail/error.
 
 ## Next Codex prompt
 

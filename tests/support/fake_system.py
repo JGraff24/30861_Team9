@@ -183,9 +183,13 @@ class FakeSystem:
             return self.project_error(422, "INVALID_WORKBOOK")
         workbook = parts.get("xl/workbook.xml", b"")
         sheets = [p for name, p in parts.items() if name.startswith("xl/worksheets/sheet")]
-        if b"workbookProtection" in workbook or any(b"sheetProtection" in s for s in sheets):
+        # Only active locks reject; a stored hash with sheet="0" is accepted (pod contract 1.1).
+        if b"workbookProtection" in workbook or any(
+            b"sheetProtection" in s and b'sheet="1"' in s for s in sheets
+        ):
             return self.project_error(422, "PROTECTED_WORKBOOK")
-        if workbook.count(b"<sheet ") > self.worksheet_limit:
+        # Chartsheets do not count toward the worksheet limit.
+        if len(sheets) > self.worksheet_limit:
             return self.project_error(422, "TOO_MANY_WORKSHEETS")
         if sum(s.count(b"<c r=") for s in sheets) > self.cell_limit:
             return self.project_error(422, "TOO_MANY_CELLS")
