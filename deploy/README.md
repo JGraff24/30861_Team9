@@ -29,7 +29,7 @@ replace or recreate the current AWS resources.
 - `aws.yaml`: reviewable CloudFormation for one EC2 instance, HTTPS security group, instance role,
   retained encrypted gp3 data volume, private encrypted source bucket and budget notification.
   Existing VPC/subnet and operator-chosen Amazon Linux 2023 AMI are inputs. Nothing auto-deploys.
-- `nginx.conf.template`: strips `/system/` and `/tester/`, 26 MiB HTTP body allowance and 660-second
+- `nginx.conf.template`: strips `/system/` and `/tester/`, 26 MiB HTTP body allowance and 1,900-second
   tester timeout. Application file limit remains exactly 25,000,000 bytes (plus 65,536 multipart bytes).
 - `iam-role-policy.json.template`, `bucket-policy.json.template`: reviewable policy examples for
   an existing bucket instead of CloudFormation. Do not apply both alternative plans blindly.

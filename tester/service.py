@@ -25,7 +25,7 @@ from app.contracts.models import (
 from tester.config import TargetAuth, TesterSettings
 from tester.errors import TesterError, bad_request
 from tester.store import ENDED, TesterSessionState, TesterStore
-from tester.suite.checks import CHECKS, SuiteContext
+from tester.suite.checks import SuiteContext
 from tester.suite.manifest import (
     LoadedSuite,
     SuiteConfigurationError,
@@ -33,6 +33,7 @@ from tester.suite.manifest import (
     restore_suite,
     snapshot_suite,
 )
+from tester.suite.registry import names as check_names
 from tester.suite.runner import (
     CODE_UNAVAILABLE,
     build_report,
@@ -81,7 +82,7 @@ class TesterService:
         )
 
     def load_suite(self) -> LoadedSuite:
-        return load_suite(self.settings.fixture_manifest_path, set(CHECKS))
+        return load_suite(self.settings.fixture_manifest_path, check_names())
 
     def setup(self, request: TesterSetupRequest, operator: str) -> SetupResponse:
         access = self._access(request.target_url)
@@ -161,7 +162,7 @@ class TesterService:
                     "legacy session has no stored plan; create a new session"
                 )
             suite = restore_suite(session.plan)
-            if {test.check for test in suite.manifest.tests} - set(CHECKS):
+            if {test.check for test in suite.manifest.tests} - check_names():
                 raise SuiteConfigurationError("stored plan uses checks unavailable in this release")
             access = self._access(session.target_url)
         except (SuiteConfigurationError, TesterError) as exc:
@@ -182,9 +183,13 @@ class TesterService:
 
         ctx: SuiteContext | None = None
         try:
-            with self._client(
-                session.target_url, access, self.settings.tester_run_timeout_seconds
-            ) as client:
+            # A Phase 4 plan carries the section 10 suite budget; Phase 3 keeps the setting.
+            seconds = (
+                suite.manifest.limits.suite_seconds
+                if suite.manifest.limits is not None
+                else self.settings.tester_run_timeout_seconds
+            )
+            with self._client(session.target_url, access, seconds) as client:
                 client.session_id = request.session_id
                 ctx = SuiteContext(
                     client, suite, request.session_id, sleep=self._sleep, clock=self._clock
@@ -210,6 +215,16 @@ class TesterService:
         body = report.model_dump_json().encode("utf-8")
         # Store first: a lost response is recovered from GET /test/report.
         self.store.finish_run(request.session_id, body, aborted)
+        auxiliary = list(dict.fromkeys(ctx.state.get("aux_sessions", []))) if ctx else []
+        if auxiliary:
+            # Evidence namespaces are retained until the run is recorded; the next setup for
+            # this target cleans them through cleanup_session_ids (section 14.1).
+            self.store.record_auxiliary(
+                request.session_id,
+                session.target_url,
+                auxiliary,
+                datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+            )
         if aborted:
             raise TesterError(500, message or "Tester aborted the suite.", ErrorSource.TESTER)
         return body
@@ -239,7 +254,13 @@ class TesterService:
             basis=CODE_UNAVAILABLE.format(reason="tester process stopped during the suite"),
         )
         for session in running:
-            if session.plan is None:
+            restored = None
+            if session.plan is not None:
+                try:
+                    restored = restore_suite(session.plan, read_fixtures=False)
+                except SuiteConfigurationError:
+                    restored = None
+            if restored is None:
                 # Pre-snapshot releases cannot reconstruct unknown unexecuted tests.
                 # Retain their recorded outcomes and disclose that limitation explicitly.
                 unknown = CoverageMeasure(
@@ -257,7 +278,7 @@ class TesterService:
                     coverage=SuiteCoverage(code=code, component=unknown, system=unknown),
                 )
             else:
-                suite = restore_suite(session.plan, read_fixtures=False)
+                suite = restored
                 results = interrupted_results(
                     suite, session.results, "The tester process stopped during this test."
                 )

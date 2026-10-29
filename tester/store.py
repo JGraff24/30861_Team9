@@ -37,6 +37,17 @@ CREATE TABLE IF NOT EXISTS tester_sessions (
     cleanup_pending INTEGER NOT NULL DEFAULT 0
 )
 """
+# Auxiliary target namespaces a run created (for example the Phase 4 fault session). They are
+# kept as evidence until the run is recorded, then cleaned on the next setup for that target.
+AUXILIARY_SCHEMA = """
+CREATE TABLE IF NOT EXISTS tester_auxiliary_sessions (
+    session_id TEXT PRIMARY KEY,
+    parent_session_id TEXT NOT NULL,
+    target_url TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    cleanup_pending INTEGER NOT NULL DEFAULT 1
+)
+"""
 
 
 @dataclass(frozen=True)
@@ -69,6 +80,7 @@ class TesterStore:
                 with sqlite3.connect(self.path) as setup:
                     setup.execute("PRAGMA journal_mode=WAL")
                     setup.execute(SCHEMA)
+                    setup.execute(AUXILIARY_SCHEMA)
                     columns = {
                         row[1] for row in setup.execute("PRAGMA table_info(tester_sessions)")
                     }
@@ -236,11 +248,37 @@ class TesterStore:
                 + " ORDER BY created_at",
                 (target_url,),
             ).fetchall()
-        return [row["session_id"] for row in rows]
+            auxiliary = db.execute(
+                "SELECT session_id FROM tester_auxiliary_sessions WHERE target_url = ?"
+                " AND cleanup_pending = 1 ORDER BY created_at, session_id",
+                (target_url,),
+            ).fetchall()
+        return [row["session_id"] for row in rows] + [row["session_id"] for row in auxiliary]
 
     def clear_cleanup(self, session_ids: list[str]) -> None:
         with self._connect(write=True) as db:
+            for table in ("tester_sessions", "tester_auxiliary_sessions"):
+                db.executemany(
+                    f"UPDATE {table} SET cleanup_pending = 0 WHERE session_id = ?",
+                    [(session_id,) for session_id in session_ids],
+                )
+
+    def record_auxiliary(
+        self, parent_session_id: str, target_url: str, session_ids: list[str], created_at: str
+    ) -> None:
+        """Remember namespaces a run created so the next setup cleans them (deduplicated)."""
+        with self._connect(write=True) as db:
             db.executemany(
-                "UPDATE tester_sessions SET cleanup_pending = 0 WHERE session_id = ?",
-                [(session_id,) for session_id in session_ids],
+                "INSERT OR IGNORE INTO tester_auxiliary_sessions"
+                " (session_id, parent_session_id, target_url, created_at) VALUES (?, ?, ?, ?)",
+                [(sid, parent_session_id, target_url, created_at) for sid in session_ids],
             )
+
+    def auxiliary_sessions(self, parent_session_id: str) -> list[str]:
+        with self._connect() as db:
+            rows = db.execute(
+                "SELECT session_id FROM tester_auxiliary_sessions WHERE parent_session_id = ?"
+                " ORDER BY created_at, session_id",
+                (parent_session_id,),
+            ).fetchall()
+        return [row["session_id"] for row in rows]
