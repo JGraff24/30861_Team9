@@ -57,10 +57,13 @@ jobs:
         run: uv run mypy --platform linux app tester scripts
       - name: Full regression suite (Linux service runtime)
         if: runner.os == 'Linux'
-        run: uv run pytest -q
+        run: uv run pytest -q --junitxml=${{ runner.temp }}/pytest-junit.xml
       - name: Portable tester, schema and foundation checks (Windows)
         if: runner.os == 'Windows'
-        run: uv run pytest tests/unit/test_tester.py tests/unit/test_tester_deadlines.py tests/unit/test_phase4_tester.py tests/unit/test_models.py tests/unit/test_foundation.py tests/contract
+        run: uv run pytest tests/unit/test_tester.py tests/unit/test_tester_deadlines.py tests/unit/test_phase4_tester.py tests/unit/test_models.py tests/unit/test_foundation.py tests/contract --durations=15 --junitxml=${{ runner.temp }}/pytest-junit.xml
+      - name: Show failing tests as annotations
+        if: failure()
+        run: uv run python -m scripts.junit_annotations "${{ runner.temp }}/pytest-junit.xml"
       - name: Real API, worker and tester integration
         if: runner.os == 'Linux'
         run: uv run python -m scripts.integration_selfcheck
