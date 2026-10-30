@@ -206,6 +206,17 @@ class OoxmlPackage:
         self.parsed_parts.add(stored)
         return result
 
+    def read_bytes(self, stored: str) -> bytes:
+        """Bounded raw bytes of one entry (counted against the expansion budget)."""
+
+        def collect(reader: _BoundedReader) -> bytes:
+            chunks = []
+            while chunk := reader.read(_READ_CHUNK):
+                chunks.append(chunk)
+            return b"".join(chunks)
+
+        return self._guard(stored, collect)
+
     def parse_xml(self, stored: str) -> Element:
         return self._guard(stored, parse_document)
 

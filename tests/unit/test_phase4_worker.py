@@ -273,9 +273,24 @@ def test_real_correction_deadline_kills_child_and_removes_private_files(
     assert list(tmp_path.iterdir()) == []
 
 
+class _AuditOnlyEngine:
+    """An engine without correction methods (the pre-Phase 4 capability)."""
+
+    supported_rulesets = ("1.0.0",)
+
+    def __init__(self) -> None:
+        self._engine = OoxmlWorkbookEngine()
+
+    def validate(self, *args: object) -> object:
+        return self._engine.validate(*args)  # type: ignore[arg-type]
+
+    def audit(self, *args: object) -> object:
+        return self._engine.audit(*args)  # type: ignore[arg-type]
+
+
 def test_missing_editor_is_explicit_dependency_failure() -> None:
     with pytest.raises(ProjectException) as error:
-        validate_decisions_bounded(OoxmlWorkbookEngine(), *engine_fixture())
+        validate_decisions_bounded(_AuditOnlyEngine(), *engine_fixture())  # type: ignore[arg-type]
     assert error.value.status_code == 503
     assert error.value.code == "SERVICE_UNAVAILABLE"
 
