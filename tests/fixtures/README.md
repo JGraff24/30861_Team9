@@ -88,3 +88,39 @@ session on the target; reviewer role alone is not access. Expected findings and 
 are independent: any valid correctly identified completed seeded audit supplies the comparison
 baseline, even if its detection accuracy fails the oracle. Invalid/missing/failed audits still
 cause repeatability skips. The healthy local fake yields 63 passes and one observation skip.
+
+## Phase 4 suite (specification 2.1.0, ruleset 2.0.0)
+
+`manifest-phase4.json` is generated from `docs/contracts/phase4/phase4-test-plan.json` by
+`scripts/build_phase4_manifest.py` (CI runs it with `--check`). It keeps the plan's 215 hosted
+IDs, order, components (C1-C9), acceptance criteria (AC-01 to AC-11), operations (1-14 plus S,
+V, R) and prerequisites, and binds each case to a check handler and parameters. Point the
+tester at it with `FIXTURE_MANIFEST_PATH`; the Phase 3 manifest stays the default.
+
+`expectations-phase4.json` is the Phase 4 oracle. It re-derives every retained Phase 3 fixture
+under the six rules (three gain `TABLE_HEADER` findings; statuses with user-input findings
+become `REMEDIATION_AVAILABLE`) and adds Team 9's Phase 4 packs in `phase4/synthetic/`:
+
+| Key | Purpose |
+|---|---|
+| clean_all_six | No findings under all six rules (formal table, described picture, descriptive link) |
+| seeded_all_six | Every rule, user-input and manual items, a decorative object |
+| review_only | Manual-only findings (`REVIEW_REQUIRED`); the no-edit batch |
+| mixed_decisions | All four correction families, manual items, two renameable sheets, a duplicate-name probe |
+| unsupported_edits | Decorative, duplicate-ID, formula-link, merge, color and INDIRECT-blocked rename targets |
+| alt_supported / link_supported / header_range / header_disabled_table / rename_references | One correction family each, with the exact expected package effect |
+| preservation_rich | Formulas, styles, names, validation, conditional rule, comment/VML, hidden sheet, opaque part |
+| large_preservation | Over 2 MiB even after recompression (incompressible PNG chunk) |
+| table_header_vectors / merge_vectors / link_vectors / contrast_vectors | One worksheet per `P4-RULE-*` case |
+
+Builders: `tester/phase4/workbooks.py` and `tester/phase4/vectors.py` (literal XML, stored ZIP
+entries, fixed timestamps). `scripts/make_synthetic_fixtures.py --check` verifies the bytes.
+Each accepted fixture's `extras` holds the decision plans, the expected package effects the
+comparator verifies, expected review-context items and rule-vector case worksheets.
+
+Expectations were hand-written from the XML. A separate blind derivation from the raw files
+and the specification agreed on 25 of 26 accepted workbooks; the one difference
+(`form_controls`, the Fallback OLE copy) is settled by pod contract 1.1. Every Phase 4
+fixture still needs two-member Team 12 review (`review.status` is `pending`) and an Excel
+no-repair check. Team 12's received `clean.xlsx` is stored under `phase4/received/team12/`
+and is **not adopted**: see `docs/evidence/phase4_team12_clean_review.md`.

@@ -4,7 +4,7 @@ name: ci
 
 on:
   push:
-    branches: [main, "phase3/**", "bootstrap/**"]
+    branches: [main, "phase3/**", "phase4/**", "bootstrap/**"]
   pull_request:
   # Opt-in live run against a deployed tester. Never part of push/PR checks.
   workflow_dispatch:
@@ -16,6 +16,12 @@ on:
         description: "Target tag/SHA from pod documentation (or 'unknown')"
         required: true
         default: unknown
+      suite:
+        description: "Manifest the deployed tester serves"
+        required: true
+        default: phase3
+        type: choice
+        options: [phase3, phase4]
 
 permissions:
   contents: read
@@ -28,7 +34,7 @@ jobs:
   checks:
     name: checks (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -54,7 +60,7 @@ jobs:
         run: uv run pytest -q
       - name: Portable tester, schema and foundation checks (Windows)
         if: runner.os == 'Windows'
-        run: uv run pytest tests/unit/test_tester.py tests/unit/test_tester_deadlines.py tests/unit/test_models.py tests/unit/test_foundation.py tests/contract
+        run: uv run pytest tests/unit/test_tester.py tests/unit/test_tester_deadlines.py tests/unit/test_phase4_tester.py tests/unit/test_models.py tests/unit/test_foundation.py tests/contract
       - name: Real API, worker and tester integration
         if: runner.os == 'Linux'
         run: uv run python -m scripts.integration_selfcheck
@@ -62,12 +68,19 @@ jobs:
         run: uv run python -m scripts.export_schemas --check
       - name: Identity vectors
         run: uv run python -m scripts.check_identity
+      - name: Phase 4 policy vectors, examples and wire schemas
+        run: uv run python -m scripts.check_phase4_policy
+      - name: Phase 4 manifest matches the normative test plan
+        run: uv run python -m scripts.build_phase4_manifest --check
       - name: Synthetic fixtures match generator
         run: uv run python -m scripts.make_synthetic_fixtures --check
       - name: Live process smoke test
         run: uv run python -m scripts.smoke_foundation
       - name: Live tester self-check (test-only fake target)
         run: uv run python -m scripts.tester_selfcheck
+      - name: Live Phase 4 tester self-check (test-only Phase 4 fake target)
+        if: runner.os == 'Linux'
+        run: uv run python -m scripts.tester_selfcheck --phase4
 
   dependency-audit:
     runs-on: ubuntu-latest
@@ -93,13 +106,14 @@ jobs:
     # TEAM9_TESTER_TOKEN (operator token); the token is never printed or uploaded.
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     env:
       TEAM9_TESTER_URL: ${{ secrets.TEAM9_TESTER_URL }}
       TEAM9_TESTER_TOKEN: ${{ secrets.TEAM9_TESTER_TOKEN }}
       TEAM9_TARGET_URL: ${{ inputs.target_url }}
       # Inputs reach the shell only through env, never interpolated into scripts.
       TARGET_REVISION: ${{ inputs.target_revision }}
+      SUITE: ${{ inputs.suite }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -119,8 +133,14 @@ jobs:
         run: uv run pytest tests/acceptance
       - name: Full suite run and sanitized record
         run: |
+          if [ "$SUITE" = "phase4" ]; then
+            MANIFEST=tests/fixtures/manifest-phase4.json
+          else
+            MANIFEST=tests/fixtures/manifest.json
+          fi
           uv run python -m scripts.run_suite --tester-url "$TEAM9_TESTER_URL" \
             --target-url "$TEAM9_TARGET_URL" --target-revision "$TARGET_REVISION" \
+            --manifest "$MANIFEST" \
             --output "$RUNNER_TEMP/report.json" --record "$RUNNER_TEMP/run-record.json"
       - name: Upload report and run record (no credentials inside)
         if: always()
