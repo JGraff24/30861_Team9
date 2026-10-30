@@ -50,6 +50,27 @@ The test engine double explicitly fabricates test findings/edits **inside tests 
 
 These expectations were not changed to make results pass. CI therefore remains red until the appropriate owners reconcile the superseded Phase 3 assertions and integration configuration. All fresh Phase 4 tests pass; this does not erase the regression failures or authorize release.
 
-## Remaining acceptance gates
+## Acceptance gates at the October 29 verification
 
-Dylan's real six-rule audit/context and correction/preservation engine, Dixon's independent Phase 4 suite and reviewed fixtures, Ryan's new UI and final editor measurement scope, shared resolution of the exact tint-vector conflict, real deployed limits/storage verification, Excel inspections and retained reciprocal reports remain outstanding. See `docs/implementation/jackson_phase4.md` for exact interfaces, migration/deployment notes and the conflict calculations. This PR is a draft backend foundation; Jackson's portion and full Phase 4 acceptance are **not declared complete**.
+Dylan's real six-rule audit/context and correction/preservation engine, Dixon's independent Phase 4 suite and reviewed fixtures, Ryan's new UI and final editor measurement scope, resolution of the tint-vector conflict (subsequently agreed October 30; see follow-up below), real deployed limits/storage verification, Excel inspections and retained reciprocal reports remain outstanding. See `docs/implementation/jackson_phase4.md` for exact interfaces, migration/deployment notes and the conflict calculations. This PR is a draft backend foundation; Jackson's portion and full Phase 4 acceptance are **not declared complete**.
+
+## October 30 follow-up — corrected context pack 2.1.1
+
+Jackson supplied the agreed Team 12 tint correction and replacement pack. The active files in `docs/contracts/phase4/` now match all eight archive members byte-for-byte. All seven member checksums in its `SHA256SUMS.txt` were verified before import and by the new regression tests. The replacement ZIP SHA256 is `a23409521dd0f3818fa6871ff6f43816c022d03d527542f89b98593aa62554c0`. The original pack remains in commit `694bb13`.
+
+The tint discrepancy is resolved: `336699/-0.5 → 1A334D`, `336699/+0.5 → 8CB3D9`, with the added `010101/-0.5 → 010101` and `050505/-0.5 → 030303` half-boundary cases retained. The origin of the old values is unverified; floating-point error is only a possible explanation. Exact rational arithmetic in the **test-only pack checker** proves the HSL/half-up values without intermediate rounding or blanket epsilon. Below-half values are separately checked so a rounding tolerance cannot promote them incorrectly.
+
+Pack revision and newly frozen suite target are **2.1.1**. Specification **2.1.0**, ruleset **2.0.0**, report/API formats, and historical records remain unchanged. Hash checks pin the baseline specification, wire schemas and examples to the earlier bytes. No database, production module, existing fixture/answer-key file, retained report or audit was edited.
+
+Fresh follow-up verification:
+
+| Command/check | Actual result |
+|---|---|
+| `python -m pytest -q tests/unit/test_phase4_context_pack.py` | **30 passed**: seven member checksums, version/baseline preservation, full tint inventory, seven exact HSL vectors, six half/below/above-half rounding cases, seven unrounded contrast comparisons, and theme/indexed-palette checks. The same tests against the preceding pack failed 13 cases and passed 17, exposing the intended missing/corrected artifacts. |
+| `python -m pytest -q tests/unit/test_phase4_context_pack.py tests/unit/test_phase4_decisions.py tests/unit/test_phase4_persistence.py tests/unit/test_phase4_reports.py` | **96 passed**, including historical migration/report immutability checks. |
+| `RULESET_VERSION=1.0.0 python -m pytest -q` | **723 passed, 9 failed, 6 skipped**. The same nine tests listed above fail for the same reasons; no new failure appeared. All 124 original Phase 4 backend cases and 30 new artifact cases pass. |
+| Ruff lint/format, strict Linux-target mypy, schema export freshness, synthetic fixture consistency, `git diff --check` | Passed. OpenAPI catalogs remain unchanged. |
+
+The existing runnable independent tester is manifest **1.5.0**, ruleset **1.0.0**. It has not been relabeled as a newly frozen Phase 4 suite. Its unchanged fixture manifest SHA256 is `8c10aee18b7cf3d04b19500b05d1cc68f99afbc1b2965981a899680db973afa1`; its unchanged expectations SHA256 is `892911df6575cabcf5aab87dd304f7403418778f02c1903aa0dddc11da328904`. Individual existing fixture byte hashes remain recorded in that manifest and pass the fixture consistency check.
+
+These are pack/oracle consistency checks, **not production color-rule, theme-resolution, indexed-color engine, or workbook tint acceptance evidence**. No production color helper or executable tester is used to generate expected values. Dylan still needs to exercise the corrected vectors against the real color engine; Dixon still needs independent Phase 4 fixture/handler coverage and individually reported cases under `P4-RULE-COLOR-THEME-TINT`, with executable manifest target 2.1.1. Ryan's UI/final measurement integration and the other acceptance gates remain outstanding. No deployment or merge was performed.
