@@ -1,0 +1,4693 @@
+{
+  "specification_version": "2.1.0",
+  "manifest_version_target": "2.1.0",
+  "ruleset_version": "2.0.0",
+  "artifact_kind": "normative assertion inventory, not an executable suite",
+  "instructions": "Each case maps to an independent check handler, reviewed fixture bytes/oracles, real resource prerequisites and a fixed execution position. Only actually executed hosted cases enter the hosted report. Local and human evidence remains separate. Retained case IDs preserve assertion purpose while all fixture expectations match the declared six-rule ruleset.",
+  "components": {
+    "C1": "Authentication and access",
+    "C2": "Intake and validation",
+    "C3": "Immutable sources and version metadata",
+    "C4": "Six-rule audit engine",
+    "C5": "Durable jobs and audit API",
+    "C6": "Isolated sessions and actual execution measurement",
+    "C7": "Human decisions and remediation",
+    "C8": "Downloads reports and history",
+    "C9": "Review user interface"
+  },
+  "acceptance": {
+    "AC-01": "Intake acceptance",
+    "AC-02": "Input rejection",
+    "AC-03": "Source protection",
+    "AC-04": "Six-rule detection",
+    "AC-05": "Actionable findings",
+    "AC-06": "Human judgment",
+    "AC-07": "Authorized remediation",
+    "AC-08": "Separate downloads",
+    "AC-09": "Preservation including Excel inspection",
+    "AC-10": "Complete report",
+    "AC-11": "Versions audits and status history"
+  },
+  "tests": [
+    {
+      "test_id": "P3-HEALTH",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Public health returns HealthResponse with the expected ruleset. Status 200 and HealthResponse schema evaluated.",
+      "components": [],
+      "acceptance": [],
+      "operations": [
+        1
+      ],
+      "inputs": {},
+      "baseline_check": "health",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUTH-UPLOAD",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Upload without a bearer token is rejected with no accepted IDs. 401 status and strict project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_without_token",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUTH-UPLOAD-INVALID",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Upload with an unknown bearer token is rejected. 401 status and project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_invalid_token",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-MISSING-FILE",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Multipart upload without the file field returns 400. 400 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_missing_file",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-CSV",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "CSV upload returns 415. 415 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_csv",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-MISSING-EXTENSION",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Missing filename extension returns 415. 415 status and strict project error envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_no_extension",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-XLS",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Legacy .xls upload returns 415. 415 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_xls",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-XLSM",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Named .xlsm upload returns 422 MACRO_ENABLED_WORKBOOK_UNSUPPORTED. 422 status, envelope and code evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_xlsm",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-CORRUPT",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Corrupt workbook returns 422 with no accepted identifiers. Status and strict project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_corrupt",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-PROTECTED",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Workbook with password-protected structure returns 422. 422 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_protected",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-BYTES-OVER",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "An upload of 25,000,001 bytes returns 413. 413 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_over_limit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-BYTES-AT",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "A valid workbook of exactly 25,000,000 bytes is accepted. 202 status and UploadResponse evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_at_limit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-SHEETS-OVER",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "A valid workbook with 51 worksheets returns 422. 422 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_worksheets_over",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-SHEETS-AT",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "A valid workbook with exactly 50 worksheets is accepted. 202 status and UploadResponse evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_worksheets_at",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-SHEETS-CHARTSHEET",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "A valid workbook with exactly 50 worksheets plus one chartsheet is accepted; chartsheets do not count toward the worksheet limit (pod contract 1.1). 202 status and UploadResponse evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_worksheets_chartsheet",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-CELLS-OVER",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "A valid workbook with 250,001 nonempty cells returns 422. 422 status and project envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_cells_over",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-CELLS-AT",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "A valid workbook with exactly 250,000 nonempty cells is accepted. 202 status and UploadResponse evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_cells_at",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-UPLOAD-CLEAN",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Clean fixture is accepted with three PROCESSING identifiers. 202 status and UploadResponse evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_clean",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-UPLOAD-SEEDED",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Seeded fixture is accepted with three PROCESSING identifiers. 202 status and UploadResponse evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {},
+      "baseline_check": "upload_seeded",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-VERSION-VALID",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN"
+      ],
+      "qualifying_assertion": "Version metadata matches the upload and the tester's own SHA256. VersionResponse identifiers, fileName and sha256 evaluated.",
+      "components": [
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        4
+      ],
+      "inputs": {},
+      "baseline_check": "version_clean",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-VERSION-UNAUTHENTICATED",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN"
+      ],
+      "qualifying_assertion": "Version read without a bearer token returns 401. 401 status and project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        4
+      ],
+      "inputs": {},
+      "baseline_check": "version_unauthenticated",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-CLEAN",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN"
+      ],
+      "qualifying_assertion": "Clean fixture audit completes with no findings. Terminal AuditResponse status and findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04"
+      ],
+      "operations": [
+        5
+      ],
+      "inputs": {},
+      "baseline_check": "audit_clean",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-SEEDED",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ],
+      "qualifying_assertion": "Seeded audit returns exactly the expected findings in contract order. Terminal status and finding identity/fields/order evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "inputs": {},
+      "baseline_check": "audit_seeded",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-SOURCE-HASH",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-AUDIT-SEEDED"
+      ],
+      "qualifying_assertion": "Source SHA256 is unchanged after auditing. Post-audit VersionResponse sha256 and latestAuditId evaluated.",
+      "components": [
+        "C3"
+      ],
+      "acceptance": [
+        "AC-03"
+      ],
+      "operations": [
+        4
+      ],
+      "inputs": {},
+      "baseline_check": "hash_after_audit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-VERSION-FOREIGN",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ],
+      "qualifying_assertion": "User B cannot read user A's version. 403 status and project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        4
+      ],
+      "inputs": {},
+      "baseline_check": "foreign_owner_forbidden",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-UNAUTHENTICATED",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN"
+      ],
+      "qualifying_assertion": "Audit read without a bearer token returns 401. 401 status and project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        5
+      ],
+      "inputs": {},
+      "baseline_check": "audit_unauthenticated",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-FOREIGN",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ],
+      "qualifying_assertion": "User B cannot read user A's audit. 403 status and project envelope evaluated.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        5
+      ],
+      "inputs": {},
+      "baseline_check": "audit_foreign_owner",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-VERSION-REVIEWER",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ],
+      "qualifying_assertion": "Explicitly granted reviewer reads user A's version. Authorized reviewer 200 status, strict schema, resource IDs and returned metadata evaluated.",
+      "components": [
+        "C1",
+        "C3"
+      ],
+      "acceptance": [],
+      "operations": [
+        4
+      ],
+      "inputs": {},
+      "baseline_check": "reviewer_version",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-REVIEWER",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ],
+      "qualifying_assertion": "Explicitly granted reviewer reads user A's audit. Authorized reviewer 200 status, strict schema, resource IDs and returned metadata evaluated.",
+      "components": [
+        "C1",
+        "C5"
+      ],
+      "acceptance": [],
+      "operations": [
+        5
+      ],
+      "inputs": {},
+      "baseline_check": "reviewer_audit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-NOT-FOUND",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "version-unknown returns 404. 404 status and project error envelope evaluated.",
+      "components": [
+        "C3"
+      ],
+      "acceptance": [],
+      "operations": [
+        4
+      ],
+      "inputs": {
+        "case": "version-unknown"
+      },
+      "baseline_check": "unknown_resources",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-VERSION-MISMATCH",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN",
+        "P3-UPLOAD-SEEDED"
+      ],
+      "qualifying_assertion": "version-mismatch returns 404. 404 status and project error envelope evaluated.",
+      "components": [
+        "C3"
+      ],
+      "acceptance": [],
+      "operations": [
+        4
+      ],
+      "inputs": {
+        "case": "version-mismatch"
+      },
+      "baseline_check": "unknown_resources",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-MISMATCH",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN",
+        "P3-UPLOAD-SEEDED"
+      ],
+      "qualifying_assertion": "audit-mismatch returns 404. 404 status and project error envelope evaluated.",
+      "components": [
+        "C5"
+      ],
+      "acceptance": [],
+      "operations": [
+        5
+      ],
+      "inputs": {
+        "case": "audit-mismatch"
+      },
+      "baseline_check": "unknown_resources",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-UNKNOWN",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-CLEAN",
+        "P3-UPLOAD-SEEDED"
+      ],
+      "qualifying_assertion": "audit-unknown returns 404. 404 status and project error envelope evaluated.",
+      "components": [
+        "C5"
+      ],
+      "acceptance": [],
+      "operations": [
+        5
+      ],
+      "inputs": {
+        "case": "audit-unknown"
+      },
+      "baseline_check": "unknown_resources",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-DETERMINISM",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-AUDIT-SEEDED"
+      ],
+      "qualifying_assertion": "Audit 2 matches the first of five uploads. Semantic findings and within-target message/recommendation compared.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [],
+      "operations": [
+        2,
+        5
+      ],
+      "inputs": {
+        "run": 2
+      },
+      "baseline_check": "determinism",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-DETERMINISM-3",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-AUDIT-SEEDED"
+      ],
+      "qualifying_assertion": "Audit 3 matches the first of five uploads. Semantic findings and within-target message/recommendation compared.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [],
+      "operations": [
+        2,
+        5
+      ],
+      "inputs": {
+        "run": 3
+      },
+      "baseline_check": "determinism",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-DETERMINISM-4",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-AUDIT-SEEDED"
+      ],
+      "qualifying_assertion": "Audit 4 matches the first of five uploads. Semantic findings and within-target message/recommendation compared.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [],
+      "operations": [
+        2,
+        5
+      ],
+      "inputs": {
+        "run": 4
+      },
+      "baseline_check": "determinism",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-DETERMINISM-5",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-AUDIT-SEEDED"
+      ],
+      "qualifying_assertion": "Audit 5 matches the first of five uploads. Semantic findings and within-target message/recommendation compared.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [],
+      "operations": [
+        2,
+        5
+      ],
+      "inputs": {
+        "run": 5
+      },
+      "baseline_check": "determinism",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-SESSION-UNKNOWN",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-SEEDED"
+      ],
+      "qualifying_assertion": "A project call naming an unknown X-Test-Session returns 400. 400 status and project envelope evaluated.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "inputs": {},
+      "baseline_check": "unknown_session_header",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-SESSION-DUPLICATE",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Repeating system setup with an existing session_id returns 409. 409 status and TestEndpointError evaluated.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "inputs": {},
+      "baseline_check": "system_setup_duplicate",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-UPLOAD-UNICODE",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "unicode accepted. 202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "unicode"
+      },
+      "baseline_check": "edge_upload",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-UNICODE",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-UNICODE"
+      ],
+      "qualifying_assertion": "unicode exact findings and limitations. Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "inputs": {
+        "fixture": "unicode"
+      },
+      "baseline_check": "edge_audit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-UPLOAD-REPEATED-IDS",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "repeated_ids accepted. 202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "repeated_ids"
+      },
+      "baseline_check": "edge_upload",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-REPEATED-IDS",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-REPEATED-IDS"
+      ],
+      "qualifying_assertion": "repeated_ids exact findings and limitations. Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "inputs": {
+        "fixture": "repeated_ids"
+      },
+      "baseline_check": "edge_audit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-UPLOAD-MULTIPLE-DRAWINGS",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "multiple_drawings accepted. 202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "multiple_drawings"
+      },
+      "baseline_check": "edge_upload",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-MULTIPLE-DRAWINGS",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-MULTIPLE-DRAWINGS"
+      ],
+      "qualifying_assertion": "multiple_drawings exact findings and limitations. Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "inputs": {
+        "fixture": "multiple_drawings"
+      },
+      "baseline_check": "edge_audit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-UPLOAD-IN-CELL-PICTURE",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "in_cell_picture (in-cell picture with rich-data and cell-image parts) accepted. 202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "in_cell_picture"
+      },
+      "baseline_check": "edge_upload",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-IN-CELL-PICTURE",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-IN-CELL-PICTURE"
+      ],
+      "qualifying_assertion": "in_cell_picture (in-cell picture with rich-data and cell-image parts) exact findings per pod contract 1.1. Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "inputs": {
+        "fixture": "in_cell_picture"
+      },
+      "baseline_check": "edge_audit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-UPLOAD-IMAGE-FORMULA",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "image_formula (IMAGE() formula cell) accepted. 202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "image_formula"
+      },
+      "baseline_check": "edge_upload",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-IMAGE-FORMULA",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-IMAGE-FORMULA"
+      ],
+      "qualifying_assertion": "image_formula (IMAGE() formula cell) exact findings per pod contract 1.1. Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "inputs": {
+        "fixture": "image_formula"
+      },
+      "baseline_check": "edge_audit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-UPLOAD-FORM-CONTROLS",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "form_controls (form control and OLE object in AlternateContent, drawing AlternateContent, group container) accepted. 202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "form_controls"
+      },
+      "baseline_check": "edge_upload",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-FORM-CONTROLS",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-FORM-CONTROLS"
+      ],
+      "qualifying_assertion": "form_controls (form control and OLE object in AlternateContent, drawing AlternateContent, group container) exact findings per pod contract 1.1. Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "inputs": {
+        "fixture": "form_controls"
+      },
+      "baseline_check": "edge_audit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-UPLOAD-VML-COMMENTS",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "vml_comments (legacy VML comment notes) accepted. 202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "vml_comments"
+      },
+      "baseline_check": "edge_upload",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-VML-COMMENTS",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-VML-COMMENTS"
+      ],
+      "qualifying_assertion": "vml_comments (legacy VML comment notes) exact findings per pod contract 1.1. Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05"
+      ],
+      "operations": [
+        5
+      ],
+      "inputs": {
+        "fixture": "vml_comments"
+      },
+      "baseline_check": "edge_audit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-UPLOAD-INACTIVE-PROTECTION",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "inactive_protection (stored sheet password with sheet=\"0\") accepted. 202 and upload identifiers evaluated.",
+      "components": [
+        "C2",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "inactive_protection"
+      },
+      "baseline_check": "edge_upload",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-AUDIT-INACTIVE-PROTECTION",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [
+        "P3-UPLOAD-INACTIVE-PROTECTION"
+      ],
+      "qualifying_assertion": "inactive_protection (stored sheet password with sheet=\"0\") exact findings per pod contract 1.1. Terminal schema/identity and independent expected findings evaluated.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04"
+      ],
+      "operations": [
+        5
+      ],
+      "inputs": {
+        "fixture": "inactive_protection"
+      },
+      "baseline_check": "edge_audit",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-ZIP-TRAVERSAL",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "zip_traversal rejects with no accepted IDs. Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "zip_traversal"
+      },
+      "baseline_check": "rejected_fixture",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-ZIP-DUPLICATE",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "zip_duplicate rejects with no accepted IDs. Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "zip_duplicate"
+      },
+      "baseline_check": "rejected_fixture",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-XML-DTD",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "xml_dtd rejects with no accepted IDs. Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "xml_dtd"
+      },
+      "baseline_check": "rejected_fixture",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-MACRO-PARTS",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "macro_parts rejects with no accepted IDs. Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "macro_parts"
+      },
+      "baseline_check": "rejected_fixture",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-ENCRYPTED-ZIP",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "encrypted_zip rejects with no accepted IDs. Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "encrypted_zip"
+      },
+      "baseline_check": "rejected_fixture",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-PROTECTED-SHEET",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "protected_sheet separately rejected. Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "protected_sheet"
+      },
+      "baseline_check": "rejected_fixture",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P3-INPUT-PROTECTED-STRUCTURE",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "protected_structure separately rejected. Expected rejection status and strict envelope evaluated.",
+      "components": [
+        "C2"
+      ],
+      "acceptance": [
+        "AC-02"
+      ],
+      "operations": [
+        2
+      ],
+      "inputs": {
+        "fixture": "protected_structure"
+      },
+      "baseline_check": "rejected_fixture",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P4-FAULT-SETUP",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Test-admin creates a separate fresh isolated session with setup.faults.audit_failures equal to integer 1; 201 echoes the supplied session_id. Setup does not execute a test or fail an ordinary session. Refused capability is fail, not skip.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "inputs": {
+        "setup": {
+          "faults": {
+            "audit_failures": 1
+          }
+        }
+      }
+    },
+    {
+      "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "clean_all_six"
+      ],
+      "prerequisites": [
+        "P4-FAULT-SETUP"
+      ],
+      "qualifying_assertion": "In the dedicated fault session, accept a valid clean fixture with normal 202 IDs, then observe PROCESSING_FAILED with completedAt, empty findings, TEST_AUDIT_FAILURE and exact specified test-only error details. Verify failed report checksPerformed empty and unchanged downloadable source. This is a required deliberately exercised case, not conditional observation.",
+      "components": [
+        "C3",
+        "C5",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [
+        2,
+        4,
+        5,
+        "S",
+        "R"
+      ],
+      "inputs": {},
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P4-FAULT-RECOVERY",
+      "tier": "hosted_http",
+      "fixtures": [
+        "clean_all_six"
+      ],
+      "prerequisites": [
+        "P3-AUDIT-FAILURE-ENVELOPE"
+      ],
+      "qualifying_assertion": "A manual re-audit of the same accepted version runs normally after one injected failure. Other sessions are unaffected; the historical failed audit/report remains unchanged.",
+      "components": [
+        "C5",
+        "C6"
+      ],
+      "acceptance": [
+        "AC-11"
+      ],
+      "operations": [
+        6,
+        5,
+        10
+      ]
+    },
+    {
+      "test_id": "P3-CODE-REPORT",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "System report returns this session's code coverage (counts and basis, or paired nulls). 200 status and SystemReport evaluated.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "inputs": {},
+      "baseline_check": "system_report",
+      "adaptation": "Use independently reviewed six-rule expectations and Section 9 statuses. Supplemental failure/security/determinism assertions remain outside the eleven-criterion Phase 4 system denominator."
+    },
+    {
+      "test_id": "P4-UPLOAD-ALL-SIX",
+      "tier": "hosted_http",
+      "fixtures": [
+        "seeded_all_six"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "202 UploadResponse with fresh IDs and PROCESSING.",
+      "components": [
+        "C2",
+        "C3",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-01"
+      ],
+      "operations": [
+        2
+      ]
+    },
+    {
+      "test_id": "P4-AUDIT-ALL-SIX",
+      "tier": "hosted_http",
+      "fixtures": [
+        "seeded_all_six"
+      ],
+      "prerequisites": [
+        "P4-UPLOAD-ALL-SIX"
+      ],
+      "qualifying_assertion": "Exact reviewed finding tuples and limitations for all six categories, correctly sorted and hashed.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        5
+      ]
+    },
+    {
+      "test_id": "P4-CLEAN-ALL-SIX",
+      "tier": "hosted_http",
+      "fixtures": [
+        "clean_all_six"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "New clean_all_six upload accepted; completed audit has AUDIT_COMPLETE and zero findings.",
+      "components": [
+        "C2",
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-MANUAL-ONLY-STATUS",
+      "tier": "hosted_http",
+      "fixtures": [
+        "review_only"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "All-manual fixture audit completes REVIEW_REQUIRED, with no advertised APPLY correction.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-HEADER-DECLARED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "table_header_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Formal table with headerRowCount 1 or omitted and distinct matching labels produces no TABLE_HEADER finding.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-HEADER-DISABLED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "header_disabled_table"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Safe formal table with headerRowCount 0 produces one REQUIRES_USER_INPUT at actual tableId target.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-HEADER-BLANK",
+      "tier": "hosted_http",
+      "fixtures": [
+        "table_header_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Formal table with a blank header produces one MANUAL_REVIEW; no label is generated.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-HEADER-DUPLICATE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "table_header_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Casefold/trim duplicate formal header labels produce one MANUAL_REVIEW.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-HEADER-FORMULA",
+      "tier": "hosted_http",
+      "fixtures": [
+        "table_header_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Formula header is MANUAL_REVIEW; cached text does not authorize editing the formula.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-HEADER-DENSE-RANGE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "header_range"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Dense 2x2-or-larger unstructured candidate with safe first-row labels requires explicit header-row input.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-HEADER-SPARSE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "table_header_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Nondense connected candidate is MANUAL_REVIEW with a limitation; disconnected regions are not joined.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-HEADER-TITLE-LIST",
+      "tier": "hosted_http",
+      "fixtures": [
+        "table_header_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Single row, single column, and isolated title do not produce inferred-table findings; scope limitation is present.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-HEADER-HIDDEN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "table_header_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Hidden-sheet tables are inspected using the same criteria.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-MERGE-POPULATED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "merge_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Each populated merge produces one MANUAL_REVIEW at #merge= rectangle; title merges included.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-MERGE-EMPTY",
+      "tier": "hosted_http",
+      "fixtures": [
+        "merge_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Empty and formatting-only merges produce no MERGED_CELLS finding.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-LINK-GENERIC",
+      "tier": "hosted_http",
+      "fixtures": [
+        "link_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Finite vocabulary, whitespace collapse, casefold, and one trailing punctuation mark follow Section 7.6.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-LINK-RAW-ADDRESS",
+      "tier": "hosted_http",
+      "fixtures": [
+        "link_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "http/https/www/mailto labels and exact-destination labels trigger; descriptive text does not.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-LINK-CELL-DISPLAY",
+      "tier": "hosted_http",
+      "fixtures": [
+        "link_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Actual cell text determines the label; a misleading display attribute alone does not mask an ambiguous cell.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-LINK-FORMULA-LITERAL",
+      "tier": "hosted_http",
+      "fixtures": [
+        "link_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "One/two literal HYPERLINK arguments are screened, but any correction remains MANUAL_REVIEW.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-LINK-FORMULA-DYNAMIC",
+      "tier": "hosted_http",
+      "fixtures": [
+        "link_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Computed/localized/unsupported HYPERLINK forms produce MANUAL_REVIEW and a limitation without evaluation.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-LINK-RANGE-DUPLICATE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "link_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Multi-cell and duplicate link representations are MANUAL_REVIEW with distinct indexed locations.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-DEFAULT",
+      "tier": "hosted_http",
+      "fixtures": [
+        "contrast_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Default black/white and a neutral high-contrast pair produce no COLOR_CONTRAST finding.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-LOW-CONTRAST",
+      "tier": "hosted_http",
+      "fixtures": [
+        "contrast_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Low-contrast static pair produces one cell MANUAL_REVIEW; no automatic recoloring.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-LARGE-TEXT",
+      "tier": "hosted_http",
+      "fixtures": [
+        "contrast_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "18pt ordinary and 14pt bold text use 3.0; smaller text uses 4.5.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-BOUNDARY",
+      "tier": "hosted_http",
+      "fixtures": [
+        "contrast_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Use unrounded ratio for comparison; include vectors immediately above and below both thresholds.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-THEME-TINT",
+      "tier": "hosted_http",
+      "fixtures": [
+        "contrast_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Theme indices, HSL tint, and channel rounding match the frozen policy vectors.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-INDEXED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "contrast_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Explicit workbook palette overrides the standard 64-entry indexed palette.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-MEANING",
+      "tier": "hosted_http",
+      "fixtures": [
+        "contrast_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Nonneutral color at adequate contrast still yields one manual color-meaning finding.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-CONDITIONAL",
+      "tier": "hosted_http",
+      "fixtures": [
+        "contrast_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Visual conditional-formatting ranges get manual findings; static results inside them are suppressed.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-UNSUPPORTED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "contrast_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Gradient/pattern/rich text/ambiguous inheritance/table overlay causes disclosure and manual review, not a guessed ratio.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-HIDDEN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "contrast_vectors"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Hidden cells use the same policy and deterministic locations.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-REVIEW-CONTEXT",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "ReviewResponse matches source current values, canonical item order and owner actions; no unknown fields are injected into Finding. Missing alt fields are null and existing values preserved.",
+      "components": [
+        "C7",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07"
+      ],
+      "operations": [
+        "V"
+      ]
+    },
+    {
+      "test_id": "P4-REVIEW-REVIEWER",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Granted reviewer sees current values but allowedActions empty and cannot submit a decision batch.",
+      "components": [
+        "C1",
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06"
+      ],
+      "operations": [
+        "V",
+        7
+      ]
+    },
+    {
+      "test_id": "P4-VERSION-NEW",
+      "tier": "hosted_http",
+      "fixtures": [
+        "clean_all_six",
+        "seeded_all_six"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Owner adds changed bytes with the same filename through operation 3; workbook ID preserved, version/audit IDs fresh, parent null, earlier records unchanged.",
+      "components": [
+        "C2",
+        "C3",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-01",
+        "AC-11"
+      ],
+      "operations": [
+        3,
+        4,
+        5,
+        10
+      ]
+    },
+    {
+      "test_id": "P4-VERSION-SAME-BYTES",
+      "tier": "hosted_http",
+      "fixtures": [
+        "clean_all_six"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Same bytes uploaded as a new version still produce fresh version/audit IDs with the same byte hash.",
+      "components": [
+        "C3"
+      ],
+      "acceptance": [
+        "AC-11"
+      ],
+      "operations": [
+        3,
+        4,
+        10
+      ]
+    },
+    {
+      "test_id": "P4-REAUDIT",
+      "tier": "hosted_http",
+      "fixtures": [
+        "seeded_all_six"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "POST absent body, empty object, and MANUAL_REAUDIT reason on separate trials returns 202; new audit IDs on same version; previous audit/report bytes unchanged.",
+      "components": [
+        "C3",
+        "C5",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-11"
+      ],
+      "operations": [
+        6,
+        5,
+        10,
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-REAUDIT-INVALID",
+      "tier": "hosted_http",
+      "fixtures": [
+        "clean_all_six"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Wrong reason or unknown field returns 400 INVALID_REQUEST; no extra audit.",
+      "components": [
+        "C5"
+      ],
+      "acceptance": [
+        "AC-11"
+      ],
+      "operations": [
+        6,
+        10
+      ]
+    },
+    {
+      "test_id": "P4-REAUDIT-DETERMINISM",
+      "tier": "hosted_http",
+      "fixtures": [
+        "seeded_all_six"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Five manual re-audits return identical findings, limitations, classification, status and within-target prose; IDs/timestamps of audits are fresh.",
+      "components": [
+        "C4",
+        "C5"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-11"
+      ],
+      "operations": [
+        6,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-SOURCE-BEFORE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "preservation_rich"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Authorized source download equals uploaded bytes, not a regenerated workbook; correct media type and disposition.",
+      "components": [
+        "C3",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-03"
+      ],
+      "operations": [
+        "S"
+      ]
+    },
+    {
+      "test_id": "P4-DECISIONS-MIXED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [
+        "P4-AUDIT-ALL-SIX"
+      ],
+      "qualifying_assertion": "Approve one supported correction, decline a second, mark another manual and omit another. Accepted job completes with only the approved edit, unresolved others, coherent output provenance.",
+      "components": [
+        "C7",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-10"
+      ],
+      "operations": [
+        7,
+        8,
+        9,
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-APPLY-ALT",
+      "tier": "hosted_http",
+      "fixtures": [
+        "alt_supported"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Title and description exactly match user input, including Unicode/XML escaping; existing IDs, media, anchors, relationships and all unselected fields unchanged.",
+      "components": [
+        "C7",
+        "C4",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-07",
+        "AC-09"
+      ],
+      "operations": [
+        7,
+        8,
+        9,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-APPLY-RENAME",
+      "tier": "hosted_http",
+      "fixtures": [
+        "rename_references"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "New sheet name and all supported references correctly rewritten; similar strings, literal cell text, formula caches and all other content preserved.",
+      "components": [
+        "C7",
+        "C4",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-07",
+        "AC-09"
+      ],
+      "operations": [
+        7,
+        8,
+        9,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-APPLY-LINK",
+      "tier": "hosted_http",
+      "fixtures": [
+        "link_supported"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Only selected cell label/display changes; reused shared string remains intact for other cells and target relationship is unchanged.",
+      "components": [
+        "C7",
+        "C4",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-07",
+        "AC-09"
+      ],
+      "operations": [
+        7,
+        8,
+        9,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-APPLY-HEADER-RANGE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "header_range"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Exact rectangle becomes valid minimally styled table with selected first header row and deterministic new part/relationship/table IDs; values/formulas/styles unchanged.",
+      "components": [
+        "C7",
+        "C4",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-07",
+        "AC-09"
+      ],
+      "operations": [
+        7,
+        8,
+        9,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-APPLY-HEADER-TABLE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "header_disabled_table"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Only supported disabled header is enabled; no row insertion, data rewriting or unrelated metadata change.",
+      "components": [
+        "C7",
+        "C4",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-07",
+        "AC-09"
+      ],
+      "operations": [
+        7,
+        8,
+        9,
+        5
+      ]
+    },
+    {
+      "test_id": "P4-APPLY-COMBINED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "All four supported edit families apply in deterministic source-target order, including rename on a sheet containing another selected target.",
+      "components": [
+        "C7",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-07",
+        "AC-09"
+      ],
+      "operations": [
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "test_id": "P4-APPLY-STRING-LABEL",
+      "tier": "hosted_http",
+      "fixtures": [
+        "link_supported"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "A hyperlink label starting with = is an explicit inline string, never a new formula.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-07",
+        "AC-09"
+      ],
+      "operations": [
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "test_id": "P4-APPLY-NO-EDITS",
+      "tier": "hosted_http",
+      "fixtures": [
+        "review_only"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "All DECLINE/manual batch creates a separate version and output with byte-identical bytes, zero approvedChanges and unresolved findings.",
+      "components": [
+        "C7",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-08",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        8,
+        9,
+        10,
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-EMPTY",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": {
+          "auditId": "current",
+          "decisions": []
+        }
+      }
+    },
+    {
+      "test_id": "P4-REJECT-UNKNOWN-FIELD",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "extra envelope or decision field"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-DUPLICATE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "400 ProjectError code DUPLICATE_DECISION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "same findingId twice"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-UNKNOWN-FINDING",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError code FINDING_NOT_FOUND; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "well-formed findingId absent from selected audit"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-CROSS-AUDIT-FINDING",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError code FINDING_NOT_FOUND; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "finding belongs to a different audit/version"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-STALE-AUDIT",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "409 ProjectError code STALE_AUDIT; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "prior successful audit after newer completed audit"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-AUDIT-PROCESSING",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "409 ProjectError code ACTIVE_OPERATION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "current source audit not terminal"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-AUDIT-FAILED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "409 ProjectError code AUDIT_NOT_READY; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "latest audit failed"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-VALUE-MISSING",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "400 ProjectError code MISSING_VALUE; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "APPLY omits value"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-VALUE-WRONG-SHAPE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "APPLY uses a string, wrong object type, unknown value field, or null"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-VALUE-ON-DECLINE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "DECLINE or MANUAL_REVIEW supplies value"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-ALT-BLANK",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "whitespace-only title or description"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-ALT-TOO-LONG",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "title >200 or description >800 code points"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-NAME-INVALID",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "overlong, untrimmed, forbidden character, generic, History, case-only, unchanged, or duplicate name"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-NAME-SWAP",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "422 ProjectError code CONFLICTING_CORRECTIONS; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "two requested names swap or reuse another source sheet name"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-LINK-AMBIGUOUS",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "replacement label still matches ambiguous predicate"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-HEADER-ROW",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "wrong absolute row, boolean row, replacement labels or unsupported range"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-MANUAL-APPLY",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "APPLY to manual/decorative/duplicate-ID/color/merge/formula-link/unsafe-rename"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-MISSING-KEY",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "400 ProjectError code IDEMPOTENCY_KEY_REQUIRED; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "Idempotency-Key absent or malformed"
+      }
+    },
+    {
+      "test_id": "P4-REJECT-DECISIONS-OVER",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "inputs": {
+        "condition": "1001 decisions"
+      }
+    },
+    {
+      "test_id": "P4-BATCH-ATOMIC-REJECTION",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "One valid APPLY plus one invalid decision rejects entire batch; the valid edit is not applied.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-07",
+        "AC-09"
+      ],
+      "operations": [
+        7,
+        9,
+        10
+      ]
+    },
+    {
+      "test_id": "P4-IDEMPOTENCY-REPLAY",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Identical valid key/body returns exact original 202 body while pending and after completion; reordered decisions/object keys are equivalent; exactly one job/output.",
+      "components": [
+        "C7",
+        "C3"
+      ],
+      "acceptance": [
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        8,
+        10
+      ]
+    },
+    {
+      "test_id": "P4-IDEMPOTENCY-CONFLICT",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Same scope/key with changed valid body returns 409 IDEMPOTENCY_CONFLICT; first operation unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        8,
+        10
+      ]
+    },
+    {
+      "test_id": "P4-IDEMPOTENCY-INVALID-FIRST",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Rejected invalid request does not consume key; corrected valid body with same key can be accepted.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-07"
+      ],
+      "operations": [
+        7
+      ]
+    },
+    {
+      "test_id": "P4-OUTPUT-HASH",
+      "tier": "hosted_http",
+      "fixtures": [
+        "preservation_rich"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Downloaded output equals version source download, matches output-version metadata hash, has correct type/filename and stable repeated bytes.",
+      "components": [
+        "C3",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-03",
+        "AC-08",
+        "AC-09"
+      ],
+      "operations": [
+        4,
+        9,
+        "S"
+      ]
+    },
+    {
+      "test_id": "P4-SOURCE-AFTER",
+      "tier": "hosted_http",
+      "fixtures": [
+        "preservation_rich"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Source bytes/hash and historical audits/reports are identical before/after remediation and repeated downloads.",
+      "components": [
+        "C3",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-03",
+        "AC-09",
+        "AC-11"
+      ],
+      "operations": [
+        4,
+        5,
+        9,
+        "S",
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-PRESERVATION",
+      "tier": "hosted_http",
+      "fixtures": [
+        "preservation_rich"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Independent package comparator finds exactly the approved differences, covering the complete Section 11 inventory including opaque untouched part bytes.",
+      "components": [
+        "C7",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-09"
+      ],
+      "operations": [
+        9,
+        "S"
+      ]
+    },
+    {
+      "test_id": "P4-OUTPUT-AUDIT",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Successful output has a completed six-rule audit against output bytes and current ruleset, corrected supported findings absent, declined/unselected findings retained semantically.",
+      "components": [
+        "C4",
+        "C5",
+        "C7"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-07",
+        "AC-10"
+      ],
+      "operations": [
+        5,
+        8
+      ]
+    },
+    {
+      "test_id": "P4-REPORT-COMPLETE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Downloaded JSON validates AuditReport, six checks and exact findings/decisions/applied/unresolved/manual/limitations/provenance match actual records.",
+      "components": [
+        "C8"
+      ],
+      "acceptance": [
+        "AC-08",
+        "AC-10"
+      ],
+      "operations": [
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-REPORT-STABLE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Repeated report downloads are byte-identical; later decisions/re-audits do not rewrite the earlier report.",
+      "components": [
+        "C8"
+      ],
+      "acceptance": [
+        "AC-10",
+        "AC-11"
+      ],
+      "operations": [
+        "R",
+        6,
+        7
+      ]
+    },
+    {
+      "test_id": "P4-HISTORY",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "History arrays follow creation/acceptance sequence, preserve distinct same-filename uploads, derived parent, all audits, statuses and failed audit records.",
+      "components": [
+        "C3",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-11"
+      ],
+      "operations": [
+        3,
+        6,
+        7,
+        10
+      ]
+    },
+    {
+      "test_id": "P4-REMEDIATED-STATUS",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Generated version status REMEDIATED can coexist with an audit requiring review; no compliant status appears.",
+      "components": [
+        "C3",
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-11"
+      ],
+      "operations": [
+        4,
+        5,
+        8,
+        10
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-NEW-VERSION-UNAUTHENTICATED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under unauthenticated conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        3
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-NEW-VERSION-INVALID-TOKEN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under invalid-token conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        3
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-NEW-VERSION-FOREIGN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 ProjectError under foreign conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        3
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-NEW-VERSION-UNKNOWN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under unknown conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        3
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-NEW-VERSION-WRONG-NAMESPACE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under wrong-namespace conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        3
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-NEW-VERSION-REVIEWER-WRITE-REFUSED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Explicitly granted read-only reviewer receives 403; role alone is not sufficient.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        3
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REAUDIT-UNAUTHENTICATED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under unauthenticated conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        6
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REAUDIT-INVALID-TOKEN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under invalid-token conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        6
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REAUDIT-FOREIGN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 ProjectError under foreign conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        6
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REAUDIT-UNKNOWN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under unknown conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        6
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REAUDIT-WRONG-NAMESPACE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under wrong-namespace conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        6
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REAUDIT-REVIEWER-WRITE-REFUSED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Explicitly granted read-only reviewer receives 403; role alone is not sufficient.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        6
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-DECISIONS-UNAUTHENTICATED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under unauthenticated conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        7
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-DECISIONS-INVALID-TOKEN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under invalid-token conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        7
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-DECISIONS-FOREIGN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 ProjectError under foreign conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        7
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-DECISIONS-UNKNOWN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under unknown conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        7
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-DECISIONS-WRONG-NAMESPACE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under wrong-namespace conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        7
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-DECISIONS-REVIEWER-WRITE-REFUSED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Explicitly granted read-only reviewer receives 403; role alone is not sufficient.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        7
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-UNAUTHENTICATED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under unauthenticated conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        8
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-INVALID-TOKEN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under invalid-token conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        8
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-FOREIGN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 ProjectError under foreign conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        8
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-UNKNOWN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under unknown conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        8
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-WRONG-NAMESPACE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under wrong-namespace conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        8
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-REVIEWER-READ",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Explicitly granted read-only reviewer receives 200; role alone is not sufficient.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        8
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-UNAUTHENTICATED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under unauthenticated conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        9
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-INVALID-TOKEN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under invalid-token conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        9
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-FOREIGN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 ProjectError under foreign conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        9
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-UNKNOWN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under unknown conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        9
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-WRONG-NAMESPACE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under wrong-namespace conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        9
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-REVIEWER-READ",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Explicitly granted read-only reviewer receives 200; role alone is not sufficient.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        9
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-HISTORY-UNAUTHENTICATED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under unauthenticated conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        10
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-HISTORY-INVALID-TOKEN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under invalid-token conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        10
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-HISTORY-FOREIGN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 ProjectError under foreign conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        10
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-HISTORY-UNKNOWN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under unknown conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        10
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-HISTORY-WRONG-NAMESPACE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under wrong-namespace conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        10
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-HISTORY-REVIEWER-READ",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Explicitly granted read-only reviewer receives 200; role alone is not sufficient.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        10
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-SOURCE-UNAUTHENTICATED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under unauthenticated conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "S"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-SOURCE-INVALID-TOKEN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under invalid-token conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "S"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-SOURCE-FOREIGN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 ProjectError under foreign conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "S"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-SOURCE-UNKNOWN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under unknown conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "S"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-SOURCE-WRONG-NAMESPACE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under wrong-namespace conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "S"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-SOURCE-REVIEWER-READ",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Explicitly granted read-only reviewer receives 200; role alone is not sufficient.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "S"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REPORT-UNAUTHENTICATED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under unauthenticated conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REPORT-INVALID-TOKEN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under invalid-token conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REPORT-FOREIGN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 ProjectError under foreign conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REPORT-UNKNOWN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under unknown conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REPORT-WRONG-NAMESPACE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under wrong-namespace conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REPORT-REVIEWER-READ",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Explicitly granted read-only reviewer receives 200; role alone is not sufficient.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REVIEW-UNAUTHENTICATED",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under unauthenticated conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "V"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REVIEW-INVALID-TOKEN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "401 ProjectError under invalid-token conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "V"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REVIEW-FOREIGN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 ProjectError under foreign conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "V"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REVIEW-UNKNOWN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under unknown conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "V"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REVIEW-WRONG-NAMESPACE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "404 ProjectError under wrong-namespace conditions; no artifact leakage or mutation. Use schema-valid IDs/values and a valid key when testing authentication.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "V"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REVIEW-REVIEWER-READ",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "Explicitly granted read-only reviewer receives 200; role alone is not sufficient.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "V"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-NEW-VERSION-TEST-ADMIN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 FORBIDDEN: test-admin credentials do not authorize business data access or writes.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        3
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REAUDIT-TEST-ADMIN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 FORBIDDEN: test-admin credentials do not authorize business data access or writes.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        6
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-DECISIONS-TEST-ADMIN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 FORBIDDEN: test-admin credentials do not authorize business data access or writes.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        7
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-TEST-ADMIN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 FORBIDDEN: test-admin credentials do not authorize business data access or writes.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        8
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-TEST-ADMIN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 FORBIDDEN: test-admin credentials do not authorize business data access or writes.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        9
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-HISTORY-TEST-ADMIN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 FORBIDDEN: test-admin credentials do not authorize business data access or writes.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        10
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-SOURCE-TEST-ADMIN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 FORBIDDEN: test-admin credentials do not authorize business data access or writes.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "S"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REPORT-TEST-ADMIN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 FORBIDDEN: test-admin credentials do not authorize business data access or writes.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "R"
+      ]
+    },
+    {
+      "test_id": "P4-ACCESS-REVIEW-TEST-ADMIN",
+      "tier": "hosted_http",
+      "fixtures": [
+        "mixed_decisions"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "403 FORBIDDEN: test-admin credentials do not authorize business data access or writes.",
+      "components": [
+        "C1"
+      ],
+      "acceptance": [],
+      "operations": [
+        "V"
+      ]
+    },
+    {
+      "test_id": "P4-DOWNLOAD-LARGE",
+      "tier": "hosted_http",
+      "fixtures": [
+        "large_preservation"
+      ],
+      "prerequisites": [],
+      "qualifying_assertion": "An accepted source/output over 2 MiB downloads successfully within the new binary limit; no legacy target-client truncation.",
+      "components": [
+        "C8"
+      ],
+      "acceptance": [
+        "AC-08",
+        "AC-09"
+      ],
+      "operations": [
+        9,
+        "S"
+      ]
+    },
+    {
+      "test_id": "P4-SESSION-COVERAGE",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "System report returns only this session actual code coverage or paired nulls with scope; repeated retrieval does not execute/reset work.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-SESSION-CLEANUP",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Later caller-owned cleanup removes this inactive session’s sources, outputs, jobs, keys and measurements, while another session and ordinary data remain accessible.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-REPORT-FORMAT",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Every planned hosted ID appears once in order; source exists exactly for error outcomes, coverage types/counts valid; stored report stable.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-FAULT-AUTH",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "User/reviewer credentials cannot configure faults through system setup; return testing 403, while absent/invalid credentials return 401, with no new runnable namespace.",
+      "components": [
+        "C1",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-FAULT-INVALID",
+      "tier": "hosted_http",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace.",
+      "components": [
+        "C1",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-FAULT-DISABLED",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "A deployment with its trusted fault switch disabled rejects valid fault setup with testing 403 source system. Faults never affect ordinary data, another namespace, or output-remediation audits. Assignment/consumption is atomic and persists across restart.",
+      "components": [
+        "C1",
+        "C5",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-CONCURRENT-AUDIT",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Concurrent audit versus remediation on one version has exactly one acceptance and a 409 ACTIVE_OPERATION; rejected request has no side effects.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-CONCURRENT-KEY",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Concurrent same-key submissions reserve exactly one durable remediation and return the same acceptance response.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-WORKER-TIMEOUT",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Enforced worker deadline gives PROCESSING_FAILED/PROCESSING_TIMEOUT, no published candidate, retained source and error.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-WORKER-LOSS",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Worker crash/lease expiry transitions accepted job to failure and prevents a late worker from publishing.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-PRESERVATION-FAILURE",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Injected unapproved semantic change causes PRESERVATION_FAILED with no successful output/version.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-OUTPUT-AUDIT-FAILURE",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Candidate audit failure causes OUTPUT_AUDIT_FAILED and no published output.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-STORAGE-FAILURE",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Blob or transaction failure has compensating cleanup and no successful partial output.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-SOURCE-CORRUPTION",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "A checksum mismatch returns/finalizes SOURCE_INTEGRITY_FAILED; no alternate bytes or false success.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-OUTPUT-BOUND",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Candidate larger than upload/ZIP/result bounds fails controlled without truncation.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-NOT-READY",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Known unpublished output and processing report return specified 409 envelopes.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-STATE-TRANSITIONS",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Exercise all Section 9 processing/completion/failure transitions, including generated version re-audit.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-MIGRATION",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Database migration preserves legacy source/audits/test reports and rejects a false six-rule backfill.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-RESTART",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Restart API/worker/tester without losing committed output, keys, reports, histories or measurements.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-CLEANUP-ACTIVE",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Cleanup of active/foreign namespace is refused atomically and never selects ordinary records.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-REVIEWER-NO-GRANT",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Reviewer role without an explicit owner grant cannot access artifacts.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-FIXTURE-SNAPSHOT",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Changed fixture hash prevents setup; a prepared session uses its immutable plan and byte snapshot.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-TESTER-ABORT",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Tester abort stores completed results, one interrupted tester error, remaining skips and a retrievable final report.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-TESTER-LOST-RESPONSE",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Lost run response is recovered by report GET without another run POST.",
+      "components": [
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-PALETTE-VECTORS",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Independent indexed/theme/tint vectors and contrast calculations agree with frozen constants.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-XML-ESCAPING",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Text containing Unicode, XML metacharacters, tabs/newlines and literal OOXML escape-looking text round-trips without changing meaning.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-NAMING-COLLISIONS",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Header table/part/relationship/name allocations use the exact lowest-free deterministic rules.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-SCHEMA-NEGATIVES",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Required nulls, unknown fields, illegal enums, source-only-on-error and state coherence are enforced.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-LOCAL-LOGGING",
+      "tier": "local_integration",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "The actual deployed worker entry point emits audit/remediation terminal events with safe IDs, stages and durations, without tokens or workbook contents.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-MANUAL-EXCEL-ALT",
+      "tier": "manual_release",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Open every supported alt-edit output in Microsoft Excel; no repair warning; verify no unexplained changes.",
+      "components": [],
+      "acceptance": [
+        "AC-09"
+      ],
+      "operations": []
+    },
+    {
+      "test_id": "P4-MANUAL-EXCEL-RENAME",
+      "tier": "manual_release",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Open supported reference-heavy rename outputs; no repair warning or stale references.",
+      "components": [],
+      "acceptance": [
+        "AC-09"
+      ],
+      "operations": []
+    },
+    {
+      "test_id": "P4-MANUAL-EXCEL-LINK",
+      "tier": "manual_release",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Open simple/shared-string hyperlink edit outputs; correct displayed label and unchanged target.",
+      "components": [],
+      "acceptance": [
+        "AC-09"
+      ],
+      "operations": []
+    },
+    {
+      "test_id": "P4-MANUAL-EXCEL-HEADER",
+      "tier": "manual_release",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Open new-table and enabled-header outputs; no repair warning, correct table header, unchanged body.",
+      "components": [],
+      "acceptance": [
+        "AC-09"
+      ],
+      "operations": []
+    },
+    {
+      "test_id": "P4-MANUAL-REAL-WORKBOOKS",
+      "tier": "manual_release",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "At least five de-identified real workbooks; review per-rule precision >=90% or report not estimable; seeded detection separately complete.",
+      "components": [],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-MANUAL-REAL-DETERMINISM",
+      "tier": "manual_release",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Audit each real-world workbook five times with identical results and disclosed limits.",
+      "components": [],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-MANUAL-UI-REVIEW",
+      "tier": "manual_release",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Keyboard-based upload/audit/decision/output/history workflow, proper labels/focus/text errors; reviewer read-only; no preapproved edits.",
+      "components": [
+        "C9"
+      ],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-MANUAL-PROSE-REVIEW",
+      "tier": "manual_release",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Independent reviewers confirm finding explanations and recommendations accurately describe seeded issues.",
+      "components": [],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-MANUAL-POD-FIXTURE-REVIEW",
+      "tier": "manual_release",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Each implementation answer key is reviewed by two members of the other implementation team, with recorded byte hashes, exact findings, expected edits and preservation differences.",
+      "components": [],
+      "acceptance": [],
+      "operations": []
+    },
+    {
+      "test_id": "P4-MANUAL-RECIPROCAL-RUNS",
+      "tier": "manual_release",
+      "fixtures": [],
+      "prerequisites": [],
+      "qualifying_assertion": "Retain both tester-to-other-system directions with actual revisions/counts/artifacts and triaged mismatch ownership.",
+      "components": [],
+      "acceptance": [],
+      "operations": []
+    }
+  ],
+  "counts_by_tier": {
+    "hosted_http": 215,
+    "local_integration": 24,
+    "manual_release": 10
+  },
+  "runtime_note": "Current inventory count is an authored requirement count, not executed test evidence. Expand grouped negative vectors into individual result IDs in the final executable manifest; freeze exact count before cross-testing. Do not change the instructor response shape."
+}

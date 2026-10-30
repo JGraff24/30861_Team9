@@ -1,0 +1,354 @@
+{
+  "specification_version": "2.1.0",
+  "notice": "Policy constants and calculated mathematical vectors. These are not executed workbook-suite results and do not identify fixture byte hashes.",
+  "white_space_codepoints": [
+    "U+0009",
+    "U+000A",
+    "U+000B",
+    "U+000C",
+    "U+000D",
+    "U+0020",
+    "U+0085",
+    "U+00A0",
+    "U+1680",
+    "U+2000",
+    "U+2001",
+    "U+2002",
+    "U+2003",
+    "U+2004",
+    "U+2005",
+    "U+2006",
+    "U+2007",
+    "U+2008",
+    "U+2009",
+    "U+200A",
+    "U+2028",
+    "U+2029",
+    "U+202F",
+    "U+205F",
+    "U+3000"
+  ],
+  "generic_names": [
+    {
+      "name": "Sheet1",
+      "triggers": true
+    },
+    {
+      "name": "sheet2",
+      "triggers": true
+    },
+    {
+      "name": "Sheet01",
+      "triggers": true
+    },
+    {
+      "name": " Sheet3 ",
+      "triggers": true
+    },
+    {
+      "name": "Sheet0",
+      "triggers": false
+    },
+    {
+      "name": "Sheet",
+      "triggers": false
+    },
+    {
+      "name": "Sheet١",
+      "triggers": false
+    },
+    {
+      "name": "Expenses",
+      "triggers": false
+    },
+    {
+      "name": "Sheet1​",
+      "triggers": false
+    }
+  ],
+  "ambiguous_labels": [
+    {
+      "label": " click HERE! ",
+      "destination": "https://example.edu",
+      "triggers": true
+    },
+    {
+      "label": "Annual accessibility report",
+      "destination": "https://example.edu",
+      "triggers": false
+    },
+    {
+      "label": "https://example.edu",
+      "destination": "https://other.example.edu",
+      "triggers": true
+    },
+    {
+      "label": "www.example.edu",
+      "destination": "https://example.edu",
+      "triggers": true
+    },
+    {
+      "label": "mailto:staff@example.edu",
+      "destination": "mailto:staff@example.edu",
+      "triggers": true
+    },
+    {
+      "label": "example.edu",
+      "destination": "example.edu",
+      "triggers": true
+    },
+    {
+      "label": "Reference link description",
+      "destination": "https://example.edu",
+      "triggers": false
+    }
+  ],
+  "theme_index_names": [
+    "lt1",
+    "dk1",
+    "lt2",
+    "dk2",
+    "accent1",
+    "accent2",
+    "accent3",
+    "accent4",
+    "accent5",
+    "accent6",
+    "hlink",
+    "folHlink"
+  ],
+  "default_indexed_rgb": [
+    "000000",
+    "FFFFFF",
+    "FF0000",
+    "00FF00",
+    "0000FF",
+    "FFFF00",
+    "FF00FF",
+    "00FFFF",
+    "000000",
+    "FFFFFF",
+    "FF0000",
+    "00FF00",
+    "0000FF",
+    "FFFF00",
+    "FF00FF",
+    "00FFFF",
+    "800000",
+    "008000",
+    "000080",
+    "808000",
+    "800080",
+    "008080",
+    "C0C0C0",
+    "808080",
+    "9999FF",
+    "993366",
+    "FFFFCC",
+    "CCFFFF",
+    "660066",
+    "FF8080",
+    "0066CC",
+    "CCCCFF",
+    "000080",
+    "FF00FF",
+    "FFFF00",
+    "00FFFF",
+    "800080",
+    "800000",
+    "008080",
+    "0000FF",
+    "00CCFF",
+    "CCFFFF",
+    "CCFFCC",
+    "FFFF99",
+    "99CCFF",
+    "FF99CC",
+    "CC99FF",
+    "FFCC99",
+    "3366FF",
+    "33CCCC",
+    "99CC00",
+    "FFCC00",
+    "FF9900",
+    "FF6600",
+    "666699",
+    "969696",
+    "003366",
+    "339966",
+    "003300",
+    "333300",
+    "993300",
+    "993366",
+    "333399",
+    "333333"
+  ],
+  "contrast": [
+    {
+      "font_rgb": "000000",
+      "fill_rgb": "FFFFFF",
+      "ratio": 21.0,
+      "passes_normal": true,
+      "passes_large": true,
+      "has_nonneutral_color": false
+    },
+    {
+      "font_rgb": "FFFFFF",
+      "fill_rgb": "FFFFFF",
+      "ratio": 1.0,
+      "passes_normal": false,
+      "passes_large": false,
+      "has_nonneutral_color": false
+    },
+    {
+      "font_rgb": "777777",
+      "fill_rgb": "FFFFFF",
+      "ratio": 4.478089453577214,
+      "passes_normal": false,
+      "passes_large": true,
+      "has_nonneutral_color": false
+    },
+    {
+      "font_rgb": "767676",
+      "fill_rgb": "FFFFFF",
+      "ratio": 4.542224959605253,
+      "passes_normal": true,
+      "passes_large": true,
+      "has_nonneutral_color": false
+    },
+    {
+      "font_rgb": "959595",
+      "fill_rgb": "FFFFFF",
+      "ratio": 2.9953461357088114,
+      "passes_normal": false,
+      "passes_large": false,
+      "has_nonneutral_color": false
+    },
+    {
+      "font_rgb": "949494",
+      "fill_rgb": "FFFFFF",
+      "ratio": 3.0334698257384747,
+      "passes_normal": false,
+      "passes_large": true,
+      "has_nonneutral_color": false
+    },
+    {
+      "font_rgb": "FF0000",
+      "fill_rgb": "FFFFFF",
+      "ratio": 3.9984767707539985,
+      "passes_normal": false,
+      "passes_large": true,
+      "has_nonneutral_color": true
+    }
+  ],
+  "tint": [
+    {
+      "base_rgb": "336699",
+      "tint": -1,
+      "expected_rgb": "000000"
+    },
+    {
+      "base_rgb": "336699",
+      "tint": -0.5,
+      "expected_rgb": "19334D"
+    },
+    {
+      "base_rgb": "336699",
+      "tint": 0,
+      "expected_rgb": "336699"
+    },
+    {
+      "base_rgb": "336699",
+      "tint": 0.5,
+      "expected_rgb": "8CB2D9"
+    },
+    {
+      "base_rgb": "336699",
+      "tint": 1,
+      "expected_rgb": "FFFFFF"
+    }
+  ],
+  "identity_vectors": [
+    {
+      "input": [
+        "0000000000000000000000000000000000000000000000000000000000000000",
+        "2.0.0",
+        "ALT_TEXT",
+        "Expenses",
+        "xl/drawings/drawing1.xml#id=7"
+      ],
+      "compact_utf8_text": "[\"0000000000000000000000000000000000000000000000000000000000000000\",\"2.0.0\",\"ALT_TEXT\",\"Expenses\",\"xl/drawings/drawing1.xml#id=7\"]",
+      "expected": "cb2c9e338057c073a33cf03ec43085470810c3cfa4d62f5a5afd9df388f37b3e"
+    },
+    {
+      "input": [
+        "0000000000000000000000000000000000000000000000000000000000000000",
+        "2.0.0",
+        "ALT_TEXT",
+        "Dépenses 📊",
+        "xl/drawings/drawing1.xml#id=7"
+      ],
+      "compact_utf8_text": "[\"0000000000000000000000000000000000000000000000000000000000000000\",\"2.0.0\",\"ALT_TEXT\",\"Dépenses 📊\",\"xl/drawings/drawing1.xml#id=7\"]",
+      "expected": "0e649325952b60274320b6b2bef5778d13b2677330caea10f20cc9f9dce2c304"
+    },
+    {
+      "input": [
+        "0000000000000000000000000000000000000000000000000000000000000000",
+        "2.0.0",
+        "ALT_TEXT",
+        "Dépenses 📊",
+        "xl/drawings/drawing1.xml#id=7"
+      ],
+      "compact_utf8_text": "[\"0000000000000000000000000000000000000000000000000000000000000000\",\"2.0.0\",\"ALT_TEXT\",\"Dépenses 📊\",\"xl/drawings/drawing1.xml#id=7\"]",
+      "expected": "3fd4f9b41173d0702c18b219f6a87b98d3fa53431001eca7c1cc063a5896788d"
+    }
+  ],
+  "header_components": [
+    {
+      "description": "dense safe 2 by 2 candidate",
+      "cells": {
+        "A1": "Name",
+        "B1": "Score",
+        "A2": "Ada",
+        "B2": 9
+      },
+      "existing_tables": [],
+      "expected_target_suffix": "#range=A1:B2",
+      "expected_classification": "REQUIRES_USER_INPUT"
+    },
+    {
+      "description": "diagonal contact is separate components",
+      "cells": {
+        "A1": "Name",
+        "B2": 9
+      },
+      "existing_tables": [],
+      "expected_table_findings": []
+    },
+    {
+      "description": "single row is not an inferred table",
+      "cells": {
+        "A1": "Name",
+        "B1": "Score"
+      },
+      "existing_tables": [],
+      "expected_table_findings": []
+    },
+    {
+      "description": "connected sparse 2 by 2 is manual",
+      "cells": {
+        "A1": "Name",
+        "B1": "Score",
+        "A2": "Ada"
+      },
+      "existing_tables": [],
+      "expected_target_suffix": "#range=A1:B2",
+      "expected_classification": "MANUAL_REVIEW"
+    }
+  ],
+  "duplicate_id_targets": [
+    "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[1]/pic[1]",
+    "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[2]/pic[1]"
+  ],
+  "duplicate_id_note": "Applies to a drawing with two twoCellAnchor siblings containing pic elements with the same cNvPr id; other source layouts require their actual indexed paths."
+}

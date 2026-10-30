@@ -2,8 +2,8 @@
   "openapi": "3.1.1",
   "info": {
     "title": "Team 9 system",
-    "description": "Integrated Phase 3 workbook auditing and testing service.",
-    "version": "0.3.0"
+    "description": "Phase 4 backend contracts and durable workbook operations. Engine capability is checked at runtime.",
+    "version": "0.4.0"
   },
   "paths": {
     "/api/v1/health": {
@@ -19,6 +19,17 @@
                   "$ref": "#/components/schemas/HealthResponse"
                 }
               }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
             }
           },
           "503": {
@@ -29,36 +40,27 @@
                   "$ref": "#/components/schemas/ProjectError"
                 }
               }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/api/v1/workbooks": {
       "post": {
         "summary": "Upload",
         "operationId": "upload_api_v1_workbooks_post",
-        "parameters": [
-          {
-            "name": "x-test-session",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 64,
-                  "pattern": "^[A-Za-z0-9_-]+$"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Test-Session"
-            }
-          }
-        ],
         "responses": {
           "202": {
             "description": "Successful Response",
@@ -66,6 +68,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
                 }
               }
             }
@@ -78,7 +91,18 @@
                 }
               }
             },
-            "description": "Bad Request"
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "401": {
             "content": {
@@ -88,7 +112,18 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "403": {
             "content": {
@@ -98,7 +133,18 @@
                 }
               }
             },
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "404": {
             "content": {
@@ -108,7 +154,39 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "413": {
             "content": {
@@ -118,7 +196,18 @@
                 }
               }
             },
-            "description": "Request Entity Too Large"
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "415": {
             "content": {
@@ -128,7 +217,18 @@
                 }
               }
             },
-            "description": "Unsupported Media Type"
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "422": {
             "content": {
@@ -138,7 +238,18 @@
                 }
               }
             },
-            "description": "Unprocessable Entity"
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "500": {
             "content": {
@@ -148,7 +259,18 @@
                 }
               }
             },
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "503": {
             "content": {
@@ -158,7 +280,322 @@
                 }
               }
             },
-            "description": "Service Unavailable"
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Test-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workbooks/{workbookId}/versions": {
+      "post": {
+        "summary": "Upload Version",
+        "operationId": "upload_version_api_v1_workbooks__workbookId__versions_post",
+        "parameters": [
+          {
+            "name": "workbookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workbookid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "X-Test-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -199,10 +636,10 @@
             "required": true,
             "schema": {
               "type": "string",
+              "title": "Workbookid",
               "minLength": 1,
               "maxLength": 64,
-              "pattern": "^[A-Za-z0-9_-]+$",
-              "title": "Workbookid"
+              "pattern": "^[A-Za-z0-9_-]+$"
             }
           },
           {
@@ -211,30 +648,23 @@
             "required": true,
             "schema": {
               "type": "string",
+              "title": "Versionid",
               "minLength": 1,
               "maxLength": 64,
-              "pattern": "^[A-Za-z0-9_-]+$",
-              "title": "Versionid"
+              "pattern": "^[A-Za-z0-9_-]+$"
             }
           },
           {
-            "name": "x-test-session",
+            "name": "X-Test-Session",
             "in": "header",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 64,
-                  "pattern": "^[A-Za-z0-9_-]+$"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Test-Session"
-            }
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
           }
         ],
         "responses": {
@@ -244,6 +674,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VersionResponse"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
                 }
               }
             }
@@ -256,7 +697,18 @@
                 }
               }
             },
-            "description": "Bad Request"
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "401": {
             "content": {
@@ -266,7 +718,18 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "403": {
             "content": {
@@ -276,7 +739,18 @@
                 }
               }
             },
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "404": {
             "content": {
@@ -286,7 +760,39 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "413": {
             "content": {
@@ -296,7 +802,18 @@
                 }
               }
             },
-            "description": "Request Entity Too Large"
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "415": {
             "content": {
@@ -306,7 +823,18 @@
                 }
               }
             },
-            "description": "Unsupported Media Type"
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "422": {
             "content": {
@@ -316,7 +844,18 @@
                 }
               }
             },
-            "description": "Unprocessable Entity"
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "500": {
             "content": {
@@ -326,7 +865,18 @@
                 }
               }
             },
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "503": {
             "content": {
@@ -336,7 +886,18 @@
                 }
               }
             },
-            "description": "Service Unavailable"
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -357,10 +918,10 @@
             "required": true,
             "schema": {
               "type": "string",
+              "title": "Workbookid",
               "minLength": 1,
               "maxLength": 64,
-              "pattern": "^[A-Za-z0-9_-]+$",
-              "title": "Workbookid"
+              "pattern": "^[A-Za-z0-9_-]+$"
             }
           },
           {
@@ -369,10 +930,10 @@
             "required": true,
             "schema": {
               "type": "string",
+              "title": "Versionid",
               "minLength": 1,
               "maxLength": 64,
-              "pattern": "^[A-Za-z0-9_-]+$",
-              "title": "Versionid"
+              "pattern": "^[A-Za-z0-9_-]+$"
             }
           },
           {
@@ -381,30 +942,23 @@
             "required": true,
             "schema": {
               "type": "string",
+              "title": "Auditid",
               "minLength": 1,
               "maxLength": 64,
-              "pattern": "^[A-Za-z0-9_-]+$",
-              "title": "Auditid"
+              "pattern": "^[A-Za-z0-9_-]+$"
             }
           },
           {
-            "name": "x-test-session",
+            "name": "X-Test-Session",
             "in": "header",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "minLength": 1,
-                  "maxLength": 64,
-                  "pattern": "^[A-Za-z0-9_-]+$"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Test-Session"
-            }
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
           }
         ],
         "responses": {
@@ -414,6 +968,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AuditResponse"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
                 }
               }
             }
@@ -426,7 +991,18 @@
                 }
               }
             },
-            "description": "Bad Request"
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "401": {
             "content": {
@@ -436,7 +1012,18 @@
                 }
               }
             },
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "403": {
             "content": {
@@ -446,7 +1033,18 @@
                 }
               }
             },
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "404": {
             "content": {
@@ -456,7 +1054,39 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "413": {
             "content": {
@@ -466,7 +1096,18 @@
                 }
               }
             },
-            "description": "Request Entity Too Large"
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "415": {
             "content": {
@@ -476,7 +1117,18 @@
                 }
               }
             },
-            "description": "Unsupported Media Type"
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "422": {
             "content": {
@@ -486,7 +1138,18 @@
                 }
               }
             },
-            "description": "Unprocessable Entity"
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "500": {
             "content": {
@@ -496,7 +1159,18 @@
                 }
               }
             },
-            "description": "Internal Server Error"
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           },
           "503": {
             "content": {
@@ -506,7 +1180,2346 @@
                 }
               }
             },
-            "description": "Service Unavailable"
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits": {
+      "post": {
+        "summary": "Reaudit",
+        "operationId": "reaudit_api_v1_workbooks__workbookId__versions__versionId__audits_post",
+        "parameters": [
+          {
+            "name": "workbookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workbookid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "versionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Versionid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "X-Test-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReauditResponse"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReauditRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}/review": {
+      "get": {
+        "summary": "Review",
+        "operationId": "review_api_v1_workbooks__workbookId__versions__versionId__audits__auditId__review_get",
+        "parameters": [
+          {
+            "name": "workbookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workbookid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "versionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Versionid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "auditId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Auditid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "X-Test-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewResponse"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workbooks/{workbookId}/versions/{versionId}/remediations": {
+      "post": {
+        "summary": "Submit Remediation",
+        "operationId": "submit_remediation_api_v1_workbooks__workbookId__versions__versionId__remediations_post",
+        "parameters": [
+          {
+            "name": "workbookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workbookid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "versionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Versionid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "X-Test-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemediationAccepted"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemediationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/remediations/{remediationId}": {
+      "get": {
+        "summary": "Remediation",
+        "operationId": "remediation_api_v1_remediations__remediationId__get",
+        "parameters": [
+          {
+            "name": "remediationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Remediationid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "X-Test-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemediationResponse"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workbooks/{workbookId}/history": {
+      "get": {
+        "summary": "History",
+        "operationId": "history_api_v1_workbooks__workbookId__history_get",
+        "parameters": [
+          {
+            "name": "workbookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workbookid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "X-Test-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryResponse"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workbooks/{workbookId}/versions/{versionId}/source": {
+      "get": {
+        "summary": "Source",
+        "operationId": "source_api_v1_workbooks__workbookId__versions__versionId__source_get",
+        "parameters": [
+          {
+            "name": "workbookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workbookid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "versionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Versionid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "X-Test-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized immutable attachment, pre-read and integrity checked.",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "Content-Length": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/outputs/{outputId}/workbook": {
+      "get": {
+        "summary": "Output",
+        "operationId": "output_api_v1_outputs__outputId__workbook_get",
+        "parameters": [
+          {
+            "name": "outputId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Outputid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "X-Test-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized immutable attachment, pre-read and integrity checked.",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "Content-Length": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}/report": {
+      "get": {
+        "summary": "Report",
+        "operationId": "report_api_v1_workbooks__workbookId__versions__versionId__audits__auditId__report_get",
+        "parameters": [
+          {
+            "name": "workbookId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Workbookid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "versionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Versionid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "auditId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Auditid",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          },
+          {
+            "name": "X-Test-Session",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "description": "Isolated test namespace; omission selects ordinary data."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized immutable attachment, pre-read and integrity checked.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditReport"
+                }
+              }
+            },
+            "headers": {
+              "Content-Length": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              },
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Bad Request",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unauthorized",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Forbidden",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Not Found",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Conflict",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Request Entity Too Large",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unsupported Media Type",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Unprocessable Entity",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Internal Server Error",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            },
+            "description": "Service Unavailable",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Server-generated request correlation identifier.",
+                "schema": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -524,9 +3537,6 @@
           "content": {
             "application/json": {
               "schema": {
-                "$defs": {
-                  "JsonValue": {}
-                },
                 "properties": {
                   "session_id": {
                     "type": "string",
@@ -536,9 +3546,31 @@
                     "title": "Session Id"
                   },
                   "setup": {
-                    "additionalProperties": {
-                      "$ref": "#/$defs/JsonValue"
+                    "properties": {
+                      "cleanup_session_ids": {
+                        "items": {
+                          "type": "string",
+                          "maxLength": 64,
+                          "minLength": 1,
+                          "pattern": "^[A-Za-z0-9_-]+$"
+                        },
+                        "type": "array"
+                      },
+                      "faults": {
+                        "properties": {
+                          "audit_failures": {
+                            "type": "integer",
+                            "const": 1
+                          }
+                        },
+                        "additionalProperties": false,
+                        "type": "object",
+                        "required": [
+                          "audit_failures"
+                        ]
+                      }
                     },
+                    "additionalProperties": false,
                     "type": "object",
                     "title": "Setup"
                   }
@@ -1032,6 +4064,116 @@
         "title": "HealthResponse",
         "type": "object"
       },
+      "HistoryAudit": {
+        "additionalProperties": false,
+        "properties": {
+          "auditId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Auditid",
+            "type": "string"
+          },
+          "versionId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Versionid",
+            "type": "string"
+          },
+          "rulesetVersion": {
+            "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(\\.(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$",
+            "title": "Rulesetversion",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AuditStatus"
+          }
+        },
+        "required": [
+          "auditId",
+          "versionId",
+          "rulesetVersion",
+          "status"
+        ],
+        "title": "HistoryAudit",
+        "type": "object"
+      },
+      "HistoryResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "workbookId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Workbookid",
+            "type": "string"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryVersion"
+            },
+            "title": "Versions",
+            "type": "array"
+          },
+          "audits": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryAudit"
+            },
+            "title": "Audits",
+            "type": "array"
+          }
+        },
+        "required": [
+          "workbookId",
+          "versions",
+          "audits"
+        ],
+        "title": "HistoryResponse",
+        "type": "object"
+      },
+      "HistoryVersion": {
+        "additionalProperties": false,
+        "properties": {
+          "versionId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Versionid",
+            "type": "string"
+          },
+          "sourceVersionId": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sourceversionid"
+          },
+          "status": {
+            "$ref": "#/components/schemas/VersionStatus"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          }
+        },
+        "required": [
+          "versionId",
+          "sourceVersionId",
+          "status",
+          "createdAt"
+        ],
+        "title": "HistoryVersion",
+        "type": "object"
+      },
       "JsonValue": {},
       "ProjectError": {
         "additionalProperties": false,
@@ -1070,6 +4212,396 @@
           "details"
         ],
         "title": "ProjectError",
+        "type": "object"
+      },
+      "ReauditResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "auditId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Auditid",
+            "type": "string"
+          },
+          "versionId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Versionid",
+            "type": "string"
+          },
+          "rulesetVersion": {
+            "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(\\.(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$",
+            "title": "Rulesetversion",
+            "type": "string"
+          },
+          "status": {
+            "const": "PROCESSING",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "auditId",
+          "versionId",
+          "rulesetVersion",
+          "status"
+        ],
+        "title": "ReauditResponse",
+        "type": "object"
+      },
+      "RemediationAccepted": {
+        "additionalProperties": false,
+        "properties": {
+          "remediationId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Remediationid",
+            "type": "string"
+          },
+          "sourceVersionId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Sourceversionid",
+            "type": "string"
+          },
+          "status": {
+            "const": "REMEDIATING",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "remediationId",
+          "sourceVersionId",
+          "status"
+        ],
+        "title": "RemediationAccepted",
+        "type": "object"
+      },
+      "RemediationResponse": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "REMEDIATING"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "outputVersionId": {
+                  "type": "null"
+                },
+                "outputId": {
+                  "type": "null"
+                },
+                "auditId": {
+                  "type": "null"
+                },
+                "error": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "REMEDIATED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "outputVersionId": {
+                  "type": "string"
+                },
+                "outputId": {
+                  "type": "string"
+                },
+                "auditId": {
+                  "type": "string"
+                },
+                "error": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "PROCESSING_FAILED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "outputVersionId": {
+                  "type": "null"
+                },
+                "outputId": {
+                  "type": "null"
+                },
+                "auditId": {
+                  "type": "null"
+                },
+                "error": {
+                  "$ref": "#/components/schemas/ProjectError"
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "remediationId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Remediationid",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "REMEDIATING",
+              "REMEDIATED",
+              "PROCESSING_FAILED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "sourceVersionId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Sourceversionid",
+            "type": "string"
+          },
+          "outputVersionId": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outputversionid"
+          },
+          "outputId": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outputid"
+          },
+          "auditId": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auditid"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectError"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "remediationId",
+          "status",
+          "sourceVersionId",
+          "outputVersionId",
+          "outputId",
+          "auditId",
+          "error"
+        ],
+        "title": "RemediationResponse",
+        "type": "object"
+      },
+      "ReviewItem": {
+        "additionalProperties": false,
+        "properties": {
+          "findingId": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Findingid",
+            "type": "string"
+          },
+          "allowedActions": {
+            "items": {
+              "enum": [
+                "APPLY",
+                "DECLINE",
+                "MANUAL_REVIEW"
+              ],
+              "type": "string"
+            },
+            "maxItems": 3,
+            "title": "Allowedactions",
+            "type": "array",
+            "uniqueItems": true
+          },
+          "currentValue": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "title": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "description": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "title",
+                      "description"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "text"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "headerRow": {
+                        "maximum": 1048576,
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "headerRow"
+                    ],
+                    "type": "object"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currentvalue"
+          },
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "findingId",
+          "allowedActions",
+          "currentValue",
+          "reason"
+        ],
+        "title": "ReviewItem",
+        "type": "object"
+      },
+      "ReviewResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "workbookId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Workbookid",
+            "type": "string"
+          },
+          "versionId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Versionid",
+            "type": "string"
+          },
+          "auditId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Auditid",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "workbookId",
+          "versionId",
+          "auditId",
+          "items"
+        ],
+        "title": "ReviewResponse",
         "type": "object"
       },
       "SetupResponse": {
@@ -1276,6 +4808,736 @@
         "title": "VersionStatus",
         "type": "string"
       },
+      "AuditReport": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "else": {
+              "properties": {
+                "error": {
+                  "type": "null"
+                },
+                "checksPerformed": {
+                  "const": [
+                    "ALT_TEXT",
+                    "WORKSHEET_NAME",
+                    "TABLE_HEADER",
+                    "MERGED_CELLS",
+                    "LINK_TEXT",
+                    "COLOR_CONTRAST"
+                  ]
+                }
+              }
+            },
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "PROCESSING_FAILED"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "error": {
+                  "$ref": "#/components/schemas/ProjectError"
+                },
+                "findings": {
+                  "maxItems": 0
+                },
+                "unresolvedFindings": {
+                  "maxItems": 0
+                },
+                "manualReviewItems": {
+                  "maxItems": 0
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "AUDIT_COMPLETE"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "findings": {
+                  "maxItems": 0
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "REVIEW_REQUIRED",
+                    "REMEDIATION_AVAILABLE"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "findings": {
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "reportVersion": {
+            "const": "2.0.0",
+            "title": "Reportversion",
+            "type": "string"
+          },
+          "specificationVersion": {
+            "const": "2.1.0",
+            "title": "Specificationversion",
+            "type": "string"
+          },
+          "workbookId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Workbookid",
+            "type": "string"
+          },
+          "versionId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Versionid",
+            "type": "string"
+          },
+          "auditId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Auditid",
+            "type": "string"
+          },
+          "fileName": {
+            "maxLength": 255,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Filename",
+            "type": "string"
+          },
+          "sha256": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          },
+          "sourceVersionId": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sourceversionid"
+          },
+          "auditDate": {
+            "format": "date-time",
+            "title": "Auditdate",
+            "type": "string"
+          },
+          "rulesetVersion": {
+            "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(\\.(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$",
+            "title": "Rulesetversion",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "AUDIT_COMPLETE",
+              "REVIEW_REQUIRED",
+              "REMEDIATION_AVAILABLE",
+              "PROCESSING_FAILED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "checksPerformed": {
+            "items": {
+              "enum": [
+                "ALT_TEXT",
+                "WORKSHEET_NAME",
+                "TABLE_HEADER",
+                "MERGED_CELLS",
+                "LINK_TEXT",
+                "COLOR_CONTRAST"
+              ],
+              "type": "string"
+            },
+            "title": "Checksperformed",
+            "type": "array",
+            "uniqueItems": true
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/ReportDecision"
+            },
+            "title": "Decisions",
+            "type": "array"
+          },
+          "approvedChanges": {
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ReportDecision"
+                },
+                {
+                  "properties": {
+                    "action": {
+                      "const": "APPLY"
+                    }
+                  }
+                }
+              ]
+            },
+            "title": "Approvedchanges",
+            "type": "array"
+          },
+          "unresolvedFindings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Unresolvedfindings",
+            "type": "array"
+          },
+          "manualReviewItems": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Manualreviewitems",
+            "type": "array"
+          },
+          "limitations": {
+            "items": {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array",
+            "uniqueItems": true
+          },
+          "remediationId": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remediationid"
+          },
+          "outputVersionId": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outputversionid"
+          },
+          "outputId": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outputid"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectError"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "reportVersion",
+          "specificationVersion",
+          "workbookId",
+          "versionId",
+          "auditId",
+          "fileName",
+          "sha256",
+          "sourceVersionId",
+          "auditDate",
+          "rulesetVersion",
+          "status",
+          "checksPerformed",
+          "findings",
+          "decisions",
+          "approvedChanges",
+          "unresolvedFindings",
+          "manualReviewItems",
+          "limitations",
+          "remediationId",
+          "outputVersionId",
+          "outputId",
+          "error"
+        ],
+        "title": "AuditReport",
+        "type": "object"
+      },
+      "Decision": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "else": {
+              "not": {
+                "required": [
+                  "value"
+                ]
+              }
+            },
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "APPLY"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "value"
+              ]
+            }
+          }
+        ],
+        "properties": {
+          "findingId": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Findingid",
+            "type": "string"
+          },
+          "action": {
+            "enum": [
+              "APPLY",
+              "DECLINE",
+              "MANUAL_REVIEW"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "value": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "title": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Title",
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 800,
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Description",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title",
+                  "description"
+                ],
+                "title": "AltTextValue",
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "maxLength": 31,
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Name",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "title": "WorksheetNameValue",
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "maxLength": 1000,
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "title": "Text",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text"
+                ],
+                "title": "LinkTextValue",
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "headerRow": {
+                    "maximum": 1048576,
+                    "minimum": 1,
+                    "title": "Headerrow",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "headerRow"
+                ],
+                "title": "HeaderRowValue",
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": [
+          "findingId",
+          "action"
+        ],
+        "title": "Decision",
+        "type": "object"
+      },
+      "ReauditRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "const": "MANUAL_REAUDIT",
+            "default": "MANUAL_REAUDIT",
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "title": "ReauditRequest",
+        "type": "object"
+      },
+      "RemediationRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "auditId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Auditid",
+            "type": "string"
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/Decision"
+            },
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Decisions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "auditId",
+          "decisions"
+        ],
+        "title": "RemediationRequest",
+        "type": "object"
+      },
+      "ReportDecision": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "else": {
+              "properties": {
+                "value": {
+                  "type": "null"
+                }
+              }
+            },
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "APPLY"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "value": {
+                  "oneOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "title": {
+                          "maxLength": 200,
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "title": "Title",
+                          "type": "string"
+                        },
+                        "description": {
+                          "maxLength": 800,
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "title": "Description",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "title",
+                        "description"
+                      ],
+                      "title": "AltTextValue",
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "name": {
+                          "maxLength": 31,
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "title": "Name",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "title": "WorksheetNameValue",
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "text": {
+                          "maxLength": 1000,
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "title": "Text",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "text"
+                      ],
+                      "title": "LinkTextValue",
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "headerRow": {
+                          "maximum": 1048576,
+                          "minimum": 1,
+                          "title": "Headerrow",
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "headerRow"
+                      ],
+                      "title": "HeaderRowValue",
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "sourceAuditId": {
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Sourceauditid",
+            "type": "string"
+          },
+          "findingId": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Findingid",
+            "type": "string"
+          },
+          "ruleId": {
+            "enum": [
+              "ALT_TEXT",
+              "WORKSHEET_NAME",
+              "TABLE_HEADER",
+              "MERGED_CELLS",
+              "LINK_TEXT",
+              "COLOR_CONTRAST"
+            ],
+            "title": "Ruleid",
+            "type": "string"
+          },
+          "worksheet": {
+            "title": "Worksheet",
+            "type": "string"
+          },
+          "target": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Target",
+            "type": "string"
+          },
+          "action": {
+            "enum": [
+              "APPLY",
+              "DECLINE",
+              "MANUAL_REVIEW"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "title": {
+                        "maxLength": 200,
+                        "minLength": 1,
+                        "pattern": "\\S",
+                        "title": "Title",
+                        "type": "string"
+                      },
+                      "description": {
+                        "maxLength": 800,
+                        "minLength": 1,
+                        "pattern": "\\S",
+                        "title": "Description",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "title",
+                      "description"
+                    ],
+                    "title": "AltTextValue",
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "maxLength": 31,
+                        "minLength": 1,
+                        "pattern": "\\S",
+                        "title": "Name",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "title": "WorksheetNameValue",
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "text": {
+                        "maxLength": 1000,
+                        "minLength": 1,
+                        "pattern": "\\S",
+                        "title": "Text",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "text"
+                    ],
+                    "title": "LinkTextValue",
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "headerRow": {
+                        "maximum": 1048576,
+                        "minimum": 1,
+                        "title": "Headerrow",
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "headerRow"
+                    ],
+                    "title": "HeaderRowValue",
+                    "type": "object"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "sourceAuditId",
+          "findingId",
+          "ruleId",
+          "worksheet",
+          "target",
+          "action",
+          "value"
+        ],
+        "title": "ReportDecision",
+        "type": "object"
+      },
       "SystemSetupRequest": {
         "additionalProperties": false,
         "properties": {
@@ -1287,8 +5549,30 @@
             "type": "string"
           },
           "setup": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/JsonValue"
+            "additionalProperties": false,
+            "properties": {
+              "cleanup_session_ids": {
+                "items": {
+                  "maxLength": 64,
+                  "minLength": 1,
+                  "pattern": "^[A-Za-z0-9_-]+$",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "faults": {
+                "additionalProperties": false,
+                "properties": {
+                  "audit_failures": {
+                    "const": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "audit_failures"
+                ],
+                "type": "object"
+              }
             },
             "title": "Setup",
             "type": "object"
@@ -1309,27 +5593,32 @@
     }
   },
   "x-operation-status": {
-    "delivered-service-routes": [
+    "delivered-backend-routes": [
       1,
       2,
-      4,
-      5
-    ],
-    "pending-business-operations": [
       3,
+      4,
+      5,
       6,
       7,
       8,
       9,
       10,
+      "S",
+      "V",
+      "R"
+    ],
+    "pending-business-operations": [
       11,
       12,
       13,
       14
     ],
-    "integration-note": "Health checks storage and configured engine/runner availability."
+    "integration-note": "Health checks storage and configured ruleset capability. Phase 4 audit/correction execution requires the Phase 4 engine port."
   },
-  "x-foundation-status": "Integrated Phase 3 project and system testing routes delivered",
-  "x-team9-contract-profile": "1.0.0",
+  "x-specification-version": "2.1.0",
+  "x-target-ruleset-version": "2.0.0",
+  "x-foundation-status": "Phase 4 backend contracts; execution requires installed Phase 4 engine capability",
+  "x-team9-contract-profile": "2.1.0",
   "x-instructor-interface-version": "0.4.2"
 }

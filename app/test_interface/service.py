@@ -81,6 +81,11 @@ class PersistentSessionService:
             request = SystemSetupRequest.model_validate({"session_id": session_id, "setup": setup})
         except ValidationError:
             raise ProjectException(400, "INVALID_SETUP", "Invalid setup request.") from None
+        faults = request.setup.get("faults")
+        if faults is not None and not self.settings.enable_test_audit_faults:
+            raise ProjectException(
+                403, "FAULTS_DISABLED", "Isolated audit failure control is disabled."
+            )
         cleanup = request.setup.get("cleanup_session_ids", [])
         assert isinstance(cleanup, list)
         if session_id in cleanup:
@@ -102,6 +107,7 @@ class PersistentSessionService:
             created_at=datetime.now(UTC),
             revision=self.settings.deployment_sha,
             cleanup_error=None,
+            audit_failures_remaining=1 if faults is not None else 0,
         )
         self.repository.create_test_session(session)
         try:
