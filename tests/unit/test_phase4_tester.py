@@ -7,6 +7,7 @@ prove that the independent checks fail on real defects instead of passing vacuou
 import hashlib
 import io
 import json
+import sys
 import zipfile
 from collections import Counter
 from collections.abc import Callable
@@ -252,6 +253,20 @@ def test_phase4_fixture_bytes_are_deterministic_and_committed() -> None:
         entries = read_package(data)
         assert "[Content_Types].xml" in entries and "xl/workbook.xml" in entries
     assert len(phase4_fixtures()["large_preservation.xlsx"]) > 2_097_152
+
+
+@pytest.mark.parametrize("platform", ["win32", "linux", "darwin"])
+def test_phase4_fixture_bytes_do_not_depend_on_platform(
+    platform: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # zipfile records the running OS in each entry unless told otherwise; CI on Windows caught it.
+    from scripts.make_synthetic_fixtures import PHASE4_DIR, phase4_files
+
+    monkeypatch.setattr(sys, "platform", platform)
+    built = phase4_files()
+    assert len(built) == 16
+    for name, data in built.items():
+        assert data == (PHASE4_DIR / name).read_bytes(), name
 
 
 def test_phase4_fixtures_open_in_openpyxl() -> None:

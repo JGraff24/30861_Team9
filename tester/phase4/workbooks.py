@@ -420,6 +420,9 @@ class Package:
                 )
                 info = zipfile.ZipInfo(name, FIXED_TIME)
                 info.compress_type = zipfile.ZIP_STORED
+                # ZipInfo defaults "made by" to the running OS (0 on Windows, 3 elsewhere), which
+                # would make the committed fixture bytes differ between platforms.
+                info.create_system = 3
                 info.external_attr = 0o600 << 16
                 archive.writestr(info, content)
         return stream.getvalue()
