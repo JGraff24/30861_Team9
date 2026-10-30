@@ -16,7 +16,7 @@ proxy timeout. It does not change the system's API, engine, editor, storage or U
 | Comparator | `tester/phase4/package.py` | Independent package comparison for section 11 (details below) |
 | Fixtures | `tester/phase4/workbooks.py`, `tester/phase4/vectors.py`, `tests/fixtures/expectations-phase4.json` | 16 Team 9 synthetic packs plus re-derived Phase 3 fixtures; see `tests/fixtures/README.md` |
 | Shared modules | `tester/suite/{manifest,runner,records,checks,registry}.py`, `tester/service.py`, `tester/store.py`, `tester/target.py` | Versioned manifests, Phase 4 coverage rules, per-request response bounds, auxiliary-session cleanup |
-| Operator/CI | `scripts/run_suite.py`, `scripts/tester_selfcheck.py`, `.github/workflows/ci.yml`, `deploy/nginx.conf.template` | `--manifest`/`--read-timeout`, `--phase4` self-check, new CI steps, 1,900 s tester proxy timeout |
+| Operator/CI | `scripts/run_suite.py`, `scripts/tester_selfcheck.py`, `.github/workflows/ci.yml`, `deploy/nginx.conf.template`, `scripts/deploy_host.py` | `--manifest`/`--read-timeout`, `--phase4` self-check, new CI steps, 1,900 s tester proxy timeout, and autodeploy waits up to 1,900 s for active runs |
 
 The Phase 3 manifest stays the default (`FIXTURE_MANIFEST_PATH`), so the deployed Phase 3
 workflow is unchanged. A Phase 4 deployment sets `FIXTURE_MANIFEST_PATH` to
@@ -111,7 +111,20 @@ The tester never imports the system's engine, editor, storage or preservation co
    x14 extension and that the comment VML was too thin. Shapes were also invisible. All were
    fixed, and the reviewer judged the fixtures and corrected outputs otherwise Excel-safe. This
    is a reading, not an Excel run.
-5. **Tests:**
+5. **Final fresh re-review** confirmed the earlier fixes and found further problems, all
+   fixed with regression tests:
+   - a shared-result ordering bug that turned one preservation defect into 19 false skips;
+   - comparator false passes on a misplaced `tableParts` and on wrong `count` values;
+   - `mc:` prefixes resolved outside their scope;
+   - pathological JSON raising instead of failing;
+   - auxiliary-session IDs saved only at the end of the run;
+   - a competing re-audit ID recorded too late.
+
+   Two low-severity items remain open:
+   - `P4-SESSION-COVERAGE` runs at plan position 210, so code coverage misses the final few
+     calls.
+   - The `xml:space` tolerance looks only at the element's own text.
+6. **Tests:**
    - `tests/unit/test_phase4_tester.py`: contract, policy, manifest binding, expectation
      consistency, the comparator (accepts every plan, rejects 12 mutations, tolerates
      re-prefixing), a full conforming run (215/215), six defective targets, a corrupt output,

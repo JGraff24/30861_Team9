@@ -118,7 +118,15 @@ def parse_json(content: bytes, definition: str) -> Any:
     try:
         text = content.decode("utf-8")
         body = json.loads(text, object_pairs_hook=no_duplicates, parse_constant=no_constant)
+    except ContractViolation:
+        raise
     except (UnicodeDecodeError, json.JSONDecodeError):
         raise ContractViolation(f"body for {definition} is not UTF-8 JSON") from None
-    validate(definition, body)
+    except (RecursionError, ValueError):
+        # Pathological nesting or oversized integers are target defects, not tester faults.
+        raise ContractViolation(f"body for {definition} is not acceptable JSON") from None
+    try:
+        validate(definition, body)
+    except RecursionError:
+        raise ContractViolation(f"body for {definition} is nested too deeply") from None
     return body

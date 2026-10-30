@@ -24,7 +24,7 @@ def test_deployment_renderer(tmp_path: Path) -> None:
     nginx = (output / "nginx.conf").read_text()
     assert "server_name review.invalid;" in nginx
     assert "proxy_set_header Host $host;" in nginx
-    assert "proxy_read_timeout 660s;" in nginx
+    assert "proxy_read_timeout 1900s;" in nginx
     assert subprocess.run(command, cwd=root, env=env, capture_output=True).returncode != 0
     env["SERVER_NAME"] = "bad; injected"
     command[-1] = str(tmp_path / "invalid")

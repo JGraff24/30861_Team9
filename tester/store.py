@@ -264,14 +264,36 @@ class TesterStore:
                 )
 
     def record_auxiliary(
-        self, parent_session_id: str, target_url: str, session_ids: list[str], created_at: str
+        self,
+        parent_session_id: str,
+        target_url: str,
+        session_ids: list[str],
+        created_at: str,
+        *,
+        pending: bool = True,
     ) -> None:
-        """Remember namespaces a run created so the next setup cleans them (deduplicated)."""
+        """Remember namespaces a run created (deduplicated).
+
+        During a run they are saved with cleanup held (`pending=False`) so a crash cannot lose
+        them; `release_auxiliary` queues them once the run's evidence is recorded.
+        """
         with self._connect(write=True) as db:
             db.executemany(
                 "INSERT OR IGNORE INTO tester_auxiliary_sessions"
-                " (session_id, parent_session_id, target_url, created_at) VALUES (?, ?, ?, ?)",
-                [(sid, parent_session_id, target_url, created_at) for sid in session_ids],
+                " (session_id, parent_session_id, target_url, created_at, cleanup_pending)"
+                " VALUES (?, ?, ?, ?, ?)",
+                [
+                    (sid, parent_session_id, target_url, created_at, int(pending))
+                    for sid in session_ids
+                ],
+            )
+
+    def release_auxiliary(self, parent_session_id: str) -> None:
+        with self._connect(write=True) as db:
+            db.execute(
+                "UPDATE tester_auxiliary_sessions SET cleanup_pending = 1"
+                " WHERE parent_session_id = ?",
+                (parent_session_id,),
             )
 
     def auxiliary_sessions(self, parent_session_id: str) -> list[str]:

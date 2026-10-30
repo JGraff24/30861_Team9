@@ -116,15 +116,41 @@ def declarations(content: bytes) -> list[tuple[str, str]]:
         raise PackageError("unsafe or malformed XML part") from exc
 
 
-def normalize_compatibility(root: Element, prefixes: Mapping[str, str]) -> list[str]:
-    """Rewrite mc:* prefix lists to sorted namespace URIs; report prefixes nobody declared.
+def scopes(content: bytes) -> list[dict[str, str]]:
+    """The in-scope prefix map of every element, in document order (comments excluded)."""
+    found: list[dict[str, str]] = []
+    stack: list[dict[str, str]] = [{"xml": "http://www.w3.org/XML/1998/namespace"}]
+    declared: dict[str, str] = {}
+    try:
+        for event, item in safe_xml.iterparse(
+            io.BytesIO(content), events=("start-ns", "start", "end"), forbid_dtd=True
+        ):
+            if event == "start-ns":
+                prefix, uri = item
+                declared[prefix or ""] = uri
+            elif event == "start":
+                scope = {**stack[-1], **declared}
+                declared = {}
+                stack.append(scope)
+                found.append(scope)
+            else:
+                stack.pop()
+    except (DefusedXmlException, SyntaxError, ValueError) as exc:
+        raise PackageError("unsafe or malformed XML part") from exc
+    return found
+
+
+def normalize_compatibility(root: Element, element_scopes: list[dict[str, str]]) -> list[str]:
+    """Rewrite mc:* prefix lists to sorted namespace URIs; report prefixes not in scope.
 
     Markup-compatibility attributes name namespaces by prefix, which ElementTree does not
-    resolve. Comparing URIs keeps a legitimate re-prefixing equal while still catching a
-    dropped or undeclared namespace (section 11).
+    resolve. Each element's prefixes are resolved against the declarations in scope at that
+    element, so a legitimate re-prefixing compares equal while a dropped, moved-out-of-scope
+    or undeclared namespace is caught (section 11).
     """
     undeclared = []
-    for element in root.iter():
+    elements = [e for e in root.iter() if isinstance(e.tag, str)]
+    for element, prefixes in zip(elements, element_scopes, strict=False):
         for name in MC_ATTRIBUTES & set(element.attrib):
             tokens = []
             for token in element.attrib[name].split():
@@ -448,7 +474,18 @@ def _header_range(plan: EffectPlan, effect: Mapping[str, Any], source_parts: set
         return [e for e in descendants(root, "tablePart") if r_attribute(e, "id") == rel_id]
 
     def verify_sheet(source: Element, output: Element) -> list[str]:
-        return [] if len(table_parts(output)) == 1 else ["header: sheet lacks the new tablePart"]
+        if len(table_parts(output)) != 1:
+            return ["header: sheet lacks the new tablePart"]
+        containers = [e for e in output if local(e.tag) == "tableParts"]
+        if len(containers) != 1 or len(list(descendants(output, "tableParts"))) != 1:
+            return ["header: the worksheet needs exactly one tableParts child of the root"]
+        children = list(output)
+        after = children[children.index(containers[0]) + 1 :]
+        if any(local(e.tag) != "extLst" for e in after):
+            return ["header: tableParts is not the last worksheet child before extLst"]
+        if containers[0].get("count") != str(len(containers[0])):
+            return ["header: tableParts count does not equal its tablePart children"]
+        return []
 
     def mask_sheet(source: Element, output: Element) -> None:
         for container in list(descendants(output, "tableParts")):
@@ -518,6 +555,9 @@ def _header_range(plan: EffectPlan, effect: Mapping[str, Any], source_parts: set
         if any(e.get("name") for e in descendants(root, "tableStyleInfo")):
             problems.append("header: new table applies a style overlay")
         columns = [e.get("name") for e in descendants(root, "tableColumn")]
+        for container in descendants(root, "tableColumns"):
+            if container.get("count") != str(len(columns)):
+                problems.append("header: tableColumns count does not equal its columns")
         if columns != list(effect["columns"]):
             problems.append("header: table column names differ from the confirmed header labels")
         ids = [e.get("id") for e in descendants(root, "tableColumn")]
@@ -627,8 +667,8 @@ def compare_packages(
             problems.append(
                 f"changed part {name} no longer declares namespace {sorted(dropped)[0]}"
             )
-        normalize_compatibility(before, dict(source_ns))
-        if normalize_compatibility(after, dict(output_ns)):
+        normalize_compatibility(before, scopes(source[name]))
+        if normalize_compatibility(after, scopes(output[name])):
             problems.append(f"changed part {name} uses an undeclared prefix in mc: attributes")
         for verify in rule.verify:
             problems.extend(verify(before, after))

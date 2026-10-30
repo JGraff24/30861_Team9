@@ -708,3 +708,97 @@ def test_skipped_cases_and_setup_calls_earn_no_coverage(tmp_path: Path) -> None:
     empty = build_report(suite, "s", BASE_URL, results, code, markers)
     assert (empty.coverage.component.covered, empty.coverage.system.covered) == (0, 0)
     assert Manifest  # imported for type clarity
+
+
+def test_a_preservation_defect_does_not_skip_independent_cases(tmp_path: Path) -> None:
+    def mutate(parts: dict[str, bytes]) -> None:
+        parts["docProps/app.xml"] = b"<Properties/>"
+
+    result = outcomes(run_phase4(tmp_path, FakePhase4(**SMALL, mutate_output=mutate)))
+    assert result["P4-DECISIONS-MIXED"] == "fail" and result["P4-PRESERVATION"] == "fail"
+    for independent in (
+        "P4-OUTPUT-AUDIT",
+        "P4-REPORT-COMPLETE",
+        "P4-REPORT-STABLE",
+        "P4-HISTORY",
+        "P4-REMEDIATED-STATUS",
+        "P4-ACCESS-OUTPUT-REVIEWER-READ",
+        "P4-ACCESS-REMEDIATION-FOREIGN",
+    ):
+        assert result[independent] == "pass", independent
+
+
+@pytest.mark.parametrize(
+    ("change", "expected"),
+    [
+        (
+            _sub(
+                "xl/worksheets/sheet1.xml",
+                '<tableParts count="1">',
+                '<tableParts count="7">',
+            ),
+            "tableParts count",
+        ),
+        (
+            _sub("xl/tables/table1.xml", '<tableColumns count="3">', '<tableColumns count="9">'),
+            "tableColumns count",
+        ),
+    ],
+)
+def test_comparator_requires_valid_table_part_counts(
+    change: Callable[[dict[str, bytes]], None], expected: str
+) -> None:
+    source = phase4_fixtures()["header_range.xlsx"]
+    output = _rewrite(FakePhase4().edit(source, _decisions("header_range", "header_range")), change)
+    problems = compare_packages(source, output, _effects("header_range", "header_range"))
+    assert any(expected in problem for problem in problems), problems
+
+
+def test_comparator_requires_table_parts_at_the_end_of_the_worksheet() -> None:
+    source = phase4_fixtures()["header_range.xlsx"]
+    output = FakePhase4().edit(source, _decisions("header_range", "header_range"))
+
+    def move(parts: dict[str, bytes]) -> None:
+        text = parts["xl/worksheets/sheet1.xml"].decode()
+        block = '<tableParts count="1"><tablePart r:id="rId1"/></tableParts>'
+        text = text.replace(block, "").replace("<sheetData>", block + "<sheetData>")
+        parts["xl/worksheets/sheet1.xml"] = text.encode()
+
+    problems = compare_packages(
+        source, _rewrite(output, move), _effects("header_range", "header_range")
+    )
+    assert any("last worksheet child" in problem for problem in problems), problems
+
+
+def test_comparator_resolves_compatibility_prefixes_in_scope() -> None:
+    source = phase4_fixtures()["alt_supported.xlsx"]
+    mc = "http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x14 = "http://schemas.microsoft.com/office/spreadsheetml/2009/9/main"
+
+    def declare_on_root(parts: dict[str, bytes]) -> None:
+        text = parts["xl/drawings/drawing1.xml"].decode()
+        extra = f' xmlns:mc="{mc}" mc:Ignorable="x14" xmlns:x14="{x14}"'
+        parts["xl/drawings/drawing1.xml"] = text.replace(
+            "<xdr:wsDr ", f"<xdr:wsDr{extra} ", 1
+        ).encode()
+
+    base = _rewrite(source, declare_on_root)
+    output = FakePhase4().edit(base, _decisions("alt_supported", "alt"))
+
+    def move_into_child(parts: dict[str, bytes]) -> None:
+        text = parts["xl/drawings/drawing1.xml"].decode()
+        text = text.replace(f' xmlns:x14="{x14}"', "", 1)
+        text = text.replace("<xdr:twoCellAnchor ", f'<xdr:twoCellAnchor xmlns:x14="{x14}" ', 1)
+        parts["xl/drawings/drawing1.xml"] = text.encode()
+
+    problems = compare_packages(
+        base, _rewrite(output, move_into_child), _effects("alt_supported", "alt")
+    )
+    assert any("undeclared prefix" in problem for problem in problems), problems
+
+
+def test_pathological_json_is_a_contract_violation_not_a_crash() -> None:
+    with pytest.raises(contract.ContractViolation):
+        contract.parse_json(b"[" * 200_000 + b"]" * 200_000, "SetupResponse")
+    with pytest.raises(contract.ContractViolation):
+        contract.parse_json(b'{"session_id": ' + b"9" * 5000 + b"}", "SetupResponse")

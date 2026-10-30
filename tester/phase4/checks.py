@@ -25,12 +25,11 @@ from tester.suite.checks import (
     CheckFailed,
     Prerequisite,
     SuiteContext,
-    SystemFault,
     expect_status,
 )
 from tester.suite.identity import finding_id
 from tester.suite.manifest import AcceptedFixture, SuiteConfigurationError
-from tester.target import CommunicationError, DeadlineExceeded, Identity
+from tester.target import DeadlineExceeded, Identity
 
 Json = Any
 SessionChoice = str | Literal["main", "none"]
@@ -266,8 +265,10 @@ def remember_failure(ctx: SuiteContext, cache: str) -> Iterator[None]:
     """Record why a shared upload/audit/remediation failed so dependents skip quickly."""
     try:
         yield
-    except (CheckFailed, SystemFault, Prerequisite, CommunicationError) as exc:
-        ctx.state[f"{cache}:failed"] = bounded(str(exc), 160)
+    except DeadlineExceeded:
+        raise
+    except Exception as exc:
+        ctx.state[f"{cache}:failed"] = bounded(str(exc) or type(exc).__name__, 160)
         raise
 
 
@@ -675,16 +676,31 @@ def check_output(ctx: SuiteContext, result: Json, action: str) -> Json:
             ctx.suite.bytes_of(result["fixture"]), result["output"], details["effects"]
         )
     except PackageError as exc:
-        raise CheckFailed(f"{action}: output package unreadable ({exc}).") from None
+        problems = [f"output package unreadable ({exc})"]
+    # The output audit is a separate resource: record it before judging preservation, so a
+    # preservation defect does not hide the audit from independent cases (section 15.3).
+    audit = output_audit_of(ctx, result, action)
     if problems:
         raise CheckFailed(f"{action}: {problems[0]} ({len(problems)} problem(s)).")
-    audit = poll_audit(
-        ctx,
-        ids,
-        f"{action} output audit",
-        audit_id=status["auditId"],
-        version_id=status["outputVersionId"],
-    )
+    check_output_findings(ctx, result, audit, action)
+    return audit
+
+
+def output_audit_of(ctx: SuiteContext, result: Json, action: str) -> Json:
+    if "output_audit" not in result:
+        status = result["status"]
+        result["output_audit"] = poll_audit(
+            ctx,
+            result["ids"],
+            f"{action} output audit",
+            audit_id=status["auditId"],
+            version_id=status["outputVersionId"],
+        )
+    audit: Json = result["output_audit"]
+    return audit
+
+
+def check_output_findings(ctx: SuiteContext, result: Json, audit: Json, action: str) -> None:
     expected = expected_output(ctx, result)
     if audit["status"] != status_for(expected):
         raise CheckFailed(
@@ -693,8 +709,6 @@ def check_output(ctx: SuiteContext, result: Json, action: str) -> Json:
     actual = actual_tuples(audit)
     if actual != expected:
         raise CheckFailed(f"{action} output audit: {describe(actual, expected)}")
-    result["output_audit"] = audit
-    return audit
 
 
 def report_records(ctx: SuiteContext, result: Json) -> tuple[list[Json], list[Json]]:
@@ -739,6 +753,10 @@ def setup_session(
     session_id: str | None = None,
 ) -> tuple[str, httpx.Response]:
     session_id = session_id or f"t9-{uuid.uuid4().hex}"
+    # Recorded before sending: a lost response may still have created the namespace, and
+    # cleaning an unknown ID is an idempotent no-op (section 14).
+    pending: list[str] = ctx.state.setdefault("aux_sessions", [])
+    pending.append(session_id)
     response = ctx.client.request(
         "POST",
         "/test/setup",
@@ -747,13 +765,9 @@ def setup_session(
         json={"session_id": session_id, "setup": setup},
         timeout=limit(ctx, "system_setup_seconds", 30),
     )
+    if response.status_code != 201:
+        pending.remove(session_id)  # an answered refusal created nothing to clean
     return session_id, response
-
-
-def track_unexpected_session(ctx: SuiteContext, session_id: str, response: httpx.Response) -> None:
-    """Any setup that answered 201 created a namespace; queue it for caller-owned cleanup."""
-    if response.status_code == 201:
-        ctx.state.setdefault("aux_sessions", []).append(session_id)
 
 
 def unknown_session(ctx: SuiteContext, session_id: str, action: str) -> None:
@@ -764,7 +778,6 @@ def unknown_session(ctx: SuiteContext, session_id: str, action: str) -> None:
 
 def fault_setup(ctx: SuiteContext) -> str:
     session_id, response = setup_session(ctx, {"faults": {"audit_failures": 1}})
-    track_unexpected_session(ctx, session_id, response)
     ctx.qualify()
     if response.status_code == 403:
         raise CheckFailed(
@@ -790,6 +803,8 @@ def fault_envelope(ctx: SuiteContext) -> str:
         raise CheckFailed(
             f"The armed fault session audit ended {audit['status']}, not PROCESSING_FAILED."
         )
+    # The failed audit exists now; recovery can proceed even if a later assertion here fails.
+    ctx.state["fault"] = {"ids": ids, "audit": audit, "report": None}
     error = audit["error"]
     if (error["code"], error["message"], error["details"]) != (
         "TEST_AUDIT_FAILURE",
@@ -818,7 +833,7 @@ def fault_envelope(ctx: SuiteContext) -> str:
     current = version(ctx, ids, "Fault-session version", session=session)
     if current["latestAuditId"] != ids["auditId"] or current["status"] != "PROCESSING_FAILED":
         raise CheckFailed("The version does not record the failed latest audit.")
-    ctx.state["fault"] = {"ids": ids, "audit": audit, "report": report_raw}
+    ctx.state["fault"]["report"] = report_raw
     return (
         f"Fault session {session}: injected PROCESSING_FAILED envelope, failed report and "
         "unchanged source verified."
@@ -843,7 +858,7 @@ def fault_recovery(ctx: SuiteContext) -> str:
     if body_of(old, "AuditResponse", "Historical failed audit") != fault["audit"]:
         raise CheckFailed("The historical failed audit changed after recovery.")
     raw, _ = report_bytes(ctx, ids, ids["auditId"], "Historical failed report", session=session)
-    if raw != fault["report"]:
+    if fault["report"] is not None and raw != fault["report"]:
         raise CheckFailed("The historical failed report bytes changed after recovery.")
     current = version(ctx, ids, "Recovered version", session=session)
     if current["latestAuditId"] != accepted["auditId"]:
@@ -870,7 +885,6 @@ def fault_auth(ctx: SuiteContext) -> str:
         session_id, response = setup_session(
             ctx, {"faults": {"audit_failures": 1}}, identity=identity, raw_token=token
         )
-        track_unexpected_session(ctx, session_id, response)
         testing_error(ctx, response, status, f"Fault setup by {label}", None)
         unknown_session(ctx, session_id, f"Fault setup by {label}")
     return (
@@ -890,7 +904,6 @@ def fault_invalid(ctx: SuiteContext) -> str:
     ]
     for faults in variants:
         session_id, response = setup_session(ctx, {"faults": faults})
-        track_unexpected_session(ctx, session_id, response)
         testing_error(ctx, response, 400, f"Fault setup {json.dumps(faults)}", "system")
         unknown_session(ctx, session_id, f"Fault setup {json.dumps(faults)}")
     return f"All {len(variants)} malformed fault objects returned 400 source system; no namespace."
@@ -910,9 +923,9 @@ def fixture_audit(ctx: SuiteContext) -> str:
     ids = ctx.state.get(f"p4:upload:{fixture}")
     if ids is None:
         raise Prerequisite(f"Not executed: the {fixture} upload produced no identifiers.")
+    ctx.qualify()
     audit = poll_audit(ctx, ids, f"{fixture} audit")
     ctx.state[f"p4:audit:{fixture}"] = audit
-    ctx.qualify()
     expected = check_audit(ctx, audit, fixture, f"{fixture} audit")
     return f"{fixture} returned exactly the {len(expected)} reviewed findings in contract order."
 
@@ -1189,11 +1202,12 @@ def reaudit_determinism(ctx: SuiteContext) -> str:
 def source_before(ctx: SuiteContext) -> str:
     fixture = str(ctx.parameters["fixture"])
     ids, audit = audited(ctx, fixture, f"preserve:{fixture}")
+    with setup(ctx):
+        report, _ = report_bytes(ctx, ids, ids["auditId"], "Source report before remediation")
+    ctx.state[f"p4:before:{fixture}"] = {"audit": audit, "report": report}
     source, _ = download(ctx, f"{version_path(ids)}/source", "Source download")
     if source != ctx.suite.bytes_of(fixture):
         raise CheckFailed("The source download differs from the uploaded bytes.")
-    report, _ = report_bytes(ctx, ids, ids["auditId"], "Source report before remediation")
-    ctx.state[f"p4:before:{fixture}"] = {"audit": audit, "report": report}
     return "Source download returned the exact uploaded bytes as an XLSX attachment."
 
 
@@ -1278,13 +1292,15 @@ def decisions_mixed(ctx: SuiteContext) -> str:
     fixture = str(ctx.parameters["fixture"])
     ctx.qualify()
     result = run_plan(ctx, fixture, "mixed", f"mixed:{fixture}")
+    # Published for dependents as soon as the remediation exists; this case's own accuracy
+    # checks below do not gate independent cases (section 15.3).
+    ctx.state["mixed_remediation"] = result
     if result["accepted"]["status"] != "REMEDIATING":
         raise CheckFailed("RemediationAccepted did not report REMEDIATING.")
     check_output(ctx, result, "Mixed decisions")
     source = version(ctx, result["ids"], "Source version after remediation")
     if source["status"] != ctx.suite.accepted(fixture).expected_status:
         raise CheckFailed("The source version's stable status was rewritten by the remediation.")
-    ctx.state["mixed_remediation"] = result
     return "Approved, declined, manual and omitted decisions produced only the approved edit."
 
 
@@ -1321,10 +1337,11 @@ def output_audit(ctx: SuiteContext) -> str:
     result = ctx.state.get("mixed_remediation")
     if result is None:
         raise Prerequisite("Not executed: the mixed remediation did not complete.")
-    audit = result.get("output_audit") or check_output(ctx, result, "Output audit")
     ctx.qualify()
+    audit = output_audit_of(ctx, result, "Output audit")
     if audit["rulesetVersion"] != ctx.suite.manifest.ruleset_version:
         raise CheckFailed("The output audit used a different ruleset.")
+    check_output_findings(ctx, result, audit, "Output audit")
     return "The output audit ran all rules on the output bytes; only the approved finding is gone."
 
 
@@ -1679,9 +1696,25 @@ def _requests(
 
 
 def _reject_base(ctx: SuiteContext, fixture: str) -> tuple[dict[str, str], Json]:
+    """The shared reject base and its latest completed audit (resolving any pending re-audit)."""
     ids, audit = audited(ctx, fixture, f"reject:{fixture}")
-    latest = ctx.state.get(f"p4:reject-latest:{fixture}")
-    return ids, latest or audit
+    cache = f"p4:reject-latest:{fixture}"
+    shared_failure(ctx, cache)
+    pending = ctx.state.get(f"{cache}:pending")
+    if pending is not None:
+        with remember_failure(ctx, cache), setup(ctx):
+            ctx.state[cache] = poll_audit(ctx, ids, "Pending re-audit", audit_id=pending)
+        del ctx.state[f"{cache}:pending"]
+    return ids, ctx.state.get(cache) or audit
+
+
+def _competing_reaudit(
+    ctx: SuiteContext, fixture: str, ids: Mapping[str, str], action: str
+) -> Json:
+    """Start a re-audit on the shared reject base and record it before anything can fail."""
+    accepted = _reaudit(ctx, ids, action, None, absent=True)
+    ctx.state[f"p4:reject-latest:{fixture}:pending"] = accepted["auditId"]
+    return accepted
 
 
 def _expect_rejected(
@@ -1778,9 +1811,8 @@ def reject_decisions(ctx: SuiteContext) -> str:
     if condition == "stale_audit":
         ids, audit = _reject_base(ctx, fixture)
         with setup(ctx):
-            accepted = _reaudit(ctx, ids, "Re-audit making the old audit stale", None, absent=True)
-            newer = poll_audit(ctx, ids, "Newer audit", audit_id=accepted["auditId"])
-        ctx.state[f"p4:reject-latest:{fixture}"] = newer
+            _competing_reaudit(ctx, fixture, ids, "Re-audit making the old audit stale")
+            _reject_base(ctx, fixture)
         merge = _ids_for(ctx, fixture)[_first(ctx, fixture, "MERGED_CELLS", "MANUAL_REVIEW")]
         _expect_rejected(
             ctx,
@@ -1803,7 +1835,7 @@ def reject_decisions(ctx: SuiteContext) -> str:
         merge = _ids_for(ctx, fixture)[_first(ctx, fixture, "MERGED_CELLS", "MANUAL_REVIEW")]
         with setup(ctx):
             before = history(ctx, ids, "History before competing batch")
-            accepted = _reaudit(ctx, ids, "Competing re-audit", None, absent=True)
+            accepted = _competing_reaudit(ctx, fixture, ids, "Competing re-audit")
         response = submit(
             ctx,
             ids,
@@ -1822,8 +1854,7 @@ def reject_decisions(ctx: SuiteContext) -> str:
                 "PROCESSING"
             )
         with setup(ctx):
-            newer = poll_audit(ctx, ids, "Competing re-audit", audit_id=accepted["auditId"])
-        ctx.state[f"p4:reject-latest:{fixture}"] = newer
+            _reject_base(ctx, fixture)
         if stale and still_active:
             ctx.qualify()
             raise CheckFailed(
@@ -1847,7 +1878,6 @@ def reject_decisions(ctx: SuiteContext) -> str:
     if condition == "audit_failed":
         with setup(ctx):
             session_id, response = setup_session(ctx, {"faults": {"audit_failures": 1}})
-            track_unexpected_session(ctx, session_id, response)
             if response.status_code != 201:
                 raise Prerequisite(
                     "Not executed: a fault session for the failed-audit case was refused."
@@ -2082,12 +2112,9 @@ def access(ctx: SuiteContext) -> str:
             ctx, "GET", path, identity=identity, raw_token=token, session=session, binary=binary
         )
     if expected != 200:
-        error = project_error(ctx, response, expected, action)
-        if (
-            expected in (401, 403)
-            and error["code"] != {401: "UNAUTHORIZED", 403: "FORBIDDEN"}[expected]
-        ):
-            raise CheckFailed(f"{action} returned code {bounded(error['code'], 64)}.")
+        # Section 10 codes for new Phase 4 paths: 401 UNAUTHORIZED, 403 FORBIDDEN, 404 NOT_FOUND.
+        code = {401: "UNAUTHORIZED", 403: "FORBIDDEN", 404: "NOT_FOUND"}[expected]
+        project_error(ctx, response, expected, action, code)
         return f"{action} returned {expected} with the project error envelope and no data."
     if response.status_code >= 500:
         expect_status(response, 200, action)
@@ -2147,12 +2174,10 @@ def session_cleanup(ctx: SuiteContext) -> str:
     fixture = str(ctx.parameters["fixture"])
     with setup(ctx):
         scratch, response = setup_session(ctx, {})
-        track_unexpected_session(ctx, scratch, response)
         expect_status(response, 201, "Scratch session setup")
         ids = upload(ctx, fixture, "Scratch upload", session=scratch)
         poll_audit(ctx, ids, "Scratch audit", session=scratch)
     carrier, response = setup_session(ctx, {"cleanup_session_ids": [scratch]})
-    track_unexpected_session(ctx, carrier, response)
     ctx.qualify()
     expect_status(response, 201, "Cleanup carrier setup")
     gone = call(ctx, "GET", version_path(ids), session=scratch)

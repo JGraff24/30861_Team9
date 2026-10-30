@@ -47,6 +47,10 @@ IDENTIFIER = TypeAdapter(Identifier)
 SYSTEM_SETUP_TIMEOUT_SECONDS = 30
 
 
+def now() -> str:
+    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
+
+
 class TesterService:
     def __init__(
         self,
@@ -180,6 +184,15 @@ class TesterService:
             results_so_far[:] = results
             markers_so_far.update(markers)
             self.store.save_progress(request.session_id, results, markers)
+            if ctx is not None and ctx.state.get("aux_sessions"):
+                # Held (not yet cleanable) evidence namespaces survive a tester crash.
+                self.store.record_auxiliary(
+                    request.session_id,
+                    session.target_url,
+                    list(dict.fromkeys(ctx.state["aux_sessions"])),
+                    now(),
+                    pending=False,
+                )
 
         ctx: SuiteContext | None = None
         try:
@@ -217,14 +230,12 @@ class TesterService:
         self.store.finish_run(request.session_id, body, aborted)
         auxiliary = list(dict.fromkeys(ctx.state.get("aux_sessions", []))) if ctx else []
         if auxiliary:
-            # Evidence namespaces are retained until the run is recorded; the next setup for
-            # this target cleans them through cleanup_session_ids (section 14.1).
             self.store.record_auxiliary(
-                request.session_id,
-                session.target_url,
-                auxiliary,
-                datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+                request.session_id, session.target_url, auxiliary, now(), pending=False
             )
+        # Evidence namespaces are retained until the run is recorded; the next setup for this
+        # target cleans them through cleanup_session_ids (section 14.1).
+        self.store.release_auxiliary(request.session_id)
         if aborted:
             raise TesterError(500, message or "Tester aborted the suite.", ErrorSource.TESTER)
         return body
@@ -288,6 +299,7 @@ class TesterService:
             self.store.finish_run(
                 session.session_id, report.model_dump_json().encode("utf-8"), aborted=True
             )
+            self.store.release_auxiliary(session.session_id)
             logger.warning("Recorded interrupted tester session as aborted")
 
 

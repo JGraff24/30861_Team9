@@ -221,7 +221,7 @@ def test_busy_tester_defers_deployment_without_stopping_services(
     data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
     with sqlite3.connect(data / "tester/tester.sqlite3") as database:
         database.execute("INSERT INTO tester_sessions VALUES ('RUNNING')")
-    clock = iter([0.0, 661.0])
+    clock = iter([0.0, 1901.0])
     monkeypatch.setattr(deploy_host.time, "monotonic", lambda: next(clock))
     with pytest.raises(TimeoutError, match="Active audit/tester work"):
         host.update()
