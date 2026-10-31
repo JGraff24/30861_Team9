@@ -250,7 +250,7 @@
     {
       "base_rgb": "336699",
       "tint": -0.5,
-      "expected_rgb": "19334D"
+      "expected_rgb": "1A334D"
     },
     {
       "base_rgb": "336699",
@@ -260,12 +260,22 @@
     {
       "base_rgb": "336699",
       "tint": 0.5,
-      "expected_rgb": "8CB2D9"
+      "expected_rgb": "8CB3D9"
     },
     {
       "base_rgb": "336699",
       "tint": 1,
       "expected_rgb": "FFFFFF"
+    },
+    {
+      "base_rgb": "010101",
+      "tint": -0.5,
+      "expected_rgb": "010101"
+    },
+    {
+      "base_rgb": "050505",
+      "tint": -0.5,
+      "expected_rgb": "030303"
     }
   ],
   "identity_vectors": [

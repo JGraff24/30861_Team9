@@ -2,7 +2,8 @@
 
 Excel accessibility hub — Phase 3 engine with a proposed Phase 4 backend.
 
-The Phase 4 backend targets specification 2.1.0 and ruleset 2.0.0 and adds version
+The Phase 4 backend uses corrected context pack 2.1.1 (suite target 2.1.1),
+with specification 2.1.0 and ruleset 2.0.0 unchanged, and adds version
 uploads, re-audits, review context, durable remediation orchestration, downloads,
 reports and history. **The real six-rule engine/editor is still missing**, so the
 default 2.0.0 configuration refuses unsupported processing with 503. This work was
