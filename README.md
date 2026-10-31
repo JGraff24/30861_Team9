@@ -1,17 +1,21 @@
 # 30861_Team9
 
-Excel accessibility hub — Phase 3 engine with a proposed Phase 4 backend.
+Excel accessibility hub — local Phase 4 backend, engine, and review UI integration.
 
 The Phase 4 backend uses corrected context pack 2.1.1 (suite target 2.1.1),
 with specification 2.1.0 and ruleset 2.0.0 unchanged, and adds version
 uploads, re-audits, review context, durable remediation orchestration, downloads,
-reports and history. **The real six-rule engine/editor is still missing**, so the
-default 2.0.0 configuration refuses unsupported processing with 503. This work was
-not deployed. See the [backend integration/handoff](docs/implementation/jackson_phase4.md)
-and [verification evidence](docs/evidence/jackson_phase4.md). Use an explicit
+reports and history. This local branch includes Dylan's six-rule engine/editor and
+Ryan's permission-aware review, correction decisions, history and download UI.
+Ryan's changes are separate from the existing backend/engine prerequisite commits;
+Dixon's Phase 4 tester branch is not merged here. This work was not deployed.
+See [Ryan's implementation and limitations](docs/implementation/ryan_phase4.md),
+[local verification](docs/evidence/ryan_phase4.md), and the
+[backend handoff](docs/implementation/jackson_phase4.md). Use an explicit
 `RULESET_VERSION=1.0.0` only for legacy Phase 3 development/regression checks.
 
-The following Phase 3 operating reference describes the existing two-rule engine.
+The following Phase 3 operating reference is historical; it does not claim that
+this local Phase 4 branch is deployed or that the cross-team acceptance gates passed.
 
 The system accepts authenticated `.xlsx` uploads, retains immutable sources, runs durable
 asynchronous audits for missing alternative text and generic worksheet names, and exposes
@@ -24,7 +28,7 @@ See the [integration review and evidence](docs/evidence/phase3_integration.md),
 The system and tester are deployed on AWS over HTTPS. The hosted tester is configured
 to test both Team 9's and Team 12's systems; see the access guide below.
 Backend remediation orchestration, history and downloadable reports now have
-Phase 4 interfaces; real corrections depend on the engine handoff above.
+Phase 4 interfaces and an integrated local engine/editor.
 Scheduling and ordinary deletion remain Phase 5 work.
 
 ## Hosted access
