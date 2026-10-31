@@ -131,7 +131,8 @@ class Deployment:
         )
 
     def wait_idle(self, data: Path) -> None:
-        deadline = time.monotonic() + 660
+        # Phase 4 suites run up to 1,800 s; wait as long as the tester proxy allows.
+        deadline = time.monotonic() + 1900
         while True:
             busy = 0
             for path, query in (

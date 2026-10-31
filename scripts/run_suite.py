@@ -57,7 +57,17 @@ def main() -> int:
         default="unknown",
         help="target tag/SHA from pod documentation; never inferred (default: unknown)",
     )
-    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=DEFAULT_MANIFEST,
+        help="the manifest the tester serves (Phase 4: tests/fixtures/manifest-phase4.json)",
+    )
+    parser.add_argument(
+        "--read-timeout",
+        type=int,
+        help="override the run read timeout in seconds (default: from the manifest limits)",
+    )
     args = parser.parse_args()
     token = os.environ.get("TEAM9_TESTER_TOKEN")
     if not token:
@@ -90,21 +100,27 @@ def main() -> int:
             return 1
         session_id = setup.json()["session_id"]
         print(f"session {session_id} ready; running suite once")
+        # Phase 4 manifests declare the section 10 run read timeout (at least 1,830 s).
+        read_timeout = args.read_timeout or (
+            manifest.limits.run_read_timeout_seconds
+            if manifest.limits is not None
+            else RUN_READ_TIMEOUT_SECONDS
+        )
         started = time.monotonic()
-        client.deadline = started + RUN_READ_TIMEOUT_SECONDS
+        client.deadline = started + read_timeout
         try:
             run = client.request(
                 "POST",
                 "/test/run",
                 identity="test-admin",
                 json={"session_id": session_id},
-                timeout=RUN_READ_TIMEOUT_SECONDS,
+                timeout=read_timeout,
             )
             print(f"run returned HTTP {run.status_code} after {time.monotonic() - started:.1f} s")
         except (CommunicationError, DeadlineExceeded) as exc:
             print(f"run response lost ({type(exc).__name__}); polling stored report")
         try:
-            report = poll_report(client, session_id, time.monotonic() + RUN_READ_TIMEOUT_SECONDS)
+            report = poll_report(client, session_id, time.monotonic() + read_timeout)
         except (CommunicationError, DeadlineExceeded):
             print(
                 "Report polling deadline reached; retain the session ID for later recovery.",

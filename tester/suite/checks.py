@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import httpx
-from pydantic import BaseModel
+from pydantic import BaseModel, JsonValue
 
 from app.contracts.models import (
     AuditResponse,
@@ -17,6 +17,7 @@ from app.contracts.models import (
     ProjectError,
     SystemReport,
     TestEndpointError,
+    TestResult,
     UploadResponse,
     VersionResponse,
 )
@@ -28,7 +29,7 @@ from tester.suite.workbooks import (
     protected_workbook,
     worksheets_workbook,
 )
-from tester.target import Identity, TargetClient
+from tester.target import DeadlineExceeded, Identity, TargetClient
 
 UPLOAD_LIMIT_BYTES = 25_000_000
 WORKSHEET_LIMIT = 50
@@ -61,6 +62,10 @@ class SuiteContext:
     clock: Callable[[], float] = time.monotonic
     state: dict[str, Any] = field(default_factory=dict)
     current: PlannedTest | None = None
+    # Outcomes recorded so far in this run (read-only for report-format self-checks).
+    results: list[TestResult] = field(default_factory=list)
+    # Nonzero while a check performs shared setup; setup calls never earn coverage markers.
+    setup_depth: int = 0
     markers: dict[str, dict[str, list[str]]] = field(default_factory=dict)
     code: CoverageMeasure = field(
         default_factory=lambda: CoverageMeasure(
@@ -74,7 +79,7 @@ class SuiteContext:
         self, *, components: list[str] | None = None, acceptance: list[str] | None = None
     ) -> None:
         """Record only the predeclared assertions/calls that have actually been reached."""
-        if self.current is None:
+        if self.current is None or self.setup_depth:
             return
         row = self.markers.setdefault(self.current.test_id, {"components": [], "acceptance": []})
         for key, requested, allowed in (
@@ -87,7 +92,7 @@ class SuiteContext:
             row[key] = sorted(set(row[key]) | set(selected))
 
     @property
-    def parameters(self) -> dict[str, str | int]:
+    def parameters(self) -> dict[str, JsonValue]:
         return self.current.parameters if self.current else {}
 
 
@@ -179,11 +184,13 @@ def require(ctx: SuiteContext, key: str, producer: str) -> Any:
 
 
 def poll_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> AuditResponse:
-    give_up = ctx.clock() + AUDIT_POLL_SECONDS
+    limits = ctx.suite.manifest.limits
+    seconds = float(limits.audit_poll_seconds) if limits is not None else AUDIT_POLL_SECONDS
+    give_up = ctx.clock() + seconds
     while True:
         left = give_up - ctx.clock()
         if left <= 0:
-            raise CheckFailed(f"{action} was still PROCESSING after {AUDIT_POLL_SECONDS:.0f} s.")
+            raise CheckFailed(f"{action} was still PROCESSING after {seconds:.0f} s.")
         response = ctx.client.request(
             "GET", audit_path(ids), identity="userA", timeout=min(10, left)
         )
@@ -208,11 +215,14 @@ def poll_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> AuditResp
             raise CheckFailed(f"{action} exceeded its audit polling deadline.")
         if audit.status != AuditStatus.PROCESSING:
             return audit
+        if ctx.client.remaining() < POLL_INTERVAL_SECONDS and limits is not None:
+            # Phase 4: running out of suite budget is the tester's deadline, not a target fault.
+            raise DeadlineExceeded("suite deadline reached while polling an audit")
         if (
             ctx.clock() + POLL_INTERVAL_SECONDS > give_up
             or ctx.client.remaining() < POLL_INTERVAL_SECONDS
         ):
-            raise CheckFailed(f"{action} was still PROCESSING after {AUDIT_POLL_SECONDS:.0f} s.")
+            raise CheckFailed(f"{action} was still PROCESSING after {seconds:.0f} s.")
         ctx.sleep(POLL_INTERVAL_SECONDS)
 
 

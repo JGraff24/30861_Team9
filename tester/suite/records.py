@@ -27,8 +27,10 @@ def _conformance(outcomes: list[Outcome]) -> Conformance:
 
 def operation_status(manifest: SuiteManifest, report: SuiteReport) -> list[dict[str, Any]]:
     outcomes = {result.test_id: result.outcome for result in report.results}
+    phase = manifest.phase
     rows = []
     for operation in manifest.operations:
+        delivered = operation.phase4 if phase == "4" else operation.phase3
         tests = [test for test in manifest.tests if operation.number in test.operations]
         by_path = {
             path: [outcomes.get(t.test_id, Outcome.SKIP) for t in tests if t.path == path]
@@ -44,8 +46,8 @@ def operation_status(manifest: SuiteManifest, report: SuiteReport) -> list[dict[
                 **_describe(operation),
                 "implemented": (
                     ("observed responding" if observed else "not observed")
-                    if operation.phase3
-                    else "not delivered in Phase 3"
+                    if delivered
+                    else f"not delivered in Phase {phase}"
                 ),
                 "success_conformance": _conformance(by_path["success"]),
                 "error_conformance": _conformance(by_path["error"]),
@@ -83,6 +85,8 @@ def run_record(
         "session_id": report.session_id,
         "report_sha256": hashlib.sha256(report_bytes).hexdigest(),
         "manifest_version": manifest.manifest_version,
+        "specification_version": manifest.specification_version,
+        "ruleset_version": manifest.ruleset_version,
         "counts": {
             "run": sum(result.outcome != Outcome.SKIP for result in report.results),
             "planned": len(manifest.tests),
@@ -116,11 +120,17 @@ def run_record(
                     for test in manifest.tests
                     if criterion in test.acceptance
                 ],
-                "completeness": "partial Phase 3 scope; outcomes do not prove every boundary",
+                "completeness": (
+                    "exercised-criterion evidence only; per-AC human evidence is tracked "
+                    "separately and outcomes do not prove every boundary"
+                    if manifest.phase == "4"
+                    else "partial Phase 3 scope; outcomes do not prove every boundary"
+                ),
             }
             for criterion, scope in manifest.acceptance.items()
         },
-        "known_deviations": [
+        "known_deviations": manifest.known_deviations
+        or [
             "Team 9 profile/defaults require pod confirmation.",
             "Synthetic fixtures and message meaning require manual pod review.",
             (

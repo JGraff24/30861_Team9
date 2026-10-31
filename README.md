@@ -71,6 +71,17 @@ uncertain setup POST. Each prepared session runs once.
 For reciprocal testing, Team 12 uses its own tester and operator token, targeting
 `https://3.139.178.70.sslip.io/system` with Team 9's system credentials.
 
+## Phase 4 tester (in progress)
+
+The tester also carries the Phase 4 suite for shared specification 2.1.0 (ruleset 2.0.0):
+215 hosted cases generated from the pod's test plan, Team 9's synthetic fixture packs and an
+independent package comparator. Select it with
+`FIXTURE_MANIFEST_PATH=tests/fixtures/manifest-phase4.json`; Phase 3 remains the default until
+the system delivers Phase 4. Phase 4 runs take up to 1,800 seconds, so callers need a read
+timeout of at least 1,830 seconds. See
+[the Phase 4 implementation notes](docs/implementation/dixon_phase4.md) and the
+[adopted specification pack](docs/contracts/phase4/).
+
 ## Local setup
 
 Use Python 3.12 and uv 0.13.1. Install uv if needed:
@@ -161,6 +172,8 @@ uv run mypy app tester scripts
 uv run pytest -q
 uv run python -m scripts.export_schemas --check
 uv run python -m scripts.check_identity
+uv run python -m scripts.check_phase4_policy
+uv run python -m scripts.build_phase4_manifest --check
 uv run python -m scripts.make_synthetic_fixtures --check
 uv run python -m scripts.smoke_foundation
 uv run python -m scripts.integration_selfcheck --evidence-dir /tmp/team9-integration-evidence

@@ -41,7 +41,13 @@ def main() -> int:
     parser.add_argument(
         "--evidence-dir", type=Path, help="retain sanitized fake-target report/record"
     )
+    parser.add_argument(
+        "--phase4", action="store_true", help="run the Phase 4 manifest against the Phase 4 fake"
+    )
     args = parser.parse_args()
+    manifest = (
+        REPO / "tests" / "fixtures" / ("manifest-phase4.json" if args.phase4 else "manifest.json")
+    )
     if args.evidence_dir:
         args.evidence_dir.mkdir(parents=True, exist_ok=True)
     for port in (8000, 8001):
@@ -56,7 +62,8 @@ def main() -> int:
             ),
             "ALLOWED_TARGET_URLS": json.dumps([BASE_URL]),
             "TARGET_AUTH_MAP_JSON": json.dumps(access_map()),
-            "FIXTURE_MANIFEST_PATH": str(REPO / "tests" / "fixtures" / "manifest.json"),
+            "FIXTURE_MANIFEST_PATH": str(manifest),
+            "FAKE_TARGET_PHASE": "4" if args.phase4 else "3",
         }
         commands = [
             ("tests.support.fake_target_app:app", 8000, []),
@@ -104,6 +111,8 @@ def main() -> int:
                     str(report_path),
                     "--record",
                     str(record_path),
+                    "--manifest",
+                    str(manifest),
                 ],
                 cwd=REPO,
                 env=child,

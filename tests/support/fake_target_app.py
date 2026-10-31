@@ -3,13 +3,19 @@
 This is not the Team 9 system and must never be deployed or registered as a target.
 """
 
+import os
+
 import httpx
 from starlette.concurrency import run_in_threadpool
 from starlette.types import Receive, Scope, Send
 
+from tests.support.fake_phase4 import FakePhase4
 from tests.support.fake_system import FakeSystem
 
-fake = FakeSystem()
+# FAKE_TARGET_PHASE=4 serves the test-only Phase 4 fake; the default stays Phase 3.
+fake: FakeSystem | FakePhase4 = (
+    FakePhase4() if os.environ.get("FAKE_TARGET_PHASE") == "4" else FakeSystem()
+)
 
 
 async def app(scope: Scope, receive: Receive, send: Send) -> None:
