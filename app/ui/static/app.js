@@ -21,6 +21,9 @@
     el("reaudit").hidden = !owner();
     el("submit").disabled = busy || !!pending || !owner();
     el("upload-kind").options[1].disabled = !workbookId;
+    text("upload-destination", workbookId
+      ? `Additional versions will be uploaded to workbook ${workbookId}, shown in history.`
+      : "Open a workbook's history before uploading an additional version.");
     for (const field of el("review-form").querySelectorAll("input, select, textarea")) {
       field.disabled = busy || !!pending;
     }
@@ -58,6 +61,13 @@
   }
   async function history(requestedId = workbookId) {
     const h = await api(`/api/v1/workbooks/${enc(requestedId)}/history`);
+    if (selected && selected.workbookId !== h.workbookId) {
+      // History chooses the new-version destination. Do not leave another
+      // workbook's results or output beside that newly selected destination.
+      selected = null; output = null;
+      el("results").hidden = true; el("output-panel").hidden = true;
+      text("selection-note", "Open an audit from this workbook's history to review it.");
+    }
     workbookId = h.workbookId;
     text("history-workbook", `Workbook ${workbookId}. Oldest versions and audits first.`);
     el("history").replaceChildren();

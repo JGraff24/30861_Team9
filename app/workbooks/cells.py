@@ -17,6 +17,8 @@ from app.workbooks.xmlsafe import local_name, namespace
 
 XmlPath = tuple[tuple[str, int], ...]
 STRING_TYPES = frozenset({"s", "inlineStr", "str"})
+X14_MAIN = "http://schemas.microsoft.com/office/spreadsheetml/2009/9/main"
+EXCEL_MAIN = "http://schemas.microsoft.com/office/excel/2006/main"
 #: Unicode White_Space (specification section 6); U+200B is deliberately absent.
 WHITE_SPACE = "".join(
     chr(code)
@@ -157,6 +159,7 @@ class ExtensionConditional:
     """x14 conditional formatting stored in the worksheet extension list."""
 
     sqref: str
+    visual: bool = True
 
 
 @dataclass
@@ -170,11 +173,13 @@ class WorksheetModel:
     conditionals: list[ConditionalDecl] = field(default_factory=list)
     extension_conditionals: list[ExtensionConditional] = field(default_factory=list)
     validation_formulas: list[str] = field(default_factory=list)
+    extension_formulas: list[str] = field(default_factory=list)
     table_rel_ids: list[str] = field(default_factory=list)
     auto_filter: str | None = None
     #: Formulas or sheet references held inside the worksheet extension list (x14 data
     #: validation, sparklines, slicers). They make reference rewriting unprovable.
     extension_formula_count: int = 0
+    extension_reference_unsupported: bool = False
     extension_names: set[str] = field(default_factory=set)
     root_children: list[str] = field(default_factory=list)
     alternate_content: bool = False
@@ -432,17 +437,152 @@ class _WorksheetReader:
 
     def _read_extensions(self, elem: Element) -> None:
         main = namespace(elem.tag)
+        understood: set[int] = set()
+        for node in elem.iter():
+            if node.tag != f"{{{X14_MAIN}}}conditionalFormatting":
+                continue
+            formulas, safe, visual = _extension_conditional(node)
+            if safe:
+                understood.update(id(formula) for formula in formulas)
+                self.model.extension_formulas.extend(formula.text or "" for formula in formulas)
+            else:
+                self.model.extension_reference_unsupported = True
+            for child in node:
+                if child.tag == f"{{{EXCEL_MAIN}}}sqref" and child.text:
+                    self.model.extension_conditionals.append(
+                        ExtensionConditional(child.text, visual if safe else True)
+                    )
         for node in elem.iter():
             node_name = local_name(node.tag)
             node_ns = namespace(node.tag)
             if node_ns != main and node_name not in ("ext", "extLst"):
                 self.model.extension_names.add(node_name)
-            if node_name in ("f", "formula", "formula1", "formula2") and node_ns != main:
+            if (
+                node_name in ("f", "formula", "formula1", "formula2")
+                and node_ns != main
+                and id(node) not in understood
+            ):
                 self.model.extension_formula_count += 1
-            if node_name == "conditionalFormatting" and node_ns != main:
+            if node_name == "conditionalFormatting" and node_ns not in (main, X14_MAIN):
                 for child in node:
                     if local_name(child.tag) == "sqref" and child.text:
                         self.model.extension_conditionals.append(ExtensionConditional(child.text))
+
+
+def _extension_conditional(element: Element) -> tuple[list[Element], bool, bool]:
+    """Understand ordinary expression/cellIs rules in Excel's x14 representation.
+
+    Their xm:f text is a normal formula and is rewritten by the same tokenizer as
+    main-namespace conditional formulas. Unknown extension payloads remain opaque.
+    A known bold/number-format-only rule does not imply a color change.
+    """
+    formulas: list[Element] = []
+    safe = set(element.attrib) <= {"pivot"} and element.get("pivot", "0") in ("0", "false")
+    visual = False
+    scopes = 0
+    rules = 0
+    for child in element:
+        if child.tag == f"{{{EXCEL_MAIN}}}sqref":
+            scopes += 1
+            safe = safe and bool(child.text) and not child.attrib and not len(child)
+            continue
+        if child.tag != f"{{{X14_MAIN}}}cfRule":
+            safe = False
+            continue
+        rules += 1
+        safe = safe and set(child.attrib) <= {
+            "type",
+            "priority",
+            "stopIfTrue",
+            "aboveAverage",
+            "percent",
+            "bottom",
+            "operator",
+            "text",
+            "timePeriod",
+            "rank",
+            "stdDev",
+            "equalAverage",
+            "id",
+        }
+        if child.get("type") not in {"expression", "cellIs"}:
+            safe = False
+        rule_formulas = 0
+        for payload in child:
+            if payload.tag == f"{{{EXCEL_MAIN}}}f":
+                formulas.append(payload)
+                rule_formulas += 1
+                safe = (
+                    safe
+                    and bool(payload.text and payload.text.strip())
+                    and not payload.attrib
+                    and not len(payload)
+                )
+            elif payload.tag == f"{{{X14_MAIN}}}dxf":
+                known, changes_colors = _extension_differential(payload)
+                safe = safe and known
+                visual = visual or changes_colors
+            else:
+                safe = False
+        safe = safe and rule_formulas > 0 and child.get("dxfId") is None
+    return formulas, safe and scopes == 1 and rules > 0, visual
+
+
+def _extension_differential(element: Element) -> tuple[bool, bool]:
+    allowed = {
+        "dxf",
+        "font",
+        "fill",
+        "border",
+        "numFmt",
+        "alignment",
+        "protection",
+        "patternFill",
+        "gradientFill",
+        "fgColor",
+        "bgColor",
+        "stop",
+        "color",
+        "b",
+        "i",
+        "strike",
+        "condense",
+        "extend",
+        "outline",
+        "shadow",
+        "u",
+        "vertAlign",
+        "sz",
+        "name",
+        "family",
+        "charset",
+        "scheme",
+        "left",
+        "right",
+        "top",
+        "bottom",
+        "diagonal",
+        "vertical",
+        "horizontal",
+        "start",
+        "end",
+    }
+    namespaces = {
+        X14_MAIN,
+        "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
+        "http://purl.oclc.org/ooxml/spreadsheetml/main",
+    }
+    known = all(
+        local_name(node.tag) in allowed and namespace(node.tag) in namespaces
+        for node in element.iter()
+    )
+    visual = any(
+        local_name(child.tag) == "fill"
+        or local_name(child.tag) == "font"
+        and any(local_name(node.tag) == "color" for node in child)
+        for child in element
+    )
+    return known, visual
 
 
 def read_worksheet(package: OoxmlPackage, part: str, shared: list[RichText]) -> WorksheetModel:

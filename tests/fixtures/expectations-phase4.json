@@ -2193,7 +2193,7 @@
       ],
       "limitation_facts": [
         "Unsupported fills, mixed rich text and automatic colors were not given a ratio.",
-        "Static results inside visual conditional ranges are suppressed.",
+        "Visual conditional formatting was not evaluated; affected ranges require manual contrast review.",
         "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
         "Missing fill is treated as white and missing font color as black (display assumption)."
       ],
@@ -2250,6 +2250,66 @@
             "worksheets": [
               "Hidden",
               "HiddenRow"
+            ]
+          }
+        }
+      }
+    },
+    "tint_half_vectors": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/tint_half_vectors.xlsx",
+      "sha256": "13be0503cf498e3f5417acce3e3773af0874a2f8a9b021226a45c9412cd66826",
+      "origin": "synthetic",
+      "upload_name": "tint_half_vectors.xlsx",
+      "notes": "Pack 2.1.1 exact-half HSL inputs authored as literal XML. GrayFive font 030303 against 757575 has contrast 4.476248585820453 and must flag; truncation/ties-even 020202 gives 4.503095875365348 and wrongly passes. Blue +/- half colors remain manual color-meaning screens; their exact channels are checked independently in policy tests.",
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "BlueNegative",
+          "target": "xl/worksheets/sheet1.xml#cell=A1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "BluePositive",
+          "target": "xl/worksheets/sheet2.xml#cell=A1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "GrayFive",
+          "target": "xl/worksheets/sheet4.xml#cell=A1",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "cases": {
+          "tint_blue_negative": {
+            "worksheets": [
+              "BlueNegative"
+            ]
+          },
+          "tint_blue_positive": {
+            "worksheets": [
+              "BluePositive"
+            ]
+          },
+          "tint_gray_one": {
+            "worksheets": [
+              "GrayOne"
+            ]
+          },
+          "tint_gray_five": {
+            "worksheets": [
+              "GrayFive"
             ]
           }
         }

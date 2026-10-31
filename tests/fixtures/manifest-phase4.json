@@ -1,8 +1,55 @@
 {
-  "manifest_version": "2.1.0",
+  "manifest_version": "2.1.1",
   "ruleset_version": "2.0.0",
   "specification_version": "2.1.0",
   "expectations": "expectations-phase4.json",
+  "fixture_hashes": {
+    "corrupt": "c51c63778cc8b7337c98ea4a62ee51d3abb17b537b28a64cfeffc0ef9d292265",
+    "zip_traversal": "8643e444288c01475000843f03d8621e6c59660eb8a45974392a7e2ce3880ebc",
+    "zip_duplicate": "dd10f96a1ca5f1dac9caa59396acb6929f862b1ab7fd1123ccb2c110fdf9a98d",
+    "xml_dtd": "accad3c326749fcc2e1fc1aa77999d7a5bf74c9cb9fbc7e2244ae374947c4843",
+    "macro_parts": "0b2819c85a29d598707f08a43371133fae7db386be8233c3a536d86e576663fe",
+    "encrypted_zip": "cde084966c1c048cfd860b82f492087521816a1bca32c9342cb5589d6782dd06",
+    "protected_sheet": "390e3ea3f9f3768c52fddf67c146ff569e3a1fa81da1d9e0a3c888c56419e3dc",
+    "protected_structure": "3b611ae68cd84e2bbffc17ad086886732e7409c689ec2e6bc6416de28758bc11",
+    "clean": "e1de45e415b8552304a69050a86c5d605ab07eeaf96cef0c92dde6ba2d63e35e",
+    "seeded_issues": "6e54efe60ce3a45530f364168557ea7ceb085a454b3c02fe5927ab715b00d223",
+    "unicode": "5d938a482bcb0f0bf84df3bfd9cc6dfedf7f0c57a0f9ac3357ef9b15520e1efd",
+    "repeated_ids": "680d7d50899bfb4d2178acaafecbf9741f46fb0a9bdff1fb374670c50c813883",
+    "multiple_drawings": "52fb02a37099b7ab9a0787e7858d36340155a1c5682dc7000fe35fa79ef2eb27",
+    "in_cell_picture": "63921a4e08cd90ee035afe125d94676dffabeaa7fd74aaf6c993fd7fe4088f1b",
+    "image_formula": "edefdb8a4b567fe2ef4cb79e37aeb1b3c85116286c0d040ed8956b6a124effc5",
+    "form_controls": "53630b5946d30abdf056cfd12a6ebd124b19d6e9d318766e67f57af2dddcc53c",
+    "vml_comments": "dacd584e94b8647c37417ddae6714fa6e3a55471a7122ac7868f55578015029f",
+    "inactive_protection": "1f01f6857964fb9d52c04bee2457ab06ed5c0128bc5f793d0418568d867e21d7",
+    "clean_all_six": "916ac672e6b3ef914493312e6c63c7c94dc45c84a9381087dbee5966ceec33a7",
+    "seeded_all_six": "0b3b8eed0f295cece0fdf1da56c534acba5b2b2a84ce3082e953a903d2f907a6",
+    "review_only": "d1eb3d0da748009c75ae41b75991ca861e1e4a9b9086d7c467ae037d09159de7",
+    "mixed_decisions": "888056e1c67048ce1c7214e8848801ac6d102c2e96f0645835d337a988a5d6b4",
+    "unsupported_edits": "08ef768ac2cbae331fd6436718d27db1a75aa18393507a4bfa186da95005343d",
+    "alt_supported": "c6490ba00e7879f6dfb73cf5b07c95bd1375697d6d46bf812a16399e333fe57f",
+    "link_supported": "346a3d095c4b79d96b118389e999c71962dbab27edb5731c1a72e14cea0b5ad1",
+    "header_range": "ee2c92878ca27bf2830e8abd4a5d17df478de62a6e9fa8bae4ddb3b2e9956721",
+    "header_disabled_table": "28ef03661dbc430c66436f43225f11ec092ff122895b5d58996380a1bfc9c9e5",
+    "rename_references": "fabf363d00df9f6af44e791945d9d67dec8405dc9fadb516633a1684c8221d51",
+    "preservation_rich": "7e870c77e26a57bb97c34a76eb18cde4dd19be69edbcdf68af3a24ef2085fad7",
+    "large_preservation": "d55c8af59d4d1b5c52299d403a9b5798411f425461c02e240364d78ce7f6eb05",
+    "table_header_vectors": "f6a1f5905e7b6c5d5ef11666f92614cacba1c96e8753a5c6168729ed30ab85b7",
+    "merge_vectors": "66c3f84e0d8367cac38dad9a18d4b5faa28d9d360908e38869d9734a09c73ede",
+    "link_vectors": "9f7b4a843c385d42fd135ee5af2272244d6430bf54c31cc92e12e4334b95399c",
+    "contrast_vectors": "71af778563435779715c64b1dda39e293c501b0aebd7c9439cc326ff495a5a0c",
+    "tint_half_vectors": "13be0503cf498e3f5417acce3e3773af0874a2f8a9b021226a45c9412cd66826"
+  },
+  "pack_revision": "2.1.1",
+  "pack_hashes": {
+    "CORRECTIONS.md": "816f65a5af73bceee9b30857cc392094211de66305e27e60374e8a196319af30",
+    "Phase4_Shared_Specification.md": "ba8a1a1bf3a09d216b50336b99c2749f8854b14697865e37ed6bfa57c686a698",
+    "README.md": "82d8f2cc8b21afdab28691158e609465e9518a9f5a539453888c884ea95af9d3",
+    "phase4-examples.json": "124e5737e86038ac7ef0d40a99b3f5951914f5a707b93a2c38e4725ac87d3a06",
+    "phase4-policy-vectors.json": "a5b3ad3e635e9a902ab821e6e11dcd2d8c17f7b2f6c3e012c3eb5a635f003a24",
+    "phase4-test-plan.json": "1d894c8085318205f39d622d175a8deda6852e4005e433cf5e2dc997abb4ee60",
+    "phase4-wire-schemas.json": "4acb67c26e27c501d1b45f69b25f7faf29344be892f5302ae515f776bc182d4a"
+  },
   "components": {
     "C1": "Authentication and access",
     "C2": "Intake and validation",
@@ -288,8 +335,7 @@
     "binary_response_bytes": 33554432
   },
   "pending_confirmation": [
-    "Grouped negative vectors (for example P4-REJECT-NAME-INVALID) still report one result ID each; the pod must agree on expanded IDs before freezing the count.",
-    "Fixture packs marked pending in expectations.json need bytes, reviewed expectations and two-member review by the other team (section 15.2).",
+    "Expanded vector IDs are recorded individually in suite 2.1.1; cross-team adoption of this executable manifest and its exact fixture hashes remains pending.",
     "Team 12's received clean.xlsx is not adopted: an independent reading finds six findings (docs/evidence/phase4_team12_clean_review.md).",
     "LINK_TEXT destination comparison uses the trimmed, collapsed, casefolded label against the trimmed, casefolded destination (tester/phase4/policy.py).",
     "APPLY to COLOR_CONTRAST/MERGED_CELLS findings expects 422 UNSUPPORTED_CORRECTION (safe-profile check before value shape); the pod must confirm the check order.",
@@ -298,9 +344,9 @@
     "A STALE_AUDIT answer while the competing re-audit is still PROCESSING is a fail; if the re-audit already finished, the case is skipped as unobservable."
   ],
   "known_deviations": [
-    "HTTP-only run: C9 review UI and the Excel no-repair gate need separate evidence.",
+    "HTTP-only run: C9 review UI and Excel no-repair behavior are not established here.",
     "Local-integration (24) and manual-release (10) plan entries are outside this report.",
-    "Synthetic fixture expectations await two-member Team 12 review."
+    "Human fixture/Excel review was not performed; no approval is inferred from automated results."
   ],
   "tests": [
     {
@@ -2437,8 +2483,8 @@
     {
       "test_id": "P4-RULE-COLOR-THEME-TINT",
       "check": "rule_vector",
-      "description": "Theme indices, HSL tint, and channel rounding match the frozen policy vectors",
-      "qualifying_assertion": "Theme indices, HSL tint, and channel rounding match the frozen policy vectors.",
+      "description": "Theme indices, HSL tint, and channel rounding match the frozen policy vectors [standard]",
+      "qualifying_assertion": "Individual standard vector from P4-RULE-COLOR-THEME-TINT: Theme indices, HSL tint, and channel rounding match the frozen policy vectors. Use the corrected pack 2.1.1 constants, including both 336699 corrections and the 010101/050505 half-boundary cases. Exact half-channel values round upward despite intermediate numerical error; expectations must not be generated by the production color helper.",
       "components": [
         "C4"
       ],
@@ -2456,10 +2502,123 @@
       "prerequisites": [],
       "parameters": {
         "fixture": "contrast_vectors",
-        "case": "color_theme_tint"
+        "case": "color_theme_tint",
+        "variant": "standard"
       },
       "fixtures": [
         "contrast_vectors"
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-NEGATIVE",
+      "check": "rule_vector",
+      "description": "Theme indices, HSL tint, and channel rounding match the frozen policy vectors [blue_negative]",
+      "qualifying_assertion": "Individual blue_negative vector from P4-RULE-COLOR-THEME-TINT: Theme indices, HSL tint, and channel rounding match the frozen policy vectors. Use the corrected pack 2.1.1 constants, including both 336699 corrections and the 010101/050505 half-boundary cases. Exact half-channel values round upward despite intermediate numerical error; expectations must not be generated by the production color helper.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ],
+      "path": "success",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "tint_half_vectors",
+        "case": "tint_blue_negative"
+      },
+      "fixtures": [
+        "tint_half_vectors"
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-POSITIVE",
+      "check": "rule_vector",
+      "description": "Theme indices, HSL tint, and channel rounding match the frozen policy vectors [blue_positive]",
+      "qualifying_assertion": "Individual blue_positive vector from P4-RULE-COLOR-THEME-TINT: Theme indices, HSL tint, and channel rounding match the frozen policy vectors. Use the corrected pack 2.1.1 constants, including both 336699 corrections and the 010101/050505 half-boundary cases. Exact half-channel values round upward despite intermediate numerical error; expectations must not be generated by the production color helper.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ],
+      "path": "success",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "tint_half_vectors",
+        "case": "tint_blue_positive"
+      },
+      "fixtures": [
+        "tint_half_vectors"
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-ONE",
+      "check": "rule_vector",
+      "description": "Theme indices, HSL tint, and channel rounding match the frozen policy vectors [gray_one]",
+      "qualifying_assertion": "Individual gray_one vector from P4-RULE-COLOR-THEME-TINT: Theme indices, HSL tint, and channel rounding match the frozen policy vectors. Use the corrected pack 2.1.1 constants, including both 336699 corrections and the 010101/050505 half-boundary cases. Exact half-channel values round upward despite intermediate numerical error; expectations must not be generated by the production color helper.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ],
+      "path": "success",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "tint_half_vectors",
+        "case": "tint_gray_one"
+      },
+      "fixtures": [
+        "tint_half_vectors"
+      ]
+    },
+    {
+      "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-FIVE",
+      "check": "rule_vector",
+      "description": "Theme indices, HSL tint, and channel rounding match the frozen policy vectors [gray_five]",
+      "qualifying_assertion": "Individual gray_five vector from P4-RULE-COLOR-THEME-TINT: Theme indices, HSL tint, and channel rounding match the frozen policy vectors. Use the corrected pack 2.1.1 constants, including both 336699 corrections and the 010101/050505 half-boundary cases. Exact half-channel values round upward despite intermediate numerical error; expectations must not be generated by the production color helper.",
+      "components": [
+        "C4"
+      ],
+      "acceptance": [
+        "AC-04",
+        "AC-05",
+        "AC-06"
+      ],
+      "operations": [
+        2,
+        5
+      ],
+      "path": "success",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "tint_half_vectors",
+        "case": "tint_gray_five"
+      },
+      "fixtures": [
+        "tint_half_vectors"
       ]
     },
     {
@@ -2715,8 +2874,8 @@
     {
       "test_id": "P4-REAUDIT",
       "check": "reaudit",
-      "description": "POST absent body, empty object, and MANUAL_REAUDIT reason on separate trials returns 202; new audit IDs on same version; previous audit/report bytes unchanged",
-      "qualifying_assertion": "POST absent body, empty object, and MANUAL_REAUDIT reason on separate trials returns 202; new audit IDs on same version; previous audit/report bytes unchanged.",
+      "description": "POST absent body, empty object, and MANUAL_REAUDIT reason on separate trials returns 202; new audit IDs on same version; previous audit/report bytes unchanged [absent]",
+      "qualifying_assertion": "Individual absent vector from P4-REAUDIT: POST absent body, empty object, and MANUAL_REAUDIT reason on separate trials returns 202; new audit IDs on same version; previous audit/report bytes unchanged.",
       "components": [
         "C3",
         "C5",
@@ -2735,7 +2894,68 @@
       "phase": "4",
       "prerequisites": [],
       "parameters": {
-        "fixture": "seeded_all_six"
+        "fixture": "seeded_all_six",
+        "variant": "absent"
+      },
+      "fixtures": [
+        "seeded_all_six"
+      ]
+    },
+    {
+      "test_id": "P4-REAUDIT--EMPTY-OBJECT",
+      "check": "reaudit",
+      "description": "POST absent body, empty object, and MANUAL_REAUDIT reason on separate trials returns 202; new audit IDs on same version; previous audit/report bytes unchanged [empty_object]",
+      "qualifying_assertion": "Individual empty_object vector from P4-REAUDIT: POST absent body, empty object, and MANUAL_REAUDIT reason on separate trials returns 202; new audit IDs on same version; previous audit/report bytes unchanged.",
+      "components": [
+        "C3",
+        "C5",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-11"
+      ],
+      "operations": [
+        6,
+        5,
+        10,
+        "R"
+      ],
+      "path": "success",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "seeded_all_six",
+        "variant": "empty_object"
+      },
+      "fixtures": [
+        "seeded_all_six"
+      ]
+    },
+    {
+      "test_id": "P4-REAUDIT--REASON",
+      "check": "reaudit",
+      "description": "POST absent body, empty object, and MANUAL_REAUDIT reason on separate trials returns 202; new audit IDs on same version; previous audit/report bytes unchanged [reason]",
+      "qualifying_assertion": "Individual reason vector from P4-REAUDIT: POST absent body, empty object, and MANUAL_REAUDIT reason on separate trials returns 202; new audit IDs on same version; previous audit/report bytes unchanged.",
+      "components": [
+        "C3",
+        "C5",
+        "C8"
+      ],
+      "acceptance": [
+        "AC-11"
+      ],
+      "operations": [
+        6,
+        5,
+        10,
+        "R"
+      ],
+      "path": "success",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "seeded_all_six",
+        "variant": "reason"
       },
       "fixtures": [
         "seeded_all_six"
@@ -2744,8 +2964,8 @@
     {
       "test_id": "P4-REAUDIT-INVALID",
       "check": "reaudit_invalid",
-      "description": "Wrong reason or unknown field returns 400 INVALID_REQUEST; no extra audit",
-      "qualifying_assertion": "Wrong reason or unknown field returns 400 INVALID_REQUEST; no extra audit.",
+      "description": "Wrong reason or unknown field returns 400 INVALID_REQUEST; no extra audit [wrong_reason]",
+      "qualifying_assertion": "Individual wrong_reason vector from P4-REAUDIT-INVALID: Wrong reason or unknown field returns 400 INVALID_REQUEST; no extra audit.",
       "components": [
         "C5"
       ],
@@ -2760,7 +2980,34 @@
       "phase": "4",
       "prerequisites": [],
       "parameters": {
-        "fixture": "clean_all_six"
+        "fixture": "clean_all_six",
+        "variant": "wrong_reason"
+      },
+      "fixtures": [
+        "clean_all_six"
+      ]
+    },
+    {
+      "test_id": "P4-REAUDIT-INVALID--UNKNOWN-FIELD",
+      "check": "reaudit_invalid",
+      "description": "Wrong reason or unknown field returns 400 INVALID_REQUEST; no extra audit [unknown_field]",
+      "qualifying_assertion": "Individual unknown_field vector from P4-REAUDIT-INVALID: Wrong reason or unknown field returns 400 INVALID_REQUEST; no extra audit.",
+      "components": [
+        "C5"
+      ],
+      "acceptance": [
+        "AC-11"
+      ],
+      "operations": [
+        6,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "clean_all_six",
+        "variant": "unknown_field"
       },
       "fixtures": [
         "clean_all_six"
@@ -3127,8 +3374,8 @@
     {
       "test_id": "P4-REJECT-UNKNOWN-FIELD",
       "check": "reject_decisions",
-      "description": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged",
-      "qualifying_assertion": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "description": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged [envelope]",
+      "qualifying_assertion": "Individual envelope vector from P4-REJECT-UNKNOWN-FIELD: 400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged.",
       "components": [
         "C7"
       ],
@@ -3146,7 +3393,38 @@
       "prerequisites": [],
       "parameters": {
         "fixture": "mixed_decisions",
-        "condition": "unknown_field"
+        "condition": "unknown_field",
+        "variant": "envelope"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-UNKNOWN-FIELD--DECISION",
+      "check": "reject_decisions",
+      "description": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged [decision]",
+      "qualifying_assertion": "Individual decision vector from P4-REJECT-UNKNOWN-FIELD: 400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "unknown_field",
+        "variant": "decision"
       },
       "fixtures": [
         "mixed_decisions",
@@ -3359,8 +3637,8 @@
     {
       "test_id": "P4-REJECT-VALUE-WRONG-SHAPE",
       "check": "reject_decisions",
-      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged",
-      "qualifying_assertion": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [string]",
+      "qualifying_assertion": "Individual string vector from P4-REJECT-VALUE-WRONG-SHAPE: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
       "components": [
         "C7"
       ],
@@ -3378,7 +3656,98 @@
       "prerequisites": [],
       "parameters": {
         "fixture": "mixed_decisions",
-        "condition": "value_wrong_shape"
+        "condition": "value_wrong_shape",
+        "variant": "string"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--OTHER-RULE",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [other_rule]",
+      "qualifying_assertion": "Individual other_rule vector from P4-REJECT-VALUE-WRONG-SHAPE: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "value_wrong_shape",
+        "variant": "other_rule"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--UNKNOWN-FIELD",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [unknown_field]",
+      "qualifying_assertion": "Individual unknown_field vector from P4-REJECT-VALUE-WRONG-SHAPE: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "value_wrong_shape",
+        "variant": "unknown_field"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--NULL",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [null]",
+      "qualifying_assertion": "Individual null vector from P4-REJECT-VALUE-WRONG-SHAPE: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "value_wrong_shape",
+        "variant": "null"
       },
       "fixtures": [
         "mixed_decisions",
@@ -3388,8 +3757,8 @@
     {
       "test_id": "P4-REJECT-VALUE-ON-DECLINE",
       "check": "reject_decisions",
-      "description": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged",
-      "qualifying_assertion": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "description": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged [decline]",
+      "qualifying_assertion": "Individual decline vector from P4-REJECT-VALUE-ON-DECLINE: 400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged.",
       "components": [
         "C7"
       ],
@@ -3407,7 +3776,38 @@
       "prerequisites": [],
       "parameters": {
         "fixture": "mixed_decisions",
-        "condition": "value_on_decline"
+        "condition": "value_on_decline",
+        "variant": "decline"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-VALUE-ON-DECLINE--MANUAL-REVIEW",
+      "check": "reject_decisions",
+      "description": "400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged [manual_review]",
+      "qualifying_assertion": "Individual manual_review vector from P4-REJECT-VALUE-ON-DECLINE: 400 ProjectError code INVALID_REQUEST; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "value_on_decline",
+        "variant": "manual_review"
       },
       "fixtures": [
         "mixed_decisions",
@@ -3417,8 +3817,8 @@
     {
       "test_id": "P4-REJECT-ALT-BLANK",
       "check": "reject_decisions",
-      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged",
-      "qualifying_assertion": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [title]",
+      "qualifying_assertion": "Individual title vector from P4-REJECT-ALT-BLANK: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
       "components": [
         "C7"
       ],
@@ -3436,7 +3836,38 @@
       "prerequisites": [],
       "parameters": {
         "fixture": "mixed_decisions",
-        "condition": "alt_blank"
+        "condition": "alt_blank",
+        "variant": "title"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-ALT-BLANK--DESCRIPTION",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [description]",
+      "qualifying_assertion": "Individual description vector from P4-REJECT-ALT-BLANK: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "alt_blank",
+        "variant": "description"
       },
       "fixtures": [
         "mixed_decisions",
@@ -3446,8 +3877,8 @@
     {
       "test_id": "P4-REJECT-ALT-TOO-LONG",
       "check": "reject_decisions",
-      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged",
-      "qualifying_assertion": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [title]",
+      "qualifying_assertion": "Individual title vector from P4-REJECT-ALT-TOO-LONG: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
       "components": [
         "C7"
       ],
@@ -3465,7 +3896,38 @@
       "prerequisites": [],
       "parameters": {
         "fixture": "mixed_decisions",
-        "condition": "alt_too_long"
+        "condition": "alt_too_long",
+        "variant": "title"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-ALT-TOO-LONG--DESCRIPTION",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [description]",
+      "qualifying_assertion": "Individual description vector from P4-REJECT-ALT-TOO-LONG: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "alt_too_long",
+        "variant": "description"
       },
       "fixtures": [
         "mixed_decisions",
@@ -3475,8 +3937,8 @@
     {
       "test_id": "P4-REJECT-NAME-INVALID",
       "check": "reject_decisions",
-      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged",
-      "qualifying_assertion": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [too_long]",
+      "qualifying_assertion": "Individual too_long vector from P4-REJECT-NAME-INVALID: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
       "components": [
         "C7"
       ],
@@ -3494,7 +3956,218 @@
       "prerequisites": [],
       "parameters": {
         "fixture": "mixed_decisions",
-        "condition": "name_invalid"
+        "condition": "name_invalid",
+        "variant": "too_long"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-NAME-INVALID--EDGE-WHITESPACE",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [edge_whitespace]",
+      "qualifying_assertion": "Individual edge_whitespace vector from P4-REJECT-NAME-INVALID: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "name_invalid",
+        "variant": "edge_whitespace"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-NAME-INVALID--SEPARATOR",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [separator]",
+      "qualifying_assertion": "Individual separator vector from P4-REJECT-NAME-INVALID: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "name_invalid",
+        "variant": "separator"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-NAME-INVALID--GENERIC",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [generic]",
+      "qualifying_assertion": "Individual generic vector from P4-REJECT-NAME-INVALID: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "name_invalid",
+        "variant": "generic"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-NAME-INVALID--RESERVED",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [reserved]",
+      "qualifying_assertion": "Individual reserved vector from P4-REJECT-NAME-INVALID: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "name_invalid",
+        "variant": "reserved"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-NAME-INVALID--CASE-ONLY",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [case_only]",
+      "qualifying_assertion": "Individual case_only vector from P4-REJECT-NAME-INVALID: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "name_invalid",
+        "variant": "case_only"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-NAME-INVALID--UNCHANGED",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [unchanged]",
+      "qualifying_assertion": "Individual unchanged vector from P4-REJECT-NAME-INVALID: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "name_invalid",
+        "variant": "unchanged"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-NAME-INVALID--SOURCE-COLLISION",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [source_collision]",
+      "qualifying_assertion": "Individual source_collision vector from P4-REJECT-NAME-INVALID: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "name_invalid",
+        "variant": "source_collision"
       },
       "fixtures": [
         "mixed_decisions",
@@ -3562,8 +4235,8 @@
     {
       "test_id": "P4-REJECT-HEADER-ROW",
       "check": "reject_decisions",
-      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged",
-      "qualifying_assertion": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [wrong_row]",
+      "qualifying_assertion": "Individual wrong_row vector from P4-REJECT-HEADER-ROW: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
       "components": [
         "C7"
       ],
@@ -3581,7 +4254,68 @@
       "prerequisites": [],
       "parameters": {
         "fixture": "mixed_decisions",
-        "condition": "header_row"
+        "condition": "header_row",
+        "variant": "wrong_row"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-HEADER-ROW--BOOLEAN",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [boolean]",
+      "qualifying_assertion": "Individual boolean vector from P4-REJECT-HEADER-ROW: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "header_row",
+        "variant": "boolean"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-HEADER-ROW--REPLACEMENT-LABELS",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [replacement_labels]",
+      "qualifying_assertion": "Individual replacement_labels vector from P4-REJECT-HEADER-ROW: 422 ProjectError code INVALID_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "header_row",
+        "variant": "replacement_labels"
       },
       "fixtures": [
         "mixed_decisions",
@@ -3591,8 +4325,8 @@
     {
       "test_id": "P4-REJECT-MANUAL-APPLY",
       "check": "reject_decisions",
-      "description": "422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged",
-      "qualifying_assertion": "422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "description": "422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [decorative_alt]",
+      "qualifying_assertion": "Individual decorative_alt vector from P4-REJECT-MANUAL-APPLY: 422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
       "components": [
         "C7"
       ],
@@ -3610,7 +4344,158 @@
       "prerequisites": [],
       "parameters": {
         "fixture": "unsupported_edits",
-        "condition": "manual_apply"
+        "condition": "manual_apply",
+        "variant": "decorative_alt"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-MANUAL-APPLY--DUPLICATE-ALT",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [duplicate_alt]",
+      "qualifying_assertion": "Individual duplicate_alt vector from P4-REJECT-MANUAL-APPLY: 422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "unsupported_edits",
+        "condition": "manual_apply",
+        "variant": "duplicate_alt"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-MANUAL-APPLY--COLOR",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [color]",
+      "qualifying_assertion": "Individual color vector from P4-REJECT-MANUAL-APPLY: 422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "unsupported_edits",
+        "condition": "manual_apply",
+        "variant": "color"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-MANUAL-APPLY--FORMULA-LINK",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [formula_link]",
+      "qualifying_assertion": "Individual formula_link vector from P4-REJECT-MANUAL-APPLY: 422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "unsupported_edits",
+        "condition": "manual_apply",
+        "variant": "formula_link"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-MANUAL-APPLY--MERGE",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [merge]",
+      "qualifying_assertion": "Individual merge vector from P4-REJECT-MANUAL-APPLY: 422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "unsupported_edits",
+        "condition": "manual_apply",
+        "variant": "merge"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-MANUAL-APPLY--UNSAFE-RENAME",
+      "check": "reject_decisions",
+      "description": "422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged [unsafe_rename]",
+      "qualifying_assertion": "Individual unsafe_rename vector from P4-REJECT-MANUAL-APPLY: 422 ProjectError code UNSUPPORTED_CORRECTION; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "unsupported_edits",
+        "condition": "manual_apply",
+        "variant": "unsafe_rename"
       },
       "fixtures": [
         "mixed_decisions",
@@ -3620,8 +4505,8 @@
     {
       "test_id": "P4-REJECT-MISSING-KEY",
       "check": "reject_decisions",
-      "description": "400 ProjectError code IDEMPOTENCY_KEY_REQUIRED; no accepted remediation/output or decision batch; source and prior history unchanged",
-      "qualifying_assertion": "400 ProjectError code IDEMPOTENCY_KEY_REQUIRED; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "description": "400 ProjectError code IDEMPOTENCY_KEY_REQUIRED; no accepted remediation/output or decision batch; source and prior history unchanged [missing]",
+      "qualifying_assertion": "Individual missing vector from P4-REJECT-MISSING-KEY: 400 ProjectError code IDEMPOTENCY_KEY_REQUIRED; no accepted remediation/output or decision batch; source and prior history unchanged.",
       "components": [
         "C7"
       ],
@@ -3639,7 +4524,38 @@
       "prerequisites": [],
       "parameters": {
         "fixture": "mixed_decisions",
-        "condition": "missing_key"
+        "condition": "missing_key",
+        "variant": "missing"
+      },
+      "fixtures": [
+        "mixed_decisions",
+        "unsupported_edits"
+      ]
+    },
+    {
+      "test_id": "P4-REJECT-MISSING-KEY--MALFORMED",
+      "check": "reject_decisions",
+      "description": "400 ProjectError code IDEMPOTENCY_KEY_REQUIRED; no accepted remediation/output or decision batch; source and prior history unchanged [malformed]",
+      "qualifying_assertion": "Individual malformed vector from P4-REJECT-MISSING-KEY: 400 ProjectError code IDEMPOTENCY_KEY_REQUIRED; no accepted remediation/output or decision batch; source and prior history unchanged.",
+      "components": [
+        "C7"
+      ],
+      "acceptance": [
+        "AC-06",
+        "AC-07",
+        "AC-11"
+      ],
+      "operations": [
+        7,
+        10
+      ],
+      "path": "error",
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "fixture": "mixed_decisions",
+        "condition": "missing_key",
+        "variant": "malformed"
       },
       "fixtures": [
         "mixed_decisions",
@@ -5596,8 +6512,8 @@
     {
       "test_id": "P4-FAULT-AUTH",
       "check": "fault_auth",
-      "description": "User/reviewer credentials cannot configure faults through system setup; return testing 403, while absent/invalid credentials return 401, with no new runnable...",
-      "qualifying_assertion": "User/reviewer credentials cannot configure faults through system setup; return testing 403, while absent/invalid credentials return 401, with no new runnable namespace.",
+      "description": "User/reviewer credentials cannot configure faults through system setup; return testing 403, while absent/invalid credentials return 401, with no new runnable... [user]",
+      "qualifying_assertion": "Individual user vector from P4-FAULT-AUTH: User/reviewer credentials cannot configure faults through system setup; return testing 403, while absent/invalid credentials return 401, with no new runnable namespace.",
       "components": [
         "C1",
         "C6"
@@ -5606,14 +6522,70 @@
       "operations": [],
       "phase": "4",
       "prerequisites": [],
-      "parameters": {},
+      "parameters": {
+        "variant": "user"
+      },
+      "fixtures": []
+    },
+    {
+      "test_id": "P4-FAULT-AUTH--REVIEWER",
+      "check": "fault_auth",
+      "description": "User/reviewer credentials cannot configure faults through system setup; return testing 403, while absent/invalid credentials return 401, with no new runnable... [reviewer]",
+      "qualifying_assertion": "Individual reviewer vector from P4-FAULT-AUTH: User/reviewer credentials cannot configure faults through system setup; return testing 403, while absent/invalid credentials return 401, with no new runnable namespace.",
+      "components": [
+        "C1",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "variant": "reviewer"
+      },
+      "fixtures": []
+    },
+    {
+      "test_id": "P4-FAULT-AUTH--UNAUTHENTICATED",
+      "check": "fault_auth",
+      "description": "User/reviewer credentials cannot configure faults through system setup; return testing 403, while absent/invalid credentials return 401, with no new runnable... [unauthenticated]",
+      "qualifying_assertion": "Individual unauthenticated vector from P4-FAULT-AUTH: User/reviewer credentials cannot configure faults through system setup; return testing 403, while absent/invalid credentials return 401, with no new runnable namespace.",
+      "components": [
+        "C1",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "variant": "unauthenticated"
+      },
+      "fixtures": []
+    },
+    {
+      "test_id": "P4-FAULT-AUTH--INVALID-TOKEN",
+      "check": "fault_auth",
+      "description": "User/reviewer credentials cannot configure faults through system setup; return testing 403, while absent/invalid credentials return 401, with no new runnable... [invalid_token]",
+      "qualifying_assertion": "Individual invalid_token vector from P4-FAULT-AUTH: User/reviewer credentials cannot configure faults through system setup; return testing 403, while absent/invalid credentials return 401, with no new runnable namespace.",
+      "components": [
+        "C1",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "variant": "invalid_token"
+      },
       "fixtures": []
     },
     {
       "test_id": "P4-FAULT-INVALID",
       "check": "fault_invalid",
-      "description": "Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace",
-      "qualifying_assertion": "Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace.",
+      "description": "Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace [empty]",
+      "qualifying_assertion": "Individual empty vector from P4-FAULT-INVALID: Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace.",
       "components": [
         "C1",
         "C6"
@@ -5622,7 +6594,117 @@
       "operations": [],
       "phase": "4",
       "prerequisites": [],
-      "parameters": {},
+      "parameters": {
+        "variant": "empty"
+      },
+      "fixtures": []
+    },
+    {
+      "test_id": "P4-FAULT-INVALID--TWO",
+      "check": "fault_invalid",
+      "description": "Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace [two]",
+      "qualifying_assertion": "Individual two vector from P4-FAULT-INVALID: Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace.",
+      "components": [
+        "C1",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "variant": "two"
+      },
+      "fixtures": []
+    },
+    {
+      "test_id": "P4-FAULT-INVALID--ZERO",
+      "check": "fault_invalid",
+      "description": "Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace [zero]",
+      "qualifying_assertion": "Individual zero vector from P4-FAULT-INVALID: Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace.",
+      "components": [
+        "C1",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "variant": "zero"
+      },
+      "fixtures": []
+    },
+    {
+      "test_id": "P4-FAULT-INVALID--BOOLEAN",
+      "check": "fault_invalid",
+      "description": "Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace [boolean]",
+      "qualifying_assertion": "Individual boolean vector from P4-FAULT-INVALID: Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace.",
+      "components": [
+        "C1",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "variant": "boolean"
+      },
+      "fixtures": []
+    },
+    {
+      "test_id": "P4-FAULT-INVALID--STRING",
+      "check": "fault_invalid",
+      "description": "Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace [string]",
+      "qualifying_assertion": "Individual string vector from P4-FAULT-INVALID: Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace.",
+      "components": [
+        "C1",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "variant": "string"
+      },
+      "fixtures": []
+    },
+    {
+      "test_id": "P4-FAULT-INVALID--EXTRA-FIELD",
+      "check": "fault_invalid",
+      "description": "Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace [extra_field]",
+      "qualifying_assertion": "Individual extra_field vector from P4-FAULT-INVALID: Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace.",
+      "components": [
+        "C1",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "variant": "extra_field"
+      },
+      "fixtures": []
+    },
+    {
+      "test_id": "P4-FAULT-INVALID--UNKNOWN-FIELD",
+      "check": "fault_invalid",
+      "description": "Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace [unknown_field]",
+      "qualifying_assertion": "Individual unknown_field vector from P4-FAULT-INVALID: Empty faults, wrong count/type including true or string 1, and unknown fault keys return testing 400 source system; no new runnable namespace.",
+      "components": [
+        "C1",
+        "C6"
+      ],
+      "acceptance": [],
+      "operations": [],
+      "phase": "4",
+      "prerequisites": [],
+      "parameters": {
+        "variant": "unknown_field"
+      },
       "fixtures": []
     }
   ]

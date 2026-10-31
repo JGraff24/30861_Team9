@@ -68,33 +68,77 @@ Leaving the log viewer does not stop deployment. A build can take several minute
    existing `measurement` Docker target with `team9-phase3:<SHA>` image tags.
 4. Require mounted storage and at least 2 GiB free on the root disk. Build and validate
    before interrupting production. Verify that main has not advanced before activation.
-5. Wait up to 11 minutes for active tester setup/runs and queued/running audits. Take
-   online SQLite backups at `/data/deployment-backups/<time>-<SHA>/`.
-6. Atomically change only `TEAM9_IMAGE` and `DEPLOYMENT_SHA` in `compose.env`, then recreate
-   the system, worker, tester and nginx. Including nginx refreshes its upstream addresses.
-7. Require all four containers, the expected application image tags, public HTTPS system
-   health, tester schema, and unauthenticated tester rejection. Record the release in
-   `/opt/team9/config/deployment-state.json` only after those checks pass. Upgrade the
-   polling bootstrap from that successful release as well.
+5. Wait up to 1,900 seconds for active tester setup/runs, audits, remediations and upload
+   reservations. Stop nginx ingress, then gracefully stop all database writers. Recheck the
+   stopped databases: if an old request accepted new work while shutdown finished, restart
+   the old release and defer without migrating. This closes the initial idle-check race.
+6. Back up the quiescent SQLite stores at `/data/deployment-backups/<time>-<SHA>/`, including
+   their original ownership and permissions. Change only the image/SHA in `compose.env`.
+   Start the candidate system, worker and tester with nginx still stopped. Verify their image
+   identities, exact ruleset-2 health, trusted isolated-fault configuration, installed Phase 4
+   fixture manifest/hashes and 1,800-second suite budget, tester schema and authentication.
+   These private probes issue only read requests and create no workbooks or test sessions.
+7. Record `/opt/team9/config/publication-state.json` and start nginx only after private checks
+   pass. From this point a request may be accepted, so earlier database backups cannot be
+   restored automatically. Verify public HTTPS health, images, schema and authentication;
+   then record `deployment-state.json`, clear the publication marker and upgrade the poller.
 
-The single-host activation briefly interrupts service. New requests racing that window can
-fail. The readiness check does not replace CI integration or claim a new full live-suite run.
+The single-host activation interrupts ingress while writers stop, databases are backed up and
+the candidate is checked. Requests racing shutdown may fail. The readiness check does not
+replace CI integration or claim a new full live-suite run.
+
+Production Compose explicitly selects ruleset `2.0.0`, the installed Phase 4 manifest and the
+required isolated audit-failure control for this designated shared test deployment. These
+operational overrides take precedence over retained Phase 3 environment values. Credentials,
+reviewer grants, target access maps, bucket/prefix and retained mounts stay in the existing
+private configuration. Outside this designated topology, the fault control remains disabled
+by default. The image name retains the historical `team9-phase3:<SHA>` prefix; that name does
+not select the audit ruleset.
 
 ## Failure and recovery
 
 A failed build or preflight leaves the existing release running. Busy-host deferrals retry
-on a later timer tick. Failed activation restores the previous image and Compose environment,
-recreates the containers and checks recovery. A failed release SHA is recorded in
-`/opt/team9/config/deploy-failed.json` so the timer does not repeatedly build/restart it.
-New main commits are still eligible. To retry the same SHA after investigating:
+on a later timer tick. A failure before nginx publication stops candidate writers, restores the post-drain SQLite
+snapshots with their original owner/mode, removes migrated WAL/SHM/journal sidecars, and
+restarts the old image and configuration. No public request can have reached the candidate
+before that rollback. Immutable source objects are not replaced or rolled back.
+
+A failure once nginx startup was attempted keeps the new backend, configuration and migrated
+databases. It does **not** restore old database pages or start an incompatible Phase 3 image:
+new user writes may already exist. The durable publication marker remains for diagnosis.
+An explicit retry runs only that already-vetted release's local deployment script, verifies
+its pinned image/configuration and health, and starts missing services without recreating
+running writers. It does not rebuild, migrate or restore data. This recovery runs before
+fresh-main deployment gates and still works if main has advanced. After recovery, the next
+timer tick applies the ordinary exact-SHA CI gate to any newer main release.
+
+A failed release SHA is recorded in `/opt/team9/config/deploy-failed.json`. A failure or
+unfinished-publication marker is checked before the apparent current SHA, so neither the timer
+nor a matching `compose.env` can hide an incomplete release. To retry after investigating:
 
 ```sh
 sudo python3 /opt/team9/automation/deploy_poll.py JGraff24/30861_Team9 --retry
 ```
 
-Database backups are retained but **not automatically restored**. An image rollback cannot
-guarantee compatibility after future incompatible schema migrations; those need a reviewed
-migration/recovery procedure. If rollback also fails, inspect the journal and backups first.
+For the first upgrade from an older bootstrap, that installed poller may not yet understand
+the new publication marker. Its already-vetted local release script is an explicit recovery
+entry point; use the full SHA recorded in `publication-state.json`:
+
+```sh
+TEAM9_PUBLISHED_SHA=FULL_SHA_FROM_PUBLICATION_STATE
+sudo python3 "/opt/team9/releases/$TEAM9_PUBLISHED_SHA/scripts/deploy_host.py" \
+  "$TEAM9_PUBLISHED_SHA" JGraff24/30861_Team9
+```
+
+This can recover the existing publication even after main advances. Once health passes it
+installs that healthy release's updated polling bootstrap. It never substitutes another
+candidate image or restores pre-publication data. Both publication/failure marker writes
+fsync the file and containing directory before execution proceeds.
+
+Database snapshots are restored only inside the closed-ingress, pre-publication rollback
+boundary above. After publication they remain retained recovery evidence and require a
+record-preserving recovery procedure. If private rollback fails, services remain stopped and
+operators must inspect the journal and backups before reopening ingress.
 
 Deployment status lives in the host journal and deployment-state file, not a GitHub deployment
 job. Green GitHub CI alone is not proof that the host updated:

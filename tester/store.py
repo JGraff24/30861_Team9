@@ -48,6 +48,20 @@ CREATE TABLE IF NOT EXISTS tester_auxiliary_sessions (
     cleanup_pending INTEGER NOT NULL DEFAULT 1
 )
 """
+PLAN_SCHEMA = """
+CREATE TABLE IF NOT EXISTS tester_plan_snapshots (
+    session_id TEXT PRIMARY KEY,
+    plan TEXT NOT NULL
+)
+"""
+# Keep immutable multi-megabyte fixture bundles off the progress row. Updating a
+# result must not rewrite the entire accepted fixture snapshot on every case.
+SESSION_SELECT = (
+    "SELECT s.session_id,s.operator_subject,s.target_url,s.state,s.created_at,"
+    "s.results,s.report,s.cleanup_pending,COALESCE(p.plan,s.plan) AS plan,"
+    "s.setup_json,s.markers FROM tester_sessions s LEFT JOIN tester_plan_snapshots p "
+    "ON p.session_id=s.session_id "
+)
 
 
 @dataclass(frozen=True)
@@ -81,6 +95,11 @@ class TesterStore:
                     setup.execute("PRAGMA journal_mode=WAL")
                     setup.execute(SCHEMA)
                     setup.execute(AUXILIARY_SCHEMA)
+                    setup.execute(PLAN_SCHEMA)
+                    setup.execute(
+                        "CREATE TRIGGER IF NOT EXISTS immutable_tester_snapshot BEFORE UPDATE "
+                        "ON tester_plan_snapshots BEGIN SELECT RAISE(ABORT,'immutable plan'); END"
+                    )
                     columns = {
                         row[1] for row in setup.execute("PRAGMA table_info(tester_sessions)")
                     }
@@ -134,6 +153,14 @@ class TesterStore:
         setup: dict[str, object] | None = None,
     ) -> None:
         with self._connect(write=True) as db:
+            snapshot = None
+            if plan is not None:
+                try:
+                    parsed = json.loads(plan)
+                    if "fixture_bytes" in parsed:
+                        snapshot, plan = plan, None
+                except (ValueError, TypeError):
+                    pass  # Existing malformed legacy plans keep their controlled run rejection.
             db.execute(
                 "INSERT INTO tester_sessions (session_id, operator_subject, target_url, state,"
                 " created_at, plan, setup_json) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -147,6 +174,8 @@ class TesterStore:
                     json.dumps(setup or {}),
                 ),
             )
+            if snapshot is not None:
+                db.execute("INSERT INTO tester_plan_snapshots VALUES (?,?)", (session_id, snapshot))
 
     def finish_setup(self, session_id: str, ready: bool) -> None:
         state = TesterSessionState.READY if ready else TesterSessionState.SETUP_FAILED
@@ -159,9 +188,7 @@ class TesterStore:
 
     def get(self, session_id: str) -> SessionRow | None:
         with self._connect() as db:
-            row = db.execute(
-                "SELECT * FROM tester_sessions WHERE session_id = ?", (session_id,)
-            ).fetchone()
+            row = db.execute(SESSION_SELECT + "WHERE s.session_id = ?", (session_id,)).fetchone()
         return None if row is None else self._row(row)
 
     def require_owned(self, session_id: str, operator: str) -> SessionRow:
@@ -175,9 +202,7 @@ class TesterStore:
     def begin_run(self, session_id: str, operator: str) -> SessionRow:
         """Consume a READY session exactly once; every later or concurrent run gets 409."""
         with self._connect(write=True) as db:
-            row = db.execute(
-                "SELECT * FROM tester_sessions WHERE session_id = ?", (session_id,)
-            ).fetchone()
+            row = db.execute(SESSION_SELECT + "WHERE s.session_id = ?", (session_id,)).fetchone()
             if row is None:
                 raise TesterError(404, "Unknown tester session.", ErrorSource.TESTER)
             if row["operator_subject"] != operator:
@@ -228,7 +253,7 @@ class TesterStore:
     def running_sessions(self) -> list[SessionRow]:
         with self._connect() as db:
             rows = db.execute(
-                "SELECT * FROM tester_sessions WHERE state = ?", (TesterSessionState.RUNNING,)
+                SESSION_SELECT + "WHERE s.state = ?", (TesterSessionState.RUNNING,)
             ).fetchall()
         return [self._row(row) for row in rows]
 

@@ -595,6 +595,10 @@ def determinism(ctx: SuiteContext) -> str:
         or [(f.message, f.recommendation) for f in audit.findings] != prose
     ):
         raise CheckFailed(f"Audit {run} of identical bytes returned different findings or prose.")
+    if ctx.suite.manifest.phase == "4":
+        first = require(ctx, "seeded_audit", "the valid first completed audit")
+        if (audit.limitations, audit.status) != (first.limitations, first.status):
+            raise CheckFailed(f"Audit {run} of identical bytes changed limitations or status.")
     return f"Audit {run} matched the first audit's semantic findings and prose."
 
 

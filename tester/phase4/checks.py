@@ -18,6 +18,15 @@ import httpx
 from pydantic import ValidationError
 
 from tester.phase4 import contract
+from tester.phase4.catalog import (
+    DECISION_VARIANTS,
+    FAULT_AUTH,
+    FAULT_INVALID,
+    REAUDIT_FORMS,
+    REAUDIT_INVALID,
+    select_variant,
+)
+from tester.phase4.disclosures import missing_facts
 from tester.phase4.package import PackageError, compare_packages
 from tester.phase4.policy import RULE_ORDER
 from tester.suite.checks import (
@@ -364,6 +373,12 @@ def check_limitations(audit: Json, fixture: AcceptedFixture, action: str) -> Non
             f"{action} disclosed {len(limitations)} limitation(s); the fixture requires at least "
             f"{fixture.min_limitations} ({'; '.join(fixture.limitation_facts)})."
         )
+    missing = missing_facts(list(fixture.limitation_facts), limitations)
+    if missing:
+        raise CheckFailed(
+            f"{action} did not establish a required scope/display disclosure: {missing[0]} "
+            "Target wording may differ; retain unrecognized wording for human review."
+        )
 
 
 def check_audit(
@@ -709,6 +724,7 @@ def check_output_findings(ctx: SuiteContext, result: Json, audit: Json, action: 
     actual = actual_tuples(audit)
     if actual != expected:
         raise CheckFailed(f"{action} output audit: {describe(actual, expected)}")
+    check_limitations(audit, ctx.suite.accepted(result["fixture"]), action)
 
 
 def report_records(ctx: SuiteContext, result: Json) -> tuple[list[Json], list[Json]]:
@@ -881,14 +897,16 @@ def fault_auth(ctx: SuiteContext) -> str:
         ("unauthenticated", None, None, 401),
         ("invalid token", None, INVALID_TOKEN, 401),
     ]
-    for label, identity, token, status in cases:
+    for label, identity, token, status in select_variant(
+        cases, FAULT_AUTH, ctx.parameters.get("variant")
+    ):
         session_id, response = setup_session(
             ctx, {"faults": {"audit_failures": 1}}, identity=identity, raw_token=token
         )
         testing_error(ctx, response, status, f"Fault setup by {label}", None)
         unknown_session(ctx, session_id, f"Fault setup by {label}")
     return (
-        "User/reviewer fault setup returned 403 and missing/invalid credentials 401; no namespace."
+        f"Fault authorization vector {ctx.parameters.get('variant', 'all')} matched; no namespace."
     )
 
 
@@ -902,11 +920,13 @@ def fault_invalid(ctx: SuiteContext) -> str:
         {"audit_failures": 1, "extra": 1},
         {"unknown_fault": 1},
     ]
-    for faults in variants:
+    for faults in select_variant(variants, FAULT_INVALID, ctx.parameters.get("variant")):
         session_id, response = setup_session(ctx, {"faults": faults})
         testing_error(ctx, response, 400, f"Fault setup {json.dumps(faults)}", "system")
         unknown_session(ctx, session_id, f"Fault setup {json.dumps(faults)}")
-    return f"All {len(variants)} malformed fault objects returned 400 source system; no namespace."
+    return (
+        f"Malformed fault vector {ctx.parameters.get('variant', 'all')} returned 400 source system."
+    )
 
 
 # --- uploads and audits ----------------------------------------------------------------------
@@ -927,7 +947,7 @@ def fixture_audit(ctx: SuiteContext) -> str:
     audit = poll_audit(ctx, ids, f"{fixture} audit")
     ctx.state[f"p4:audit:{fixture}"] = audit
     expected = check_audit(ctx, audit, fixture, f"{fixture} audit")
-    return f"{fixture} returned exactly the {len(expected)} reviewed findings in contract order."
+    return f"{fixture} returned exactly the {len(expected)} fixture findings in contract order."
 
 
 def fixture_upload_audit(ctx: SuiteContext) -> str:
@@ -962,7 +982,8 @@ def rule_vector(ctx: SuiteContext) -> str:
         raise CheckFailed(f"{case}: limitations are not deduplicated and code-point sorted.")
     if cases[case].get("requires_limitation") and not limitations:
         raise CheckFailed(f"{case}: the required limitation/disclosure is missing.")
-    return f"{case}: {len(expected)} finding(s) on {sorted(sheets)} match the reviewed vector."
+    check_limitations(audit, accepted, case)
+    return f"{case}: {len(expected)} finding(s) on {sorted(sheets)} match the independent vector."
 
 
 # --- review context ----------------------------------------------------------------------------
@@ -999,7 +1020,7 @@ def review_context(ctx: SuiteContext) -> str:
                 "actions or current value."
             )
     ctx.state[f"p4:review-body:{fixture}"] = review
-    return f"Owner review context matched {len(expected)} reviewed items in audit order."
+    return f"Owner review context matched {len(expected)} expected items in audit order."
 
 
 def review_reviewer(ctx: SuiteContext) -> str:
@@ -1141,7 +1162,7 @@ def reaudit(ctx: SuiteContext) -> str:
         ("empty object", {}, False),
         ("MANUAL_REAUDIT reason", {"reason": "MANUAL_REAUDIT"}, False),
     ]
-    for label, body, absent in trials:
+    for label, body, absent in select_variant(trials, REAUDIT_FORMS, ctx.parameters.get("variant")):
         accepted = _reaudit(ctx, ids, f"Re-audit with {label}", body, absent=absent)
         audit = poll_audit(ctx, ids, f"Re-audit with {label}", audit_id=accepted["auditId"])
         if actual_tuples(audit) != actual_tuples(first):
@@ -1156,7 +1177,8 @@ def reaudit(ctx: SuiteContext) -> str:
         raise CheckFailed("The original audit changed after manual re-audits.")
     if report_bytes(ctx, ids, ids["auditId"], "First report again")[0] != first_report:
         raise CheckFailed("The original report bytes changed after manual re-audits.")
-    return "Three accepted re-audit forms created fresh audits on the same version; history intact."
+    selected = ctx.parameters.get("variant", "all")
+    return f"Re-audit form {selected} created a fresh audit; history intact."
 
 
 def reaudit_invalid(ctx: SuiteContext) -> str:
@@ -1165,15 +1187,17 @@ def reaudit_invalid(ctx: SuiteContext) -> str:
         ids = upload(ctx, fixture, f"{fixture} upload")
         poll_audit(ctx, ids, f"{fixture} audit")
     before = history(ctx, ids, "History before invalid re-audits")
-    for label, body in (
+    trials = [
         ("wrong reason", {"reason": "SCHEDULED"}),
         ("unknown field", {"reason": "MANUAL_REAUDIT", "force": True}),
-    ):
+    ]
+    for label, body in select_variant(trials, REAUDIT_INVALID, ctx.parameters.get("variant")):
         response = call(ctx, "POST", f"{version_path(ids)}/audits", json=body)
         project_error(ctx, response, 400, f"Re-audit with {label}", "INVALID_REQUEST")
     if history(ctx, ids, "History after invalid re-audits") != before:
         raise CheckFailed("A rejected re-audit request created an audit.")
-    return "Wrong reason and unknown field returned 400 INVALID_REQUEST with no extra audit."
+    selected = ctx.parameters.get("variant", "all")
+    return f"Invalid re-audit vector {selected} returned 400; no extra audit."
 
 
 def reaudit_determinism(ctx: SuiteContext) -> str:
@@ -1539,12 +1563,12 @@ def _requests(
     def apply(finding: str, value: Json) -> Json:
         return {"findingId": finding, "action": "APPLY", "value": value}
 
-    def rename(value: str) -> tuple[str, Json, int, str]:
+    def rename(value: str, code: str = "INVALID_CORRECTION") -> tuple[str, Json, int, str]:
         return (
             f"name {value!r}",
             batch(apply(names[0], {"name": value})),
             422,
-            "INVALID_CORRECTION",
+            code,
         )
 
     if condition == "empty":
@@ -1651,9 +1675,9 @@ def _requests(
             rename("Units/2026"),
             rename("Sheet7"),
             rename("history"),
-            rename("sheet1"),
+            rename("sheet1", "UNSUPPORTED_CORRECTION"),
             rename("Sheet1"),
-            rename("notes"),
+            rename("notes", "CONFLICTING_CORRECTIONS"),
         ]
     if condition == "name_swap":
         if len(names) < 2:
@@ -1726,6 +1750,10 @@ def _expect_rejected(
     session: SessionChoice = "main",
 ) -> None:
     before = history(ctx, ids, "History before rejected batches", session=session)
+    condition = str(ctx.parameters.get("condition", ""))
+    choices = DECISION_VARIANTS.get(condition)
+    if choices is not None:
+        requests = select_variant(requests, choices, ctx.parameters.get("variant"))
     for label, body, status, code in requests:
         response = submit(ctx, ids, body, key=new_key() if key == "fresh" else key, session=session)
         project_error(ctx, response, status, f"Decision batch with {label}", code)
@@ -1757,10 +1785,7 @@ def reject_decisions(ctx: SuiteContext) -> str:
             for item in extras(ctx, fixture, "unsupported_apply")
         ]
         _expect_rejected(ctx, ids, requests)
-        return (
-            f"All {len(requests)} APPLY decisions outside the safe profile returned 422 "
-            "UNSUPPORTED_CORRECTION."
-        )
+        return f"Unsupported APPLY vector {ctx.parameters.get('variant', 'all')} returned 422."
     if condition == "missing_key":
         ids, audit = _reject_base(ctx, fixture)
         body = {
@@ -1774,16 +1799,13 @@ def reject_decisions(ctx: SuiteContext) -> str:
                 }
             ],
         }
-        _expect_rejected(
-            ctx, ids, [("no Idempotency-Key", body, 400, "IDEMPOTENCY_KEY_REQUIRED")], key=None
-        )
-        _expect_rejected(
-            ctx,
-            ids,
-            [("malformed Idempotency-Key", body, 400, "IDEMPOTENCY_KEY_REQUIRED")],
-            key="bad key!",
-        )
-        return "Absent and malformed Idempotency-Key returned 400 IDEMPOTENCY_KEY_REQUIRED."
+        selected = str(ctx.parameters.get("variant", "missing"))
+        before = history(ctx, ids, "History before invalid idempotency key")
+        response = submit(ctx, ids, body, key=None if selected == "missing" else "bad key!")
+        project_error(ctx, response, 400, f"{selected} Idempotency-Key", "IDEMPOTENCY_KEY_REQUIRED")
+        if history(ctx, ids, "History after invalid idempotency key") != before:
+            raise CheckFailed("A rejected key created a version or audit.")
+        return f"{selected} Idempotency-Key returned 400 IDEMPOTENCY_KEY_REQUIRED."
     if condition == "cross_audit_finding":
         ids, audit = _reject_base(ctx, fixture)
         other = ctx.state.get("p4:audit:seeded_all_six")
@@ -1909,7 +1931,8 @@ def reject_decisions(ctx: SuiteContext) -> str:
     ids, audit = _reject_base(ctx, fixture)
     requests = _requests(ctx, fixture, audit["auditId"], condition)
     _expect_rejected(ctx, ids, requests)
-    return f"{len(requests)} {condition} request(s) got the exact status/code; nothing changed."
+    selected = str(ctx.parameters.get("variant", "single"))
+    return f"Decision vector {condition}/{selected} got the exact status/code; nothing changed."
 
 
 def batch_atomic(ctx: SuiteContext) -> str:

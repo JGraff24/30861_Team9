@@ -3,6 +3,7 @@
 Run: python -m tests.ryan.browser_ui (requires Playwright and Chromium).
 """
 
+import argparse
 import json
 from pathlib import Path
 
@@ -62,14 +63,18 @@ def check(browser, base, scenario):
             state["reads"].append(path)
         if path == "/ui/identity":
             r.fulfill(json={"role": "reviewer" if scenario == "reviewer" else "user"})
-        elif path in ("/api/v1/workbooks", "/api/v1/workbooks/w/versions"):
+        elif path in (
+            "/api/v1/workbooks",
+            "/api/v1/workbooks/w/versions",
+            "/api/v1/workbooks/other/versions",
+        ):
             if scenario == "upload-error":
                 r.fulfill(status=422, json={"message": HOSTILE})
             else:
                 r.fulfill(
                     status=202,
                     json={
-                        "workbookId": "w",
+                        "workbookId": "other" if "/other/" in path else "w",
                         "versionId": "v",
                         "auditId": "a",
                         "status": "PROCESSING",
@@ -78,7 +83,7 @@ def check(browser, base, scenario):
         elif path.endswith("/history"):
             r.fulfill(
                 json={
-                    "workbookId": "w",
+                    "workbookId": "other" if "/other/" in path else "w",
                     "versions": [
                         {
                             "versionId": "v",
@@ -230,6 +235,33 @@ def check(browser, base, scenario):
             assert page.locator("#send-decisions").is_hidden()
             assert page.locator("#findings select").count() == 0
             assert state["posts"] == []
+        elif scenario == "switch-workbook":
+            page.locator("#decision-0").select_option("APPLY")
+            page.get_by_label("Alternative text title").fill("Draft for the first workbook")
+            page.get_by_label("Existing workbook ID").fill("other")
+            page.get_by_role("button", name="Open history", exact=True).click()
+            page.wait_for_function(
+                "document.querySelector('#history-workbook').textContent.includes('other')"
+            )
+            assert page.locator("#results").is_hidden()
+            assert page.locator("#output-panel").is_hidden()
+            assert "other" in page.locator("#upload-destination").inner_text()
+            page.locator("#upload-kind").select_option("version")
+            page.locator("#submit").click()
+            page.wait_for_function(
+                "document.querySelector('#status').textContent === 'Selected audit loaded.'"
+            )
+            assert state["posts"].count("/api/v1/workbooks/other/versions") == 1
+            assert "other" in page.locator("#metadata").inner_text()
+            page.get_by_label("Existing workbook ID").fill("w")
+            page.get_by_role("button", name="Open history", exact=True).click()
+            page.get_by_role("button", name="Open audit a", exact=False).click()
+            page.locator("#decision-0").wait_for(state="visible")
+            assert page.locator("#decision-0").input_value() == "APPLY"
+            assert (
+                page.get_by_label("Alternative text title").input_value()
+                == "Draft for the first workbook"
+            )
         elif scenario == "navigation":
             for control in ("source-download", "report-download"):
                 with page.expect_download() as saved:
@@ -329,13 +361,17 @@ def check(browser, base, scenario):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--browser-executable", help="Optional local Chromium/Chrome executable.")
+    args = parser.parse_args()
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
+        browser = playwright.chromium.launch(executable_path=args.browser_executable)
         for base in ("", "/system"):
             for scenario in (
                 "workflow",
                 "all-families",
                 "navigation",
+                "switch-workbook",
                 "lost-acceptance",
                 "validation",
                 "conflict",

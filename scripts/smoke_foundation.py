@@ -66,7 +66,7 @@ def main() -> None:
                         if time.monotonic() > deadline:
                             raise TimeoutError(f"{module} startup deadline exceeded")
                         time.sleep(0.1)
-                    expected = 4 if port == 8000 else 3
+                    expected = 13 if port == 8000 else 3
                     assert len(response.json()["paths"]) == expected
                     assert response.json()["openapi"] == "3.1.1"
                     assert client.get("/docs").status_code == 200

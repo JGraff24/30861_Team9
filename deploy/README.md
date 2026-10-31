@@ -70,6 +70,10 @@ No `down -v`: that removes durable volumes. Concrete factories are selected by d
 health returns 200 when storage and required integrations are available. Use
 `TEAM9_BUILD_TARGET=measurement` for development Compose when enabling code measurement.
 The tester is implemented and its manifest/fixtures are included in the installed wheel.
+The Docker build also copies the shared wire-schema source before building that wheel.
+Production selects its bundled Phase 4 manifest at
+`/service/.venv/lib/python3.12/site-packages/tester/fixtures/manifest-phase4.json`; there is no
+source checkout under `/service/tester` in the runtime image.
 The Docker build copies fixture inputs before packaging and runs the installed wheel so
 package-relative fixture/UI paths resolve. Validate local image/Compose changes separately
 before applying them to the existing deployment.
@@ -166,7 +170,7 @@ are up. Verify a valid certificate using an HTTPS client without `-k`, and test 
 `/tester/docs`, `/system/api/v1/health`, rejected credentials and authenticated real workbook
 flow. Check security groups and host sockets to prove direct APIs are unreachable publicly.
 The grader uses `https://$SERVER_NAME/system` and `https://$SERVER_NAME/tester` bases, never `/test`
-suffixes/credentials/queries. Grader tester-run read timeout must be at least 630 seconds.
+suffixes/credentials/queries. Grader tester-run read timeout must be at least 1,830 seconds for the Phase 4 suite.
 
 ## Recovery, backup, cleanup and rollback
 
@@ -217,3 +221,18 @@ never automatically delete committed/unknown keys. Full reconciliation tooling i
 - [Using EBS volumes](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-using-volumes.html): identify devices and avoid formatting retained data.
 - [Instance metadata options](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-options.html): operator review for containers and role access.
 - [EC2 pricing](https://aws.amazon.com/ec2/pricing/): verify current region/account costs at deployment; no price quote is recorded here.
+
+## Phase 4 activation and schema recovery
+
+Use the automatic release process described in [AUTODEPLOY.md](AUTODEPLOY.md) for the existing
+host. Production Compose explicitly overrides retained Phase 3 ruleset/manifest values and
+enables the required test-only audit-failure control on this designated shared test target;
+it leaves private credentials, grants, access maps and storage locations intact. Ordinary
+data cannot consume that control.
+
+Schema 2 cannot be opened by the old Phase 3 repository. Activation therefore closes ingress,
+stops all old writers, refuses raced active work, and snapshots the resulting stores before
+starting the candidate privately. Only a failure before proxy publication may restore those
+snapshots and the old image. After proxy startup is attempted, automatic recovery retains the
+new databases and image, records the unfinished publication and requires an explicit safe
+retry. Never restore a pre-release backup over data accepted after publication.

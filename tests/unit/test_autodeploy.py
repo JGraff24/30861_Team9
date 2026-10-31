@@ -91,6 +91,9 @@ class Host(deploy_host.Deployment):
         self.healthy: list[str] = []
         self.fail_build = False
         self.fail_health = False
+        self.fail_private = False
+        self.private_healthy: list[str] = []
+        self.timeline: list[str] = []
         self.current = [True, True, True]
 
     def run(self, *command: str, capture: bool = False, timeout: int = 900) -> str:
@@ -108,9 +111,22 @@ class Host(deploy_host.Deployment):
     def compose(self, directory: Path, env: Path, *args: str, capture: bool = False) -> str:
         image = deploy_host.read_env(env)["TEAM9_IMAGE"]
         self.events.append((directory, image, args))
+        self.timeline.append(" ".join(args))
         return ""
 
-    def wait_healthy(self, directory: Path, image: str, hostname: str) -> None:
+    def backup(self, data: Path, original: str, previous: Path) -> Path:
+        self.timeline.append("backup")
+        return super().backup(data, original, previous)
+
+    def wait_private_healthy(self, directory: Path, image: str) -> None:
+        self.private_healthy.append(image)
+        self.timeline.append("private checks")
+        if self.fail_private:
+            raise RuntimeError("New image is privately unhealthy")
+
+    def wait_healthy(
+        self, directory: Path, image: str, hostname: str, expected_ruleset: str | None = None
+    ) -> None:
         self.healthy.append(image)
         if self.fail_health and image == "team9-phase3:" + SHA:
             raise RuntimeError("New image is unhealthy")
@@ -151,7 +167,16 @@ def test_success_updates_all_services_and_keeps_sqlite_backups(host: Host) -> No
     assert state["sha"] == SHA and state["previous_image"] == "team9-phase3:" + OLD
     assert host.healthy == ["team9-phase3:" + SHA]
     starts = [event for event in host.events if event[2][0] == "up"]
-    assert len(starts) == 1 and "--force-recreate" in starts[0][2]
+    assert len(starts) == 2 and "--force-recreate" in starts[0][2]
+    assert starts[0][2][-3:] == ("system", "worker", "tester")
+    assert starts[1][2][-1] == "proxy"
+    assert host.private_healthy == ["team9-phase3:" + SHA]
+    assert host.timeline.index("stop --timeout 1900 proxy") < host.timeline.index("backup")
+    assert host.timeline.index("stop --timeout 90 system worker tester") < host.timeline.index(
+        "backup"
+    )
+    assert host.timeline.index("backup") < host.timeline.index("private checks")
+    assert not host.publication.exists()
     assert (Path(state["backup"]) / "system.sqlite3").is_file()
     assert (Path(state["backup"]) / "tester.sqlite3").is_file()
     assert host.config.stat().st_mode & 0o777 == 0o600
@@ -167,13 +192,14 @@ def test_failed_build_does_not_stop_production(host: Host) -> None:
     assert not host.events
 
 
-def test_failed_health_restores_previous_config_and_image(host: Host) -> None:
+def test_failed_private_health_restores_previous_config_and_image(host: Host) -> None:
     original = host.config.read_bytes()
-    host.fail_health = True
+    host.fail_private = True
     with pytest.raises(RuntimeError, match="unhealthy"):
         host.update()
     assert host.config.read_bytes() == original
-    assert host.healthy == ["team9-phase3:" + SHA, "team9-phase3:" + OLD]
+    assert host.private_healthy == ["team9-phase3:" + SHA]
+    assert host.healthy == ["team9-phase3:" + OLD]
     assert not host.state.exists()
     assert host.events[-1][1] == "team9-phase3:" + OLD
     assert not list(host.config.parent.glob("candidate-*.env"))
@@ -185,7 +211,7 @@ def test_failed_next_release_preserves_existing_release_record(host: Host) -> No
     (previous / "deploy/compose.production.yaml").touch()
     original = json.dumps({"sha": OLD, "directory": str(previous)})
     host.state.write_text(original)
-    host.fail_health = True
+    host.fail_private = True
     with pytest.raises(RuntimeError):
         host.update()
     assert host.state.read_text() == original
@@ -366,3 +392,442 @@ def test_deployment_timeout_allows_graceful_recovery_before_killing(
     assert deploy_poll.execute(tmp_path / "candidate.py", SHA, REPOSITORY) == 124
     assert events[:3] == [("wait", 2400), ("terminate", None), ("wait", 180)]
     assert (("kill", None) in events) == force_kill
+
+
+@pytest.mark.parametrize("operation", ["remediation", "upload"])
+def test_phase4_active_work_defers_deployment_without_stopping_services(
+    host: Host, monkeypatch: pytest.MonkeyPatch, operation: str
+) -> None:
+    data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
+    with sqlite3.connect(data / "system/system.sqlite3") as database:
+        if operation == "remediation":
+            database.execute("CREATE TABLE remediation_jobs(state TEXT)")
+            database.execute("INSERT INTO remediation_jobs VALUES ('RUNNING')")
+        else:
+            database.execute("CREATE TABLE upload_staging(deadline TEXT)")
+            database.execute("INSERT INTO upload_staging VALUES ('2999-01-01T00:00:00+00:00')")
+    monkeypatch.setattr(
+        host, "backup", lambda *args: pytest.fail("backup began during active Phase 4 work")
+    )
+    clock = iter([0.0, 1901.0])
+    monkeypatch.setattr(deploy_host.time, "monotonic", lambda: next(clock))
+    with pytest.raises(TimeoutError, match="Active audit/tester work"):
+        host.update()
+    assert all(event[2][0] not in {"up", "stop"} for event in host.events)
+
+
+def test_public_health_failure_keeps_new_release_and_data_for_safe_retry(host: Host) -> None:
+    host.fail_health = True
+    with pytest.raises(RuntimeError, match="unhealthy"):
+        host.update()
+    assert deploy_host.read_env(host.config)["DEPLOYMENT_SHA"] == SHA
+    assert host.publication.exists()
+    assert not host.state.exists()
+    assert host.healthy == ["team9-phase3:" + SHA]
+    assert all(image != "team9-phase3:" + OLD for _, image, args in host.events if args[0] == "up")
+    # A post-publication acceptance must survive an explicit recovery attempt.
+    data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
+    with sqlite3.connect(data / "system/system.sqlite3") as db:
+        db.execute("CREATE TABLE accepted_after_publication(id TEXT PRIMARY KEY)")
+        db.execute("INSERT INTO accepted_after_publication VALUES ('retained')")
+        db.execute("PRAGMA user_version=2")
+    host.fail_health = False
+    host.current = [True]
+    host.events.clear()
+    host.update()
+    assert not host.publication.exists()
+    assert json.loads(host.state.read_text())["sha"] == SHA
+    with sqlite3.connect(data / "system/system.sqlite3") as db:
+        assert db.execute("SELECT id FROM accepted_after_publication").fetchall() == [("retained",)]
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 2
+    assert all("--force-recreate" not in args for _, _, args in host.events)
+    assert all(args[0] not in {"stop"} for _, _, args in host.events)
+
+
+def test_acceptance_racing_the_first_drain_defers_before_backup_or_migration(
+    host: Host,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
+    compose = host.compose
+
+    def stop_old_writers(directory: Path, env: Path, *args: str, capture: bool = False) -> str:
+        result = compose(directory, env, *args, capture=capture)
+        if args == ("stop", "--timeout", "90", "system", "worker", "tester"):
+            # Simulate an upload finishing validation as graceful API shutdown ends.
+            with sqlite3.connect(data / "system/system.sqlite3") as db:
+                db.execute("INSERT INTO jobs VALUES ('QUEUED')")
+        return result
+
+    monkeypatch.setattr(host, "compose", stop_old_writers)
+    with pytest.raises(TimeoutError, match="Work arrived during quiescence"):
+        host.update()
+    assert "backup" not in host.timeline
+    assert not host.private_healthy
+    assert not host.publication.exists()
+    assert deploy_host.read_env(host.config)["DEPLOYMENT_SHA"] == OLD
+    with sqlite3.connect(data / "system/system.sqlite3") as db:
+        assert db.execute("SELECT state FROM jobs").fetchall() == [("QUEUED",)]
+    assert host.events[-1][1] == "team9-phase3:" + OLD
+
+
+def test_failed_marker_precedes_current_compose_sha_and_retry_still_requires_exact_ci(
+    poller: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (poller / "config/compose.env").write_text("DEPLOYMENT_SHA='" + SHA + "'\n")
+    (poller / "config/deploy-failed.json").write_text(json.dumps({"sha": SHA}))
+    calls: list[str] = []
+    monkeypatch.setattr(deploy_poll, "eligible", lambda *args: calls.append("ci") or False)
+    monkeypatch.setattr(deploy_poll, "execute", lambda *args: pytest.fail("CI is not successful"))
+    deploy_poll.poll(poller, REPOSITORY)
+    assert calls == []
+    deploy_poll.poll(poller, REPOSITORY, retry=True)
+    assert calls == ["ci"]
+
+
+def test_unfinished_publication_cannot_be_reported_as_current(
+    poller: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (poller / "config/compose.env").write_text("DEPLOYMENT_SHA='" + SHA + "'\n")
+    (poller / "config/publication-state.json").write_text(json.dumps({"sha": SHA}))
+    monkeypatch.setattr(
+        deploy_poll, "eligible", lambda *args: pytest.fail("Explicit retry required")
+    )
+    deploy_poll.poll(poller, REPOSITORY)
+
+
+def test_private_failure_restores_real_phase3_schema_records_permissions_and_wal(
+    host: Host,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import hashlib
+    from datetime import UTC, datetime
+
+    from app.storage.sqlite import SCHEMA_V1, SQLiteRepository
+
+    data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
+    path = data / "system/system.sqlite3"
+    path.unlink()
+    stamp = datetime.now(UTC).isoformat()
+    digest = hashlib.sha256(b"retained immutable bytes").hexdigest()
+    workbook = {
+        "workbook_id": "wb",
+        "owner_subject": "owner",
+        "session_id": None,
+        "created_at": stamp,
+    }
+    version = {
+        "version_id": "v",
+        "workbook_id": "wb",
+        "owner_subject": "owner",
+        "session_id": None,
+        "file_name": "original.xlsx",
+        "source_sha256": digest,
+        "blob_key": "ordinary/wb/v/source",
+        "size_bytes": 24,
+        "worksheet_count": 1,
+        "nonempty_cell_count": 0,
+        "created_at": stamp,
+        "status": "AUDIT_COMPLETE",
+        "latest_audit_id": "a",
+        "source_version_id": None,
+    }
+    audit = {
+        "audit_id": "a",
+        "workbook_id": "wb",
+        "version_id": "v",
+        "owner_subject": "owner",
+        "session_id": None,
+        "ruleset_version": "1.0.0",
+        "status": "AUDIT_COMPLETE",
+        "started_at": stamp,
+        "completed_at": stamp,
+        "findings": [],
+        "limitations": [],
+        "error": None,
+    }
+    with sqlite3.connect(path) as db:
+        for statement in SCHEMA_V1:
+            db.execute(statement)
+        db.execute("PRAGMA user_version=1")
+        db.execute(
+            "INSERT INTO workbooks VALUES (?,?,?,?)", ("wb", None, "owner", json.dumps(workbook))
+        )
+        db.execute(
+            "INSERT INTO versions VALUES (?,?,?,?)",
+            ("v", "wb", version["blob_key"], json.dumps(version)),
+        )
+        db.execute("INSERT INTO audits VALUES (?,?,?)", ("a", "v", json.dumps(audit)))
+    path.chmod(0o640)
+    info = path.stat()
+    retained = b'{"historicalReport":"unchanged"}'
+    with sqlite3.connect(data / "tester/tester.sqlite3") as db:
+        db.execute("CREATE TABLE retained_reports(id TEXT PRIMARY KEY, report BLOB)")
+        db.execute("INSERT INTO retained_reports VALUES ('old',?)", (retained,))
+    original_payload = json.dumps(audit)
+
+    def migrate_then_fail(directory: Path, image: str) -> None:
+        assert not any(args[0] == "up" and args[-1] == "proxy" for _, _, args in host.events)
+        SQLiteRepository(path).initialize()
+        with sqlite3.connect(path) as db:
+            assert db.execute("PRAGMA user_version").fetchone()[0] == 2
+        Path(str(path) + "-wal").write_bytes(b"stale migrated WAL must not be replayed")
+        Path(str(path) + "-shm").write_bytes(b"stale migrated shared memory")
+        raise RuntimeError("private migration readiness failed")
+
+    monkeypatch.setattr(host, "wait_private_healthy", migrate_then_fail)
+    with pytest.raises(RuntimeError, match="private migration readiness"):
+        host.update()
+    with sqlite3.connect(path) as db:
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 1
+        assert (
+            db.execute("SELECT payload FROM audits WHERE id='a'").fetchone()[0] == original_payload
+        )
+        assert db.execute("SELECT payload FROM versions WHERE id='v'").fetchone()[0] == json.dumps(
+            version
+        )
+        assert not db.execute("SELECT 1 FROM sqlite_master WHERE name='remediations'").fetchall()
+    assert (path.stat().st_uid, path.stat().st_gid, path.stat().st_mode & 0o777) == (
+        info.st_uid,
+        info.st_gid,
+        0o640,
+    )
+    assert not Path(str(path) + "-wal").exists()
+    assert not Path(str(path) + "-shm").exists()
+    with sqlite3.connect(data / "tester/tester.sqlite3") as db:
+        assert db.execute("SELECT report FROM retained_reports").fetchone()[0] == retained
+    assert deploy_host.read_env(host.config)["DEPLOYMENT_SHA"] == OLD
+
+
+@pytest.mark.parametrize("bad_configuration", [None, "faults_disabled", "legacy_manifest"])
+def test_private_probes_use_actual_apps_readonly_before_proxy_publication(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    bad_configuration: str | None,
+) -> None:
+    from io import BytesIO
+    from urllib.error import HTTPError
+
+    from fastapi.testclient import TestClient
+
+    from app.config import SystemSettings
+    from app.main import create_app as system_app
+    from tester.config import TesterSettings
+    from tester.main import create_app as tester_app
+
+    root = Path(__file__).parents[2]
+    monkeypatch.setenv("RULESET_VERSION", "2.0.0")
+    monkeypatch.setenv("ENABLE_TEST_INTERFACE", "true")
+    monkeypatch.setenv("ENABLE_TEST_AUDIT_FAULTS", "true")
+    monkeypatch.setenv("METADATA_DB_PATH", str(tmp_path / "system.sqlite3"))
+    monkeypatch.setenv("BLOB_ROOT", str(tmp_path / "blobs"))
+    monkeypatch.setenv("TESTER_DB_PATH", str(tmp_path / "tester.sqlite3"))
+    monkeypatch.setenv("FIXTURE_MANIFEST_PATH", str(root / "tests/fixtures/manifest-phase4.json"))
+    settings = SystemSettings(_env_file=None)
+    requested: list[str] = []
+    with (
+        TestClient(system_app(settings)) as system,
+        TestClient(tester_app(TesterSettings(_env_file=None))) as tester,
+    ):
+        if bad_configuration == "faults_disabled":
+            monkeypatch.setenv("ENABLE_TEST_AUDIT_FAULTS", "false")
+        if bad_configuration == "legacy_manifest":
+            monkeypatch.setenv("FIXTURE_MANIFEST_PATH", str(root / "tests/fixtures/manifest.json"))
+
+        def local_urlopen(url: str, timeout: int = 5) -> BytesIO:
+            requested.append(url)
+            port = ":8000" if ":8000/" in url else ":8001"
+            path = url.split(port, 1)[1]
+            response = (system if port == ":8000" else tester).get(path)
+            if response.status_code >= 400:
+                raise HTTPError(url, response.status_code, "local test response", {}, None)
+            return BytesIO(response.content)
+
+        monkeypatch.setattr("urllib.request.urlopen", local_urlopen)
+        deploy = deploy_host.Deployment(tmp_path, REPOSITORY, SHA)
+        monkeypatch.setattr(deploy, "verify_images", lambda *args: None)
+
+        class ProbeRejected(Exception):
+            pass
+
+        def container_exec(directory: Path, env: Path, *args: str, capture: bool = False) -> str:
+            assert args[:2] == ("exec", "-T")
+            assert args[2] in {"system", "tester"}
+            assert args[3:5] == ("python", "-c")
+            try:
+                exec(compile(args[5], "private-container-probe", "exec"), {})
+            except RuntimeError as exc:
+                # Observe the probe's actual rejection without running its two-minute
+                # container retry loop or altering clocks used by TestClient threads.
+                raise ProbeRejected(str(exc)) from exc
+            return ""
+
+        monkeypatch.setattr(deploy, "compose", container_exec)
+        if bad_configuration is None:
+            deploy.wait_private_healthy(tmp_path, "team9-phase3:" + SHA)
+            assert requested == [
+                "http://127.0.0.1:8000/api/v1/health",
+                "http://127.0.0.1:8001/openapi.json",
+                "http://127.0.0.1:8001/test/report",
+            ]
+        else:
+            with pytest.raises(ProbeRejected, match="incomplete|incompatible"):
+                deploy.wait_private_healthy(tmp_path, "team9-phase3:" + SHA)
+        assert all("/workbooks" not in url and "/test/setup" not in url for url in requested)
+        with sqlite3.connect(settings.metadata_db_path) as db:
+            assert db.execute("SELECT count(*) FROM workbooks").fetchone()[0] == 0
+            assert db.execute("SELECT count(*) FROM sessions").fetchone()[0] == 0
+
+
+def test_published_release_recovers_when_main_has_advanced_without_rebuilding(
+    host: Host, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    host.fail_health = True
+    with pytest.raises(RuntimeError):
+        host.update()
+    published_directory = host.release
+    host.fail_health = False
+    host.sha = "c" * 40
+    host.release = host.root / "releases" / host.sha
+    host.events.clear()
+    monkeypatch.setattr(
+        host, "is_current", lambda: pytest.fail("Recovery must precede new-main gates")
+    )
+    monkeypatch.setattr(
+        host, "prepare_release", lambda *args: pytest.fail("Do not build during recovery")
+    )
+    monkeypatch.setattr(
+        host, "backup", lambda *args: pytest.fail("Do not snapshot or restore accepted data")
+    )
+    host.update()
+    assert not host.publication.exists()
+    assert json.loads(host.state.read_text())["sha"] == SHA
+    assert all(directory == published_directory for directory, _, _ in host.events)
+    assert all(image == "team9-phase3:" + SHA for _, image, _ in host.events)
+    starts = [args for _, _, args in host.events if args[0] == "up"]
+    assert "--no-recreate" in starts[0]
+    assert all("--force-recreate" not in args for args in starts)
+
+
+def test_poller_recovers_only_pinned_existing_release_before_new_main_ci(
+    poller: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    directory = poller / "releases" / OLD
+    source = directory / "scripts/deploy_host.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("# vetted previously published deployment artifact\n")
+    publication = poller / "config/publication-state.json"
+    publication.write_text(json.dumps({"sha": OLD, "directory": str(directory)}))
+    (poller / "config/deploy-failed.json").write_text(json.dumps({"sha": OLD}))
+    lookup_main = deploy_poll.subprocess.run
+    monkeypatch.setattr(
+        deploy_poll.subprocess,
+        "run",
+        lambda *args, **kwargs: pytest.fail("Existing recovery needs no main lookup"),
+    )
+    monkeypatch.setattr(
+        deploy_poll,
+        "eligible",
+        lambda *args: pytest.fail("No new candidate is admitted during existing-image recovery"),
+    )
+    recovered: list[str] = []
+
+    def recover(candidate: Path, sha: str, repository: str) -> int:
+        assert candidate == source and sha == OLD
+        assert candidate.read_text() == "# vetted previously published deployment artifact\n"
+        recovered.append(sha)
+        publication.unlink()
+        (poller / "config/deployment-state.json").write_text(json.dumps({"sha": OLD}))
+        return 0
+
+    monkeypatch.setattr(deploy_poll, "execute", recover)
+    deploy_poll.poll(poller, REPOSITORY, retry=True)
+    assert recovered == [OLD]
+    assert not (poller / "config/deploy-failed.json").exists()
+    # The next main commit still cannot execute before its own exact-SHA CI passes.
+    monkeypatch.setattr(deploy_poll.subprocess, "run", lookup_main)
+    monkeypatch.setattr(deploy_poll, "eligible", lambda *args: False)
+    monkeypatch.setattr(deploy_poll, "execute", lambda *args: pytest.fail("New main must pass CI"))
+    deploy_poll.poll(poller, REPOSITORY)
+
+
+def test_lost_proxy_start_ack_does_not_restore_prepublication_database(
+    host: Host, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
+    path = data / "system/system.sqlite3"
+    compose = host.compose
+
+    def publish_then_lose_ack(directory: Path, env: Path, *args: str, capture: bool = False) -> str:
+        result = compose(directory, env, *args, capture=capture)
+        if args[0] == "up" and args[-1] == "proxy":
+            with sqlite3.connect(path) as db:
+                db.execute("PRAGMA user_version=2")
+                db.execute("CREATE TABLE published_acceptances(id TEXT)")
+                db.execute("INSERT INTO published_acceptances VALUES ('must survive')")
+            raise RuntimeError("Lost proxy-start acknowledgement after a public acceptance")
+        return result
+
+    monkeypatch.setattr(host, "compose", publish_then_lose_ack)
+    with pytest.raises(RuntimeError, match="Lost proxy-start"):
+        host.update()
+    assert host.publication.exists()
+    assert deploy_host.read_env(host.config)["DEPLOYMENT_SHA"] == SHA
+    with sqlite3.connect(path) as db:
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 2
+        assert db.execute("SELECT id FROM published_acceptances").fetchone()[0] == "must survive"
+    assert not any(
+        image == "team9-phase3:" + OLD and args[0] == "up" for _, image, args in host.events
+    )
+
+
+@pytest.mark.parametrize(
+    "module,value",
+    [(deploy_host, "durable publication marker"), (deploy_poll, b"durable failure marker")],
+)
+def test_atomic_marker_writes_fsync_both_file_and_parent_directory(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    module: Any,
+    value: str | bytes,
+) -> None:
+    import os
+    import stat
+
+    sync, replace = os.fsync, os.replace
+    events: list[str] = []
+
+    def fsync(fd: int) -> None:
+        events.append("directory" if stat.S_ISDIR(os.fstat(fd).st_mode) else "file")
+        sync(fd)
+
+    def renamed(source: Path, destination: Path) -> None:
+        replace(source, destination)
+        events.append("replace")
+
+    monkeypatch.setattr(os, "fsync", fsync)
+    monkeypatch.setattr(os, "replace", renamed)
+    path = tmp_path / "marker"
+    module.private_write(path, value)
+    assert events == ["file", "replace", "directory"]
+    assert path.read_bytes() == (value.encode() if isinstance(value, str) else value)
+    assert path.stat().st_mode & 0o777 == 0o600
+
+
+def test_proxy_grace_period_is_not_cut_short_by_the_compose_command_timeout(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    deployment = deploy_host.Deployment(tmp_path, REPOSITORY, SHA)
+    bounds: list[int] = []
+
+    def run(*command: str, capture: bool = False, timeout: int = 900) -> str:
+        bounds.append(timeout)
+        return ""
+
+    monkeypatch.setattr(deployment, "run", run)
+    deployment.compose(tmp_path, tmp_path / "config.env", "stop", "--timeout", "1900", "proxy")
+    assert bounds[0] >= 1900 + 30

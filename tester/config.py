@@ -79,9 +79,9 @@ class TesterSettings(EnvironmentSettings):
     )
     fixture_manifest_path: Path = Field(
         default_factory=lambda: (
-            Path(__file__).resolve().parent / "fixtures" / "manifest.json"
-            if (Path(__file__).resolve().parent / "fixtures" / "manifest.json").exists()
-            else Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "manifest.json"
+            Path(__file__).resolve().parent / "fixtures" / "manifest-phase4.json"
+            if (Path(__file__).resolve().parent / "fixtures" / "manifest-phase4.json").exists()
+            else Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "manifest-phase4.json"
         )
     )
     tester_setup_timeout_seconds: PositiveSeconds = 45

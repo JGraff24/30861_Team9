@@ -16,7 +16,7 @@ def test_openapi_catalogs_are_valid_current_and_reflect_delivered_routes() -> No
         stored = json.loads((CONTRACT_DIR / f"{name}.openapi.json").read_text(encoding="utf-8"))
         assert stored == expected
         validate(stored)
-        assert len(stored["paths"]) == (6 if name == "system" else 3)
+        assert len(stored["paths"]) == (15 if name == "system" else 3)
         if name == "tester":
             assert set(stored["paths"]) == {"/test/setup", "/test/run", "/test/report"}
         if name == "system":

@@ -149,7 +149,7 @@ def test_policy_contrast_and_tint_boundaries() -> None:
     assert policy.is_large_text(18, False) and policy.is_large_text(14, True)
     assert not policy.is_large_text(14, False)
     assert policy.parse_rgb("FF1F4E78") == (0x1F, 0x4E, 0x78)
-    assert policy.hex_rgb(policy.apply_tint((0x33, 0x66, 0x99), 0.5)) == "8CB2D9"
+    assert policy.hex_rgb(policy.apply_tint((0x33, 0x66, 0x99), 0.5)) == "8CB3D9"
     with pytest.raises(ValueError):
         policy.parse_rgb("12345")
     with pytest.raises(ValueError):
@@ -182,8 +182,13 @@ def test_committed_manifest_is_generated_from_the_normative_plan() -> None:
     hosted = [entry for entry in plan["tests"] if entry["tier"] == "hosted_http"]
     manifest = SuiteManifest.model_validate_json(MANIFEST.read_bytes())
     assert manifest.phase == "4"
-    assert [test.test_id for test in manifest.tests] == [entry["test_id"] for entry in hosted]
-    for test, entry in zip(manifest.tests, hosted, strict=True):
+    assert list(dict.fromkeys(test.test_id.split("--")[0] for test in manifest.tests)) == [
+        entry["test_id"] for entry in hosted
+    ]
+    assert manifest.manifest_version == "2.1.1"
+    original = {entry["test_id"]: entry for entry in hosted}
+    for test in manifest.tests:
+        entry = original[test.test_id.split("--")[0]]
         assert test.components == entry["components"]
         assert test.acceptance == entry["acceptance"]
         assert test.operations == entry["operations"]
@@ -217,7 +222,8 @@ def test_expectations_are_internally_consistent() -> None:
         from tester.phase4.checks import status_for
 
         assert status_for(rows) == fixture.expected_status, name
-        assert fixture.review is not None and fixture.review.status in ("pending", "approved"), name
+        if fixture.review is not None:
+            assert fixture.review.status in ("pending", "approved"), name
         targets = {(f.ruleId, f.target) for f in fixture.findings}
         decisions = fixture.extras.get("decisions", {})
         assert isinstance(decisions, dict)
@@ -264,7 +270,7 @@ def test_phase4_fixture_bytes_do_not_depend_on_platform(
 
     monkeypatch.setattr(sys, "platform", platform)
     built = phase4_files()
-    assert len(built) == 16
+    assert len(built) == 17  # Includes corrected-pack 2.1.1 exact-half tint fixture.
     for name, data in built.items():
         assert data == (PHASE4_DIR / name).read_bytes(), name
 
@@ -493,7 +499,10 @@ def test_full_phase4_run_against_a_conforming_fake(tmp_path: Path) -> None:
     report = run_phase4(tmp_path, FakePhase4(**SMALL))
     contract.validate("SuiteReport", report)
     counts = Counter(result["outcome"] for result in report["results"])
-    assert counts == {"pass": 215}, [r for r in report["results"] if r["outcome"] != "pass"]
+    expected_cases = len(SuiteManifest.model_validate_json(MANIFEST.read_bytes()).tests)
+    assert counts == {"pass": expected_cases}, [
+        r for r in report["results"] if r["outcome"] != "pass"
+    ]
     assert report["coverage"]["component"]["covered"] == 8
     assert report["coverage"]["component"]["total"] == 9
     assert (report["coverage"]["system"]["covered"], report["coverage"]["system"]["total"]) == (
@@ -509,6 +518,17 @@ def test_full_phase4_run_against_a_conforming_fake(tmp_path: Path) -> None:
     assert rows["S"]["implemented"] == "observed responding"
     assert rows[11]["implemented"] == "not delivered in Phase 4"
     assert record["specification_version"] == "2.1.0"
+    assert record["manifest_version"] == "2.1.1" and record["pack_revision"] == "2.1.1"
+    suite = load_suite(MANIFEST, check_names())
+    assert record["fixture_hashes"] == {
+        name: hashlib.sha256(data).hexdigest() for name, data in suite.data.items()
+    }
+    assert (
+        record["pack_hashes"]["CORRECTIONS.md"]
+        == hashlib.sha256((REPO / "docs/contracts/phase4/CORRECTIONS.md").read_bytes()).hexdigest()
+    )
+    assert len(record["manifest_sha256"]) == 64
+    assert "tester_revision" not in record and "started_at" not in record
 
 
 @pytest.mark.parametrize(
@@ -663,7 +683,7 @@ def test_comparator_checks_namespace_declarations_and_compatibility_prefixes() -
     assert any("undeclared prefix" in p for p in problems), problems
 
 
-def test_comparator_allows_header_metadata_when_enabling_a_table_header() -> None:
+def test_comparator_rejects_unapproved_filter_when_enabling_a_table_header() -> None:
     source = phase4_fixtures()["header_disabled_table.xlsx"]
     output = FakePhase4().edit(source, _decisions("header_disabled_table", "header_table"))
     with_filter = _rewrite(
@@ -674,10 +694,8 @@ def test_comparator_allows_header_metadata_when_enabling_a_table_header() -> Non
             'totalsRowShown="0"><autoFilter ref="A1:B4"/>',
         ),
     )
-    assert (
-        compare_packages(source, with_filter, _effects("header_disabled_table", "header_table"))
-        == []
-    )
+    # Section 8.6 permits header metadata, not an additional filter operation.
+    assert compare_packages(source, with_filter, _effects("header_disabled_table", "header_table"))
 
 
 def test_auxiliary_sessions_are_kept_then_cleaned_on_the_next_setup(tmp_path: Path) -> None:

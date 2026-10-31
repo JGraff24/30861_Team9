@@ -115,7 +115,7 @@ def test_schema_initialize_is_idempotent_and_foreign_keys(repository: SQLiteRepo
         assert db.execute("PRAGMA foreign_keys").fetchone()[0] == 1
         assert db.execute("PRAGMA journal_mode").fetchone()[0] == "wal"
         assert db.execute("PRAGMA busy_timeout").fetchone()[0] == 5000
-        assert db.execute("PRAGMA user_version").fetchone()[0] == 1
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 2
     with sqlite3.connect(repository.path) as db:
         db.execute("PRAGMA user_version=99")
     with pytest.raises(StorageError):
@@ -246,11 +246,10 @@ def test_measurements_sets_unavailable_and_revision(repository: SQLiteRepository
             }
         )
     )
-    assert repository.summarize_measurements("s").model_dump() | {} == {
-        "covered": 2,
-        "total": 3,
-        "basis": "Validation/audit child line sets only; not whole-system coverage.",
-    }
+    measured = repository.summarize_measurements("s")
+    assert (measured.covered, measured.total) == (2, 3)
+    assert "app/workbooks" in measured.basis and "app/audit" in measured.basis
+    assert "excludes API, storage, UI" in measured.basis
     with pytest.raises(IntegrityError):
         repository.record_measurement(base.model_copy(update={"revision": "other"}))
     with pytest.raises(IntegrityError):

@@ -11,7 +11,9 @@ from dataclasses import dataclass
 
 _NAME_CHAR = re.compile(r"[A-Za-z0-9_.\\\u0080-\U0010FFFF]")
 _NAME_START = re.compile(r"[A-Za-z_\\\u0080-\U0010FFFF]")
-_FUNCTION = re.compile(r"((?:_xlfn\.|_xlws\.)?[A-Za-z][A-Za-z0-9_.]*)\s*\(", re.ASCII)
+_FUNCTION = re.compile(
+    r"((?:_(?:xlfn|xlws)\.)*[A-Za-z][A-Za-z0-9_.]*)\s*\(", re.ASCII | re.IGNORECASE
+)
 _HYPERLINK = re.compile(r"(?:_xlfn\.)?HYPERLINK", re.IGNORECASE | re.ASCII)
 REFERENCE_CONSTRUCTORS = frozenset({"INDIRECT", "EVALUATE"})
 
@@ -98,7 +100,9 @@ def scan_formula(text: str) -> FormulaScan:
             if end is None:
                 return FormulaScan(tuple(tokens), tuple(functions), "unterminated sheet name")
             first = unquote_sheet(text[index:end])
-            names = [first]
+            # Excel also quotes both endpoints of a 3D reference together:
+            # 'First sheet:Last sheet'!A1. A colon cannot belong to a sheet name.
+            names = first.split(":", 1) if ":" in first and not first.startswith("[") else [first]
             cursor = end
             if cursor < length and text[cursor] == ":":
                 second_end = None
@@ -136,6 +140,10 @@ def scan_formula(text: str) -> FormulaScan:
             call = _FUNCTION.match(text, index)
             if call is not None and call.end(1) == end:
                 name = call.group(1).upper()
+                if name.startswith(("_XLFN.", "_XLWS.")):
+                    return FormulaScan(
+                        tuple(tokens), tuple(functions), "unsupported formula extension"
+                    )
                 for prefix in ("_XLFN.", "_XLWS."):
                     name = name.removeprefix(prefix)
                 functions.append(name)

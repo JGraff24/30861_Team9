@@ -911,8 +911,8 @@ class SQLiteRepository:
                 raise ProjectException(
                     409, "AUDIT_NOT_READY", "A successful completed audit is required."
                 )
-            namespace = f"tests/{current.session_id}" if current.session_id else "ordinary"
-            expected_key = f"{namespace}/{current.workbook_id}/{job.output_version_id}/source"
+            blob_namespace = f"tests/{current.session_id}" if current.session_id else "ordinary"
+            expected_key = f"{blob_namespace}/{current.workbook_id}/{job.output_version_id}/source"
             if not (
                 remediation.source_version_id == job.version_id == current.version_id
                 and remediation.remediation_id == job.remediation_id

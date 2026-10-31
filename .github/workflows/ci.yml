@@ -34,7 +34,7 @@ jobs:
   checks:
     name: checks (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -67,6 +67,47 @@ jobs:
       - name: Real API, worker and tester integration
         if: runner.os == 'Linux'
         run: uv run python -m scripts.integration_selfcheck
+      - name: Real Phase 4 API, worker and independent tester integration
+        if: runner.os == 'Linux'
+        run: uv run python -m scripts.integration_selfcheck --phase4 --evidence-dir "${{ runner.temp }}/phase4-real-integration"
+      - name: Retain real Phase 4 integration evidence
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-real-integration
+          path: ${{ runner.temp }}/phase4-real-integration
+          if-no-files-found: ignore
+      - name: Build and smoke installed production image
+        if: runner.os == 'Linux'
+        env:
+          INTEGRATION_IMAGE: team9-integration:${{ github.sha }}
+        run: |
+          docker build --target measurement --tag "$INTEGRATION_IMAGE" -f deploy/Dockerfile .
+          docker run --rm --network none -i "$INTEGRATION_IMAGE" python - <<'PYTHON'
+          import json
+          from fastapi.testclient import TestClient
+          from app.audit.engine import OoxmlWorkbookEngine
+          from app.contracts.models import ProcessingLimits
+          from app.main import create_app
+          from tester.config import TesterSettings
+          from tester.suite.manifest import load_suite
+          from tester.suite.registry import names
+          suite = load_suite(TesterSettings().fixture_manifest_path, names())
+          assert suite.manifest.manifest_version == "2.1.1"
+          assert suite.manifest.ruleset_version == "2.0.0"
+          engine = OoxmlWorkbookEngine()
+          data = suite.bytes_of("clean_all_six")
+          validated = engine.validate(data, "clean.xlsx", ProcessingLimits())
+          result = engine.audit(data, validated, "2.0.0")
+          assert not result.findings and len(result.checks_performed) == 6
+          with TestClient(create_app()) as client:
+              assert client.get("/api/v1/health").json() == {
+                  "status": "AVAILABLE", "apiVersion": "1.0", "rulesetVersion": "2.0.0"
+              }
+              assert client.post("/api/v1/workbooks").status_code == 401
+              assert client.get("/").status_code == 200
+          print(json.dumps({"installed_image": "ok", "manifest": "2.1.1", "cases": len(suite.manifest.tests)}))
+          PYTHON
       - name: OpenAPI catalogs are current
         run: uv run python -m scripts.export_schemas --check
       - name: Identity vectors

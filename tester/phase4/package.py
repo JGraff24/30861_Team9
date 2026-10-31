@@ -225,8 +225,14 @@ def differences(source: Element, output: Element, path: str = "") -> list[str]:
         for attributes in (before, after):
             if attributes.get("s") == "0":
                 del attributes["s"]
-    if all((e.text or "") == (e.text or "").strip() for e in (source, output)):
-        # xml:space="preserve" is meaningless when the text has no edge whitespace.
+    if all(
+        (text or "") == (text or "").strip()
+        for element in (source, output)
+        for descendant in element.iter()
+        for text in (descendant.text, descendant.tail)
+    ):
+        # xml:space is inherited. Its removal is harmless only when neither the
+        # element nor any descendant text relies on preservation of edge whitespace.
         before.pop(XML_SPACE, None)
         after.pop(XML_SPACE, None)
     if before != after:
@@ -330,14 +336,13 @@ def _link(plan: EffectPlan, effect: Mapping[str, Any]) -> None:
     def mask(source: Element, output: Element) -> None:
         for tree in (source, output):
             for cell in _cells(tree, ref):
-                keep = {"r": cell.get("r", "")}
-                if cell.get("s", "0") != "0":
-                    keep["s"] = cell.get("s", "0")
-                cell.attrib.clear()
-                cell.attrib.update(keep)
+                # Only the selected string representation/content may change. Cell
+                # metadata, unknown attributes and opaque children remain observable.
+                cell.attrib.pop("t", None)
+                namespace = str(cell.tag).rsplit("}", 1)[0] + "}"
                 for child in list(cell):
-                    cell.remove(child)
-                cell.text = None
+                    if child.tag in {namespace + "v", namespace + "is"}:
+                        cell.remove(child)
             for link in _hyperlinks(tree, ref):
                 link.attrib.pop("display", None)
 
@@ -598,10 +603,6 @@ def _header_table(plan: EffectPlan, effect: Mapping[str, Any]) -> None:
         for tree in (source, output):
             for name in ("headerRowCount", *HEADER_METADATA):
                 tree.attrib.pop(name, None)
-        if not [e for e in source if local(e.tag) == "autoFilter"]:
-            for element in [e for e in output if local(e.tag) == "autoFilter"]:
-                if element.get("ref") == output.get("ref"):
-                    output.remove(element)
 
     rule = plan.rule(effect["table_part"])
     rule.verify.append(verify)

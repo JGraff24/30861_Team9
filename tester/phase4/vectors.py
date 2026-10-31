@@ -547,4 +547,53 @@ def vector_fixtures(default_palette: list[str]) -> dict[str, bytes]:
         "merge_vectors.xlsx": merge_vectors(),
         "link_vectors.xlsx": link_vectors(),
         "contrast_vectors.xlsx": contrast_vectors(default_palette),
+        "tint_half_vectors.xlsx": tint_half_vectors(),
     }
+
+
+def tint_half_vectors() -> bytes:
+    """Literal corrected-pack inputs; expectations are authored separately from policy math.
+
+    Accent1 336699 at +/-0.5 exercises the corrected HSL inputs. GrayOne (010101 at
+    -0.5) remains high contrast. GrayFive (050505 at -0.5) becomes 030303 over 757575:
+    ratio 4.476248585820453 is below 4.5. Truncation/ties-to-even produces 020202 and
+    ratio 4.503095875365348, incorrectly missing that finding. All cells are isolated.
+    """
+    package = Package("Corrected pack 2.1.1 mathematical tint boundaries")
+    fonts = [
+        '<font><sz val="11"/><color rgb="FF000000"/><name val="Calibri"/></font>',
+        *[
+            f'<font><sz val="11"/><color theme="{theme}" tint="{tint}"/>'
+            '<name val="Calibri"/></font>'
+            for theme, tint in ((4, "-0.5"), (4, "0.5"), (5, "-0.5"), (6, "-0.5"))
+        ],
+    ]
+    styles = (
+        XML_DECLARATION
+        + f'<styleSheet xmlns="{MAIN}"><fonts count="5">'
+        + "".join(fonts)
+        + '</fonts><fills count="4"><fill><patternFill patternType="none"/></fill>'
+        '<fill><patternFill patternType="gray125"/></fill><fill>'
+        '<patternFill patternType="solid"><fgColor rgb="FFFFFFFF"/></patternFill></fill>'
+        '<fill><patternFill patternType="solid"><fgColor rgb="FF757575"/></patternFill></fill>'
+        '</fills><borders count="1"><border/></borders><cellStyleXfs count="1">'
+        '<xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+        '<cellXfs count="5">'
+        + "".join(
+            f'<xf numFmtId="0" fontId="{index}" fillId="{3 if index == 4 else 2}" '
+            'borderId="0" xfId="0" applyFont="1" applyFill="1"/>'
+            for index in range(5)
+        )
+        + '</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" '
+        'builtinId="0"/></cellStyles></styleSheet>'
+    )
+    package.add("xl/styles.xml", styles, "styles")
+    theme = THEME.replace('val="C0504D"', 'val="010101"').replace('val="9BBB59"', 'val="050505"')
+    package.add("xl/theme/theme1.xml", theme)
+    package.overrides["/xl/theme/theme1.xml"] = THEME_CT
+    package.workbook_relationships.append(("theme", "theme/theme1.xml"))
+    for index, name in enumerate(("BlueNegative", "BluePositive", "GrayOne", "GrayFive"), 1):
+        part = f"xl/worksheets/sheet{index}.xml"
+        package.sheet(name, index, part)
+        package.add(part, worksheet(rows(text("A1", "Tint boundary", index))))
+    return package.build()

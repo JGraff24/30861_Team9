@@ -101,18 +101,11 @@ def test_large_text_thresholds() -> None:
     assert not is_large_text(Fraction(27, 2), True)
 
 
-# The two half-value vectors disagree with the normative half-up rule in section 7.7:
-# exact channels (25.5, 51, 76.5) and (140.25, 178.5, 216.75) round to 1A334D and
-# 8CB3D9. The engine follows the normative text; see docs/implementation/dylan_phase4.md.
-DISPUTED_TINTS = {"19334D": "1A334D", "8CB2D9": "8CB3D9"}
-
-
 @pytest.mark.parametrize("vector", VECTORS["tint"])
 def test_tint_vectors_follow_exact_half_up_rule(vector: dict[str, object]) -> None:
     base = hex_rgb(str(vector["base_rgb"]))
     assert base is not None
     expected = str(vector["expected_rgb"])
-    expected = DISPUTED_TINTS.get(expected, expected)
     assert rgb_hex(apply_tint(base, Fraction(str(vector["tint"])))) == expected
 
 

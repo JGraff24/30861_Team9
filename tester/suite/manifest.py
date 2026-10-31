@@ -5,6 +5,7 @@ Manifest major version 1 is the Phase 3 suite (C1-C6, eight Phase 3 AC portions,
 operations 1-14 plus the S, V and R paths). Both run through the same runner and checks.
 """
 
+import base64
 import hashlib
 import json
 from dataclasses import dataclass
@@ -112,6 +113,9 @@ class SuiteManifest(ContractModel):
     operations: list[Operation]
     pending_confirmation: list[NonemptyText]
     known_deviations: list[NonemptyText] = Field(default_factory=list)
+    fixture_hashes: dict[NonemptyText, SHA256] = Field(default_factory=dict)
+    pack_revision: SemVer | None = None
+    pack_hashes: dict[NonemptyText, SHA256] = Field(default_factory=dict)
     limits: SuiteLimits | None = None
     tests: list[PlannedTest]
 
@@ -274,6 +278,12 @@ def load_suite(manifest_path: Path, known_checks: set[str]) -> LoadedSuite:
         raise SuiteConfigurationError(f"cannot load suite manifest: {type(exc).__name__}") from exc
     if expectations.ruleset_version != manifest.ruleset_version:
         raise SuiteConfigurationError("manifest and expectations name different rulesets")
+    if manifest.fixture_hashes and manifest.fixture_hashes != {
+        name: fixture.sha256
+        for name, fixture in expectations.fixtures.items()
+        if not isinstance(fixture, PendingFixture)
+    }:
+        raise SuiteConfigurationError("manifest fixture hashes differ from the frozen answer key")
     unknown = {test.check for test in manifest.tests} - known_checks
     if unknown:
         raise SuiteConfigurationError(f"manifest names unknown checks: {sorted(unknown)}")
@@ -305,15 +315,18 @@ def load_fixture_bytes(
 
 
 def snapshot_suite(suite: LoadedSuite, manifest_path: Path) -> str:
-    return json.dumps(
-        {
-            "manifest": suite.manifest.model_dump(mode="json"),
-            "expectations": suite.expectations.model_dump(mode="json"),
-            "fixture_root": str(
-                (manifest_path.parent / suite.manifest.expectations).parent.resolve()
-            ),
+    saved = {
+        "manifest": suite.manifest.model_dump(mode="json"),
+        "expectations": suite.expectations.model_dump(mode="json"),
+        "fixture_root": str((manifest_path.parent / suite.manifest.expectations).parent.resolve()),
+    }
+    if suite.manifest.phase == "4":
+        # The accepted session owns its bytes even after fixtures are replaced by a
+        # deployment. Keep legacy Phase3 snapshot semantics and retained plans intact.
+        saved["fixture_bytes"] = {
+            name: base64.b64encode(data).decode("ascii") for name, data in suite.data.items()
         }
-    )
+    return json.dumps(saved)
 
 
 def restore_suite(snapshot: str, *, read_fixtures: bool = True) -> LoadedSuite:
@@ -322,6 +335,26 @@ def restore_suite(snapshot: str, *, read_fixtures: bool = True) -> LoadedSuite:
         manifest = SuiteManifest.model_validate(saved["manifest"])
         expectations = Expectations.model_validate(saved["expectations"])
         if read_fixtures:
+            if "fixture_bytes" in saved:
+                encoded = saved["fixture_bytes"]
+                expected = {
+                    name: fixture
+                    for name, fixture in expectations.fixtures.items()
+                    if not isinstance(fixture, PendingFixture)
+                }
+                if not isinstance(encoded, dict) or set(encoded) != set(expected):
+                    raise SuiteConfigurationError("stored fixture inventory differs from its plan")
+                data = {}
+                for name, fixture in expected.items():
+                    content = base64.b64decode(encoded[name], validate=True)
+                    if hashlib.sha256(content).hexdigest() != fixture.sha256:
+                        raise SuiteConfigurationError(
+                            "stored fixture bytes differ from recorded hash"
+                        )
+                    data[name] = content
+                return LoadedSuite(manifest, expectations, data)
+            # Existing prepared plans predate durable fixture snapshots. They retain
+            # their original version and hash checks rather than inventing new bytes.
             return load_fixture_bytes(manifest, expectations, Path(saved["fixture_root"]))
         return LoadedSuite(manifest, expectations, {})
     except (ValueError, KeyError, TypeError) as exc:

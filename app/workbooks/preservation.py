@@ -7,10 +7,13 @@ uncompressed contents; every changed XML part must equal its expected tree exact
 """
 
 import io
+import posixpath
 import re
 import zipfile
 from collections.abc import Callable
-from xml.etree.ElementTree import Element, SubElement
+from xml.etree.ElementTree import Element, SubElement, TreeBuilder
+
+import defusedxml.ElementTree as safe_xml  # type: ignore[import-untyped]
 
 from app.workbooks.editor import (
     RELS_CONTENT_TYPE,
@@ -23,28 +26,71 @@ from app.workbooks.editor import (
 from app.workbooks.formulas import quote_sheet, scan_formula
 from app.workbooks.inventory import WorkbookInventory
 from app.workbooks.package import CONTENT_TYPES_PART
-from app.workbooks.xmlsafe import local_name, namespace, parse_document
+from app.workbooks.xmlsafe import local_name, namespace
 from app.workbooks.xmltext import XML_NS
 
 XmlPath = tuple[tuple[str, int], ...]
 _DECLARATIONS = re.compile(rb"xmlns(?::[A-Za-z0-9_.\-]+)?\s*=\s*(\"[^\"]*\"|'[^']*')")
 FORMULA_ELEMENTS = frozenset({"f", "formula", "formula1", "formula2", "definedName"})
+PACKAGE_REL = "http://schemas.openxmlformats.org/package/2006/relationships"
 
 
 class PreservationError(Exception):
     """The candidate differs from the source beyond the approved changes."""
 
 
-def _parse(data: bytes) -> Element:
-    return parse_document(io.BytesIO(data))
+class _PreservationBuilder(TreeBuilder):
+    """Retain document-level comments/PIs as well as nodes inside the root."""
+
+    def __init__(self, outer: list[tuple[bool, str, str]]) -> None:
+        super().__init__(insert_comments=True, insert_pis=True)
+        self.outer = outer
+        self.depth = 0
+        self.root_seen = False
+
+    def start(self, tag: str, attrs: dict[str, str]) -> Element:
+        self.depth += 1
+        self.root_seen = True
+        return super().start(tag, attrs)
+
+    def end(self, tag: str) -> Element:
+        element = super().end(tag)
+        self.depth -= 1
+        return element
+
+    def comment(self, text: str | None) -> Element:
+        if self.depth == 0:
+            self.outer.append((self.root_seen, "comment", text or ""))
+        return super().comment(text)
+
+    def pi(self, target: str, text: str | None = None) -> Element:
+        if self.depth == 0:
+            self.outer.append((self.root_seen, target, text or ""))
+        return super().pi(target, text)
+
+
+def _parse(data: bytes, *, outer: list[tuple[bool, str, str]] | None = None) -> Element:
+    # The audit parser may omit comments, but a preservation comparison may not.
+    parser = safe_xml.DefusedXMLParser(
+        target=_PreservationBuilder(outer if outer is not None else []),
+        forbid_dtd=True,
+        forbid_entities=True,
+        forbid_external=True,
+    )
+    root: Element = safe_xml.parse(io.BytesIO(data), parser=parser).getroot()
+    return root
+
+
+def _local(element: Element) -> str | None:
+    return local_name(element.tag) if isinstance(element.tag, str) else None
 
 
 def find_path(root: Element, path: XmlPath) -> Element:
-    if not path or local_name(root.tag) != path[0][0]:
+    if not path or _local(root) != path[0][0]:
         raise PreservationError("approved target path does not resolve")
     current = root
     for name, index in path[1:]:
-        matches = [child for child in current if local_name(child.tag) == name]
+        matches = [child for child in current if _local(child) == name]
         if len(matches) < index:
             raise PreservationError("approved target path does not resolve")
         current = matches[index - 1]
@@ -57,8 +103,6 @@ def _norm(text: str | None) -> str:
 
 def rename_equivalent(source: str, candidate: str, mapping: dict[str, str]) -> bool:
     """Same formula except single-sheet prefixes naming a renamed sheet."""
-    if source == candidate:
-        return True
     before, after = scan_formula(source), scan_formula(candidate)
     if before.unsupported or after.unsupported:
         return False
@@ -90,20 +134,20 @@ def _compare(
 ) -> None:
     if expected.tag != actual.tag:
         raise PreservationError(f"element changed in {where}")
-    if expected.attrib != actual.attrib:
-        if formula_ok is None or set(expected.attrib) != set(actual.attrib):
+    if set(expected.attrib) != set(actual.attrib):
+        raise PreservationError(f"attributes changed in {where}")
+    for key, value in expected.attrib.items():
+        other = actual.attrib[key]
+        if formula_ok is not None and _local(expected) == "hyperlink" and key == "location":
+            if not formula_ok(value, other):
+                raise PreservationError(f"hyperlink reference changed incorrectly in {where}")
+        elif value != other:
             raise PreservationError(f"attributes changed in {where}")
-        for key, value in expected.attrib.items():
-            other = actual.attrib[key]
-            if value != other and not (local_name(key) == "location" and formula_ok(value, other)):
-                raise PreservationError(f"attributes changed in {where}")
-    if _norm(expected.text) != _norm(actual.text):
-        if not (
-            formula_ok is not None
-            and local_name(expected.tag) in FORMULA_ELEMENTS
-            and formula_ok(_norm(expected.text), _norm(actual.text))
-        ):
-            raise PreservationError(f"text changed in {where}")
+    if formula_ok is not None and _local(expected) in FORMULA_ELEMENTS:
+        if not formula_ok(_norm(expected.text), _norm(actual.text)):
+            raise PreservationError(f"formula reference changed incorrectly in {where}")
+    elif _norm(expected.text) != _norm(actual.text):
+        raise PreservationError(f"text changed in {where}")
     if _norm(expected.tail) != _norm(actual.tail):
         raise PreservationError(f"text changed in {where}")
     if len(expected) != len(actual):
@@ -165,6 +209,12 @@ def _verify(
             ):
                 raise PreservationError(f"XML declaration changed in {name}")
             changed[name] = (original, updated)
+        if any(edit.correction.kind == "rename" for edit in edits):
+            # Unchanged reference-bearing parts also require comparison: leaving
+            # an old sheet token behind is a missing approved dependency rewrite.
+            for name in allowed:
+                if name in source_infos and name not in changed:
+                    changed[name] = (before.read(name), after.read(name))
         for name, (original, updated) in changed.items():
             _verify_part(name, original, updated, inventory, edits, tables, main, rel_ns)
         for table in tables:
@@ -238,8 +288,12 @@ def _verify_part(
     main: str,
     rel_ns: str,
 ) -> None:
-    expected = _parse(original)
-    actual = _parse(updated)
+    original_outer: list[tuple[bool, str, str]] = []
+    updated_outer: list[tuple[bool, str, str]] = []
+    expected = _parse(original, outer=original_outer)
+    actual = _parse(updated, outer=updated_outer)
+    if original_outer != updated_outer:
+        raise PreservationError(f"document comments or processing instructions changed in {name}")
     mapping = {
         (edit.correction.sheet_name or "").casefold(): str(edit.value["name"])
         for edit in edits
@@ -253,7 +307,7 @@ def _verify_part(
             matches = [
                 node
                 for node in expected.iter()
-                if local_name(node.tag) == "cNvPr" and node.get("id") == correction.object_id
+                if _local(node) == "cNvPr" and node.get("id") == correction.object_id
             ]
             if len(matches) != 1:
                 raise PreservationError("alternative-text target is ambiguous")
@@ -282,7 +336,7 @@ def _verify_part(
             sheet = find_path(
                 expected,
                 (
-                    (local_name(expected.tag), 1),
+                    (_local(expected) or "", 1),
                     ("sheets", 1),
                     ("sheet", correction.sheet_position or 0),
                 ),
@@ -316,33 +370,41 @@ def _strip_new_table_parts(
     actual: Element, expected: Element, tables: list[NewTable], rel_ns: str
 ) -> None:
     rel_ids = {table.rel_id for table in tables}
-    container = next((child for child in actual if local_name(child.tag) == "tableParts"), None)
+    container = next((child for child in actual if _local(child) == "tableParts"), None)
     if container is None:
         raise PreservationError("table reference was not added")
     added = [
         child
         for child in container
-        if local_name(child.tag) == "tablePart" and child.get(f"{{{rel_ns}}}id") in rel_ids
+        if _local(child) == "tablePart" and child.get(f"{{{rel_ns}}}id") in rel_ids
     ]
     if len(added) != len(tables):
         raise PreservationError("table references do not match the approved headers")
     for child in added:
-        if child.attrib != {f"{{{rel_ns}}}id": child.get(f"{{{rel_ns}}}id")} or len(child):
+        if (
+            child.tag != f"{{{namespace(actual.tag)}}}tablePart"
+            or child.attrib != {f"{{{rel_ns}}}id": child.get(f"{{{rel_ns}}}id")}
+            or len(child)
+            or _norm(child.text)
+            or _norm(child.tail)
+        ):
             raise PreservationError("table reference has unexpected content")
         container.remove(child)
-    source_container = next(
-        (child for child in expected if local_name(child.tag) == "tableParts"), None
-    )
+    source_container = next((child for child in expected if _local(child) == "tableParts"), None)
     if source_container is None:
-        if len(container) or container.attrib != {"count": str(len(tables))}:
+        if (
+            container.tag != f"{{{namespace(actual.tag)}}}tableParts"
+            or len(container)
+            or container.attrib != {"count": str(len(tables))}
+            or _norm(container.text)
+            or _norm(container.tail)
+        ):
             raise PreservationError("new table reference list has unexpected content")
         actual.remove(container)
     else:
         source_container.set(
             "count",
-            str(
-                len([c for c in source_container if local_name(c.tag) == "tablePart"]) + len(tables)
-            ),
+            str(len([c for c in source_container if _local(c) == "tablePart"]) + len(tables)),
         )
 
 
@@ -360,9 +422,17 @@ def _strip_new_relationships(
     actual: Element, expected: Element, tables: list[NewTable], rel_ns: str
 ) -> None:
     extra = _strip_appended(actual, len(expected), "relationship")
-    wanted = [(table.rel_id, f"{rel_ns}/table") for table in tables]
-    found = [(child.get("Id"), child.get("Type")) for child in extra]
-    if found != wanted or any(child.get("TargetMode") for child in extra):
+    wanted = [
+        {
+            "Id": table.rel_id,
+            "Type": f"{rel_ns}/table",
+            "Target": posixpath.relpath(table.part, posixpath.dirname(table.sheet_part)),
+        }
+        for table in tables
+    ]
+    if [child.attrib for child in extra] != wanted or any(
+        child.tag != f"{{{PACKAGE_REL}}}Relationship" for child in extra
+    ):
         raise PreservationError("table relationships are not as approved")
 
 
@@ -370,44 +440,75 @@ def _strip_new_content_types(
     actual: Element, expected: Element, tables: list[NewTable], needs_default: bool
 ) -> None:
     extra = _strip_appended(actual, len(expected), "content type")
-    wanted: list[tuple[str, str | None, str | None]] = [
-        ("Override", f"/{table.part}", TABLE_CONTENT_TYPE) for table in tables
+    content_ns = namespace(expected.tag)
+    wanted: list[tuple[str, dict[str, str]]] = [
+        (
+            f"{{{content_ns}}}Override",
+            {"PartName": f"/{table.part}", "ContentType": TABLE_CONTENT_TYPE},
+        )
+        for table in tables
     ]
     if needs_default:
-        wanted.append(("Default", None, RELS_CONTENT_TYPE))
-    found = [
-        (local_name(child.tag), child.get("PartName"), child.get("ContentType")) for child in extra
-    ]
+        wanted.append(
+            (
+                f"{{{content_ns}}}Default",
+                {"Extension": "rels", "ContentType": RELS_CONTENT_TYPE},
+            )
+        )
+    found = [(child.tag, child.attrib) for child in extra]
     if found != wanted:
         raise PreservationError("content types are not as approved")
 
 
 def _verify_new_rels(data: bytes, tables: list[NewTable], rel_ns: str) -> None:
-    root = _parse(data)
-    if local_name(root.tag) != "Relationships" or len(root) != len(tables):
+    outer: list[tuple[bool, str, str]] = []
+    root = _parse(data, outer=outer)
+    if (
+        root.tag != f"{{{PACKAGE_REL}}}Relationships"
+        or root.attrib
+        or len(root) != len(tables)
+        or _norm(root.text)
+        or _norm(root.tail)
+        or outer
+    ):
         raise PreservationError("new relationship part has unexpected content")
     for child, table in zip(root, tables, strict=True):
-        if child.get("Id") != table.rel_id or child.get("Type") != f"{rel_ns}/table":
+        if (
+            child.tag != f"{{{PACKAGE_REL}}}Relationship"
+            or child.attrib
+            != {
+                "Id": table.rel_id,
+                "Type": f"{rel_ns}/table",
+                "Target": posixpath.relpath(table.part, posixpath.dirname(table.sheet_part)),
+            }
+            or len(child)
+            or _norm(child.text)
+            or _norm(child.tail)
+        ):
             raise PreservationError("new relationship part has unexpected content")
 
 
 def _verify_new_table(data: bytes, table: NewTable, main: str) -> None:
-    root = _parse(data)
+    outer: list[tuple[bool, str, str]] = []
+    root = _parse(data, outer=outer)
+    if outer:
+        raise PreservationError("new table has unapproved document markup")
     rect = table.correction.rect
     assert rect is not None
-    if (
-        root.tag != f"{{{main}}}table"
-        or root.get("id") != str(table.table_id)
-        or root.get("name") != table.name
-        or root.get("displayName") != table.name
-        or root.get("ref") != rect.canonical()
-        or root.get("headerRowCount") != "1"
-        or root.get("totalsRowCount") not in (None, "0")
-    ):
-        raise PreservationError("new table metadata is not as approved")
-    children = [local_name(child.tag) for child in root]
-    if children != ["tableColumns"]:
-        raise PreservationError("new table has unexpected structure")
-    names = [column.get("name") for column in root[0]]
-    if names != list(table.correction.labels):
-        raise PreservationError("new table column names do not match the header row")
+    expected = Element(
+        f"{{{main}}}table",
+        {
+            "id": str(table.table_id),
+            "name": table.name,
+            "displayName": table.name,
+            "ref": rect.canonical(),
+            "headerRowCount": "1",
+            "totalsRowShown": "0",
+        },
+    )
+    columns = SubElement(
+        expected, f"{{{main}}}tableColumns", {"count": str(len(table.correction.labels))}
+    )
+    for index, label in enumerate(table.correction.labels, start=1):
+        SubElement(columns, f"{{{main}}}tableColumn", {"id": str(index), "name": label})
+    _compare(expected, root, "new table")

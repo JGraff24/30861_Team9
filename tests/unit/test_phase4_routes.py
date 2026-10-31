@@ -590,3 +590,38 @@ def test_initial_upload_rejects_wrong_role_before_malformed_body(
     )
     assert response.status_code == 403
     assert response.json()["code"] == "FORBIDDEN"
+
+
+def test_http_idempotency_replay_and_conflict_inside_isolated_session(
+    workflow_client: TestClient,
+) -> None:
+    client = workflow_client
+    session = "idempotency-session"
+    response = client.post(
+        "/test/setup", json={"session_id": session, "setup": {}}, headers=workflow_auth("admin")
+    )
+    assert response.status_code == 201
+    _, accepted, path = workflow_upload(client, session)
+    workflow_tick(client)
+    headers = workflow_auth(session=session) | {"Idempotency-Key": "session-key"}
+    audit = client.get(path + "/audits/" + accepted["auditId"], headers=headers).json()
+    body = {
+        "auditId": accepted["auditId"],
+        "decisions": [{"findingId": audit["findings"][0]["findingId"], "action": "DECLINE"}],
+    }
+    first = client.post(path + "/remediations", json=body, headers=headers)
+    assert first.status_code == 202, first.text
+    replay = client.post(path + "/remediations", json=body, headers=headers)
+    assert replay.status_code == 202, replay.text
+    assert replay.content == first.content
+    changed = body | {"decisions": [body["decisions"][0] | {"action": "MANUAL_REVIEW"}]}
+    conflict = client.post(path + "/remediations", json=changed, headers=headers)
+    assert conflict.status_code == 409
+    assert conflict.json()["code"] == "IDEMPOTENCY_CONFLICT"
+    workflow_tick(client)
+    late = client.post(path + "/remediations", json=body, headers=headers)
+    assert late.status_code == 202 and late.content == first.content
+    history = client.get(
+        f"/api/v1/workbooks/{accepted['workbookId']}/history", headers=headers
+    ).json()
+    assert len(history["versions"]) == 2

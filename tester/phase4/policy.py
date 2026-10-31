@@ -6,11 +6,10 @@ audit engine and never produce a fixture's expected findings automatically: expe
 stay hand-written from each fixture's XML (§15.2).
 """
 
-import colorsys
-import math
 import re
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
+from fractions import Fraction
 
 # §6: Unicode White_Space for rule trimming. U+200B is deliberately absent.
 WHITE_SPACE = frozenset("\u0009\u000a\u000b\u000c\u000d \u0085                 　")
@@ -131,26 +130,51 @@ def hex_rgb(rgb: tuple[int, int, int]) -> str:
     return "".join(f"{channel:02X}" for channel in rgb)
 
 
-def _round_half_up(value: float) -> int:
-    return math.floor(value + 0.5)
+def _round_half_up(value: Fraction) -> int:
+    return (value + Fraction(1, 2)).numerator // (value + Fraction(1, 2)).denominator
 
 
 def apply_tint(rgb: tuple[int, int, int], tint: float) -> tuple[int, int, int]:
     """HSL lightness tint: L*(1+t) for t<0, L*(1-t)+t for t>0; clamp; round half up.
 
-    Uses IEEE double arithmetic through the standard HLS conversion. The frozen vectors (for
-    example 336699 at +0.5 -> 8CB2D9) depend on those exact floating-point intermediates.
+    The corrected pack 2.1.1 requires mathematical half-up results, including exact channel
+    halves. All intermediates are rational; decimal tint text is represented exactly. This
+    independent oracle neither imports production math nor uses a blanket rounding epsilon.
     """
     if not -1 <= tint <= 1:
         raise ValueError("tint must be within [-1, 1]")
-    hue, lightness, saturation = colorsys.rgb_to_hls(*(channel / 255 for channel in rgb))
-    if tint < 0:
-        lightness = lightness * (1 + tint)
-    elif tint > 0:
-        lightness = lightness * (1 - tint) + tint
-    channels = colorsys.hls_to_rgb(hue, lightness, saturation)
-    red, green, blue = (_round_half_up(min(1.0, max(0.0, c)) * 255) for c in channels)
-    return red, green, blue
+    red, green, blue = (Fraction(channel, 255) for channel in rgb)
+    high, low = max(red, green, blue), min(red, green, blue)
+    lightness = (high + low) / 2
+    delta = high - low
+    saturation = delta / (1 - abs(2 * lightness - 1)) if delta else Fraction(0)
+    if not delta:
+        sector = Fraction(0)
+    elif high == red:
+        sector = ((green - blue) / delta) % 6
+    elif high == green:
+        sector = (blue - red) / delta + 2
+    else:
+        sector = (red - green) / delta + 4
+    amount = Fraction(str(tint))
+    lightness = lightness * (1 + amount) if amount < 0 else lightness * (1 - amount) + amount
+    chroma = (1 - abs(2 * lightness - 1)) * saturation
+    secondary = chroma * (1 - abs(sector % 2 - 1))
+    zero = Fraction(0)
+    candidates = (
+        (chroma, secondary, zero),
+        (secondary, chroma, zero),
+        (zero, chroma, secondary),
+        (zero, secondary, chroma),
+        (secondary, zero, chroma),
+        (chroma, zero, secondary),
+    )
+    offset = lightness - chroma / 2
+    channels = candidates[int(sector)]
+    output_red, output_green, output_blue = (
+        _round_half_up(min(Fraction(1), max(zero, channel + offset)) * 255) for channel in channels
+    )
+    return output_red, output_green, output_blue
 
 
 def relative_luminance(rgb: tuple[int, int, int]) -> float:

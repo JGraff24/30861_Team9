@@ -8,16 +8,19 @@ outside the hosted report (§16); they are tracked in the run record and the imp
 """
 
 import argparse
+import hashlib
 import json
 import re
 from pathlib import Path
 from typing import Any
 
+from tester.phase4.catalog import variants
+
 REPO = Path(__file__).resolve().parents[1]
 PLAN = REPO / "docs" / "contracts" / "phase4" / "phase4-test-plan.json"
 PHASE3_MANIFEST = REPO / "tests" / "fixtures" / "manifest.json"
 OUTPUT = REPO / "tests" / "fixtures" / "manifest-phase4.json"
-MANIFEST_VERSION = "2.1.0"
+MANIFEST_VERSION = "2.1.1"
 
 LIMITS = {
     "suite_seconds": 1800,
@@ -195,6 +198,14 @@ def build() -> dict[str, Any]:
     phase3_ops = {operation["number"]: operation for operation in phase3["operations"]}
     if plan["specification_version"] != "2.1.0" or plan["ruleset_version"] != "2.0.0":
         raise SystemExit("unexpected test plan version")
+    pack_hashes = {}
+    for line in (PLAN.parent / "SHA256SUMS.txt").read_text(encoding="utf-8").splitlines():
+        digest, filename = line.split(maxsplit=1)
+        filename = filename.lstrip("*")
+        if hashlib.sha256((PLAN.parent / filename).read_bytes()).hexdigest() != digest:
+            raise SystemExit("corrected pack member hash differs: " + filename)
+        pack_hashes[filename] = digest
+    expectations = json.loads((OUTPUT.parent / "expectations-phase4.json").read_text("utf-8"))
     operations = []
     for number in [*range(1, 15), "S", "V", "R"]:
         delivered = number in PHASE4_OPERATIONS
@@ -251,21 +262,42 @@ def build() -> dict[str, Any]:
         }
         if path is None:
             del test["path"]
-        tests.append(test)
+        selected = variants(test_id)
+        if not selected:
+            tests.append(test)
+            continue
+        for index, variant in enumerate(selected):
+            row = {**test, "parameters": {**parameters, "variant": variant}}
+            row["test_id"] = (
+                test_id if index == 0 else test_id + "--" + variant.upper().replace("_", "-")
+            )
+            row["description"] = first_sentence(entry["qualifying_assertion"]) + f" [{variant}]"
+            row["qualifying_assertion"] = (
+                f"Individual {variant} vector from {test_id}: " + entry["qualifying_assertion"]
+            )
+            if test_id == "P4-RULE-COLOR-THEME-TINT" and variant != "standard":
+                row["parameters"] = {"fixture": "tint_half_vectors", "case": "tint_" + variant}
+                row["fixtures"] = ["tint_half_vectors"]
+            tests.append(row)
     return {
         "manifest_version": MANIFEST_VERSION,
         "ruleset_version": plan["ruleset_version"],
         "specification_version": plan["specification_version"],
         "expectations": "expectations-phase4.json",
+        "fixture_hashes": {
+            name: fixture["sha256"]
+            for name, fixture in expectations["fixtures"].items()
+            if fixture["kind"] != "pending"
+        },
+        "pack_revision": "2.1.1",
+        "pack_hashes": pack_hashes,
         "components": COMPONENTS,
         "acceptance": plan["acceptance"],
         "operations": operations,
         "limits": LIMITS,
         "pending_confirmation": [
-            "Grouped negative vectors (for example P4-REJECT-NAME-INVALID) still report one "
-            "result ID each; the pod must agree on expanded IDs before freezing the count.",
-            "Fixture packs marked pending in expectations.json need bytes, reviewed "
-            "expectations and two-member review by the other team (section 15.2).",
+            "Expanded vector IDs are recorded individually in suite 2.1.1; cross-team adoption "
+            "of this executable manifest and its exact fixture hashes remains pending.",
             "Team 12's received clean.xlsx is not adopted: an independent reading finds six "
             "findings (docs/evidence/phase4_team12_clean_review.md).",
             "LINK_TEXT destination comparison uses the trimmed, collapsed, casefolded label "
@@ -280,9 +312,10 @@ def build() -> dict[str, Any]:
             "if the re-audit already finished, the case is skipped as unobservable.",
         ],
         "known_deviations": [
-            "HTTP-only run: C9 review UI and the Excel no-repair gate need separate evidence.",
+            "HTTP-only run: C9 review UI and Excel no-repair behavior are not established here.",
             "Local-integration (24) and manual-release (10) plan entries are outside this report.",
-            "Synthetic fixture expectations await two-member Team 12 review.",
+            "Human fixture/Excel review was not performed; no approval is inferred "
+            "from automated results.",
         ],
         "tests": tests,
     }

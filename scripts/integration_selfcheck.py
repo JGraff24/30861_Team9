@@ -19,9 +19,9 @@ from pathlib import Path
 
 import httpx
 
-from tester.suite.checks import CHECKS
 from tester.suite.manifest import load_suite
 from tester.suite.records import run_record
+from tester.suite.registry import names as check_names
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -44,7 +44,16 @@ def stop(process: subprocess.Popen[bytes]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--evidence-dir", type=Path)
+    parser.add_argument(
+        "--phase4",
+        action="store_true",
+        help="Run the real ruleset 2.0.0 system and corrected Phase 4 independent suite",
+    )
     args = parser.parse_args()
+    manifest_path = (
+        REPO / "tests/fixtures" / ("manifest-phase4.json" if args.phase4 else "manifest.json")
+    )
+    suite = load_suite(manifest_path, check_names())
     output = args.evidence_dir.resolve() if args.evidence_dir else None
     if output:
         output.mkdir(parents=True, exist_ok=True)
@@ -89,6 +98,9 @@ def main() -> int:
             "PATH": os.defpath,
             "PYTHONPATH": str(REPO),
             "APP_ENV": "test",
+            "RULESET_VERSION": suite.manifest.ruleset_version,
+            "ENABLE_TEST_AUDIT_FAULTS": "true" if args.phase4 else "false",
+            "TESTER_RUN_TIMEOUT_SECONDS": "1800" if args.phase4 else "600",
             "DEPLOYMENT_SHA": revision,
             "METADATA_DB_PATH": str(state / "system.sqlite3"),
             "BLOB_ROOT": str(state / "sources"),
@@ -112,7 +124,7 @@ def main() -> int:
                     }
                 }
             ),
-            "FIXTURE_MANIFEST_PATH": str(REPO / "tests/fixtures/manifest.json"),
+            "FIXTURE_MANIFEST_PATH": str(manifest_path),
         }
         processes: list[subprocess.Popen[bytes]] = []
 
@@ -189,7 +201,9 @@ def main() -> int:
                     if audit["status"] != "PROCESSING" or time.monotonic() >= deadline:
                         break
                     time.sleep(0.2)
-                assert audit["status"] == "REVIEW_REQUIRED", audit
+                assert audit["status"] == (
+                    "REMEDIATION_AVAILABLE" if args.phase4 else "REVIEW_REQUIRED"
+                ), audit
                 assert audit["findings"] and audit["error"] is None
                 assert client.get(path).json()["sha256"] == hashlib.sha256(source).hexdigest()
                 assert worker.poll() is None
@@ -200,7 +214,7 @@ def main() -> int:
             with httpx.Client(
                 base_url=tester_url,
                 trust_env=False,
-                timeout=630,
+                timeout=1830 if args.phase4 else 630,
                 headers={"Authorization": f"Bearer {tokens['operator']}"},
             ) as client:
                 setup = client.post("/test/setup", json={"target_url": target})
@@ -215,7 +229,7 @@ def main() -> int:
                 counts = dict(Counter(result["outcome"] for result in report["results"]))
                 if output:
                     (output / "report.json").write_bytes(stored.content)
-                    suite = load_suite(REPO / "tests/fixtures/manifest.json", set(CHECKS))
+                    suite = load_suite(manifest_path, check_names())
                     record = run_record(
                         stored.content,
                         suite.manifest,
@@ -243,6 +257,8 @@ def main() -> int:
                 cwd=REPO,
                 env=environment
                 | {
+                    "TEAM9_SUITE_MANIFEST": str(manifest_path),
+                    "TEAM9_RUN_READ_TIMEOUT": "1830" if args.phase4 else "630",
                     "TEAM9_TESTER_URL": tester_url,
                     "TEAM9_TARGET_URL": target,
                     "TEAM9_TESTER_TOKEN": tokens["operator"],

@@ -95,6 +95,8 @@ def main() -> int:
                 "TEAM9_TESTER_TOKEN": token,
                 "TEAM9_TESTER_URL": "http://127.0.0.1:8001",
                 "TEAM9_TARGET_URL": BASE_URL,
+                "FIXTURE_MANIFEST_PATH": str(manifest),
+                "TEAM9_RUN_READ_TIMEOUT": "1830" if args.phase4 else "630",
             }
             report_path = (args.evidence_dir or Path(state)) / "report.json"
             record_path = (args.evidence_dir or Path(state)) / "run-record.json"

@@ -330,7 +330,11 @@ def read_stylesheet(
             for attribute, flag in (("fontId", "applyFont"), ("fillId", "applyFill")):
                 applied = xf.get(flag)
                 own, inherited = xf.get(attribute), base.get(attribute)
-                if applied is not None and applied.strip() not in TRUE_VALUES and own != inherited:
+                if own is None and inherited not in (None, "0"):
+                    ambiguous = "an unresolved font or fill inheritance path"
+                elif (
+                    applied is not None and applied.strip() not in TRUE_VALUES and own != inherited
+                ):
                     ambiguous = "cell style disables a differing font or fill"
         sheet.cell_formats.append(CellFormat(font_id, fill_id, ambiguous))
     dxfs = sections.get("dxfs")

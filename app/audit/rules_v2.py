@@ -75,7 +75,6 @@ class Editability:
 def _manual(entry: Entry, reason: str) -> Entry:
     entry.finding = entry.finding.model_copy(update={"classification": MANUAL})
     entry.reason = reason
-    entry.current = None
     entry.correction = None
     return entry
 
@@ -100,6 +99,8 @@ def alt_text(context: RuleContext, inventory: WorkbookInventory, edit: Editabili
         for finding in findings:
             entry = Entry(finding)
             obj = objects.get(finding.target)
+            if obj is not None:
+                entry.current = {"title": obj.title, "description": obj.descr}
             if finding.classification != REQUIRES or obj is None:
                 entry.finding = finding.model_copy(update={"classification": MANUAL})
                 entry.reason = (
@@ -124,7 +125,6 @@ def alt_text(context: RuleContext, inventory: WorkbookInventory, edit: Editabili
                     _manual(entry, "Edit this object's alternative text manually.")
                 )
                 continue
-            entry.current = {"title": obj.title, "description": obj.descr}
             entry.reason = (
                 "Provide both an alternative text title and description; existing values are "
                 "shown for confirmation."
@@ -166,14 +166,13 @@ def worksheet_names(
             f'Worksheet "{display(sheet.name)}" uses a generic default name.',
             "Rename the worksheet with a descriptive name that identifies its content.",
         )
-        entry = Entry(finding)
+        entry = Entry(finding, current={"name": sheet.name})
         if blocker is not None:
             output.limitations.add(blocker)
             output.entries.append(
                 _manual(entry, "Rename this worksheet manually after reviewing its references.")
             )
             continue
-        entry.current = {"name": sheet.name}
         entry.reason = "Provide a descriptive worksheet name; references to this sheet are updated."
         entry.correction = Correction(
             "rename",
@@ -885,11 +884,17 @@ def color_contrast(context: RuleContext, inventory: WorkbookInventory) -> RuleOu
             if visual:
                 regions.extend(_sqref(declaration.sqref, part))
         for extension in worksheet.extension_conditionals:
-            regions.extend(_sqref(extension.sqref, part))
+            if extension.visual:
+                regions.extend(_sqref(extension.sqref, part))
         unique: list[Rect] = []
         for rect in regions:
             if rect not in unique:
                 unique.append(rect)
+        if unique:
+            output.limitations.add(
+                "Conditional formatting conditions and rendered states were not evaluated; "
+                "affected ranges require manual color and contrast review."
+            )
         for rect in unique:
             finding = context.finding(
                 COLOR_CONTRAST,

@@ -11,6 +11,7 @@ import json
 import os
 import sys
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
@@ -57,6 +58,7 @@ def main() -> int:
         default="unknown",
         help="target tag/SHA from pod documentation; never inferred (default: unknown)",
     )
+    parser.add_argument("--tester-revision", help="actual tester revision supplied by the operator")
     parser.add_argument(
         "--manifest",
         type=Path,
@@ -106,6 +108,7 @@ def main() -> int:
             if manifest.limits is not None
             else RUN_READ_TIMEOUT_SECONDS
         )
+        started_at = datetime.now(UTC)
         started = time.monotonic()
         client.deadline = started + read_timeout
         try:
@@ -130,6 +133,7 @@ def main() -> int:
         if report.status_code != 200:
             print(f"report unavailable: HTTP {report.status_code}", file=sys.stderr)
             return 1
+        ended_at = datetime.now(UTC)
     if args.output:
         args.output.write_bytes(report.content)
     try:
@@ -138,6 +142,9 @@ def main() -> int:
             manifest,
             tester_url=args.tester_url,
             target_revision=args.target_revision,
+            tester_revision=args.tester_revision,
+            started_at=started_at,
+            ended_at=ended_at,
         )
     except ValueError:
         print(

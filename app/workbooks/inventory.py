@@ -314,12 +314,14 @@ def build_inventory(data: bytes, limits: ProcessingLimits) -> WorkbookInventory:
             vml = package.parse_xml(name)
             if any(local_name(node.tag).startswith("Fmla") for node in vml.iter()):
                 blockers.append("a legacy form control formula")
+    if drawing_hyperlinks:
+        blockers.append("drawing hyperlinks whose destinations cannot be rewritten safely")
     for model in models:
         worksheet = model.worksheet
         if worksheet is None:
             continue
         where = f"worksheet {model.info.name}"
-        if worksheet.extension_formula_count:
+        if worksheet.extension_formula_count or worksheet.extension_reference_unsupported:
             blockers.append(f"extension formulas in {where}")
         if worksheet.alternate_content:
             blockers.append(f"alternate content in {where}")
@@ -338,6 +340,7 @@ def build_inventory(data: bytes, limits: ProcessingLimits) -> WorkbookInventory:
                 break
         for text in [
             *worksheet.validation_formulas,
+            *worksheet.extension_formulas,
             *[f for c in worksheet.conditionals for f in c.formulas],
         ]:
             blocker = _formula_blocker(text, where)

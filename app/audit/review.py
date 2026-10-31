@@ -57,7 +57,7 @@ def review_item(entry: Entry) -> ReviewItem:
     return ReviewItem(
         findingId=entry.finding.findingId,
         allowedActions=list(OWNER_ACTIONS if editable else MANUAL_ACTIONS),
-        currentValue=entry.current if editable else None,
+        currentValue=entry.current,
         reason=entry.reason,
     )
 

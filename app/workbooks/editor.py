@@ -12,7 +12,6 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from app.audit.review import Correction
-from app.workbooks.cells import ws_trim
 from app.workbooks.formulas import rewrite_sheet_references
 from app.workbooks.inventory import STRICT_MAIN, WorkbookInventory
 from app.workbooks.package import CONTENT_TYPES_PART
@@ -284,14 +283,13 @@ def _apply_renames(session: _Session, renames: list[tuple[Correction, str]]) -> 
                 workbook.replace_text(node, updated)
     parts = [model.info.part for model in inventory.sheets if model.worksheet is not None]
     parts.extend(inventory.chart_formulas)
-    markers = [ws_trim(old).casefold().encode("utf-8") for old, _ in mapping]
     for part in parts:
         stored = inventory.package.find(part)
         if stored is None:
             raise EditFailed(f"part {part} is missing")
-        raw = inventory.package.read_bytes(stored).lower()
-        if not any(marker in raw for marker in markers):
-            continue  # no token can name a renamed sheet; the part stays byte-identical
+        # Sheet tokens are XML character data, not raw byte substrings. Numeric
+        # character references and Unicode case folding can hide a relevant name
+        # from a byte search. Parse every understood reference-bearing part.
         doc = session.doc(part)
         for node in doc.nodes:
             if node.local in FORMULA_ELEMENTS and not node.self_closing:

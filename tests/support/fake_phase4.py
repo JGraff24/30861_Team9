@@ -856,6 +856,12 @@ class FakePhase4:
                 r'<sheet name="([^"]*)"', self.part(version.data, "xl/workbook.xml")
             )
             current = finding["worksheet"]
+            if isinstance(name, str) and name != current and name.casefold() == current.casefold():
+                raise project_error(422, "UNSUPPORTED_CORRECTION")
+            if isinstance(name, str) and any(
+                name.casefold() == other.casefold() for other in existing if other != current
+            ):
+                raise project_error(422, "CONFLICTING_CORRECTIONS")
             if (
                 not isinstance(name, str)
                 or not 1 <= len(name) <= 31
@@ -865,10 +871,7 @@ class FakePhase4:
                 or name.endswith("'")
                 or name.casefold() == "history"
                 or is_generic_sheet_name(name)
-                or name.casefold() == current.casefold()
-                or any(
-                    name.casefold() == other.casefold() for other in existing if other != current
-                )
+                or name == current
             ):
                 raise project_error(422, "INVALID_CORRECTION")
 

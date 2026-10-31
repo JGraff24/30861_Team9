@@ -18,7 +18,8 @@ Results support human review and are not a compliance determination.</p>
 <label for="file">Excel workbook (.xlsx)</label>
 <input id="file" name="file" type="file" accept=".xlsx" required>
 <label for="upload-kind">Upload destination</label>
-<select id="upload-kind"><option value="new">New workbook</option><option value="version" disabled>New version of selected workbook</option></select>
+<select id="upload-kind" aria-describedby="upload-destination"><option value="new">New workbook</option><option value="version" disabled>New version of workbook in history</option></select>
+<p id="upload-destination"></p>
 <button id="submit" type="submit">Upload and check</button>
 </form>
 <form id="open-workbook">
