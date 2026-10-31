@@ -21,6 +21,16 @@ from app.contracts.models import (
     UploadResponse,
     VersionResponse,
 )
+from app.contracts.phase4 import (
+    AuditReport,
+    HistoryResponse,
+    ReauditRequest,
+    ReauditResponse,
+    RemediationAccepted,
+    RemediationRequest,
+    RemediationResponse,
+    ReviewResponse,
+)
 from app.main import create_app as create_system
 from tester.config import TesterSettings
 from tester.main import create_app as create_tester
@@ -34,6 +44,14 @@ def schema_documents() -> dict[str, dict[str, object]]:
         UploadResponse,
         VersionResponse,
         AuditResponse,
+        ReauditRequest,
+        ReauditResponse,
+        RemediationRequest,
+        RemediationAccepted,
+        RemediationResponse,
+        ReviewResponse,
+        HistoryResponse,
+        AuditReport,
         ProjectError,
         SystemSetupRequest,
         SetupResponse,
@@ -58,11 +76,11 @@ def schema_documents() -> dict[str, dict[str, object]]:
         )
         document.setdefault("components", {}).setdefault("schemas", {}).update(schemas["$defs"])
         document["x-foundation-status"] = (
-            "Integrated Phase 3 project and system testing routes delivered"
+            "Phase 4 backend contracts; execution requires installed Phase 4 engine capability"
             if name == "system"
             else "Independent tester setup/run/report delivered"
         )
-        document["x-team9-contract-profile"] = "1.0.0"
+        document["x-team9-contract-profile"] = "2.1.0" if name == "system" else "1.0.0"
         document["x-instructor-interface-version"] = "0.4.2"
         documents[name] = document
     return documents

@@ -1,6 +1,17 @@
 # 30861_Team9
 
-Excel accessibility hub — integrated Phase 3.
+Excel accessibility hub — Phase 3 engine with a proposed Phase 4 backend.
+
+The Phase 4 backend uses corrected context pack 2.1.1 (suite target 2.1.1),
+with specification 2.1.0 and ruleset 2.0.0 unchanged, and adds version
+uploads, re-audits, review context, durable remediation orchestration, downloads,
+reports and history. **The real six-rule engine/editor is still missing**, so the
+default 2.0.0 configuration refuses unsupported processing with 503. This work was
+not deployed. See the [backend integration/handoff](docs/implementation/jackson_phase4.md)
+and [verification evidence](docs/evidence/jackson_phase4.md). Use an explicit
+`RULESET_VERSION=1.0.0` only for legacy Phase 3 development/regression checks.
+
+The following Phase 3 operating reference describes the existing two-rule engine.
 
 The system accepts authenticated `.xlsx` uploads, retains immutable sources, runs durable
 asynchronous audits for missing alternative text and generic worksheet names, and exposes
@@ -12,7 +23,9 @@ See the [integration review and evidence](docs/evidence/phase3_integration.md),
 [shared contract](docs/contracts/phase3.md) and [deployment runbook](deploy/README.md).
 The system and tester are deployed on AWS over HTTPS. The hosted tester is configured
 to test both Team 9's and Team 12's systems; see the access guide below.
-Remediation, history, downloadable reports, scheduling and ordinary deletion are future work.
+Backend remediation orchestration, history and downloadable reports now have
+Phase 4 interfaces; real corrections depend on the engine handoff above.
+Scheduling and ordinary deletion remain Phase 5 work.
 
 ## Hosted access
 
@@ -123,7 +136,7 @@ configuration. No HTTP caller selects a factory. Disabled/missing integrations f
 Coverage is optional at runtime: install `uv sync --locked --no-dev --extra measurement` when
 enabled, or build the Docker `measurement` target for both system and worker.
 
-The four project operations are public GET `/api/v1/health`, authenticated POST
+The original four Phase 3 operations are public GET `/api/v1/health`, authenticated POST
 `/api/v1/workbooks`, GET `/api/v1/workbooks/{workbookId}/versions/{versionId}` and its
 `/audits/{auditId}`. Version retrieval rereads and hashes the source. Owner/reviewer permission
 checks precede content reads; test-admin credentials have testing powers only.

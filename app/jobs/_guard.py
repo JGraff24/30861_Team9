@@ -7,6 +7,7 @@ from pathlib import Path
 
 from app.contracts.errors import EngineExecutionError
 from app.contracts.models import ProcessingLimits, ValidatedWorkbook
+from app.jobs.execution import MAX_IPC_BYTES
 
 
 def main() -> None:
@@ -17,7 +18,7 @@ def main() -> None:
 
         memory = request["memory_limit_mib"] * 1024 * 1024
         resource.setrlimit(resource.RLIMIT_AS, (memory, memory))
-        resource.setrlimit(resource.RLIMIT_FSIZE, (4 * 1024 * 1024, 4 * 1024 * 1024))
+        resource.setrlimit(resource.RLIMIT_FSIZE, (MAX_IPC_BYTES, MAX_IPC_BYTES))
         resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     runner = pickle.loads((root / "runner").read_bytes())  # trusted local configuration only
     request["limits"] = ProcessingLimits.model_validate(request["limits"])
@@ -49,8 +50,8 @@ def main() -> None:
                 "measurement": None,
             }
         }
-    encoded = json.dumps(payload, ensure_ascii=False).encode()
-    if len(encoded) > 4 * 1024 * 1024:
+    encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
+    if len(encoded) > MAX_IPC_BYTES:
         raise ValueError("Execution output exceeds IPC limit")
     (root / "result.json").write_bytes(encoded)
 

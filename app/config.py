@@ -38,7 +38,7 @@ class EnvironmentSettings(BaseSettings):
 
 class SystemSettings(EnvironmentSettings):
     api_root_path: RootPath = ""
-    ruleset_version: SemVer = "1.0.0"
+    ruleset_version: SemVer = "2.0.0"
     deployment_sha: NonemptyText = "unknown"
     metadata_db_path: Path = Path("state/system.sqlite3")
     blob_backend: BlobBackend = BlobBackend.FILESYSTEM
@@ -60,6 +60,7 @@ class SystemSettings(EnvironmentSettings):
     )
     engine_memory_limit_mib: Annotated[int, Field(gt=0)] = 512
     enable_test_interface: bool = False
+    enable_test_audit_faults: bool = False
     test_session_users: dict[NonemptyText, list[NonemptyText]] = Field(
         default_factory=dict,
         validation_alias="TEST_SESSION_USERS_JSON",
@@ -76,6 +77,7 @@ class SystemSettings(EnvironmentSettings):
     ui_router_factory: NonemptyText | None = "app.ui.routes:create_router"
     validation_timeout_seconds: PositiveSeconds = 30
     audit_timeout_seconds: PositiveSeconds = 60
+    remediation_timeout_seconds: PositiveSeconds = 180
     queue_timeout_seconds: PositiveSeconds = 15
 
     @model_validator(mode="after")
@@ -86,6 +88,10 @@ class SystemSettings(EnvironmentSettings):
             raise ValueError("production requires a supplied DEPLOYMENT_SHA")
         if self.audit_timeout_seconds > 60 or self.validation_timeout_seconds > 30:
             raise ValueError("audit/validation deadlines cannot exceed 60/30 seconds")
+        if self.remediation_timeout_seconds > 180:
+            raise ValueError("remediation deadline cannot exceed 180 seconds")
+        if self.queue_timeout_seconds > 15:
+            raise ValueError("queue deadline cannot exceed 15 seconds")
         if self.app_env == AppEnvironment.PRODUCTION and not self.system_token_hashes:
             raise ValueError("production requires configured token hashes")
         if self.deployment_sha != "unknown":

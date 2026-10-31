@@ -16,7 +16,7 @@ from app.contracts.models import (
     ProcessingLimits,
     ValidatedWorkbook,
 )
-from app.measurement.runner import MAX_RESULT_BYTES
+from app.measurement.runner import MAX_MEASUREMENT_BYTES, MAX_RESULT_BYTES
 
 
 def main(directory: str) -> None:
@@ -117,8 +117,11 @@ def main(directory: str) -> None:
     else:
         assert result is not None
         payload["result"] = result.model_copy(update={"measurement": measurement}).model_dump()
-    encoded = json.dumps(payload).encode()
-    if len(encoded) > MAX_RESULT_BYTES and measurement is not None:
+    encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
+    if measurement is not None and (
+        len(encoded) > MAX_RESULT_BYTES
+        or len(json.dumps(measurement.model_dump()).encode()) > MAX_MEASUREMENT_BYTES
+    ):
         # Optional instrumentation must not turn a bounded engine result into failure.
         measurement = measurement.model_copy(
             update={
@@ -130,7 +133,7 @@ def main(directory: str) -> None:
         payload["measurement"] = measurement.model_dump()
         if result is not None:
             payload["result"] = result.model_copy(update={"measurement": measurement}).model_dump()
-        encoded = json.dumps(payload).encode()
+        encoded = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
     if len(encoded) > MAX_RESULT_BYTES:
         encoded = b'{"error":{"kind":"invalid_result"}}'
     (root / "result.json").write_bytes(encoded)

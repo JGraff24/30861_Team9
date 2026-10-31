@@ -20,7 +20,8 @@ from app.contracts.models import (
 )
 from app.contracts.ports import WorkbookEngine
 
-MAX_RESULT_BYTES = 4 * 1024 * 1024
+MAX_RESULT_BYTES = 74 * 1024 * 1024
+MAX_MEASUREMENT_BYTES = 4 * 1024 * 1024
 
 
 class MeasuredEngineRunner:
@@ -71,8 +72,8 @@ class MeasuredEngineRunner:
             )
         with tempfile.TemporaryDirectory(prefix="team9-measured-") as directory:
             root = Path(directory)
-            # Jackson's guard inherits a 4 MiB per-file ceiling. Chunk private input
-            # so legal workbooks up to 25 MB still pass through that guard.
+            # Keep private input within the inherited per-file ceiling while
+            # accepting legal workbooks up to 25 MB.
             source = root / "source"
             source.mkdir()
             for offset in range(0, len(data), MAX_RESULT_BYTES):

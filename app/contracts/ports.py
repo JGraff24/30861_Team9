@@ -20,6 +20,13 @@ from app.contracts.models import (
     VersionRecord,
     WorkbookRecord,
 )
+from app.contracts.phase4 import (
+    Decision,
+    OutputRecord,
+    RemediationAccepted,
+    RemediationJob,
+    RemediationRecord,
+)
 
 
 class WorkbookEngine(Protocol):
@@ -29,6 +36,43 @@ class WorkbookEngine(Protocol):
     def audit(
         self, data: bytes, validated: ValidatedWorkbook, ruleset_version: str
     ) -> AuditEvaluation: ...
+
+
+class CorrectionEngine(WorkbookEngine, Protocol):
+    """Dylan-owned package safety/editing boundary; methods must not mutate source."""
+
+    supported_rulesets: tuple[str, ...]
+
+    def validate_decisions(
+        self,
+        data: bytes,
+        validated: ValidatedWorkbook,
+        audit: AuditRecord,
+        decisions: list[Decision],
+    ) -> None: ...
+    def remediate(
+        self,
+        data: bytes,
+        validated: ValidatedWorkbook,
+        audit: AuditRecord,
+        decisions: list[Decision],
+    ) -> bytes: ...
+    def verify_preservation(
+        self,
+        data: bytes,
+        candidate: bytes,
+        validated: ValidatedWorkbook,
+        audit: AuditRecord,
+        decisions: list[Decision],
+    ) -> None: ...
+    def verify_corrections(
+        self,
+        data: bytes,
+        candidate: bytes,
+        audit: AuditRecord,
+        decisions: list[Decision],
+        evaluation: AuditEvaluation,
+    ) -> None: ...
 
 
 class BlobStore(Protocol):
@@ -74,6 +118,49 @@ class Repository(Protocol):
     def finish_session_cleanup(self, session_id: str) -> None: ...
     def record_measurement(self, measurement: ExecutionMeasurement) -> None: ...
     def summarize_measurements(self, session_id: str) -> CoverageMeasure: ...
+
+    def get_workbook(self, workbook_id: str) -> WorkbookRecord | None: ...
+    def has_active_operation(self, version_id: str) -> bool: ...
+    def create_reaudit(
+        self, version: VersionRecord, audit: AuditRecord, job: JobRecord
+    ) -> None: ...
+    def history_records(
+        self, workbook_id: str
+    ) -> tuple[list[VersionRecord], list[AuditRecord]]: ...
+    def get_report(self, audit_id: str) -> bytes | None: ...
+    def find_idempotency(
+        self, owner: str, namespace: str, method: str, path: str, key: str, digest: str
+    ) -> RemediationAccepted | None: ...
+    def create_remediation(
+        self,
+        version: VersionRecord,
+        remediation: RemediationRecord,
+        job: RemediationJob,
+        key: str,
+        digest: str,
+        path: str,
+    ) -> RemediationAccepted: ...
+    def get_remediation(self, remediation_id: str) -> RemediationRecord | None: ...
+    def get_output(self, output_id: str) -> OutputRecord | None: ...
+    def claim_next_remediation(
+        self, worker_id: str, now: datetime, lease_seconds: int
+    ) -> RemediationJob | None: ...
+    def register_candidate(self, job_id: str, worker_id: str, digest: str) -> None: ...
+    def reserve_upload_blob(self, version: VersionRecord, deadline: datetime) -> None: ...
+    def abandon_upload_blob(self, version_id: str) -> None: ...
+    def pending_blob_cleanup(self) -> list[tuple[str, str]]: ...
+    def complete_remediation(
+        self,
+        job_id: str,
+        worker_id: str,
+        version: VersionRecord,
+        audit: AuditRecord,
+        evaluation: AuditEvaluation,
+        completed_at: datetime,
+    ) -> None: ...
+    def fail_remediation(
+        self, job_id: str, worker_id: str, error: ProjectError, completed_at: datetime
+    ) -> None: ...
 
 
 class EngineRunner(Protocol):

@@ -224,16 +224,47 @@ class TesterSetupRequest(ContractModel):
 
 class SystemSetupRequest(ContractModel):
     session_id: Identifier
-    setup: dict[str, JsonValue] = Field(default_factory=dict)
+    setup: dict[str, JsonValue] = Field(
+        default_factory=dict,
+        json_schema_extra={
+            "properties": {
+                "cleanup_session_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64,
+                        "pattern": "^[A-Za-z0-9_-]+$",
+                    },
+                },
+                "faults": {
+                    "type": "object",
+                    "properties": {"audit_failures": {"type": "integer", "const": 1}},
+                    "required": ["audit_failures"],
+                    "additionalProperties": False,
+                },
+            },
+            "additionalProperties": False,
+        },
+    )
 
     @model_validator(mode="after")
     def known_setup_keys(self) -> Self:
-        if set(self.setup) - {"cleanup_session_ids"}:
+        if set(self.setup) - {"cleanup_session_ids", "faults"}:
             raise ValueError("unknown setup keys")
         if "cleanup_session_ids" in self.setup:
             from pydantic import TypeAdapter
 
             TypeAdapter(list[Identifier]).validate_python(self.setup["cleanup_session_ids"])
+        if "faults" in self.setup:
+            faults = self.setup["faults"]
+            if not (
+                isinstance(faults, dict)
+                and set(faults) == {"audit_failures"}
+                and type(faults["audit_failures"]) is int
+                and faults["audit_failures"] == 1
+            ):
+                raise ValueError("faults requires exactly audit_failures integer 1")
         return self
 
 
@@ -337,9 +368,87 @@ class ValidatedWorkbook(ContractModel):
     worksheet_parts: dict[str, NonemptyText]
 
 
+class ReviewItem(ContractModel):
+    findingId: SHA256
+    allowedActions: list[Literal["APPLY", "DECLINE", "MANUAL_REVIEW"]] = Field(
+        max_length=3, json_schema_extra={"uniqueItems": True}
+    )
+    currentValue: dict[str, JsonValue] | None = Field(
+        json_schema_extra={
+            "anyOf": [
+                {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "title": {"type": ["string", "null"]},
+                                "description": {"type": ["string", "null"]},
+                            },
+                            "required": ["title", "description"],
+                            "additionalProperties": False,
+                        },
+                        {
+                            "type": "object",
+                            "properties": {"name": {"type": "string"}},
+                            "required": ["name"],
+                            "additionalProperties": False,
+                        },
+                        {
+                            "type": "object",
+                            "properties": {"text": {"type": "string"}},
+                            "required": ["text"],
+                            "additionalProperties": False,
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "headerRow": {"type": "integer", "minimum": 1, "maximum": 1048576}
+                            },
+                            "required": ["headerRow"],
+                            "additionalProperties": False,
+                        },
+                    ]
+                },
+                {"type": "null"},
+            ]
+        }
+    )
+    reason: ReportMessage
+
+    @model_validator(mode="after")
+    def coherent_context(self) -> Self:
+        if len(self.allowedActions) != len(set(self.allowedActions)):
+            raise ValueError("review actions must be unique")
+        current = self.currentValue
+        if current is None:
+            return self
+        keys = set(current)
+        valid = (
+            (
+                keys == {"title", "description"}
+                and all(value is None or isinstance(value, str) for value in current.values())
+            )
+            or (
+                keys in ({"name"}, {"text"})
+                and all(isinstance(value, str) for value in current.values())
+            )
+            or (
+                keys == {"headerRow"}
+                and type(current["headerRow"]) is int
+                and 1 <= current["headerRow"] <= 1048576
+            )
+        )
+        if not valid:
+            raise ValueError("review current value has an unsupported shape")
+        return self
+
+
 class AuditEvaluation(ContractModel):
     findings: list[Finding]
     limitations: list[NonemptyText]
+    # None identifies a legacy producer, never an invented empty Phase 4 inventory.
+    review_context: list[ReviewItem] | None = None
+    checks_performed: list[str] | None = None
 
 
 class WorkbookRecord(ContractModel):
@@ -380,6 +489,8 @@ class AuditRecord(ContractModel):
     findings: list[Finding]
     limitations: list[NonemptyText]
     error: ProjectError | None
+    review_context: list[ReviewItem] | None = None
+    checks_performed: list[str] | None = None
 
     @model_validator(mode="after")
     def coherent_state(self) -> Self:
@@ -400,6 +511,7 @@ class JobRecord(ContractModel):
     queue_deadline: UTCDateTime
     worker_id: NonemptyText | None
     lease_expires_at: UTCDateTime | None
+    test_audit_failure: bool = False
 
 
 class TestSession(ContractModel):
@@ -411,6 +523,7 @@ class TestSession(ContractModel):
     created_at: UTCDateTime
     revision: NonemptyText
     cleanup_error: NonemptyText | None
+    audit_failures_remaining: Annotated[StrictInt, Field(ge=0, le=1)] = 0
 
 
 class ExecutionMeasurement(ContractModel):

@@ -16,7 +16,7 @@ x-system: &system
   init: true
   restart: unless-stopped
   read_only: true
-  tmpfs: ["/tmp:size=256m,mode=1777"]
+  tmpfs: ["/tmp:size=1g,mode=1777"]
   volumes: ["${EBS_DATA_DIR:?Set mounted persistent EBS data directory}/system:/service/state"]
   networks: [private]
 services:

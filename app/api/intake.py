@@ -14,7 +14,7 @@ async def read_upload(request: Request) -> tuple[bytes, str]:
     content_type, options = parse_options_header(request.headers.get("content-type", ""))
     boundary = options.get(b"boundary", b"")
     if content_type != b"multipart/form-data" or not boundary or len(boundary) > 200:
-        raise ProjectException(400, "MALFORMED_UPLOAD", "A multipart file field is required.")
+        raise ProjectException(400, "INVALID_REQUEST", "A multipart file field is required.")
     data = bytearray()
     header_name = bytearray()
     header_value = bytearray()
@@ -24,7 +24,7 @@ async def read_upload(request: Request) -> tuple[bytes, str]:
     ended = False
 
     def malformed() -> ProjectException:
-        return ProjectException(400, "MALFORMED_UPLOAD", "Exactly one file field is required.")
+        return ProjectException(400, "INVALID_REQUEST", "Exactly one file field is required.")
 
     def part_begin() -> None:
         nonlocal parts
@@ -86,11 +86,13 @@ async def read_upload(request: Request) -> tuple[bytes, str]:
     try:
         async for chunk in request.stream():
             total += len(chunk)
+            # Let the file callback distinguish an oversized file from excessive
+            # multipart overhead, even when ASGI supplies a large single chunk.
+            parser.write(chunk)
             if total > MAX_MULTIPART_BYTES:
                 raise ProjectException(
-                    413, "FILE_TOO_LARGE", "Multipart request exceeds its limit."
+                    400, "INVALID_REQUEST", "Multipart structure exceeds its limit."
                 )
-            parser.write(chunk)
         parser.finalize()
     except ProjectException:
         raise
