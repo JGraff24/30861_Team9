@@ -1,0 +1,2 @@
+# These contract artifacts have published raw-byte hashes; never translate newlines.
+docs/contracts/phase4/* -text

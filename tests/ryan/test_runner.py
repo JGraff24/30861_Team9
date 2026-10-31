@@ -85,6 +85,24 @@ def test_rejection_and_environment(monkeypatch):
 def test_large_output():
     validated = execute().validated
     runner = MeasuredEngineRunner(Engine("large"))
+    result = runner.execute(
+        "audit",
+        b"data",
+        "x.xlsx",
+        ProcessingLimits(),
+        "2.0.0",
+        validated,
+        "one",
+        "revision-a",
+        10,
+        512,
+    )
+    assert len(result.evaluation.limitations[0]) == 5_000_000
+
+
+def test_output_exceeding_phase4_ipc_budget_is_rejected():
+    validated = execute().validated
+    runner = MeasuredEngineRunner(Engine("oversized"))
     with pytest.raises(EngineExecutionError):
         runner.execute(
             "audit",
@@ -95,8 +113,8 @@ def test_large_output():
             validated,
             "one",
             "revision-a",
-            5,
-            512,
+            10,
+            1024,
         )
 
 

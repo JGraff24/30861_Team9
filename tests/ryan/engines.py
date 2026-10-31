@@ -45,6 +45,7 @@ class Engine:
     def audit(
         self, data: bytes, validated: ValidatedWorkbook, ruleset_version: str
     ) -> AuditEvaluation:
+        sizes = {"large": 5_000_000, "oversized": 75 * 1024 * 1024}
         return AuditEvaluation(
-            findings=[], limitations=["x" * 5000000] if self.mode == "large" else []
+            findings=[], limitations=["x" * sizes[self.mode]] if self.mode in sizes else []
         )
