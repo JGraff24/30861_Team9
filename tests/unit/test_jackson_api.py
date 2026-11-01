@@ -37,6 +37,7 @@ def services(tmp_path: Path) -> SystemServices:
     }
     settings = SystemSettings(
         _env_file=None,
+        ruleset_version="1.0.0",  # Exercise the retained Phase 3 adapter contract explicitly.
         metadata_db_path=tmp_path / "metadata.sqlite3",
         blob_root=tmp_path / "sources",
         SYSTEM_TOKEN_HASHES_JSON=tokens,
@@ -248,7 +249,11 @@ def test_storage_failure_and_health(client: TestClient, services: SystemServices
     services.blob_store.put_source = Mock(side_effect=StorageError("private"))
     services.blob_store.delete_uncommitted_source = Mock()
     assert upload(client).status_code == 500
-    services.blob_store.delete_uncommitted_source.assert_not_called()
+    # A failed put may have lost its acknowledgement. Staging permits safe
+    # hash-checked compensation while preserving an immutable deletion intent.
+    services.blob_store.delete_uncommitted_source.assert_called_once()
+    assert counts(services) == [0, 0, 0, 0]
+    assert not list(services.settings.blob_root.rglob("source"))
     services.blob_store.health = Mock(return_value=False)
     response = client.get("/api/v1/health")
     assert response.status_code == 503 and response.json()["code"] == "SERVICE_UNAVAILABLE"
@@ -320,7 +325,7 @@ def test_missing_integrations_are_unavailable(tmp_path: Path) -> None:
     with TestClient(app) as client:
         assert client.get("/api/v1/health").status_code == 503
         assert client.get("/test/report").status_code == 404
-        assert len(client.get("/openapi.json").json()["paths"]) == 4
+        assert len(client.get("/openapi.json").json()["paths"]) == 13
 
 
 def test_persistence_failure_is_controlled(client: TestClient, services: SystemServices) -> None:

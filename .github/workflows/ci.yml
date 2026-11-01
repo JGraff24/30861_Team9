@@ -4,7 +4,7 @@ name: ci
 
 on:
   push:
-    branches: [main, "phase3/**", "bootstrap/**"]
+    branches: [main, "phase3/**", "phase4/**", "bootstrap/**"]
   pull_request:
   # Opt-in live run against a deployed tester. Never part of push/PR checks.
   workflow_dispatch:
@@ -16,6 +16,12 @@ on:
         description: "Target tag/SHA from pod documentation (or 'unknown')"
         required: true
         default: unknown
+      suite:
+        description: "Manifest the deployed tester serves"
+        required: true
+        default: phase3
+        type: choice
+        options: [phase3, phase4]
 
 permissions:
   contents: read
@@ -28,7 +34,7 @@ jobs:
   checks:
     name: checks (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -51,23 +57,74 @@ jobs:
         run: uv run mypy --platform linux app tester scripts
       - name: Full regression suite (Linux service runtime)
         if: runner.os == 'Linux'
-        run: uv run pytest -q
+        run: uv run pytest -q --junitxml=${{ runner.temp }}/pytest-junit.xml
       - name: Portable tester, schema and foundation checks (Windows)
         if: runner.os == 'Windows'
-        run: uv run pytest tests/unit/test_tester.py tests/unit/test_tester_deadlines.py tests/unit/test_models.py tests/unit/test_foundation.py tests/contract
+        run: uv run pytest tests/unit/test_tester.py tests/unit/test_tester_deadlines.py tests/unit/test_phase4_tester.py tests/unit/test_models.py tests/unit/test_foundation.py tests/contract --durations=15 --junitxml=${{ runner.temp }}/pytest-junit.xml
+      - name: Show failing tests as annotations
+        if: failure()
+        run: uv run python -m scripts.junit_annotations "${{ runner.temp }}/pytest-junit.xml"
+      - name: Build and smoke installed production image
+        if: runner.os == 'Linux'
+        env:
+          INTEGRATION_IMAGE: team9-integration:${{ github.sha }}
+        run: |
+          docker build --target measurement --tag "$INTEGRATION_IMAGE" -f deploy/Dockerfile .
+          docker run --rm --network none -i "$INTEGRATION_IMAGE" python - <<'PYTHON'
+          import json
+          from fastapi.testclient import TestClient
+          from app.audit.engine import OoxmlWorkbookEngine
+          from app.contracts.models import ProcessingLimits
+          from app.main import create_app
+          from tester.config import TesterSettings
+          from tester.suite.manifest import load_suite
+          from tester.suite.registry import names
+          suite = load_suite(TesterSettings().fixture_manifest_path, names())
+          assert suite.manifest.manifest_version == "2.1.1"
+          assert suite.manifest.ruleset_version == "2.0.0"
+          engine = OoxmlWorkbookEngine()
+          data = suite.bytes_of("clean_all_six")
+          validated = engine.validate(data, "clean.xlsx", ProcessingLimits())
+          result = engine.audit(data, validated, "2.0.0")
+          assert not result.findings and len(result.checks_performed) == 6
+          with TestClient(create_app()) as client:
+              assert client.get("/api/v1/health").json() == {
+                  "status": "AVAILABLE", "apiVersion": "1.0", "rulesetVersion": "2.0.0"
+              }
+              assert client.post("/api/v1/workbooks").status_code == 401
+              assert client.get("/").status_code == 200
+          print(json.dumps({"installed_image": "ok", "manifest": "2.1.1", "cases": len(suite.manifest.tests)}))
+          PYTHON
       - name: Real API, worker and tester integration
         if: runner.os == 'Linux'
         run: uv run python -m scripts.integration_selfcheck
+      - name: Real Phase 4 API, worker and independent tester integration
+        if: runner.os == 'Linux'
+        run: uv run python -m scripts.integration_selfcheck --phase4 --evidence-dir "${{ runner.temp }}/phase4-real-integration"
+      - name: Retain real Phase 4 integration evidence
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-real-integration
+          path: ${{ runner.temp }}/phase4-real-integration
+          if-no-files-found: ignore
       - name: OpenAPI catalogs are current
         run: uv run python -m scripts.export_schemas --check
       - name: Identity vectors
         run: uv run python -m scripts.check_identity
+      - name: Phase 4 policy vectors, examples and wire schemas
+        run: uv run python -m scripts.check_phase4_policy
+      - name: Phase 4 manifest matches the normative test plan
+        run: uv run python -m scripts.build_phase4_manifest --check
       - name: Synthetic fixtures match generator
         run: uv run python -m scripts.make_synthetic_fixtures --check
       - name: Live process smoke test
         run: uv run python -m scripts.smoke_foundation
       - name: Live tester self-check (test-only fake target)
         run: uv run python -m scripts.tester_selfcheck
+      - name: Live Phase 4 tester self-check (test-only Phase 4 fake target)
+        if: runner.os == 'Linux'
+        run: uv run python -m scripts.tester_selfcheck --phase4
 
   dependency-audit:
     runs-on: ubuntu-latest
@@ -93,13 +150,14 @@ jobs:
     # TEAM9_TESTER_TOKEN (operator token); the token is never printed or uploaded.
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     env:
       TEAM9_TESTER_URL: ${{ secrets.TEAM9_TESTER_URL }}
       TEAM9_TESTER_TOKEN: ${{ secrets.TEAM9_TESTER_TOKEN }}
       TEAM9_TARGET_URL: ${{ inputs.target_url }}
       # Inputs reach the shell only through env, never interpolated into scripts.
       TARGET_REVISION: ${{ inputs.target_revision }}
+      SUITE: ${{ inputs.suite }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -119,8 +177,14 @@ jobs:
         run: uv run pytest tests/acceptance
       - name: Full suite run and sanitized record
         run: |
+          if [ "$SUITE" = "phase4" ]; then
+            MANIFEST=tests/fixtures/manifest-phase4.json
+          else
+            MANIFEST=tests/fixtures/manifest.json
+          fi
           uv run python -m scripts.run_suite --tester-url "$TEAM9_TESTER_URL" \
             --target-url "$TEAM9_TARGET_URL" --target-revision "$TARGET_REVISION" \
+            --manifest "$MANIFEST" \
             --output "$RUNNER_TEMP/report.json" --record "$RUNNER_TEMP/run-record.json"
       - name: Upload report and run record (no credentials inside)
         if: always()

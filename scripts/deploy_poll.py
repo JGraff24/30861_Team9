@@ -60,6 +60,11 @@ def private_write(path: Path, content: bytes) -> None:
             temporary.flush()
             os.fsync(temporary.fileno())
             os.replace(staged, path)
+            directory = os.open(path.parent, os.O_RDONLY)
+            try:
+                os.fsync(directory)
+            finally:
+                os.close(directory)
         finally:
             staged.unlink(missing_ok=True)
 
@@ -90,9 +95,47 @@ def execute(candidate: Path, sha: str, repository: str) -> int:
             return 124
 
 
+def finish_success(root: Path, sha: str) -> None:
+    state = root / "config/deployment-state.json"
+    if state.exists() and json.loads(state.read_text()).get("sha") == sha:
+        installed = root / "automation/deploy_poll.py"
+        updated = root / "releases" / sha / "scripts/deploy_poll.py"
+        if updated.is_file():
+            private_write(installed, updated.read_bytes())
+        failed = root / "config/deploy-failed.json"
+        if failed.exists() and json.loads(failed.read_text()).get("sha") == sha:
+            failed.unlink(missing_ok=True)
+
+
 def poll(root: Path, repository: str, retry: bool = False) -> None:
     if not REPOSITORY.fullmatch(repository):
         raise ValueError("Invalid repository")
+    publication = root / "config/publication-state.json"
+    if publication.exists():
+        if not retry:
+            print("Publication is unfinished; inspect logs, then retry explicitly.", flush=True)
+            return
+        record = json.loads(publication.read_text())
+        published_sha = record.get("sha", "")
+        if not isinstance(published_sha, str) or not SHA.fullmatch(published_sha):
+            raise ValueError("Invalid unfinished publication SHA")
+        directory = root / "releases" / published_sha
+        source = directory / "scripts/deploy_host.py"
+        if record.get("directory") != str(directory) or not source.is_file():
+            raise RuntimeError("The vetted published-release recovery script is unavailable")
+        # This image and local script were already admitted by exact-SHA CI. Only
+        # recover that running release; a newer main is separately gated next tick.
+        returncode = execute(source, published_sha, repository)
+        if returncode == 75:
+            return
+        if returncode != 0:
+            private_write(
+                root / "config/deploy-failed.json",
+                json.dumps({"sha": published_sha, "returncode": returncode}).encode(),
+            )
+            raise RuntimeError("Published release recovery failed; inspect deployment logs")
+        finish_success(root, published_sha)
+        return
     result = subprocess.run(
         ["git", "ls-remote", "https://github.com/" + repository + ".git", "refs/heads/main"],
         check=True,
@@ -104,15 +147,16 @@ def poll(root: Path, repository: str, retry: bool = False) -> None:
     if not fields or not SHA.fullmatch(fields[0]):
         raise RuntimeError("Could not resolve the main branch")
     sha = fields[0]
-    if sha == deployed_sha(root):
-        print("Production is current: " + sha, flush=True)
-        return
     failed = root / "config/deploy-failed.json"
-    if failed.exists() and json.loads(failed.read_text()).get("sha") == sha and not retry:
+    failed_current = failed.exists() and json.loads(failed.read_text()).get("sha") == sha
+    if failed_current and not retry:
         print(
-            "This SHA previously failed deployment; inspect logs, then retry explicitly.",
+            "Deployment failed or publication is unfinished; inspect logs, then retry explicitly.",
             flush=True,
         )
+        return
+    if sha == deployed_sha(root) and not failed_current:
+        print("Production is current: " + sha, flush=True)
         return
     if not eligible(repository, sha):
         print("Waiting for successful push CI on main " + sha, flush=True)
@@ -138,14 +182,7 @@ def poll(root: Path, repository: str, retry: bool = False) -> None:
             raise RuntimeError(
                 "Deployment failed; inspect team9-autodeploy journal before retrying"
             )
-        state = root / "config/deployment-state.json"
-        if state.exists() and json.loads(state.read_text()).get("sha") == sha:
-            # Upgrade the small polling bootstrap only from the release that passed readiness.
-            installed = root / "automation/deploy_poll.py"
-            updated = root / "releases" / sha / "scripts/deploy_poll.py"
-            if updated.is_file():
-                private_write(installed, updated.read_bytes())
-            failed.unlink(missing_ok=True)
+        finish_success(root, sha)
     finally:
         candidate.unlink(missing_ok=True)
 

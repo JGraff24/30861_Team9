@@ -1,0 +1,2319 @@
+{
+  "ruleset_version": "2.0.0",
+  "manual_review": "Pending. Phase 4 expectations were written by Dixon from the literal fixture XML and specification 2.1.0, never from an engine run. Two-member review by Team 12 (section 15.2) and Excel no-repair checks have not been performed.",
+  "fixtures": {
+    "corrupt": {
+      "kind": "rejected",
+      "file": "synthetic/corrupt.xlsx",
+      "sha256": "c51c63778cc8b7337c98ea4a62ee51d3abb17b537b28a64cfeffc0ef9d292265",
+      "origin": "synthetic",
+      "upload_name": "corrupt.xlsx",
+      "notes": "Synthetic stand-in for Team 12 corrupt.xlsx: a local file header signature followed by unreadable bytes. The error code is not yet agreed, so only status and envelope are asserted.",
+      "http_status": 422,
+      "error_code": null,
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      }
+    },
+    "zip_traversal": {
+      "kind": "rejected",
+      "file": "synthetic/zip_traversal.xlsx",
+      "sha256": "8643e444288c01475000843f03d8621e6c59660eb8a45974392a7e2ce3880ebc",
+      "origin": "synthetic",
+      "upload_name": "zip_traversal.xlsx",
+      "notes": "Provisional hostile-input fixture. encrypted_zip sets encryption flags; it is not a genuine Excel encrypted document.",
+      "http_status": 422,
+      "error_code": null,
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      }
+    },
+    "zip_duplicate": {
+      "kind": "rejected",
+      "file": "synthetic/zip_duplicate.xlsx",
+      "sha256": "dd10f96a1ca5f1dac9caa59396acb6929f862b1ab7fd1123ccb2c110fdf9a98d",
+      "origin": "synthetic",
+      "upload_name": "zip_duplicate.xlsx",
+      "notes": "Provisional hostile-input fixture. encrypted_zip sets encryption flags; it is not a genuine Excel encrypted document.",
+      "http_status": 422,
+      "error_code": null,
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      }
+    },
+    "xml_dtd": {
+      "kind": "rejected",
+      "file": "synthetic/xml_dtd.xlsx",
+      "sha256": "accad3c326749fcc2e1fc1aa77999d7a5bf74c9cb9fbc7e2244ae374947c4843",
+      "origin": "synthetic",
+      "upload_name": "xml_dtd.xlsx",
+      "notes": "Provisional hostile-input fixture. encrypted_zip sets encryption flags; it is not a genuine Excel encrypted document.",
+      "http_status": 422,
+      "error_code": null,
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      }
+    },
+    "macro_parts": {
+      "kind": "rejected",
+      "file": "synthetic/macro_parts.xlsx",
+      "sha256": "0b2819c85a29d598707f08a43371133fae7db386be8233c3a536d86e576663fe",
+      "origin": "synthetic",
+      "upload_name": "macro_parts.xlsx",
+      "notes": "Provisional hostile-input fixture. encrypted_zip sets encryption flags; it is not a genuine Excel encrypted document.",
+      "http_status": 422,
+      "error_code": null,
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      }
+    },
+    "encrypted_zip": {
+      "kind": "rejected",
+      "file": "synthetic/encrypted_zip.xlsx",
+      "sha256": "cde084966c1c048cfd860b82f492087521816a1bca32c9342cb5589d6782dd06",
+      "origin": "synthetic",
+      "upload_name": "encrypted_zip.xlsx",
+      "notes": "Provisional genuine ZipCrypto-encrypted OOXML ZIP with a fixed fixture-only password. This is not Office CFB encryption.",
+      "http_status": 422,
+      "error_code": null,
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      }
+    },
+    "protected_sheet": {
+      "kind": "rejected",
+      "file": "synthetic/protected_sheet.xlsx",
+      "sha256": "390e3ea3f9f3768c52fddf67c146ff569e3a1fa81da1d9e0a3c888c56419e3dc",
+      "origin": "synthetic",
+      "upload_name": "protected_sheet.xlsx",
+      "notes": "Provisional isolated worksheet/structure protection metadata; tests each rejection policy separately.",
+      "http_status": 422,
+      "error_code": null,
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      }
+    },
+    "protected_structure": {
+      "kind": "rejected",
+      "file": "synthetic/protected_structure.xlsx",
+      "sha256": "3b611ae68cd84e2bbffc17ad086886732e7409c689ec2e6bc6416de28758bc11",
+      "origin": "synthetic",
+      "upload_name": "protected_structure.xlsx",
+      "notes": "Provisional isolated worksheet/structure protection metadata; tests each rejection policy separately.",
+      "http_status": 422,
+      "error_code": null,
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      }
+    },
+    "clean": {
+      "kind": "accepted",
+      "file": "synthetic/clean.xlsx",
+      "sha256": "e1de45e415b8552304a69050a86c5d605ab07eeaf96cef0c92dde6ba2d63e35e",
+      "origin": "synthetic",
+      "upload_name": "clean.xlsx",
+      "notes": "Synthetic stand-in for Team 12 clean.xlsx. Sheets Budget and Notes; Budget has a picture (id 2), a shape (id 3) and a chart (id 4), each with a nonblank title and description and no decorative marker. Six-rule re-derivation (ruleset 2.0.0): Budget A1:C1 is one row and Notes A1 one cell; no styles, merges, links or tables.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "AUDIT_COMPLETE",
+      "findings": [],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "seeded_issues": {
+      "kind": "accepted",
+      "file": "synthetic/seeded_issues.xlsx",
+      "sha256": "6e54efe60ce3a45530f364168557ea7ceb085a454b3c02fe5927ab715b00d223",
+      "origin": "synthetic",
+      "upload_name": "seeded_issues.xlsx",
+      "notes": "Synthetic stand-in for Team 12 seeded_issues.xlsx. Sheet1 (sheetId 1, sheet1.xml) holds drawing1.xml: Picture 1 (id 2) has a title but no descr; Rectangle 2 (id 3) has a whitespace-only title; Chart 3 (id 4) is natively decorative; Group 4 (id 5) has both fields and contains Picture 5 (id 6) whose descr is U+00A0 plus a space. Expenses (sheetId 2) is descriptive. Hidden sheet2 (sheetId 3) is stored in sheet3.xml. Sheet0 (sheetId 4) is excluded by the zero suffix. Six-rule re-derivation (ruleset 2.0.0): same six findings; every sheet holds one row (A1:B1) and no styles, so the four new rules add nothing. Status is REMEDIATION_AVAILABLE because user-input findings exist (section 9).",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=2",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=3",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=4",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=6",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "WORKSHEET_NAME",
+          "category": "WORKSHEET_NAME",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "WORKSHEET_NAME",
+          "category": "WORKSHEET_NAME",
+          "worksheet": "sheet2",
+          "target": "xl/worksheets/sheet3.xml#sheetId=3",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "unicode": {
+      "kind": "accepted",
+      "file": "synthetic/unicode.xlsx",
+      "sha256": "5d938a482bcb0f0bf84df3bfd9cc6dfedf7f0c57a0f9ac3357ef9b15520e1efd",
+      "origin": "synthetic",
+      "upload_name": "unicode.xlsx",
+      "notes": "Provisional hand-authored edge case; pod/Excel review pending. Six-rule re-derivation (ruleset 2.0.0): unchanged findings; one-row sheets add no new-rule findings.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": " Sheet01 ",
+          "target": "xl/drawings/drawing1.xml#id=7",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": " Sheet01 ",
+          "target": "xl/drawings/drawing1.xml#id=8",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "WORKSHEET_NAME",
+          "category": "WORKSHEET_NAME",
+          "worksheet": " Sheet01 ",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "repeated_ids": {
+      "kind": "accepted",
+      "file": "synthetic/repeated_ids.xlsx",
+      "sha256": "680d7d50899bfb4d2178acaafecbf9741f46fb0a9bdff1fb374670c50c813883",
+      "origin": "synthetic",
+      "upload_name": "repeated_ids.xlsx",
+      "notes": "Provisional hand-authored edge case; pod/Excel review pending. Duplicate ids are MANUAL_REVIEW at the object's indexed #xml= path (pod contract 1.1 section 7). Six-rule re-derivation (ruleset 2.0.0): unchanged; matches the section 7.1 duplicate-ID target vector.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Expenses",
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[1]/pic[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Expenses",
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[2]/pic[1]",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Repeated drawing object IDs use indexed XML targets.",
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "multiple_drawings": {
+      "kind": "accepted",
+      "file": "synthetic/multiple_drawings.xlsx",
+      "sha256": "52fb02a37099b7ab9a0787e7858d36340155a1c5682dc7000fe35fa79ef2eb27",
+      "origin": "synthetic",
+      "upload_name": "multiple_drawings.xlsx",
+      "notes": "Provisional hand-authored edge case; pod/Excel review pending. Six-rule re-derivation (ruleset 2.0.0): unchanged findings; one-row sheets.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Expenses",
+          "target": "xl/drawings/drawing1.xml#id=7",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Hidden costs",
+          "target": "xl/drawings/drawing2.xml#id=8",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "in_cell_picture": {
+      "kind": "accepted",
+      "file": "synthetic/in_cell_picture.xlsx",
+      "sha256": "63921a4e08cd90ee035afe125d94676dffabeaa7fd74aaf6c993fd7fe4088f1b",
+      "origin": "synthetic",
+      "upload_name": "in_cell_picture.xlsx",
+      "notes": "Pod contract 1.1 cell image. Product photos (sheet1.xml) row 2 cell B2 (second c) has vm=\"1\" (Place in Cell picture), so it is one MANUAL_REVIEW at its sheetData element path. Every xl/richData/* part (four rich-value parts plus xl/richData/_rels/richValueRel.xml.rels) and the WPS-style xl/cellimages.xml are each one workbook-level MANUAL_REVIEW (worksheet __WORKBOOK__, target <part>#xml=/). xl/metadata.xml and xl/media/image1.png are not cell-image parts. Pod/Excel review pending. Six-rule re-derivation (ruleset 2.0.0): adds TABLE_HEADER MANUAL_REVIEW at A1:B2: the dense 2x2 block has plain labels, but B2 holds an in-cell picture, an unsupported feature attached to the rectangle (section 8.6). Interpretation flagged for pod review.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Product photos",
+          "target": "xl/worksheets/sheet1.xml#xml=/worksheet[1]/sheetData[1]/row[2]/c[2]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/cellimages.xml#xml=/",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/richData/_rels/richValueRel.xml.rels#xml=/",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/richData/rdRichValueTypes.xml#xml=/",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/richData/rdrichvalue.xml#xml=/",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/richData/rdrichvaluestructure.xml#xml=/",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "__WORKBOOK__",
+          "target": "xl/richData/richValueRel.xml#xml=/",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Product photos",
+          "target": "xl/worksheets/sheet1.xml#range=A1:B2",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Logical table structure could not be established safely for A1:B2.",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "image_formula": {
+      "kind": "accepted",
+      "file": "synthetic/image_formula.xlsx",
+      "sha256": "edefdb8a4b567fe2ef4cb79e37aeb1b3c85116286c0d040ed8956b6a124effc5",
+      "origin": "synthetic",
+      "upload_name": "image_formula.xlsx",
+      "notes": "Pod contract 1.1 IMAGE() cell. Brand logos (sheet1.xml) row 2 cell B2 has an _xlfn.IMAGE(...) formula and no vm attribute: one MANUAL_REVIEW at its sheetData element path. C1's SUM formula is not an image. No rich-data parts. Pod/Excel review pending. Six-rule re-derivation (ruleset 2.0.0): adds TABLE_HEADER MANUAL_REVIEW at A1:C2: A1:C1 and A2:B2 connect into one component whose bounding rectangle has 5 of 6 cells populated (not dense).",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Brand logos",
+          "target": "xl/worksheets/sheet1.xml#xml=/worksheet[1]/sheetData[1]/row[2]/c[2]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Brand logos",
+          "target": "xl/worksheets/sheet1.xml#range=A1:C2",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Logical table structure could not be established safely for A1:C2.",
+        "Formula text was not calculated.",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "form_controls": {
+      "kind": "accepted",
+      "file": "synthetic/form_controls.xlsx",
+      "sha256": "53630b5946d30abdf056cfd12a6ebd124b19d6e9d318766e67f57af2dddcc53c",
+      "origin": "synthetic",
+      "upload_name": "form_controls.xlsx",
+      "notes": "Pod contract 1.1 controls/OLE/alternate content. Survey (sheet1.xml) nests an oleObject in mc:AlternateContent[1] (both the Choice and the Fallback copy are oleObject elements) and a form control in mc:AlternateContent[2]; each element is one MANUAL_REVIEW at its sheet #xml= path (their relationships point to ctrlProps/embeddings, not VML). drawing1.xml: mc:AlternateContent inside twoCellAnchor[1] and a root-level mc:AlternateContent are one MANUAL_REVIEW each at their element path, branches not inspected. Group 5 (id 5) has no title/descr but is a container with no finding of its own; its child shape (id 6) is described. Pod/Excel review pending. Six-rule re-derivation (ruleset 2.0.0): unchanged; one-row sheet.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Survey",
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/AlternateContent[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Survey",
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[1]/AlternateContent[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Survey",
+          "target": "xl/worksheets/sheet1.xml#xml=/worksheet[1]/AlternateContent[1]/Choice[1]/oleObjects[1]/AlternateContent[1]/Choice[1]/oleObject[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Survey",
+          "target": "xl/worksheets/sheet1.xml#xml=/worksheet[1]/AlternateContent[1]/Choice[1]/oleObjects[1]/AlternateContent[1]/Fallback[1]/oleObject[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Survey",
+          "target": "xl/worksheets/sheet1.xml#xml=/worksheet[1]/AlternateContent[2]/Choice[1]/controls[1]/AlternateContent[1]/Choice[1]/control[1]",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "vml_comments": {
+      "kind": "accepted",
+      "file": "synthetic/vml_comments.xlsx",
+      "sha256": "dacd584e94b8647c37417ddae6714fa6e3a55471a7122ac7868f55578015029f",
+      "origin": "synthetic",
+      "upload_name": "vml_comments.xlsx",
+      "notes": "Pod contract 1.1 legacy VML. Review notes (sheet1.xml) has legacyDrawing rId2 -> xl/drawings/vmlDrawing1.vml holding two comment-note v:shape elements with unique ids _x0000_s1025 and _x0000_s1026: one MANUAL_REVIEW each at #id=<id>. The v:shapetype is not a shape. Pod/Excel review pending. Six-rule re-derivation (ruleset 2.0.0): adds TABLE_HEADER MANUAL_REVIEW at A1:B2: dense 2x2, but first-row cell B1 is the number 42, not a plain-text label.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Review notes",
+          "target": "xl/drawings/vmlDrawing1.vml#id=_x0000_s1025",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Review notes",
+          "target": "xl/drawings/vmlDrawing1.vml#id=_x0000_s1026",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Review notes",
+          "target": "xl/worksheets/sheet1.xml#range=A1:B2",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Logical table structure could not be established safely for A1:B2.",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "inactive_protection": {
+      "kind": "accepted",
+      "file": "synthetic/inactive_protection.xlsx",
+      "sha256": "1f01f6857964fb9d52c04bee2457ab06ed5c0128bc5f793d0418568d867e21d7",
+      "origin": "synthetic",
+      "upload_name": "inactive_protection.xlsx",
+      "notes": "Pod contract 1.1 §4: Budget (sheet1.xml) stores a sheetProtection password hash with sheet=\"0\", which is not an active lock, so the upload is accepted. Descriptive name, no objects: no findings. Six-rule re-derivation (ruleset 2.0.0): one-row sheet with no styles; still clean.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "AUDIT_COMPLETE",
+      "findings": [],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "clean_all_six": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/clean_all_six.xlsx",
+      "sha256": "916ac672e6b3ef914493312e6c63c7c94dc45c84a9381087dbee5966ceec33a7",
+      "origin": "synthetic",
+      "upload_name": "clean_all_six.xlsx",
+      "notes": "Budget: formal table A1:B4 with matching header; described picture id 2; descriptive hyperlink label in D1. Notes: one cell. No styles with color.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "AUDIT_COMPLETE",
+      "findings": [],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "seeded_all_six": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/seeded_all_six.xlsx",
+      "sha256": "0b3b8eed0f295cece0fdf1da56c534acba5b2b2a84ce3082e953a903d2f907a6",
+      "origin": "synthetic",
+      "upload_name": "seeded_all_six.xlsx",
+      "notes": "All six categories on Sheet1: picture id 2 without alt; decorative shape id 3; red text A5 (3.998:1); ambiguous link G1; populated title merge D1:E1; dense table A1:B3; generic name.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=2",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=3",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#cell=A5",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#cell=G1",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "MERGED_CELLS",
+          "category": "MERGED_CELLS",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#merge=D1:E1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#range=A1:B3",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "WORKSHEET_NAME",
+          "category": "WORKSHEET_NAME",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {}
+    },
+    "review_only": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/review_only.xlsx",
+      "sha256": "d1eb3d0da748009c75ae41b75991ca861e1e4a9b9086d7c467ae037d09159de7",
+      "origin": "synthetic",
+      "upload_name": "review_only.xlsx",
+      "notes": "Only manual findings: populated title merge A1:C1 and green fill (nonneutral) at A3.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Summary",
+          "target": "xl/worksheets/sheet1.xml#cell=A3",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "MERGED_CELLS",
+          "category": "MERGED_CELLS",
+          "worksheet": "Summary",
+          "target": "xl/worksheets/sheet1.xml#merge=A1:C1",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "decisions": {
+          "decline_merge": {
+            "finding": [
+              "MERGED_CELLS",
+              "xl/worksheets/sheet1.xml#merge=A1:C1"
+            ],
+            "action": "DECLINE"
+          },
+          "manual_color": {
+            "finding": [
+              "COLOR_CONTRAST",
+              "xl/worksheets/sheet1.xml#cell=A3"
+            ],
+            "action": "MANUAL_REVIEW"
+          }
+        },
+        "plans": {
+          "no_edits": {
+            "decisions": [
+              "decline_merge",
+              "manual_color"
+            ],
+            "effects": []
+          }
+        }
+      }
+    },
+    "mixed_decisions": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/mixed_decisions.xlsx",
+      "sha256": "888056e1c67048ce1c7214e8848801ac6d102c2e96f0645835d337a988a5d6b4",
+      "origin": "synthetic",
+      "upload_name": "mixed_decisions.xlsx",
+      "notes": "Sheet1 holds all four supported families plus manual merge/color (the picture keeps an existing title, so review context must show it); Sheet2!A1 =SUM(Sheet1!B2:B3) depends on the Sheet1 rename; Notes is the duplicate-name probe.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=2",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#cell=A5",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#cell=D1",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "MERGED_CELLS",
+          "category": "MERGED_CELLS",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#merge=F1:G1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#range=A1:B3",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "WORKSHEET_NAME",
+          "category": "WORKSHEET_NAME",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "WORKSHEET_NAME",
+          "category": "WORKSHEET_NAME",
+          "worksheet": "Sheet2",
+          "target": "xl/worksheets/sheet2.xml#sheetId=2",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "review": [
+          {
+            "finding": [
+              "ALT_TEXT",
+              "xl/drawings/drawing1.xml#id=2"
+            ],
+            "allowedActions": [
+              "APPLY",
+              "DECLINE",
+              "MANUAL_REVIEW"
+            ],
+            "currentValue": {
+              "title": "Regional units",
+              "description": null
+            }
+          },
+          {
+            "finding": [
+              "COLOR_CONTRAST",
+              "xl/worksheets/sheet1.xml#cell=A5"
+            ],
+            "allowedActions": [
+              "DECLINE",
+              "MANUAL_REVIEW"
+            ],
+            "currentValue": null
+          },
+          {
+            "finding": [
+              "LINK_TEXT",
+              "xl/worksheets/sheet1.xml#cell=D1"
+            ],
+            "allowedActions": [
+              "APPLY",
+              "DECLINE",
+              "MANUAL_REVIEW"
+            ],
+            "currentValue": {
+              "text": "here"
+            }
+          },
+          {
+            "finding": [
+              "MERGED_CELLS",
+              "xl/worksheets/sheet1.xml#merge=F1:G1"
+            ],
+            "allowedActions": [
+              "DECLINE",
+              "MANUAL_REVIEW"
+            ],
+            "currentValue": null
+          },
+          {
+            "finding": [
+              "TABLE_HEADER",
+              "xl/worksheets/sheet1.xml#range=A1:B3"
+            ],
+            "allowedActions": [
+              "APPLY",
+              "DECLINE",
+              "MANUAL_REVIEW"
+            ],
+            "currentValue": {
+              "headerRow": 1
+            }
+          },
+          {
+            "finding": [
+              "WORKSHEET_NAME",
+              "xl/worksheets/sheet1.xml#sheetId=1"
+            ],
+            "allowedActions": [
+              "APPLY",
+              "DECLINE",
+              "MANUAL_REVIEW"
+            ],
+            "currentValue": {
+              "name": "Sheet1"
+            }
+          },
+          {
+            "finding": [
+              "WORKSHEET_NAME",
+              "xl/worksheets/sheet2.xml#sheetId=2"
+            ],
+            "allowedActions": [
+              "APPLY",
+              "DECLINE",
+              "MANUAL_REVIEW"
+            ],
+            "currentValue": {
+              "name": "Sheet2"
+            }
+          }
+        ],
+        "decisions": {
+          "alt": {
+            "finding": [
+              "ALT_TEXT",
+              "xl/drawings/drawing1.xml#id=2"
+            ],
+            "action": "APPLY",
+            "value": {
+              "title": "Regional units chart",
+              "description": "Picture of a column chart: North 12 units, South 4 units."
+            }
+          },
+          "decline_link": {
+            "finding": [
+              "LINK_TEXT",
+              "xl/worksheets/sheet1.xml#cell=D1"
+            ],
+            "action": "DECLINE"
+          },
+          "manual_merge": {
+            "finding": [
+              "MERGED_CELLS",
+              "xl/worksheets/sheet1.xml#merge=F1:G1"
+            ],
+            "action": "MANUAL_REVIEW"
+          },
+          "link": {
+            "finding": [
+              "LINK_TEXT",
+              "xl/worksheets/sheet1.xml#cell=D1"
+            ],
+            "action": "APPLY",
+            "value": {
+              "text": "Unit definitions"
+            }
+          },
+          "header": {
+            "finding": [
+              "TABLE_HEADER",
+              "xl/worksheets/sheet1.xml#range=A1:B3"
+            ],
+            "action": "APPLY",
+            "value": {
+              "headerRow": 1
+            }
+          },
+          "rename": {
+            "finding": [
+              "WORKSHEET_NAME",
+              "xl/worksheets/sheet1.xml#sheetId=1"
+            ],
+            "action": "APPLY",
+            "value": {
+              "name": "Units data"
+            }
+          },
+          "decline_color": {
+            "finding": [
+              "COLOR_CONTRAST",
+              "xl/worksheets/sheet1.xml#cell=A5"
+            ],
+            "action": "DECLINE"
+          }
+        },
+        "plans": {
+          "mixed": {
+            "decisions": [
+              "alt",
+              "decline_link",
+              "manual_merge"
+            ],
+            "effects": [
+              {
+                "type": "alt",
+                "part": "xl/drawings/drawing1.xml",
+                "id": "2",
+                "title": "Regional units chart",
+                "descr": "Picture of a column chart: North 12 units, South 4 units."
+              }
+            ]
+          },
+          "combined": {
+            "decisions": [
+              "alt",
+              "link",
+              "header",
+              "rename",
+              "decline_color"
+            ],
+            "effects": [
+              {
+                "type": "alt",
+                "part": "xl/drawings/drawing1.xml",
+                "id": "2",
+                "title": "Regional units chart",
+                "descr": "Picture of a column chart: North 12 units, South 4 units."
+              },
+              {
+                "type": "link",
+                "part": "xl/worksheets/sheet1.xml",
+                "cell": "D1",
+                "text": "Unit definitions"
+              },
+              {
+                "type": "header_range",
+                "sheet_part": "xl/worksheets/sheet1.xml",
+                "range": "A1:B3",
+                "columns": [
+                  "Region",
+                  "Units"
+                ],
+                "table_id": 1,
+                "name": "A11yTable1",
+                "table_part": "xl/tables/table1.xml",
+                "rel_id": "rId3",
+                "sheet_rels_part": "xl/worksheets/_rels/sheet1.xml.rels"
+              },
+              {
+                "type": "rename",
+                "sheet": "Sheet1",
+                "name": "Units data",
+                "references": [
+                  {
+                    "part": "xl/worksheets/sheet2.xml",
+                    "kind": "cell_formula",
+                    "ref": "A1",
+                    "formula": "SUM('Units data'!B2:B3)"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    "unsupported_edits": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/unsupported_edits.xlsx",
+      "sha256": "08ef768ac2cbae331fd6436718d27db1a75aa18393507a4bfa186da95005343d",
+      "origin": "synthetic",
+      "upload_name": "unsupported_edits.xlsx",
+      "notes": "Every finding is outside the safe profile: decorative shape id 3; two pictures sharing id 4 (indexed targets); red text A7; HYPERLINK formula in D1 (indexed c element target, interpretation flagged for pod review); merge F1:G1; rename blocked by INDIRECT in B1.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#id=3",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[1]/pic[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Sheet1",
+          "target": "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[2]/pic[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#cell=A7",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#xml=/worksheet[1]/sheetData[1]/row[1]/c[3]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "MERGED_CELLS",
+          "category": "MERGED_CELLS",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#merge=F1:G1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "WORKSHEET_NAME",
+          "category": "WORKSHEET_NAME",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Repeated drawing object IDs use indexed XML targets.",
+        "Formula-based hyperlinks are not modified.",
+        "INDIRECT reference construction makes the worksheet rename manual.",
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "unsupported_apply": [
+          {
+            "finding": [
+              "ALT_TEXT",
+              "xl/drawings/drawing1.xml#id=3"
+            ],
+            "value": {
+              "title": "Divider",
+              "description": "A thin horizontal line."
+            }
+          },
+          {
+            "finding": [
+              "ALT_TEXT",
+              "xl/drawings/drawing1.xml#xml=/wsDr[1]/twoCellAnchor[1]/pic[1]"
+            ],
+            "value": {
+              "title": "Picture A",
+              "description": "A plain square."
+            }
+          },
+          {
+            "finding": [
+              "COLOR_CONTRAST",
+              "xl/worksheets/sheet1.xml#cell=A7"
+            ],
+            "value": {
+              "text": "Late"
+            }
+          },
+          {
+            "finding": [
+              "LINK_TEXT",
+              "xl/worksheets/sheet1.xml#xml=/worksheet[1]/sheetData[1]/row[1]/c[3]"
+            ],
+            "value": {
+              "text": "Example University home page"
+            }
+          },
+          {
+            "finding": [
+              "MERGED_CELLS",
+              "xl/worksheets/sheet1.xml#merge=F1:G1"
+            ],
+            "value": {
+              "text": "Merged note"
+            }
+          },
+          {
+            "finding": [
+              "WORKSHEET_NAME",
+              "xl/worksheets/sheet1.xml#sheetId=1"
+            ],
+            "value": {
+              "name": "Lookup sheet"
+            }
+          }
+        ]
+      }
+    },
+    "alt_supported": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/alt_supported.xlsx",
+      "sha256": "c6490ba00e7879f6dfb73cf5b07c95bd1375697d6d46bf812a16399e333fe57f",
+      "origin": "synthetic",
+      "upload_name": "alt_supported.xlsx",
+      "notes": "Picture id 2 has a title but no descr; shape id 3 has neither field.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Expenses",
+          "target": "xl/drawings/drawing1.xml#id=2",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Expenses",
+          "target": "xl/drawings/drawing1.xml#id=3",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "decisions": {
+          "picture": {
+            "finding": [
+              "ALT_TEXT",
+              "xl/drawings/drawing1.xml#id=2"
+            ],
+            "action": "APPLY",
+            "value": {
+              "title": "Expense chart",
+              "description": "Bar chart: rent & travel <2026> \"Q1\" costs 📊\nSecond line\tafter a tab."
+            }
+          }
+        },
+        "plans": {
+          "alt": {
+            "decisions": [
+              "picture"
+            ],
+            "effects": [
+              {
+                "type": "alt",
+                "part": "xl/drawings/drawing1.xml",
+                "id": "2",
+                "title": "Expense chart",
+                "descr": "Bar chart: rent & travel <2026> \"Q1\" costs 📊\nSecond line\tafter a tab."
+              }
+            ]
+          }
+        }
+      }
+    },
+    "link_supported": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/link_supported.xlsx",
+      "sha256": "346a3d095c4b79d96b118389e999c71962dbab27edb5731c1a72e14cea0b5ad1",
+      "origin": "synthetic",
+      "upload_name": "link_supported.xlsx",
+      "notes": "A1 shared string 0 'here' with a hyperlink; A3 reuses shared string 0 without one; C1 inline 'click here' with a hyperlink.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Links",
+          "target": "xl/worksheets/sheet1.xml#cell=A1",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Links",
+          "target": "xl/worksheets/sheet1.xml#cell=C1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "decisions": {
+          "a1": {
+            "finding": [
+              "LINK_TEXT",
+              "xl/worksheets/sheet1.xml#cell=A1"
+            ],
+            "action": "APPLY",
+            "value": {
+              "text": "Accessibility policy (PDF)"
+            }
+          },
+          "c1": {
+            "finding": [
+              "LINK_TEXT",
+              "xl/worksheets/sheet1.xml#cell=C1"
+            ],
+            "action": "APPLY",
+            "value": {
+              "text": "=Overview of services"
+            }
+          }
+        },
+        "plans": {
+          "link": {
+            "decisions": [
+              "a1"
+            ],
+            "effects": [
+              {
+                "type": "link",
+                "part": "xl/worksheets/sheet1.xml",
+                "cell": "A1",
+                "text": "Accessibility policy (PDF)"
+              }
+            ]
+          },
+          "string_label": {
+            "decisions": [
+              "c1"
+            ],
+            "effects": [
+              {
+                "type": "link",
+                "part": "xl/worksheets/sheet1.xml",
+                "cell": "C1",
+                "text": "=Overview of services"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "header_range": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/header_range.xlsx",
+      "sha256": "ee2c92878ca27bf2830e8abd4a5d17df478de62a6e9fa8bae4ddb3b2e9956721",
+      "origin": "synthetic",
+      "upload_name": "header_range.xlsx",
+      "notes": "Dense A1:C4 with labels Name/Score/Grade and IF formulas with string caches in C2:C4.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Scores",
+          "target": "xl/worksheets/sheet1.xml#range=A1:C4",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "cases": {
+          "header_dense_range": {
+            "worksheets": [
+              "Scores"
+            ]
+          }
+        },
+        "decisions": {
+          "header": {
+            "finding": [
+              "TABLE_HEADER",
+              "xl/worksheets/sheet1.xml#range=A1:C4"
+            ],
+            "action": "APPLY",
+            "value": {
+              "headerRow": 1
+            }
+          }
+        },
+        "plans": {
+          "header_range": {
+            "decisions": [
+              "header"
+            ],
+            "effects": [
+              {
+                "type": "header_range",
+                "sheet_part": "xl/worksheets/sheet1.xml",
+                "range": "A1:C4",
+                "columns": [
+                  "Name",
+                  "Score",
+                  "Grade"
+                ],
+                "table_id": 1,
+                "name": "A11yTable1",
+                "table_part": "xl/tables/table1.xml",
+                "rel_id": "rId1",
+                "sheet_rels_part": "xl/worksheets/_rels/sheet1.xml.rels"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "header_disabled_table": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/header_disabled_table.xlsx",
+      "sha256": "28ef03661dbc430c66436f43225f11ec092ff122895b5d58996380a1bfc9c9e5",
+      "origin": "synthetic",
+      "upload_name": "header_disabled_table.xlsx",
+      "notes": "Formal table id 1 A1:B4 with headerRowCount 0; row 1 cells equal the column names.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Roster",
+          "target": "xl/tables/table1.xml#tableId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "cases": {
+          "header_disabled": {
+            "worksheets": [
+              "Roster"
+            ]
+          }
+        },
+        "review": [
+          {
+            "finding": [
+              "TABLE_HEADER",
+              "xl/tables/table1.xml#tableId=1"
+            ],
+            "allowedActions": [
+              "APPLY",
+              "DECLINE",
+              "MANUAL_REVIEW"
+            ],
+            "currentValue": {
+              "headerRow": 1
+            }
+          }
+        ],
+        "decisions": {
+          "header": {
+            "finding": [
+              "TABLE_HEADER",
+              "xl/tables/table1.xml#tableId=1"
+            ],
+            "action": "APPLY",
+            "value": {
+              "headerRow": 1
+            }
+          }
+        },
+        "plans": {
+          "header_table": {
+            "decisions": [
+              "header"
+            ],
+            "effects": [
+              {
+                "type": "header_table",
+                "table_part": "xl/tables/table1.xml"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "rename_references": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/rename_references.xlsx",
+      "sha256": "fabf363d00df9f6af44e791945d9d67dec8405dc9fadb516633a1684c8221d51",
+      "origin": "synthetic",
+      "upload_name": "rename_references.xlsx",
+      "notes": "Sheet1 referenced by ordinary, quoted and range formulas, a defined name, a chart series, a list validation, an x14 conditional formula and an internal hyperlink; a string literal, a cell text and a similar sheet name must stay unchanged.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "WORKSHEET_NAME",
+          "category": "WORKSHEET_NAME",
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "decisions": {
+          "rename": {
+            "finding": [
+              "WORKSHEET_NAME",
+              "xl/worksheets/sheet1.xml#sheetId=1"
+            ],
+            "action": "APPLY",
+            "value": {
+              "name": "Data source"
+            }
+          }
+        },
+        "plans": {
+          "rename": {
+            "decisions": [
+              "rename"
+            ],
+            "effects": [
+              {
+                "type": "rename",
+                "sheet": "Sheet1",
+                "name": "Data source",
+                "references": [
+                  {
+                    "part": "xl/worksheets/sheet2.xml",
+                    "kind": "cell_formula",
+                    "ref": "A1",
+                    "formula": "'Data source'!B2"
+                  },
+                  {
+                    "part": "xl/worksheets/sheet2.xml",
+                    "kind": "cell_formula",
+                    "ref": "A2",
+                    "formula": "SUM('Data source'!B2:B3)"
+                  },
+                  {
+                    "part": "xl/worksheets/sheet2.xml",
+                    "kind": "cell_formula",
+                    "ref": "A3",
+                    "formula": "'Data source'!B3"
+                  },
+                  {
+                    "part": "xl/workbook.xml",
+                    "kind": "defined_name",
+                    "name": "Totals",
+                    "formula": "'Data source'!$B$2:$B$3"
+                  },
+                  {
+                    "part": "xl/charts/chart1.xml",
+                    "kind": "chart_formula",
+                    "index": 0,
+                    "formula": "'Data source'!$B$2:$B$3"
+                  },
+                  {
+                    "part": "xl/worksheets/sheet2.xml",
+                    "kind": "validation",
+                    "sqref": "C1",
+                    "formula": "'Data source'!$B$2:$B$3"
+                  },
+                  {
+                    "part": "xl/worksheets/sheet2.xml",
+                    "kind": "conditional",
+                    "sqref": "D1",
+                    "formula": "'Data source'!$B$2>5"
+                  },
+                  {
+                    "part": "xl/worksheets/sheet2.xml",
+                    "kind": "hyperlink_location",
+                    "ref": "E1",
+                    "location": "'Data source'!A1"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    "preservation_rich": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/preservation_rich.xlsx",
+      "sha256": "7e870c77e26a57bb97c34a76eb18cde4dd19be69edbcdf68af3a24ef2085fad7",
+      "origin": "synthetic",
+      "upload_name": "preservation_rich.xlsx",
+      "notes": "Formulas with caches, bold style, defined name, validation, non-color conditional rule, a legacy comment with VML, a hidden sheet and an untouched opaque custom part; picture id 2 lacks alt text and is the only approved edit.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Data",
+          "target": "xl/drawings/drawing1.xml#id=2",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Data",
+          "target": "xl/drawings/vmlDrawing1.vml#id=_x0000_s1025",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "decisions": {
+          "picture": {
+            "finding": [
+              "ALT_TEXT",
+              "xl/drawings/drawing1.xml#id=2"
+            ],
+            "action": "APPLY",
+            "value": {
+              "title": "Ledger illustration",
+              "description": "A small white placeholder image."
+            }
+          }
+        },
+        "plans": {
+          "preserve": {
+            "decisions": [
+              "picture"
+            ],
+            "effects": [
+              {
+                "type": "alt",
+                "part": "xl/drawings/drawing1.xml",
+                "id": "2",
+                "title": "Ledger illustration",
+                "descr": "A small white placeholder image."
+              }
+            ]
+          }
+        }
+      }
+    },
+    "large_preservation": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/large_preservation.xlsx",
+      "sha256": "d55c8af59d4d1b5c52299d403a9b5798411f425461c02e240364d78ce7f6eb05",
+      "origin": "synthetic",
+      "upload_name": "large_preservation.xlsx",
+      "notes": "About 3 MB on the wire: a stored PNG with a padded ancillary chunk; picture id 2 lacks alt.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "ALT_TEXT",
+          "category": "NON_TEXT_CONTENT",
+          "worksheet": "Photos",
+          "target": "xl/drawings/drawing1.xml#id=2",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "decisions": {
+          "picture": {
+            "finding": [
+              "ALT_TEXT",
+              "xl/drawings/drawing1.xml#id=2"
+            ],
+            "action": "APPLY",
+            "value": {
+              "title": "Site photo",
+              "description": "A blank test image."
+            }
+          }
+        },
+        "plans": {
+          "large": {
+            "decisions": [
+              "picture"
+            ],
+            "effects": [
+              {
+                "type": "alt",
+                "part": "xl/drawings/drawing1.xml",
+                "id": "2",
+                "title": "Site photo",
+                "descr": "A blank test image."
+              }
+            ]
+          }
+        }
+      }
+    },
+    "table_header_vectors": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/table_header_vectors.xlsx",
+      "sha256": "f6a1f5905e7b6c5d5ef11666f92614cacba1c96e8753a5c6168729ed30ab85b7",
+      "origin": "synthetic",
+      "upload_name": "table_header_vectors.xlsx",
+      "notes": "One sheet per case: declared headers (none), blank, duplicate and formula headers (manual), sparse vs dense unstructured candidates with diagonal contact, title/row/column scope (none), and a hidden-sheet disabled header (user input).",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Blank",
+          "target": "xl/tables/table3.xml#tableId=3",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Duplicate",
+          "target": "xl/tables/table4.xml#tableId=4",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Formula",
+          "target": "xl/tables/table5.xml#tableId=5",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Hidden",
+          "target": "xl/tables/table6.xml#tableId=6",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Sparse",
+          "target": "xl/worksheets/sheet5.xml#range=A1:B2",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "TABLE_HEADER",
+          "category": "TABLE_STRUCTURE",
+          "worksheet": "Sparse",
+          "target": "xl/worksheets/sheet5.xml#range=D4:E5",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Logical table structure could not be established safely for Sparse!A1:B2.",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "cases": {
+          "header_declared": {
+            "worksheets": [
+              "Declared"
+            ]
+          },
+          "header_blank": {
+            "worksheets": [
+              "Blank"
+            ]
+          },
+          "header_duplicate": {
+            "worksheets": [
+              "Duplicate"
+            ]
+          },
+          "header_formula": {
+            "worksheets": [
+              "Formula"
+            ]
+          },
+          "header_sparse": {
+            "worksheets": [
+              "Sparse"
+            ],
+            "requires_limitation": true
+          },
+          "header_title_list": {
+            "worksheets": [
+              "Titles"
+            ],
+            "requires_limitation": true
+          },
+          "header_hidden": {
+            "worksheets": [
+              "Hidden"
+            ]
+          }
+        }
+      }
+    },
+    "merge_vectors": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/merge_vectors.xlsx",
+      "sha256": "66c3f84e0d8367cac38dad9a18d4b5faa28d9d360908e38869d9734a09c73ede",
+      "origin": "synthetic",
+      "upload_name": "merge_vectors.xlsx",
+      "notes": "Populated title merge, a merge populated only off-anchor, and a merge holding numeric zero; an empty merge and a formatting-only merge produce nothing.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "MERGED_CELLS",
+          "category": "MERGED_CELLS",
+          "worksheet": "Populated",
+          "target": "xl/worksheets/sheet1.xml#merge=A1:C1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "MERGED_CELLS",
+          "category": "MERGED_CELLS",
+          "worksheet": "Populated",
+          "target": "xl/worksheets/sheet1.xml#merge=E3:F4",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "MERGED_CELLS",
+          "category": "MERGED_CELLS",
+          "worksheet": "Populated",
+          "target": "xl/worksheets/sheet1.xml#merge=H1:H2",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "cases": {
+          "merge_populated": {
+            "worksheets": [
+              "Populated"
+            ]
+          },
+          "merge_empty": {
+            "worksheets": [
+              "Empty"
+            ]
+          }
+        }
+      }
+    },
+    "link_vectors": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/link_vectors.xlsx",
+      "sha256": "9f7b4a843c385d42fd135ee5af2272244d6430bf54c31cc92e12e4334b95399c",
+      "origin": "synthetic",
+      "upload_name": "link_vectors.xlsx",
+      "notes": "Finite vocabulary with whitespace collapse and one trailing mark; raw-address prefixes and a label equal to its internal location; cell text beats the display attribute; literal, one-argument, _xlfn, computed and semicolon HYPERLINK formulas (indexed c targets); a range link and duplicate declarations (indexed hyperlink targets).",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REMEDIATION_AVAILABLE",
+      "findings": [
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Display",
+          "target": "xl/worksheets/sheet3.xml#cell=A1",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "FormulaDynamic",
+          "target": "xl/worksheets/sheet5.xml#xml=/worksheet[1]/sheetData[1]/row[1]/c[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "FormulaDynamic",
+          "target": "xl/worksheets/sheet5.xml#xml=/worksheet[1]/sheetData[1]/row[2]/c[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "FormulaLiteral",
+          "target": "xl/worksheets/sheet4.xml#xml=/worksheet[1]/sheetData[1]/row[1]/c[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "FormulaLiteral",
+          "target": "xl/worksheets/sheet4.xml#xml=/worksheet[1]/sheetData[1]/row[2]/c[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "FormulaLiteral",
+          "target": "xl/worksheets/sheet4.xml#xml=/worksheet[1]/sheetData[1]/row[4]/c[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Generic",
+          "target": "xl/worksheets/sheet1.xml#cell=A1",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Generic",
+          "target": "xl/worksheets/sheet1.xml#cell=A3",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Generic",
+          "target": "xl/worksheets/sheet1.xml#cell=A5",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Generic",
+          "target": "xl/worksheets/sheet1.xml#cell=A9",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "RangeDup",
+          "target": "xl/worksheets/sheet6.xml#xml=/worksheet[1]/hyperlinks[1]/hyperlink[1]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "RangeDup",
+          "target": "xl/worksheets/sheet6.xml#xml=/worksheet[1]/hyperlinks[1]/hyperlink[2]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "RangeDup",
+          "target": "xl/worksheets/sheet6.xml#xml=/worksheet[1]/hyperlinks[1]/hyperlink[3]",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Raw",
+          "target": "xl/worksheets/sheet2.xml#cell=A1",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Raw",
+          "target": "xl/worksheets/sheet2.xml#cell=A3",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Raw",
+          "target": "xl/worksheets/sheet2.xml#cell=A5",
+          "classification": "REQUIRES_USER_INPUT"
+        },
+        {
+          "ruleId": "LINK_TEXT",
+          "category": "LINK_TEXT",
+          "worksheet": "Raw",
+          "target": "xl/worksheets/sheet2.xml#cell=A7",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "limitation_facts": [
+        "Computed or localized HYPERLINK formulas were not evaluated.",
+        "Formula-based hyperlinks are not modified.",
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "cases": {
+          "link_generic": {
+            "worksheets": [
+              "Generic"
+            ]
+          },
+          "link_raw_address": {
+            "worksheets": [
+              "Raw"
+            ]
+          },
+          "link_cell_display": {
+            "worksheets": [
+              "Display"
+            ]
+          },
+          "link_formula_literal": {
+            "worksheets": [
+              "FormulaLiteral"
+            ]
+          },
+          "link_formula_dynamic": {
+            "worksheets": [
+              "FormulaDynamic"
+            ],
+            "requires_limitation": true
+          },
+          "link_range_duplicate": {
+            "worksheets": [
+              "RangeDup"
+            ]
+          }
+        }
+      }
+    },
+    "contrast_vectors": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/contrast_vectors.xlsx",
+      "sha256": "71af778563435779715c64b1dda39e293c501b0aebd7c9439cc326ff495a5a0c",
+      "origin": "synthetic",
+      "upload_name": "contrast_vectors.xlsx",
+      "notes": "Contrast thresholds and boundaries from the frozen vectors, theme index order (dk1 is index 1) and HSL tint, a workbook palette overriding indexed 10 to black, color-only meaning, conditional ranges with suppression, unsupported fills/rich text/auto color, and hidden sheet/row cells.",
+      "review": {
+        "status": "pending",
+        "reviewers": [],
+        "notes": "Authored by Dixon (Team 9) from the literal XML in tester/phase4/workbooks.py; awaiting two-member Team 12 review (section 15.2).",
+        "excel_open": "not_checked"
+      },
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Boundary",
+          "target": "xl/worksheets/sheet4.xml#cell=A3",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Boundary",
+          "target": "xl/worksheets/sheet4.xml#cell=A7",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Conditional",
+          "target": "xl/worksheets/sheet8.xml#conditional=A1:A3",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Conditional",
+          "target": "xl/worksheets/sheet8.xml#conditional=C1:C2",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Conditional",
+          "target": "xl/worksheets/sheet8.xml#conditional=E1:E1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Hidden",
+          "target": "xl/worksheets/sheet10.xml#cell=A1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "HiddenRow",
+          "target": "xl/worksheets/sheet11.xml#cell=A3",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Large",
+          "target": "xl/worksheets/sheet3.xml#cell=A5",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Large",
+          "target": "xl/worksheets/sheet3.xml#cell=A7",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Low",
+          "target": "xl/worksheets/sheet2.xml#cell=A1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Low",
+          "target": "xl/worksheets/sheet2.xml#cell=A3",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Meaning",
+          "target": "xl/worksheets/sheet7.xml#cell=A1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Meaning",
+          "target": "xl/worksheets/sheet7.xml#cell=A3",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Theme",
+          "target": "xl/worksheets/sheet5.xml#cell=A3",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Theme",
+          "target": "xl/worksheets/sheet5.xml#cell=A5",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Unsupported",
+          "target": "xl/worksheets/sheet9.xml#cell=A1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Unsupported",
+          "target": "xl/worksheets/sheet9.xml#cell=A3",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Unsupported",
+          "target": "xl/worksheets/sheet9.xml#cell=A5",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "Unsupported",
+          "target": "xl/worksheets/sheet9.xml#cell=A7",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Unsupported fills, mixed rich text and automatic colors were not given a ratio.",
+        "Visual conditional formatting was not evaluated; affected ranges require manual contrast review.",
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure).",
+        "Missing fill is treated as white and missing font color as black (display assumption)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "cases": {
+          "color_default": {
+            "worksheets": [
+              "Default"
+            ]
+          },
+          "color_low_contrast": {
+            "worksheets": [
+              "Low"
+            ]
+          },
+          "color_large_text": {
+            "worksheets": [
+              "Large"
+            ]
+          },
+          "color_boundary": {
+            "worksheets": [
+              "Boundary"
+            ]
+          },
+          "color_theme_tint": {
+            "worksheets": [
+              "Theme"
+            ]
+          },
+          "color_indexed": {
+            "worksheets": [
+              "Indexed"
+            ]
+          },
+          "color_meaning": {
+            "worksheets": [
+              "Meaning"
+            ]
+          },
+          "color_conditional": {
+            "worksheets": [
+              "Conditional"
+            ]
+          },
+          "color_unsupported": {
+            "worksheets": [
+              "Unsupported"
+            ],
+            "requires_limitation": true
+          },
+          "color_hidden": {
+            "worksheets": [
+              "Hidden",
+              "HiddenRow"
+            ]
+          }
+        }
+      }
+    },
+    "tint_half_vectors": {
+      "kind": "accepted",
+      "file": "phase4/synthetic/tint_half_vectors.xlsx",
+      "sha256": "13be0503cf498e3f5417acce3e3773af0874a2f8a9b021226a45c9412cd66826",
+      "origin": "synthetic",
+      "upload_name": "tint_half_vectors.xlsx",
+      "notes": "Pack 2.1.1 exact-half HSL inputs authored as literal XML. GrayFive font 030303 against 757575 has contrast 4.476248585820453 and must flag; truncation/ties-even 020202 gives 4.503095875365348 and wrongly passes. Blue +/- half colors remain manual color-meaning screens; their exact channels are checked independently in policy tests.",
+      "expected_status": "REVIEW_REQUIRED",
+      "findings": [
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "BlueNegative",
+          "target": "xl/worksheets/sheet1.xml#cell=A1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "BluePositive",
+          "target": "xl/worksheets/sheet2.xml#cell=A1",
+          "classification": "MANUAL_REVIEW"
+        },
+        {
+          "ruleId": "COLOR_CONTRAST",
+          "category": "COLOR_OR_CONTRAST",
+          "worksheet": "GrayFive",
+          "target": "xl/worksheets/sheet4.xml#cell=A1",
+          "classification": "MANUAL_REVIEW"
+        }
+      ],
+      "limitation_facts": [
+        "Single-cell, one-row or one-column populated regions are not inferred tables (scope disclosure)."
+      ],
+      "min_limitations": 1,
+      "extras": {
+        "cases": {
+          "tint_blue_negative": {
+            "worksheets": [
+              "BlueNegative"
+            ]
+          },
+          "tint_blue_positive": {
+            "worksheets": [
+              "BluePositive"
+            ]
+          },
+          "tint_gray_one": {
+            "worksheets": [
+              "GrayOne"
+            ]
+          },
+          "tint_gray_five": {
+            "worksheets": [
+              "GrayFive"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

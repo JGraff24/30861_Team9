@@ -7,6 +7,11 @@ x-system: &system
     APP_ENV: production
     DEPLOYMENT_SHA: ${DEPLOYMENT_SHA:?Set source release SHA}
     API_ROOT_PATH: /system
+    # This is the designated shared Phase 4 target. Private credentials/grants stay
+    # in env_file; these release requirements must override retained Phase 3 values.
+    RULESET_VERSION: "2.0.0"
+    ENABLE_TEST_INTERFACE: "true"
+    ENABLE_TEST_AUDIT_FAULTS: "true"
     METADATA_DB_PATH: /service/state/system.sqlite3
     BLOB_BACKEND: s3
     S3_BUCKET: ${S3_BUCKET:?Set existing private source bucket}
@@ -16,7 +21,7 @@ x-system: &system
   init: true
   restart: unless-stopped
   read_only: true
-  tmpfs: ["/tmp:size=256m,mode=1777"]
+  tmpfs: ["/tmp:size=1g,mode=1777"]
   volumes: ["${EBS_DATA_DIR:?Set mounted persistent EBS data directory}/system:/service/state"]
   networks: [private]
 services:
@@ -32,6 +37,9 @@ services:
       APP_ENV: production
       TESTER_ROOT_PATH: /tester
       TESTER_DB_PATH: /service/tester-state/tester.sqlite3
+      # Docker installs the wheel in this fixed Python 3.12 virtual environment.
+      FIXTURE_MANIFEST_PATH: /service/.venv/lib/python3.12/site-packages/tester/fixtures/manifest-phase4.json
+      TESTER_RUN_TIMEOUT_SECONDS: "1800"
       AWS_EC2_METADATA_DISABLED: "true"
     command: ["uvicorn", "tester.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8001", "--no-access-log"]
     init: true

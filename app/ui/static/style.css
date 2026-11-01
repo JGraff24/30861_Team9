@@ -1,11 +1,18 @@
 :root { color-scheme: light; font: 1.05rem/1.6 system-ui, sans-serif; color: #172b3a; background: #f4f7fa; }
-main { max-width: 52rem; margin: 2rem auto; padding: 1.5rem; background: white; }
+main { max-width: 64rem; margin: 2rem auto; padding: 1.5rem; background: white; }
 label { display: block; font-weight: 650; margin-top: 1rem; }
-input { display: block; max-width: 100%; padding: .65rem; border: 1px solid #516374; }
-button { margin: 1rem 0; padding: .7rem 1rem; background: #174e78; color: white; border: 2px solid #174e78; border-radius: .25rem; font: inherit; cursor: pointer; }
-button:disabled { background: #4b5d6b; cursor: wait; }
+input, select, textarea { display: block; box-sizing: border-box; max-width: 100%; padding: .65rem; border: 1px solid #516374; font: inherit; }
+textarea { width: 100%; min-height: 6rem; }
+button { margin: .6rem .4rem .6rem 0; padding: .7rem 1rem; background: #174e78; color: white; border: 2px solid #174e78; border-radius: .25rem; font: inherit; cursor: pointer; }
+button:disabled { background: #4b5d6b; cursor: default; }
 :focus-visible { outline: 3px solid #8e3900; outline-offset: 4px; }
-#error { color: #9b1c20; font-weight: 600; }
+#error, .field-error { color: #9b1c20; font-weight: 600; }
 dt { font-weight: 650; } dd { margin: 0 0 .75rem; overflow-wrap: anywhere; }
 li { margin-bottom: 1rem; overflow-wrap: anywhere; }
+fieldset { border: 1px solid #91a5b5; padding: 1rem; min-width: 0; }
+legend { font-weight: 650; }
+#findings { padding-left: 1.2rem; }
+section { border-top: 1px solid #c6d2dc; margin-top: 1.5rem; padding-top: 1rem; }
+.hint { font-size: .95rem; }
 [hidden] { display: none !important; }
+@media (max-width: 40rem) { main { margin: 0; padding: 1rem; } button { max-width: 100%; } }

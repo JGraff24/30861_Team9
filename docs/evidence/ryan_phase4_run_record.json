@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-31",
+  "scope": "Local Ryan contribution; not a hosted SuiteReport or full Phase 4 acceptance",
+  "integration_base": "9dd62f7c073c2976af826b2318279d68e91e56af",
+  "base_counts": {
+    "passed": 800,
+    "failed": 31,
+    "skipped": 4
+  },
+  "final_counts": {
+    "passed": 818,
+    "failed": 22,
+    "skipped": 4
+  },
+  "focused_passed": 87,
+  "browser_scenarios_passed": 24,
+  "new_failure_ids": [],
+  "remaining_failure_ids": [
+    "tests/contract/test_schemas.py::test_openapi_catalogs_are_valid_current_and_reflect_delivered_routes",
+    "tests/unit/test_foundation.py::test_factories_do_not_contact_network_or_write_storage",
+    "tests/unit/test_jackson_api.py::test_acceptance_and_durable_completion",
+    "tests/unit/test_jackson_api.py::test_ownership_and_reviewer_grants",
+    "tests/unit/test_jackson_api.py::test_upload_byte_boundary",
+    "tests/unit/test_jackson_api.py::test_source_verification_and_retained_failed_source",
+    "tests/unit/test_jackson_api.py::test_completed_history_is_not_rewritten_by_get_integrity",
+    "tests/unit/test_jackson_api.py::test_metadata_failure_compensates_blob",
+    "tests/unit/test_jackson_api.py::test_storage_failure_and_health",
+    "tests/unit/test_jackson_api.py::test_worker_controlled_failures[hang-AUDIT_TIMEOUT]",
+    "tests/unit/test_jackson_api.py::test_worker_controlled_failures[crash-ENGINE_CRASH]",
+    "tests/unit/test_jackson_api.py::test_findings_sorted_and_review_required",
+    "tests/unit/test_jackson_api.py::test_testing_namespace_isolation",
+    "tests/unit/test_jackson_api.py::test_missing_integrations_are_unavailable",
+    "tests/unit/test_jackson_api.py::test_persistence_failure_is_controlled",
+    "tests/unit/test_jackson_api.py::test_source_rechecked_after_runner",
+    "tests/unit/test_jackson_api.py::test_poll_expires_queue_when_worker_is_down",
+    "tests/unit/test_jackson_api.py::test_read_storage_faults_are_not_successful_results",
+    "tests/unit/test_jackson_deploy.py::test_deployment_renderer",
+    "tests/unit/test_jackson_processes.py::test_live_process_restart_and_worker",
+    "tests/unit/test_jackson_storage.py::test_schema_initialize_is_idempotent_and_foreign_keys",
+    "tests/unit/test_jackson_storage.py::test_measurements_sets_unavailable_and_revision"
+  ],
+  "resolved_failure_ids": [
+    "tests/ryan/test_runner.py::test_large_output",
+    "tests/unit/test_phase4_context_pack.py::test_pack_member_matches_supplied_hash[CORRECTIONS.md]",
+    "tests/unit/test_phase4_context_pack.py::test_pack_member_matches_supplied_hash[Phase4_Shared_Specification.md]",
+    "tests/unit/test_phase4_context_pack.py::test_pack_member_matches_supplied_hash[README.md]",
+    "tests/unit/test_phase4_context_pack.py::test_pack_member_matches_supplied_hash[phase4-examples.json]",
+    "tests/unit/test_phase4_context_pack.py::test_pack_member_matches_supplied_hash[phase4-policy-vectors.json]",
+    "tests/unit/test_phase4_context_pack.py::test_pack_member_matches_supplied_hash[phase4-test-plan.json]",
+    "tests/unit/test_phase4_context_pack.py::test_pack_member_matches_supplied_hash[phase4-wire-schemas.json]",
+    "tests/unit/test_phase4_context_pack.py::test_pack_revision_does_not_relabel_specification_ruleset_or_wire_reports"
+  ],
+  "note": "Base and first working snapshot had Windows-converted pack newlines. Final uses committed artifact bytes with -text attributes. Four live tests lack configured remote credentials; no hosted tests were attempted."
+}

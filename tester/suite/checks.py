@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import httpx
-from pydantic import BaseModel
+from pydantic import BaseModel, JsonValue
 
 from app.contracts.models import (
     AuditResponse,
@@ -17,6 +17,7 @@ from app.contracts.models import (
     ProjectError,
     SystemReport,
     TestEndpointError,
+    TestResult,
     UploadResponse,
     VersionResponse,
 )
@@ -28,7 +29,7 @@ from tester.suite.workbooks import (
     protected_workbook,
     worksheets_workbook,
 )
-from tester.target import Identity, TargetClient
+from tester.target import DeadlineExceeded, Identity, TargetClient
 
 UPLOAD_LIMIT_BYTES = 25_000_000
 WORKSHEET_LIMIT = 50
@@ -61,6 +62,10 @@ class SuiteContext:
     clock: Callable[[], float] = time.monotonic
     state: dict[str, Any] = field(default_factory=dict)
     current: PlannedTest | None = None
+    # Outcomes recorded so far in this run (read-only for report-format self-checks).
+    results: list[TestResult] = field(default_factory=list)
+    # Nonzero while a check performs shared setup; setup calls never earn coverage markers.
+    setup_depth: int = 0
     markers: dict[str, dict[str, list[str]]] = field(default_factory=dict)
     code: CoverageMeasure = field(
         default_factory=lambda: CoverageMeasure(
@@ -74,7 +79,7 @@ class SuiteContext:
         self, *, components: list[str] | None = None, acceptance: list[str] | None = None
     ) -> None:
         """Record only the predeclared assertions/calls that have actually been reached."""
-        if self.current is None:
+        if self.current is None or self.setup_depth:
             return
         row = self.markers.setdefault(self.current.test_id, {"components": [], "acceptance": []})
         for key, requested, allowed in (
@@ -87,7 +92,7 @@ class SuiteContext:
             row[key] = sorted(set(row[key]) | set(selected))
 
     @property
-    def parameters(self) -> dict[str, str | int]:
+    def parameters(self) -> dict[str, JsonValue]:
         return self.current.parameters if self.current else {}
 
 
@@ -179,11 +184,13 @@ def require(ctx: SuiteContext, key: str, producer: str) -> Any:
 
 
 def poll_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> AuditResponse:
-    give_up = ctx.clock() + AUDIT_POLL_SECONDS
+    limits = ctx.suite.manifest.limits
+    seconds = float(limits.audit_poll_seconds) if limits is not None else AUDIT_POLL_SECONDS
+    give_up = ctx.clock() + seconds
     while True:
         left = give_up - ctx.clock()
         if left <= 0:
-            raise CheckFailed(f"{action} was still PROCESSING after {AUDIT_POLL_SECONDS:.0f} s.")
+            raise CheckFailed(f"{action} was still PROCESSING after {seconds:.0f} s.")
         response = ctx.client.request(
             "GET", audit_path(ids), identity="userA", timeout=min(10, left)
         )
@@ -203,16 +210,20 @@ def poll_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> AuditResp
             raise CheckFailed(f"{action} reports a different ruleset.")
         if audit.status == AuditStatus.PROCESSING_FAILED:
             ctx.state["processing_failure"] = audit
-            raise SystemFault(f"{action} ended PROCESSING_FAILED with a controlled target error.")
+            code = audit.error.code[:64] if audit.error is not None else "missing error"
+            raise SystemFault(f"{action} ended PROCESSING_FAILED ({code}).")
         if ctx.clock() > give_up:
             raise CheckFailed(f"{action} exceeded its audit polling deadline.")
         if audit.status != AuditStatus.PROCESSING:
             return audit
+        if ctx.client.remaining() < POLL_INTERVAL_SECONDS and limits is not None:
+            # Phase 4: running out of suite budget is the tester's deadline, not a target fault.
+            raise DeadlineExceeded("suite deadline reached while polling an audit")
         if (
             ctx.clock() + POLL_INTERVAL_SECONDS > give_up
             or ctx.client.remaining() < POLL_INTERVAL_SECONDS
         ):
-            raise CheckFailed(f"{action} was still PROCESSING after {AUDIT_POLL_SECONDS:.0f} s.")
+            raise CheckFailed(f"{action} was still PROCESSING after {seconds:.0f} s.")
         ctx.sleep(POLL_INTERVAL_SECONDS)
 
 
@@ -344,8 +355,27 @@ def upload_at_limit(ctx: SuiteContext) -> str:
         expect_status(response, 202, "Upload exactly at the byte limit")
     ctx.qualify()
     expect_status(response, 202, "Upload exactly at the byte limit")
-    accepted_ids(ctx, response, "Upload exactly at the byte limit")
+    ids = accepted_ids(ctx, response, "Upload exactly at the byte limit")
+    drain_intake_audit(ctx, ids, "Byte boundary audit")
     return "A valid workbook of exactly 25,000,000 bytes was accepted with 202."
+
+
+def drain_intake_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> None:
+    """Finish boundary-case work before submitting unrelated Phase 4 accuracy cases.
+
+    A large accepted boundary workbook can legally use most of the 60-second
+    audit budget. Leaving it queued/running would make this sequential suite
+    accidentally test overload against the separate 15-second queue bound.
+    Preparatory polling earns no coverage; genuine audit failures remain errors.
+    Legacy suite execution and independent finding expectations stay unchanged.
+    """
+    if ctx.suite.manifest.phase != "4":
+        return
+    ctx.setup_depth += 1
+    try:
+        poll_audit(ctx, ids, action)
+    finally:
+        ctx.setup_depth -= 1
 
 
 def _accepted_upload(ctx: SuiteContext, name: str) -> str:
@@ -447,7 +477,8 @@ def _limit_upload(ctx: SuiteContext, data: bytes, name: str, status: int, action
     ctx.qualify()
     if status == 202:
         expect_status(response, 202, action)
-        accepted_ids(ctx, response, action)
+        ids = accepted_ids(ctx, response, action)
+        drain_intake_audit(ctx, ids, action + " audit")
     else:
         project_error(response, status, action)
 
@@ -585,6 +616,10 @@ def determinism(ctx: SuiteContext) -> str:
         or [(f.message, f.recommendation) for f in audit.findings] != prose
     ):
         raise CheckFailed(f"Audit {run} of identical bytes returned different findings or prose.")
+    if ctx.suite.manifest.phase == "4":
+        first = require(ctx, "seeded_audit", "the valid first completed audit")
+        if (audit.limitations, audit.status) != (first.limitations, first.status):
+            raise CheckFailed(f"Audit {run} of identical bytes changed limitations or status.")
     return f"Audit {run} matched the first audit's semantic findings and prose."
 
 

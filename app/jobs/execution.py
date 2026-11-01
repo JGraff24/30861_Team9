@@ -24,7 +24,9 @@ from app.contracts.models import (
 )
 from app.contracts.ports import EngineRunner
 
-MAX_IPC_BYTES = 4 * 1024 * 1024
+# A valid audit may occupy the full public result budget. The private envelope and
+# measurement metadata need their own bounded allowance rather than reducing it.
+MAX_IPC_BYTES = 74 * 1024 * 1024
 
 
 def execute_bounded(

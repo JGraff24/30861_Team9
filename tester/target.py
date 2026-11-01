@@ -116,9 +116,14 @@ class TargetClient:
         session_header: bool = True,
         headers: Mapping[str, str] | None = None,
         timeout: float = 10,
+        max_bytes: int = MAX_RESPONSE_BYTES,
         **kwargs: Any,
     ) -> httpx.Response:
-        """One bounded call. Only GET is retried, and only after transport failures."""
+        """One bounded call. Only GET is retried, and only after transport failures.
+
+        `max_bytes` bounds the response body; Phase 4 raises it to the section 10 JSON and
+        binary transport limits so large outputs are never silently truncated.
+        """
         request_headers: dict[str, str] = {}
         token = raw_token if raw_token is not None else (identity and self._token(identity))
         if token:
@@ -169,7 +174,7 @@ class TargetClient:
                                 for chunk in response.iter_bytes():
                                     if remaining() <= 0:
                                         raise CommunicationError("request total deadline reached")
-                                    if len(content) + len(chunk) > MAX_RESPONSE_BYTES:
+                                    if len(content) + len(chunk) > max_bytes:
                                         raise CommunicationError(
                                             "target response exceeded size limit"
                                         )

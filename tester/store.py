@@ -37,6 +37,31 @@ CREATE TABLE IF NOT EXISTS tester_sessions (
     cleanup_pending INTEGER NOT NULL DEFAULT 0
 )
 """
+# Auxiliary target namespaces a run created (for example the Phase 4 fault session). They are
+# kept as evidence until the run is recorded, then cleaned on the next setup for that target.
+AUXILIARY_SCHEMA = """
+CREATE TABLE IF NOT EXISTS tester_auxiliary_sessions (
+    session_id TEXT PRIMARY KEY,
+    parent_session_id TEXT NOT NULL,
+    target_url TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    cleanup_pending INTEGER NOT NULL DEFAULT 1
+)
+"""
+PLAN_SCHEMA = """
+CREATE TABLE IF NOT EXISTS tester_plan_snapshots (
+    session_id TEXT PRIMARY KEY,
+    plan TEXT NOT NULL
+)
+"""
+# Keep immutable multi-megabyte fixture bundles off the progress row. Updating a
+# result must not rewrite the entire accepted fixture snapshot on every case.
+SESSION_SELECT = (
+    "SELECT s.session_id,s.operator_subject,s.target_url,s.state,s.created_at,"
+    "s.results,s.report,s.cleanup_pending,COALESCE(p.plan,s.plan) AS plan,"
+    "s.setup_json,s.markers FROM tester_sessions s LEFT JOIN tester_plan_snapshots p "
+    "ON p.session_id=s.session_id "
+)
 
 
 @dataclass(frozen=True)
@@ -69,6 +94,12 @@ class TesterStore:
                 with sqlite3.connect(self.path) as setup:
                     setup.execute("PRAGMA journal_mode=WAL")
                     setup.execute(SCHEMA)
+                    setup.execute(AUXILIARY_SCHEMA)
+                    setup.execute(PLAN_SCHEMA)
+                    setup.execute(
+                        "CREATE TRIGGER IF NOT EXISTS immutable_tester_snapshot BEFORE UPDATE "
+                        "ON tester_plan_snapshots BEGIN SELECT RAISE(ABORT,'immutable plan'); END"
+                    )
                     columns = {
                         row[1] for row in setup.execute("PRAGMA table_info(tester_sessions)")
                     }
@@ -122,6 +153,14 @@ class TesterStore:
         setup: dict[str, object] | None = None,
     ) -> None:
         with self._connect(write=True) as db:
+            snapshot = None
+            if plan is not None:
+                try:
+                    parsed = json.loads(plan)
+                    if "fixture_bytes" in parsed:
+                        snapshot, plan = plan, None
+                except (ValueError, TypeError):
+                    pass  # Existing malformed legacy plans keep their controlled run rejection.
             db.execute(
                 "INSERT INTO tester_sessions (session_id, operator_subject, target_url, state,"
                 " created_at, plan, setup_json) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -135,6 +174,8 @@ class TesterStore:
                     json.dumps(setup or {}),
                 ),
             )
+            if snapshot is not None:
+                db.execute("INSERT INTO tester_plan_snapshots VALUES (?,?)", (session_id, snapshot))
 
     def finish_setup(self, session_id: str, ready: bool) -> None:
         state = TesterSessionState.READY if ready else TesterSessionState.SETUP_FAILED
@@ -147,9 +188,7 @@ class TesterStore:
 
     def get(self, session_id: str) -> SessionRow | None:
         with self._connect() as db:
-            row = db.execute(
-                "SELECT * FROM tester_sessions WHERE session_id = ?", (session_id,)
-            ).fetchone()
+            row = db.execute(SESSION_SELECT + "WHERE s.session_id = ?", (session_id,)).fetchone()
         return None if row is None else self._row(row)
 
     def require_owned(self, session_id: str, operator: str) -> SessionRow:
@@ -163,9 +202,7 @@ class TesterStore:
     def begin_run(self, session_id: str, operator: str) -> SessionRow:
         """Consume a READY session exactly once; every later or concurrent run gets 409."""
         with self._connect(write=True) as db:
-            row = db.execute(
-                "SELECT * FROM tester_sessions WHERE session_id = ?", (session_id,)
-            ).fetchone()
+            row = db.execute(SESSION_SELECT + "WHERE s.session_id = ?", (session_id,)).fetchone()
             if row is None:
                 raise TesterError(404, "Unknown tester session.", ErrorSource.TESTER)
             if row["operator_subject"] != operator:
@@ -216,7 +253,7 @@ class TesterStore:
     def running_sessions(self) -> list[SessionRow]:
         with self._connect() as db:
             rows = db.execute(
-                "SELECT * FROM tester_sessions WHERE state = ?", (TesterSessionState.RUNNING,)
+                SESSION_SELECT + "WHERE s.state = ?", (TesterSessionState.RUNNING,)
             ).fetchall()
         return [self._row(row) for row in rows]
 
@@ -236,11 +273,59 @@ class TesterStore:
                 + " ORDER BY created_at",
                 (target_url,),
             ).fetchall()
-        return [row["session_id"] for row in rows]
+            auxiliary = db.execute(
+                "SELECT session_id FROM tester_auxiliary_sessions WHERE target_url = ?"
+                " AND cleanup_pending = 1 ORDER BY created_at, session_id",
+                (target_url,),
+            ).fetchall()
+        return [row["session_id"] for row in rows] + [row["session_id"] for row in auxiliary]
 
     def clear_cleanup(self, session_ids: list[str]) -> None:
         with self._connect(write=True) as db:
+            for table in ("tester_sessions", "tester_auxiliary_sessions"):
+                db.executemany(
+                    f"UPDATE {table} SET cleanup_pending = 0 WHERE session_id = ?",
+                    [(session_id,) for session_id in session_ids],
+                )
+
+    def record_auxiliary(
+        self,
+        parent_session_id: str,
+        target_url: str,
+        session_ids: list[str],
+        created_at: str,
+        *,
+        pending: bool = True,
+    ) -> None:
+        """Remember namespaces a run created (deduplicated).
+
+        During a run they are saved with cleanup held (`pending=False`) so a crash cannot lose
+        them; `release_auxiliary` queues them once the run's evidence is recorded.
+        """
+        with self._connect(write=True) as db:
             db.executemany(
-                "UPDATE tester_sessions SET cleanup_pending = 0 WHERE session_id = ?",
-                [(session_id,) for session_id in session_ids],
+                "INSERT OR IGNORE INTO tester_auxiliary_sessions"
+                " (session_id, parent_session_id, target_url, created_at, cleanup_pending)"
+                " VALUES (?, ?, ?, ?, ?)",
+                [
+                    (sid, parent_session_id, target_url, created_at, int(pending))
+                    for sid in session_ids
+                ],
             )
+
+    def release_auxiliary(self, parent_session_id: str) -> None:
+        with self._connect(write=True) as db:
+            db.execute(
+                "UPDATE tester_auxiliary_sessions SET cleanup_pending = 1"
+                " WHERE parent_session_id = ?",
+                (parent_session_id,),
+            )
+
+    def auxiliary_sessions(self, parent_session_id: str) -> list[str]:
+        with self._connect() as db:
+            rows = db.execute(
+                "SELECT session_id FROM tester_auxiliary_sessions WHERE parent_session_id = ?"
+                " ORDER BY created_at, session_id",
+                (parent_session_id,),
+            ).fetchall()
+        return [row["session_id"] for row in rows]

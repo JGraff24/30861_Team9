@@ -1,6 +1,21 @@
 # 30861_Team9
 
-Excel accessibility hub — integrated Phase 3.
+Excel accessibility hub — Phase 4 backend, engine, independent tester and review UI.
+
+The Phase 4 backend uses corrected context pack 2.1.1 (suite target 2.1.1),
+with specification 2.1.0 and ruleset 2.0.0 unchanged, and adds version
+uploads, re-audits, review context, durable remediation orchestration, downloads,
+reports and history. The integration includes Dylan's six-rule engine/editor,
+Ryan's permission-aware review UI and Dixon's independent 253-case HTTP tester.
+See the [integration changes and verification](docs/evidence/phase4_integration.md)
+for the tested scope and release limitations.
+See [Ryan's implementation and limitations](docs/implementation/ryan_phase4.md),
+[local verification](docs/evidence/ryan_phase4.md), and the
+[backend handoff](docs/implementation/jackson_phase4.md). Use an explicit
+`RULESET_VERSION=1.0.0` only for legacy Phase 3 development/regression checks.
+
+The following Phase 3 operating reference is historical; it does not claim that
+this local Phase 4 branch is deployed or that the cross-team acceptance gates passed.
 
 The system accepts authenticated `.xlsx` uploads, retains immutable sources, runs durable
 asynchronous audits for missing alternative text and generic worksheet names, and exposes
@@ -12,7 +27,9 @@ See the [integration review and evidence](docs/evidence/phase3_integration.md),
 [shared contract](docs/contracts/phase3.md) and [deployment runbook](deploy/README.md).
 The system and tester are deployed on AWS over HTTPS. The hosted tester is configured
 to test both Team 9's and Team 12's systems; see the access guide below.
-Remediation, history, downloadable reports, scheduling and ordinary deletion are future work.
+Backend remediation orchestration, history and downloadable reports now have
+Phase 4 interfaces and an integrated local engine/editor.
+Scheduling and ordinary deletion remain Phase 5 work.
 
 ## Hosted access
 
@@ -47,12 +64,23 @@ operator token to authenticate to Team 9's tester. The setup body needs no token
 Require setup to return 201, retain its `session_id`, then execute `POST /test/run` once
 with `{"session_id":"PASTE_RETURNED_SESSION_ID"}`. Retrieve the stored report through
 `GET /test/report` with the same session ID. Use a client read timeout of at least
-630 seconds. After a lost run response, retrieve the report rather than repeating the
+1,830 seconds for Phase 4 (630 for a retained Phase 3 installation). After a lost run response, retrieve the report rather than repeating the
 run POST; poll 409 report responses within a deadline. Do not automatically retry an
 uncertain setup POST. Each prepared session runs once.
 
 For reciprocal testing, Team 12 uses its own tester and operator token, targeting
 `https://3.139.178.70.sslip.io/system` with Team 9's system credentials.
+
+## Phase 4 tester
+
+The tester also carries the Phase 4 suite for shared specification 2.1.0 (ruleset 2.0.0):
+253 hosted cases generated from the corrected 2.1.1 pack, Team 9's synthetic fixture packs and an
+independent package comparator. Phase 4 is the default; use
+`FIXTURE_MANIFEST_PATH=tests/fixtures/manifest.json` explicitly for legacy Phase 3 checks.
+Phase 4 runs take up to 1,800 seconds, so callers need a read
+timeout of at least 1,830 seconds. See
+[the Phase 4 implementation notes](docs/implementation/dixon_phase4.md) and the
+[adopted specification pack](docs/contracts/phase4/).
 
 ## Local setup
 
@@ -123,7 +151,7 @@ configuration. No HTTP caller selects a factory. Disabled/missing integrations f
 Coverage is optional at runtime: install `uv sync --locked --no-dev --extra measurement` when
 enabled, or build the Docker `measurement` target for both system and worker.
 
-The four project operations are public GET `/api/v1/health`, authenticated POST
+The original four Phase 3 operations are public GET `/api/v1/health`, authenticated POST
 `/api/v1/workbooks`, GET `/api/v1/workbooks/{workbookId}/versions/{versionId}` and its
 `/audits/{auditId}`. Version retrieval rereads and hashes the source. Owner/reviewer permission
 checks precede content reads; test-admin credentials have testing powers only.
@@ -144,21 +172,25 @@ uv run mypy app tester scripts
 uv run pytest -q
 uv run python -m scripts.export_schemas --check
 uv run python -m scripts.check_identity
+uv run python -m scripts.check_phase4_policy
+uv run python -m scripts.build_phase4_manifest --check
 uv run python -m scripts.make_synthetic_fixtures --check
 uv run python -m scripts.smoke_foundation
 uv run python -m scripts.integration_selfcheck --evidence-dir /tmp/team9-integration-evidence
+uv run python -m scripts.integration_selfcheck --phase4 --evidence-dir /tmp/team9-phase4-evidence
 ```
 
 The integration self-check uses random temporary loopback ports, isolated databases and private
-credentials. It tests the real engine/API/worker, restart persistence, the 64-case tester suite,
+credentials. It tests the real engine/API/worker, restart persistence, the selected tester suite,
 report retention and four live tester acceptance checks. It contacts no AWS or Team 12 endpoint.
 Two Linux memory-limit tests skip on macOS. Live acceptance tests skip in an ordinary pytest run;
 the integration self-check configures and runs them. CI runs the full suite and real integration
 on Linux; portable tester/schema checks also run on Windows.
 
 The separate `scripts.tester_selfcheck` uses a labeled fake target to test the tester itself.
-Synthetic fixture expectations still need human pod review. Browser automation lives in
-`tests/ryan/browser_ui.py` and requires optional Playwright tooling; automated API results do
+Fixture reviews and review records were excluded by Jackson; no such reviews are claimed.
+Browser automation lives in `tests/ryan/browser_ui.py` and `tests/ryan/browser_real.py`
+and requires optional Playwright tooling; automated API results do
 not establish manual keyboard/screen-reader conformance.
 
 Runtime dependency scanning (requires network):

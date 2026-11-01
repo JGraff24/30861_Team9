@@ -50,7 +50,7 @@ def test_factories_do_not_contact_network_or_write_storage(monkeypatch: pytest.M
     assert not Path("state").exists()
     with TestClient(create_system()) as client:
         assert client.get("/docs").status_code == 200
-        assert len(client.get("/openapi.json").json()["paths"]) == 4
+        assert len(client.get("/openapi.json").json()["paths"]) == 13
         assert client.get("/api/v1/health").status_code == 200
     with TestClient(create_tester()) as client:
         assert len(client.get("/openapi.json").json()["paths"]) == 3

@@ -1,24 +1,63 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Workbook accessibility checks</title><link rel="stylesheet" href="{{ base }}/ui/style.css">
+<title>Workbook accessibility review</title><link rel="stylesheet" href="{{ base }}/ui/style.css">
 <script src="{{ base }}/ui/app.js" defer></script></head>
 <body data-base="{{ base }}"><main>
-<h1>Workbook accessibility checks</h1>
-<p>Upload an Excel workbook for two checks: image alternative text and default worksheet names.
+<h1>Workbook accessibility review</h1>
+<p>Check alternative text, worksheet names, table headers, merged cells, hyperlink text and color/contrast.
 Results support human review and are not a compliance determination.</p>
-<form id="upload">
+<form id="connect">
 <label for="token">User access token</label>
 <input id="token" aria-describedby="token-help" type="password" autocomplete="off" spellcheck="false" required>
-<p id="token-help">Use your user token. It stays in memory for this page only.</p>
+<p id="token-help">Use your user or granted reviewer token. It stays in memory for this page only. Changing credentials clears this page's review state.</p>
+<button id="connect-button" type="submit">Connect</button>
+</form>
+<p id="identity" role="status"></p>
+<div id="workspace" hidden>
+<form id="upload">
 <label for="file">Excel workbook (.xlsx)</label>
 <input id="file" name="file" type="file" accept=".xlsx" required>
+<label for="upload-kind">Upload destination</label>
+<select id="upload-kind" aria-describedby="upload-destination"><option value="new">New workbook</option><option value="version" disabled>New version of workbook in history</option></select>
+<p id="upload-destination"></p>
 <button id="submit" type="submit">Upload and check</button>
 </form>
-<p id="status" role="status" aria-live="polite" aria-atomic="true"></p>
-<p id="error" role="alert"></p>
-<button id="retry" type="button" hidden>Resume checking this upload</button>
+<form id="open-workbook">
+<label for="workbook-id">Existing workbook ID</label>
+<input id="workbook-id" pattern="[A-Za-z0-9_-]{1,64}" maxlength="64" required>
+<button type="submit">Open history</button>
+</form>
+<section id="history-panel" hidden aria-labelledby="history-heading">
+<h2 id="history-heading">Workbook history</h2>
+<p id="history-workbook"></p>
+<button id="refresh-history" type="button">Refresh history</button>
+<ul id="history"></ul>
+</section>
 <section id="results" aria-labelledby="results-heading" hidden>
 <h2 id="results-heading" tabindex="-1">Results</h2>
-<dl id="metadata"></dl><h3>Findings</h3><p id="empty"></p><ul id="findings"></ul>
+<dl id="metadata"></dl>
+<p id="selection-note"></p>
+<div class="actions">
+<button id="source-download" type="button">Download selected workbook</button>
+<button id="report-download" type="button">Download audit report (JSON)</button>
+<button id="reaudit" type="button">Re-audit selected version</button>
+</div>
+<form id="review-form">
+<h3>Findings and decisions</h3>
+<p>Choose an action for each finding you want to address. Unselected findings remain unresolved. Applying a change requires your explicit input or confirmation.</p>
+<p id="empty"></p><ul id="findings"></ul>
+<button id="send-decisions" type="submit" hidden>Submit selected decisions</button>
+</form>
 <h3>Limitations</h3><ul id="limitations"></ul>
-</section></main></body></html>
+</section>
+<section id="output-panel" hidden aria-labelledby="output-heading">
+<h2 id="output-heading">Remediation</h2>
+<p id="output-status" role="status"></p>
+<button id="output-download" type="button" hidden>Download remediated workbook</button>
+<button id="output-review" type="button" hidden>Review output findings</button>
+</section>
+</div>
+<p id="status" role="status" aria-live="polite" aria-atomic="true"></p>
+<p id="error" role="alert"></p>
+<button id="retry" type="button" hidden>Resume pending operation</button>
+</main></body></html>

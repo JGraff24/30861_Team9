@@ -29,7 +29,7 @@ def client() -> Iterator[httpx.Client]:
     with httpx.Client(
         base_url=TESTER.rstrip("/"),
         headers={"Authorization": f"Bearer {TOKEN}"},
-        timeout=httpx.Timeout(60, read=630),
+        timeout=httpx.Timeout(60, read=int(os.environ.get("TEAM9_RUN_READ_TIMEOUT", "630"))),
         trust_env=False,
     ) as live:
         yield live
@@ -85,7 +85,7 @@ def test_lost_run_response_is_recovered_without_another_run(client: httpx.Client
         assert run.status_code in (200, 500)
     except httpx.TransportError:
         pass
-    deadline = time.monotonic() + 630
+    deadline = time.monotonic() + int(os.environ.get("TEAM9_RUN_READ_TIMEOUT", "630"))
     while True:
         stored = client.get("/test/report", params={"session_id": sid})
         if stored.status_code != 409 or time.monotonic() >= deadline:

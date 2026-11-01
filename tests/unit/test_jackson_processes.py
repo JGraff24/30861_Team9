@@ -22,6 +22,7 @@ def test_live_process_restart_and_worker(tmp_path: Path) -> None:
         "HOME": str(tmp_path),
         "METADATA_DB_PATH": str(tmp_path / "system.sqlite3"),
         "BLOB_ROOT": str(tmp_path / "sources"),
+        "RULESET_VERSION": "1.0.0",  # This process injects the historical two-rule double.
         "ENGINE_FACTORY": "tests.unit.jackson_support:TestEngine",
         "RUNNER_FACTORY": "tests.unit.jackson_support:create_runner",
         "SYSTEM_TOKEN_HASHES_JSON": json.dumps(

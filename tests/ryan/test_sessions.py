@@ -281,3 +281,43 @@ def test_report_cleanup_race_returns_not_found(context):
     )
     assert response.status_code == 404
     assert repo.sessions["race"].state == SessionState.CLEANED
+
+
+@pytest.mark.parametrize(
+    "faults",
+    [
+        {},
+        {"audit_failures": True},
+        {"audit_failures": 0},
+        {"audit_failures": "1"},
+        {"audit_failures": 2},
+        {"audit_failures": 1, "extra": 1},
+    ],
+)
+def test_fault_setup_rejects_before_cleanup(context, faults):
+    repo, blobs, service, admin = context
+    service.settings.enable_test_audit_faults = True
+    service.prepare("old", admin, {})
+    before = dict(repo.sessions)
+    with pytest.raises(ProjectException) as error:
+        service.prepare("fault", admin, {"cleanup_session_ids": ["old"], "faults": faults})
+    assert error.value.status_code == 400
+    assert repo.sessions == before
+    blobs.delete_test_source.assert_not_called()
+
+
+def test_fault_setup_requires_trusted_enablement_and_fresh_session(context):
+    repo, blobs, service, admin = context
+    service.prepare("old", admin, {})
+    with pytest.raises(ProjectException) as error:
+        service.prepare(
+            "fault", admin, {"cleanup_session_ids": ["old"], "faults": {"audit_failures": 1}}
+        )
+    assert error.value.status_code == 403
+    assert set(repo.sessions) == {"old"}
+    blobs.delete_test_source.assert_not_called()
+    service.settings.enable_test_audit_faults = True
+    session = service.prepare("fault", admin, {"faults": {"audit_failures": 1}})
+    assert session.audit_failures_remaining == 1
+    with pytest.raises(DuplicateIdentifierError):
+        service.prepare("fault", admin, {"faults": {"audit_failures": 1}})

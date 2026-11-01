@@ -164,6 +164,8 @@ class FakeSystem:
             return self.project_error(400, "MISSING_FILE")
         name = part.get_filename() or ""
         data = part.get_payload(decode=True)
+        if not isinstance(data, bytes):
+            return self.project_error(400, "INVALID_FILE")
         if name.endswith(".xlsm"):
             return self.project_error(422, "MACRO_ENABLED_WORKBOOK_UNSUPPORTED")
         if not name.endswith(".xlsx"):

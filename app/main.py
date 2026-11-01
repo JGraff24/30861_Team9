@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import JsonValue
+from pydantic.json_schema import models_json_schema
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 from starlette.responses import Response
@@ -19,6 +20,11 @@ from app.api.routes import create_router
 from app.config import SystemSettings
 from app.contracts.errors import IntegrityError, ProjectException, StorageError
 from app.contracts.models import ProjectError
+from app.contracts.phase4 import (
+    AuditReport,
+    ReauditRequest,
+    RemediationRequest,
+)
 from app.contracts.ports import (
     AuthService,
     BlobStore,
@@ -97,8 +103,11 @@ def create_app(
 
     application = FastAPI(
         title="Team 9 system",
-        version="0.3.0",
-        description="Integrated Phase 3 workbook auditing and testing service.",
+        version="0.4.0",
+        description=(
+            "Phase 4 backend contracts and durable workbook operations. "
+            "Engine capability is checked at runtime."
+        ),
         root_path=container.settings.api_root_path,
         lifespan=lifespan,
     )
@@ -216,11 +225,46 @@ def create_app(
             "type": "http",
             "scheme": "bearer",
         }
+        _, catalog = models_json_schema(
+            [
+                (model, "serialization")
+                for model in (AuditReport, ReauditRequest, RemediationRequest)
+            ],
+            ref_template="#/components/schemas/{model}",
+        )
+        document["components"].setdefault("schemas", {}).update(catalog["$defs"])
+        for path, operations in document.get("paths", {}).items():
+            if not path.startswith("/api/v1/"):
+                continue
+            for method in operations.values():
+                if not isinstance(method, dict):
+                    continue
+                for parameter in method.get("parameters", []):
+                    if parameter.get("in") == "path":
+                        parameter["schema"].update(
+                            minLength=1, maxLength=64, pattern="^[A-Za-z0-9_-]+$"
+                        )
+                for response in method.get("responses", {}).values():
+                    response.setdefault("headers", {})["X-Request-ID"] = {
+                        "description": "Server-generated request correlation identifier.",
+                        "schema": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 64,
+                            "pattern": "^[A-Za-z0-9_-]+$",
+                        },
+                    }
+        document["paths"]["/api/v1/health"]["get"]["security"] = []
         document["x-operation-status"] = {
-            "delivered-service-routes": [1, 2, 4, 5],
-            "pending-business-operations": [3, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-            "integration-note": "Health checks storage and configured engine/runner availability.",
+            "delivered-backend-routes": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "S", "V", "R"],
+            "pending-business-operations": [11, 12, 13, 14],
+            "integration-note": (
+                "Health checks storage and configured ruleset capability. "
+                "Phase 4 audit/correction execution requires the Phase 4 engine port."
+            ),
         }
+        document["x-specification-version"] = "2.1.0"
+        document["x-target-ruleset-version"] = "2.0.0"
         return document
 
     application.openapi = openapi  # type: ignore[method-assign]
