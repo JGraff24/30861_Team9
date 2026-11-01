@@ -145,6 +145,9 @@ def main() -> int:
                 if port
                 else [sys.executable, "-m", module]
             )
+            if module == "app.jobs.worker" and args.phase4:
+                # Exercise the same bounded worker capacity as production Compose.
+                command.extend(["--concurrency", "2"])
             # The actual worker emits allowlisted JSON events without workbook
             # contents or credentials. Retain those events for CI diagnosis.
             with (state / "worker.log").open("ab") as worker_log:
@@ -244,6 +247,7 @@ def main() -> int:
                         "real_engine": True,
                         "api_restart_retained_upload": True,
                         "separate_worker": True,
+                        "worker_concurrency": 2 if args.phase4 else 1,
                         "source_sha256_unchanged": True,
                         "report_byte_identical": True,
                         "repeat_run_status": 409,

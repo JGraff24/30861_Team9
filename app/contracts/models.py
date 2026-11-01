@@ -524,6 +524,8 @@ class TestSession(ContractModel):
     revision: NonemptyText
     cleanup_error: NonemptyText | None
     audit_failures_remaining: Annotated[StrictInt, Field(ge=0, le=1)] = 0
+    # Internal optional metadata; never returned by the instructor interface.
+    deployment_protected_until: UTCDateTime | None = None
 
 
 class ExecutionMeasurement(ContractModel):

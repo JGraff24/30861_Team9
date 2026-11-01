@@ -122,7 +122,7 @@ def interrupted_results(
     return results
 
 
-def run_one(ctx: SuiteContext, test: PlannedTest) -> TestResult:
+def _run_one_assertion(ctx: SuiteContext, test: PlannedTest) -> TestResult:
     def result(outcome: Outcome, message: str, source: ErrorSource | None = None) -> TestResult:
         return TestResult(test_id=test.test_id, outcome=outcome, message=message, source=source)
 
@@ -159,6 +159,34 @@ def run_one(ctx: SuiteContext, test: PlannedTest) -> TestResult:
             f"The tester could not evaluate this case ({type(exc).__name__}).",
             ErrorSource.TESTER,
         )
+
+
+def run_one(ctx: SuiteContext, test: PlannedTest) -> TestResult:
+    if ctx.suite.manifest.phase != "4":
+        return _run_one_assertion(ctx, test)
+    from tester.suite.async_work import tracker_for
+
+    tracker = tracker_for(ctx)
+    result = _run_one_assertion(ctx, test)
+    try:
+        tracker.drain()
+    except DeadlineExceeded:
+        raise
+    except (SystemFault, CommunicationError) as exc:
+        diagnostic = f"Background acceptance: {exc}"
+        logger.warning("accepted_work_drain_failed case=%s: %s", test.test_id, diagnostic)
+        if result.outcome == Outcome.PASS:
+            return TestResult(
+                test_id=test.test_id,
+                outcome=Outcome.ERROR,
+                source=ErrorSource.COMMUNICATION
+                if isinstance(exc, CommunicationError)
+                else ErrorSource.SYSTEM,
+                message=diagnostic,
+            )
+        # Preserve the original rejected-status/authorization finding and its source rule.
+        return result.model_copy(update={"message": result.message + " " + diagnostic})
+    return result
 
 
 def run_suite(

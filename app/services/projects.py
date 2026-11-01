@@ -50,6 +50,10 @@ from app.jobs.remediation import require_correction_engine, validate_decisions_b
 from app.services.decisions import parse_remediation_request, validate_decisions
 from app.services.reports import bounded_json, canonical_request
 from app.storage.blobs import sha256
+from app.test_interface.activity import (
+    DEPLOYMENT_PROTECTION_SECONDS,
+    DEPLOYMENT_RENEWAL_WINDOW_SECONDS,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -124,6 +128,19 @@ class ProjectService:
             raise ProjectException(403, "FORBIDDEN", "Identity is outside this test session.")
         if session.state != SessionState.READY:
             raise ProjectException(409, "TEST_SESSION_NOT_READY", "Test session is not ready.")
+        now = datetime.now(UTC)
+        if (
+            session.deployment_protected_until is None
+            or session.deployment_protected_until
+            < now + timedelta(seconds=DEPLOYMENT_RENEWAL_WINDOW_SECONDS)
+        ):
+            # Authenticate namespace membership before extending protection. Avoid
+            # taking a write lock for every poll; the repository also fences cleanup.
+            services.repository.renew_test_session_protection(
+                session_id,
+                principal.subject,
+                now + timedelta(seconds=DEPLOYMENT_PROTECTION_SECONDS),
+            )
 
     def _authorize(
         self, owner: str, resource_session: str | None, session_id: str | None, principal: Principal

@@ -170,6 +170,8 @@ On Windows, use `.uv-tool\Scripts\python.exe` and add `.uv-tool\Scripts` to PATH
 Run the system and worker on Linux/WSL or macOS; Linux enforces the process memory cap.
 The independent tester also has Windows CI checks. Use one system API, one durable worker
 and one tester API process with separate persistent SQLite stores.
+Production runs that worker with `--concurrency 2`: two bounded execution slots prevent
+one large audit from blocking every other session. The default local command uses one slot.
 
 Both settings classes read `.env`; environment variables take precedence. No credential is
 valid by default. Generate private loopback development credentials explicitly:

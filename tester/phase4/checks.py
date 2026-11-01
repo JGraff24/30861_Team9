@@ -29,6 +29,7 @@ from tester.phase4.catalog import (
 from tester.phase4.disclosures import missing_facts
 from tester.phase4.package import PackageError, compare_packages
 from tester.phase4.policy import RULE_ORDER
+from tester.suite.async_work import error_summary, tracker_for
 from tester.suite.checks import (
     XLSX,
     CheckFailed,
@@ -221,8 +222,10 @@ def poll_audit(
 ) -> Json:
     """Poll about once a second within the section 10 audit deadline (no extension per poll)."""
     seconds = limit(ctx, "audit_poll_seconds", 80)
-    give_up = ctx.clock() + seconds
     wanted = audit_id or ids["auditId"]
+    namespace = ctx.session_id if session == "main" else None if session == "none" else session
+    tracker = tracker_for(ctx)
+    give_up = tracker.deadline("audit", wanted, namespace, seconds)
     while True:
         left = give_up - ctx.clock()
         if left <= 0:
@@ -242,10 +245,12 @@ def poll_audit(
             raise CheckFailed(f"{action} response identifiers differ from the requested audit.")
         if audit["rulesetVersion"] != ctx.suite.manifest.ruleset_version:
             raise CheckFailed(f"{action} reports ruleset {audit['rulesetVersion']}.")
+        if audit["status"] != "PROCESSING":
+            tracker.complete("audit", wanted, namespace)
         if audit["status"] == "PROCESSING_FAILED" and not allow_failure:
             # Section 1: PROCESSING_FAILED is not an acceptable result for an accepted fixture.
-            code = bounded(str(audit["error"]["code"]), 64)
-            raise CheckFailed(f"{action} ended PROCESSING_FAILED ({code}).")
+            summary = error_summary(audit["error"])
+            raise CheckFailed(f"{action} ended PROCESSING_FAILED ({summary}; auditId={wanted}).")
         if audit["status"] != "PROCESSING":
             started = contract.parse_timestamp(audit["startedAt"])
             if contract.parse_timestamp(audit["completedAt"]) < started:
@@ -572,7 +577,8 @@ def submit(
 
 def poll_remediation(ctx: SuiteContext, remediation_id: str, action: str) -> Json:
     seconds = limit(ctx, "remediation_poll_seconds", 210)
-    give_up = ctx.clock() + seconds
+    tracker = tracker_for(ctx)
+    give_up = tracker.deadline("remediation", remediation_id, ctx.session_id, seconds)
     while True:
         left = give_up - ctx.clock()
         if left <= 0:
@@ -588,6 +594,7 @@ def poll_remediation(ctx: SuiteContext, remediation_id: str, action: str) -> Jso
         if status["remediationId"] != remediation_id:
             raise CheckFailed(f"{action} names a different remediation.")
         if status["status"] != "REMEDIATING":
+            tracker.complete("remediation", remediation_id, ctx.session_id)
             return status
         if ctx.client.remaining() < POLL_SECONDS:
             raise DeadlineExceeded("suite deadline reached while polling a remediation")

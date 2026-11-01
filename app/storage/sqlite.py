@@ -1,5 +1,6 @@
 """SQLite metadata, durable queue, test namespaces and real line-set aggregation."""
 
+import logging
 import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -37,6 +38,8 @@ from app.contracts.phase4 import (
     RemediationRecord,
 )
 from app.services.reports import make_audit_result, report_snapshot
+
+logger = logging.getLogger(__name__)
 
 # Versioned schema, relational ownership and FK constraints plus validated DTO snapshots.
 SCHEMA_V1 = (
@@ -347,6 +350,7 @@ class SQLiteRepository:
             )
             if expired:
                 audit = self.get_audit_for_job(db, job)
+                stage = "queue" if job.state == JobState.QUEUED else "worker"
                 code = (
                     ("PROCESSING_TIMEOUT" if job.state == JobState.QUEUED else "WORKER_LOST")
                     if audit.ruleset_version == "2.0.0"
@@ -362,9 +366,19 @@ class SQLiteRepository:
                         code=code,
                         message="Processing deadline expired.",
                         requestId=job.job_id,
-                        details={},
+                        details={"stage": stage} if audit.ruleset_version == "2.0.0" else {},
                     ),
                     now,
+                )
+                logger.warning(
+                    "job_expiry_detected",
+                    extra={
+                        "jobId": job.job_id,
+                        "auditId": job.audit_id,
+                        "sessionId": job.session_id,
+                        "stage": stage,
+                        "code": code,
+                    },
                 )
                 count += 1
         count += self._recover_remediations(db, now)
@@ -412,6 +426,25 @@ class SQLiteRepository:
             if session.state != SessionState.PREPARING:
                 raise SessionBusyError("Only preparing sessions can become ready")
             self._save_session(db, session.model_copy(update={"state": SessionState.READY}))
+
+    def renew_test_session_protection(
+        self, session_id: str, subject: str, protected_until: datetime
+    ) -> bool:
+        with self._db(write=True) as db:
+            try:
+                session = self._session(db, session_id)
+            except RecordNotFoundError:
+                return False
+            if session.state != SessionState.READY or subject not in session.allowed_subjects:
+                return False
+            if (
+                session.deployment_protected_until is None
+                or session.deployment_protected_until < protected_until
+            ):
+                self._save_session(
+                    db, session.model_copy(update={"deployment_protected_until": protected_until})
+                )
+            return True
 
     def mark_session_failed(self, session_id: str, reason: str) -> None:
         with self._db(write=True) as db:

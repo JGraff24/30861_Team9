@@ -187,6 +187,10 @@ def poll_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> AuditResp
     limits = ctx.suite.manifest.limits
     seconds = float(limits.audit_poll_seconds) if limits is not None else AUDIT_POLL_SECONDS
     give_up = ctx.clock() + seconds
+    if ctx.suite.manifest.phase == "4":
+        from tester.suite.async_work import tracker_for
+
+        give_up = tracker_for(ctx).deadline("audit", ids.auditId, ctx.session_id, seconds)
     while True:
         left = give_up - ctx.clock()
         if left <= 0:
@@ -208,9 +212,13 @@ def poll_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> AuditResp
             raise CheckFailed(f"{action} response identifiers differ from the requested resource.")
         if audit.rulesetVersion != ctx.suite.manifest.ruleset_version:
             raise CheckFailed(f"{action} reports a different ruleset.")
+        if ctx.suite.manifest.phase == "4" and audit.status != AuditStatus.PROCESSING:
+            tracker_for(ctx).complete("audit", ids.auditId, ctx.session_id)
         if audit.status == AuditStatus.PROCESSING_FAILED:
             ctx.state["processing_failure"] = audit
-            code = audit.error.code[:64] if audit.error is not None else "missing error"
+            from tester.suite.async_work import error_summary
+
+            code = error_summary(audit.error.model_dump(mode="json") if audit.error else None)
             raise SystemFault(f"{action} ended PROCESSING_FAILED ({code}).")
         if ctx.clock() > give_up:
             raise CheckFailed(f"{action} exceeded its audit polling deadline.")
