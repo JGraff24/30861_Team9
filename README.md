@@ -33,10 +33,17 @@ Scheduling and ordinary deletion remain Phase 5 work.
 
 ## Hosted access
 
-Read the [Team 9 Class Access Guide (PDF)](docs/Team9_Class_Access_Guide.pdf), updated
-October 18, 2026, for shared class application tokens, website instructions and the hosted
-tester workflow. These credentials apply to the deployed instance; local installations
-use their own generated credentials.
+Use the **Phase 4 guide** for current instructor access, review/correction steps and hosted
+testing. The original Phase 3 PDF remains available at its existing path for historical reference.
+
+| Guide | Updated | Scope |
+|---|---|---|
+| [Phase 4 Class Access Guide (PDF)](docs/Team9_Class_Access_Guide_Phase4.pdf) | November 1, 2026 | Six-rule review, remediation, version history, downloads and the 2.1.1 tester suite |
+| [Phase 3 Class Access Guide (PDF, historical)](docs/Team9_Class_Access_Guide.pdf) | October 18, 2026 | Original two-rule upload/audit workflow and Phase 3 tester timing |
+
+Both guides retain the shared class application credentials for the deployed instance;
+local installations use their own generated credentials. The Phase 4 guide includes a
+target-health check before running the suite.
 
 | Service | URL |
 |---|---|
@@ -46,8 +53,9 @@ use their own generated credentials.
 | Tester base URL | https://3.139.178.70.sslip.io/tester |
 | Tester API documentation | https://3.139.178.70.sslip.io/tester/docs |
 
-For website uploads, enter the guide's **userA** token in **User access token** without
-a `Bearer` prefix, select an `.xlsx` workbook and choose **Upload and check**.
+For website uploads, enter the Phase 4 guide's **userA** token in **User access token** without
+a `Bearer` prefix and choose **Connect**. Then select an `.xlsx` workbook and choose
+**Upload and check**.
 
 For hosted testing, open the tester API documentation and **Authorize** with Team 9's
 **operator** token without a `Bearer` prefix. Execute `POST /test/setup` with one of

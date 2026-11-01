@@ -3,7 +3,9 @@
 The existing AWS deployment serves the website at
 https://3.139.178.70.sslip.io/system/ and the tester API documentation at
 https://3.139.178.70.sslip.io/tester/docs. For shared class application credentials and
-instructions, use the [Team 9 Class Access Guide (PDF)](../docs/Team9_Class_Access_Guide.pdf).
+instructions, use the [Phase 4 Class Access Guide (PDF)](../docs/Team9_Class_Access_Guide_Phase4.pdf).
+The [original Phase 3 guide (historical PDF)](../docs/Team9_Class_Access_Guide.pdf) is retained
+at its existing path.
 
 The hosted tester approves both `https://3.139.178.70.sslip.io/system` and
 `https://13.184.14.226.sslip.io`. Their target credentials are configured privately on the
