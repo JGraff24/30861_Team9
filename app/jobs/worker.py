@@ -1,11 +1,15 @@
-"""Separate durable worker: python -m app.jobs.worker [--once]."""
+"""Durable worker: python -m app.jobs.worker [--once | --concurrency {1,2}]."""
 
 import argparse
 import logging
 import math
+import signal
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
 from pathlib import PurePosixPath
+from threading import Event
+from types import FrameType
 from uuid import uuid4
 
 from app.config import SystemSettings
@@ -44,15 +48,19 @@ class AuditWorker:
         self.worker_id = worker_id or uuid4().hex
         self._prefer_remediation = False
         self._cleanup_retry_at: dict[str, float] = {}
+        self._cleanup_cursor = 0
 
-    def run_once(self) -> bool:
+    def run_once(
+        self, *, cleanup_when_idle: bool = True, stop_requested: Event | None = None
+    ) -> bool:
         services = self.services
         repository, blobs, runner = services.repository, services.blob_store, services.runner
         if repository is None or blobs is None or runner is None:
             raise RuntimeError(
                 "Worker requires repository, blob store and Ryan's configured runner"
             )
-        self._cleanup_candidates()
+        if stop_requested is not None and stop_requested.is_set():
+            return False
         if self._prefer_remediation:
             remediation = repository.claim_next_remediation(
                 self.worker_id,
@@ -63,15 +71,23 @@ class AuditWorker:
                 self._prefer_remediation = False
                 return self._run_remediation(remediation)
         timeout = min(60, services.settings.audit_timeout_seconds)
+        if stop_requested is not None and stop_requested.is_set():
+            return False
         # Lease includes pre/post integrity I/O, bounded runner startup and DB finalization.
         job = repository.claim_next_job(self.worker_id, datetime.now(UTC), math.ceil(timeout) + 60)
         if job is None:
+            if stop_requested is not None and stop_requested.is_set():
+                return False
             remediation = repository.claim_next_remediation(
                 self.worker_id,
                 datetime.now(UTC),
                 math.ceil(services.settings.remediation_timeout_seconds) + 30,
             )
-            return self._run_remediation(remediation) if remediation is not None else False
+            if remediation is not None:
+                return self._run_remediation(remediation)
+            if cleanup_when_idle:
+                self._cleanup_candidates()
+            return False
         self._prefer_remediation = True
         started = time.monotonic()
         stage = "source"
@@ -222,7 +238,7 @@ class AuditWorker:
         )
         return True
 
-    def _cleanup_candidates(self) -> None:
+    def _cleanup_candidates(self, *, max_items: int | None = None) -> None:
         repository, blobs = self.services.repository, self.services.blob_store
         assert repository is not None and blobs is not None
         try:
@@ -230,7 +246,13 @@ class AuditWorker:
         except StorageError:
             logger.error("candidate_cleanup_scan_failed")
             return
-        for key, digest in pending:
+        if not pending:
+            return
+        processed = 0
+        start = self._cleanup_cursor % len(pending)
+        for offset in range(len(pending)):
+            index = (start + offset) % len(pending)
+            key, digest = pending[index]
             remote = isinstance(blobs, S3BlobStore)
             if remote and self._cleanup_retry_at.get(key, 0) > time.monotonic():
                 continue
@@ -242,10 +264,13 @@ class AuditWorker:
                 # Failed-job tombstones remain eligible on later sweeps so a late
                 # fenced worker write is eventually removed after crash recovery.
                 blobs.delete_uncommitted_source(key, digest)
-            except Exception:
+            except StorageError:
                 logger.error("candidate_rollback_failed")
-            if remote:
-                # Bound remote housekeeping to one object per claim cycle.
+            processed += 1
+            self._cleanup_cursor = (index + 1) % len(pending)
+            if remote or (max_items is not None and processed >= max_items):
+                # Production housekeeping handles at most one object per interval,
+                # advancing fairly through durable intents even under queue load.
                 break
 
     def _run_remediation(self, job: RemediationJob) -> bool:
@@ -555,10 +580,53 @@ class AuditWorker:
         return True
 
 
+def run_workers(services: SystemServices, concurrency: int, stop_requested: Event) -> None:
+    """Each bounded slot claims only work it can immediately execute.
+
+    Housekeeping has its own single thread and per-iteration object budget. It
+    cannot delay claims or disappear indefinitely while every slot is occupied.
+    A failing slot stops the pool; restart/lease recovery handles unfinished work.
+    """
+    if concurrency not in (1, 2):
+        raise ValueError("Worker concurrency must be one or two")
+
+    def slot() -> None:
+        worker = AuditWorker(services)
+        try:
+            while not stop_requested.is_set():
+                if not worker.run_once(cleanup_when_idle=False, stop_requested=stop_requested):
+                    stop_requested.wait(0.25)
+        except BaseException as exc:
+            stop_requested.set()
+            logger.error("worker_slot_failed", extra={"exceptionType": type(exc).__name__})
+            raise RuntimeError("Worker slot stopped unexpectedly") from None
+
+    def housekeeping() -> None:
+        worker = AuditWorker(services)
+        try:
+            while not stop_requested.is_set():
+                worker._cleanup_candidates(max_items=1)
+                stop_requested.wait(1)
+        except BaseException as exc:
+            stop_requested.set()
+            logger.error("worker_housekeeper_failed", extra={"exceptionType": type(exc).__name__})
+            raise RuntimeError("Worker housekeeping stopped unexpectedly") from None
+
+    with ThreadPoolExecutor(
+        max_workers=concurrency + 1, thread_name_prefix="workbook-worker"
+    ) as pool:
+        futures = [pool.submit(slot) for _ in range(concurrency)] + [pool.submit(housekeeping)]
+        for future in as_completed(futures):
+            future.result()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--once", action="store_true")
+    parser.add_argument("--concurrency", type=int, choices=(1, 2), default=1)
     args = parser.parse_args()
+    if args.once and args.concurrency != 1:
+        parser.error("--once processes one job and requires --concurrency 1")
     from app.services.logging import configure_logging
 
     configure_logging()
@@ -569,12 +637,26 @@ def main() -> None:
         )
     assert services.repository is not None
     services.repository.initialize()
-    worker = AuditWorker(services)
-    while True:
-        worker.run_once()
-        if args.once:
-            break
-        time.sleep(0.25)
+    if args.once:
+        AuditWorker(services).run_once()
+        return
+    stop_requested = Event()
+
+    def stop(signum: int, _frame: FrameType | None) -> None:
+        stop_requested.set()
+        logger.info("worker_stopping", extra={"code": f"SIGNAL_{signum}"})
+
+    previous = {sig: signal.signal(sig, stop) for sig in (signal.SIGTERM, signal.SIGINT)}
+    logger.info("worker_started", extra={"code": f"CONCURRENCY_{args.concurrency}"})
+    try:
+        run_workers(services, args.concurrency, stop_requested)
+    except Exception:
+        raise SystemExit(1) from None
+    finally:
+        stop_requested.set()
+        for sig, handler in previous.items():
+            signal.signal(sig, handler)
+    logger.info("worker_stopped", extra={"code": "DRAINED"})
 
 
 if __name__ == "__main__":

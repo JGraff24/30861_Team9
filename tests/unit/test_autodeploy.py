@@ -94,7 +94,7 @@ class Host(deploy_host.Deployment):
         self.fail_private = False
         self.private_healthy: list[str] = []
         self.timeline: list[str] = []
-        self.current = [True, True, True]
+        self.current = [True, True, True, True]
 
     def run(self, *command: str, capture: bool = False, timeout: int = 900) -> str:
         assert command[:3] == ("docker", "image", "inspect")
@@ -219,7 +219,7 @@ def test_failed_next_release_preserves_existing_release_record(host: Host) -> No
 
 
 def test_main_advancing_during_build_leaves_production_running(host: Host) -> None:
-    host.current = [True, False]
+    host.current = [True, True, False]
     original = host.config.read_bytes()
     host.update()
     assert host.config.read_bytes() == original
@@ -227,7 +227,7 @@ def test_main_advancing_during_build_leaves_production_running(host: Host) -> No
 
 
 def test_main_advancing_while_waiting_leaves_production_running(host: Host) -> None:
-    host.current = [True, True, False]
+    host.current = [True, True, True, False]
     original = host.config.read_bytes()
     host.update()
     assert host.config.read_bytes() == original
@@ -831,3 +831,177 @@ def test_proxy_grace_period_is_not_cut_short_by_the_compose_command_timeout(
     monkeypatch.setattr(deployment, "run", run)
     deployment.compose(tmp_path, tmp_path / "config.env", "stop", "--timeout", "1900", "proxy")
     assert bounds[0] >= 1900 + 30
+
+
+def put_remote_session(
+    host: Host,
+    *,
+    state: str = "READY",
+    created_at: str = "2000-01-01T00:00:00Z",
+    protection: str | None = "2999-01-01T00:00:00Z",
+    include_protection: bool = True,
+) -> dict[str, Any]:
+    data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
+    payload = {
+        "session_id": "remote",
+        "owner_subject": "external-admin",
+        "allowed_subjects": ["owner"],
+        "state": state,
+        "created_at": created_at,
+        "revision": OLD,
+        "cleanup_error": None,
+        "audit_failures_remaining": 0,
+    }
+    if include_protection:
+        payload["deployment_protected_until"] = protection
+    with sqlite3.connect(data / "system/system.sqlite3") as db:
+        db.execute(
+            "CREATE TABLE IF NOT EXISTS sessions(id TEXT PRIMARY KEY,state TEXT,payload TEXT)"
+        )
+        db.execute(
+            "INSERT OR REPLACE INTO sessions VALUES (?,?,?)", ("remote", state, json.dumps(payload))
+        )
+    return payload
+
+
+@pytest.mark.parametrize("state", ["PREPARING", "READY"])
+def test_external_test_session_between_jobs_defers_before_any_build(
+    host: Host,
+    monkeypatch: pytest.MonkeyPatch,
+    state: str,
+) -> None:
+    put_remote_session(host, state=state)
+    data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
+    assert host.active_work(data) == 1
+    with sqlite3.connect(data / "system/system.sqlite3") as db:
+        assert db.execute("SELECT count(*) FROM jobs").fetchone()[0] == 0
+    with sqlite3.connect(data / "tester/tester.sqlite3") as db:
+        assert db.execute("SELECT count(*) FROM tester_sessions").fetchone()[0] == 0
+    monkeypatch.setattr(
+        host, "prepare_release", lambda *args: pytest.fail("Build competes with remote grading")
+    )
+    clock = iter([0.0, 1901.0])
+    monkeypatch.setattr(deploy_host.time, "monotonic", lambda: next(clock))
+    original = host.config.read_bytes()
+    with pytest.raises(TimeoutError, match="Active audit/tester work"):
+        host.update()
+    assert not host.events
+    assert not host.state.exists()
+    assert host.config.read_bytes() == original
+
+
+@pytest.mark.parametrize(
+    "state,fresh_creation,protection,include_protection,expected",
+    [
+        ("READY", True, None, False, 1),
+        ("PREPARING", True, None, False, 1),
+        ("READY", True, None, True, 1),
+        ("READY", False, None, False, 0),
+        ("READY", False, "2999-01-01T00:00:00+00:00", True, 1),
+        ("READY", True, "2000-01-01T00:00:00Z", True, 0),
+        ("FAILED", True, "2999-01-01T00:00:00Z", True, 0),
+        ("CLEANED", True, "2999-01-01T00:00:00Z", True, 0),
+        ("READY", False, "invalid-timestamp", True, 1),
+    ],
+)
+def test_remote_session_lease_legacy_fallback_expiry_and_cleanup_are_readonly(
+    host: Host,
+    state: str,
+    fresh_creation: bool,
+    protection: str | None,
+    include_protection: bool,
+    expected: int,
+) -> None:
+    from datetime import UTC, datetime
+
+    created = datetime.now(UTC).isoformat() if fresh_creation else "2000-01-01T00:00:00Z"
+    payload = put_remote_session(
+        host,
+        state=state,
+        created_at=created,
+        protection=protection,
+        include_protection=include_protection,
+    )
+    data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
+    assert host.active_work(data) == expected
+    with sqlite3.connect(data / "system/system.sqlite3") as db:
+        assert (
+            json.loads(db.execute("SELECT payload FROM sessions WHERE id='remote'").fetchone()[0])
+            == payload
+        )
+
+
+def test_new_remote_session_after_build_is_still_protected_before_activation(
+    host: Host,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    prepare = host.prepare_release
+
+    def build_then_remote_setup(settings: dict[str, str]) -> None:
+        prepare(settings)
+        put_remote_session(host)
+
+    monkeypatch.setattr(host, "prepare_release", build_then_remote_setup)
+    clock = iter([0.0, 0.0, 1901.0])
+    monkeypatch.setattr(deploy_host.time, "monotonic", lambda: next(clock))
+    with pytest.raises(TimeoutError, match="Active audit/tester work"):
+        host.update()
+    assert host.release.exists()
+    assert all(args[0] not in {"up", "stop"} for _, _, args in host.events)
+
+
+def test_remote_setup_racing_shutdown_defers_without_migration_or_losing_session(
+    host: Host,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    compose = host.compose
+
+    def finish_setup_during_shutdown(
+        directory: Path, env: Path, *args: str, capture: bool = False
+    ) -> str:
+        result = compose(directory, env, *args, capture=capture)
+        if args == ("stop", "--timeout", "90", "system", "worker", "tester"):
+            put_remote_session(host)
+        return result
+
+    monkeypatch.setattr(host, "compose", finish_setup_during_shutdown)
+    with pytest.raises(TimeoutError, match="Work arrived during quiescence"):
+        host.update()
+    assert "backup" not in host.timeline
+    assert not host.private_healthy
+    assert not host.publication.exists()
+    assert deploy_host.read_env(host.config)["DEPLOYMENT_SHA"] == OLD
+    data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
+    assert host.active_work(data) == 1
+
+
+def test_missing_existing_database_fails_before_build_and_does_not_create_one(
+    host: Host,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
+    database = data / "system/system.sqlite3"
+    database.unlink()
+    monkeypatch.setattr(
+        host,
+        "prepare_release",
+        lambda *args: pytest.fail("Do not build with missing retained state"),
+    )
+    with pytest.raises(sqlite3.OperationalError, match="unable to open"):
+        host.update()
+    assert not database.exists()
+    assert not host.events
+
+
+def test_main_advancing_during_prebuild_drain_never_builds_or_stops_old_release(
+    host: Host,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    host.current = [True, False]
+    monkeypatch.setattr(
+        host, "prepare_release", lambda *args: pytest.fail("Main advanced before build")
+    )
+    original = host.config.read_bytes()
+    host.update()
+    assert not host.events
+    assert host.config.read_bytes() == original

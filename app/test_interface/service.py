@@ -1,6 +1,6 @@
 """Session policy and orchestration; all persistence belongs to the repository."""
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from pydantic import ValidationError
 
@@ -15,6 +15,7 @@ from app.contracts.models import (
     TestSession,
 )
 from app.contracts.ports import BlobStore, Repository
+from app.test_interface.activity import DEPLOYMENT_PROTECTION_SECONDS
 
 
 class PersistentSessionService:
@@ -99,15 +100,17 @@ class PersistentSessionService:
             if self.repository.get_test_session(old) is not None:
                 self._owner(old, principal)
                 existing_cleanup.append(old)
+        now = datetime.now(UTC)
         session = TestSession(
             session_id=session_id,
             owner_subject=principal.subject,
             allowed_subjects=list(self.settings.test_session_users.get(principal.subject, [])),
             state=SessionState.PREPARING,
-            created_at=datetime.now(UTC),
+            created_at=now,
             revision=self.settings.deployment_sha,
             cleanup_error=None,
             audit_failures_remaining=1 if faults is not None else 0,
+            deployment_protected_until=now + timedelta(seconds=DEPLOYMENT_PROTECTION_SECONDS),
         )
         self.repository.create_test_session(session)
         try:

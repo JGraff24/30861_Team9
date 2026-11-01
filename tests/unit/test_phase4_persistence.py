@@ -466,6 +466,30 @@ def test_restart_recovery_fences_late_workers_and_retains_key(
     assert restarted.get_version(version.workbook_id, generated.version_id) is None
 
 
+@pytest.mark.parametrize("claimed", [False, True])
+def test_audit_recovery_identifies_queue_vs_worker_failure_and_preserves_snapshot(
+    repository: SQLiteRepository, claimed: bool, caplog
+):
+    workbook, version, audit, job = records("expiry")
+    repository.create_upload(workbook, version, audit, job)
+    if claimed:
+        repository.claim_next_job("lost-worker", datetime.now(UTC), 1)
+    now = datetime.now(UTC) + timedelta(seconds=20)
+    with caplog.at_level("WARNING", logger="app.storage.sqlite"):
+        assert repository.recover_stale_jobs(now) == 1
+    failed = repository.get_audit(workbook.workbook_id, version.version_id, audit.audit_id)
+    assert failed.error.details == {"stage": "worker" if claimed else "queue"}
+    assert failed.error.code == ("WORKER_LOST" if claimed else "PROCESSING_TIMEOUT")
+    event = next(record for record in caplog.records if record.message == "job_expiry_detected")
+    assert event.jobId == job.job_id and event.auditId == audit.audit_id
+    assert event.code == failed.error.code and event.stage == failed.error.details["stage"]
+    report = repository.get_report(audit.audit_id)
+    assert report is not None
+    assert repository.recover_stale_jobs(now + timedelta(days=1)) == 0
+    assert repository.get_audit(workbook.workbook_id, version.version_id, audit.audit_id) == failed
+    assert repository.get_report(audit.audit_id) == report
+
+
 def test_reports_and_terminal_audits_cannot_be_rewritten_by_database_update(
     repository: SQLiteRepository,
 ):

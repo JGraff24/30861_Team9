@@ -907,6 +907,25 @@ class FakePhase4:
 
     def complete(self, remediation: Remediation, workbook: Workbook) -> None:
         source = self.versions[remediation.source_version_id]
+        source_findings = {
+            finding["findingId"]: finding
+            for finding in self.audits[remediation.source_audit_id].findings
+        }
+        if self.accept_manual_apply and any(
+            decision["action"] == "APPLY"
+            and source_findings[decision["findingId"]]["classification"] != "REQUIRES_USER_INPUT"
+            for decision in remediation.decisions
+        ):
+            # This switch deliberately violates the submission contract. Its unsupported
+            # job still needs a pollable failure; the synthetic editor cannot implement it.
+            remediation.status = "PROCESSING_FAILED"
+            remediation.error = {
+                "code": "UNSUPPORTED_CORRECTION",
+                "message": "The test double cannot edit this unsupported finding.",
+                "requestId": "job-" + remediation.remediation_id,
+                "details": {"stage": "editing"},
+            }
+            return
         data = self.edit(source.data, remediation.decisions)
         base = source.file_name.removesuffix(".xlsx")
         output = Version(

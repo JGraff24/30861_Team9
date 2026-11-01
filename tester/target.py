@@ -21,6 +21,7 @@ from tester.config import TargetAuth, validate_base_url
 
 Identity = Literal["userA", "userB", "reviewer", "test-admin"]
 Resolver = Callable[..., list[Any]]
+ResponseObserver = Callable[[str, str, str | None, httpx.Response], None]
 
 GET_RETRIES = 3
 MAX_RESPONSE_BYTES = 2_097_152
@@ -83,6 +84,7 @@ class TargetClient:
         self._resolver = resolver
         self._clock = clock
         self._transport = transport
+        self.response_observer: ResponseObserver | None = None
 
     def close(self) -> None:
         # Each bounded request owns and closes its client, including late responses.
@@ -210,4 +212,8 @@ class TargetClient:
             raise value
         if self._clock() >= call_deadline or time.monotonic() >= wall_deadline:
             raise CommunicationError("request total deadline reached")
+        if self.response_observer is not None:
+            self.response_observer(
+                method, path, httpx.Headers(request_headers).get("x-test-session"), value
+            )
         return value

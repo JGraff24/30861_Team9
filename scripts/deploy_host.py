@@ -165,6 +165,24 @@ class Deployment:
                             "SELECT name FROM sqlite_master WHERE type='table'"
                         )
                     }
+                    if "sessions" in tables:
+                        # Remote testers have no row in our local tester database.
+                        # Their accepted session protects gaps between jobs as well
+                        # as CPU-heavy builds. Legacy payloads use the setup time.
+                        protected_until = (
+                            "CASE WHEN json_extract(payload, '$.deployment_protected_until') "
+                            "IS NULL THEN julianday(json_extract(payload, '$.created_at')) "
+                            "+ 1900.0/86400.0 ELSE "
+                            "julianday(json_extract(payload, '$.deployment_protected_until')) END"
+                        )
+                        busy += database.execute(
+                            "SELECT count(*) FROM sessions WHERE state IN ('PREPARING','READY') "
+                            "AND (("
+                            + protected_until
+                            + ")>julianday('now') OR ("
+                            + protected_until
+                            + ") IS NULL)"
+                        ).fetchone()[0]
                     if "remediation_jobs" in tables:
                         busy += database.execute(
                             "SELECT count(*) FROM remediation_jobs "
@@ -179,8 +197,8 @@ class Deployment:
         return busy
 
     def wait_idle(self, data: Path) -> None:
-        # Phase 4 suites run up to 1,800 s. This first drain leaves ingress live;
-        # the stopped-writer check below closes the request-acceptance race.
+        # Phase 4 suites run up to 1,800 s. Both pre-build and pre-activation
+        # drains leave ingress live; the stopped-writer check closes the race.
         deadline = time.monotonic() + 1900
         while self.active_work(data):
             if time.monotonic() >= deadline:
@@ -449,6 +467,10 @@ except HTTPError as error:
         if not (previous / "deploy/compose.production.yaml").is_file():
             raise RuntimeError("Previous release Compose file is missing")
         self.run("docker", "image", "inspect", settings["TEAM9_IMAGE"], capture=True)
+        self.wait_idle(data)
+        if not self.is_current():
+            print("Main advanced during the pre-build drain; production is unchanged.")
+            return
         self.prepare_release(settings)
         original = self.config.read_text()
         candidate = self.config.parent / ("candidate-" + self.sha + ".env")

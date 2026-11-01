@@ -29,7 +29,8 @@ services:
     <<: *system
   worker:
     <<: *system
-    command: ["python", "-m", "app.jobs.worker"]
+    command: ["python", "-m", "app.jobs.worker", "--concurrency", "2"]
+    stop_grace_period: 240s
   tester:
     image: ${TEAM9_IMAGE:?Set immutable image tag or digest}
     env_file: ${TEAM9_ENV_FILE:?Set absolute private environment file}

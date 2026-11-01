@@ -64,12 +64,20 @@ Leaving the log viewer does not stop deployment. A build can take several minute
    successfully, on main, from a push to this repository. While waiting, make at most
    one CI API request per two-minute tick. An unchanged deployed main makes no REST call.
 3. Download the host deployment script from that exact tested commit. A host lock prevents
-   simultaneous deployers. Builds use fresh `/opt/team9/releases/<SHA>` checkouts and the
+   simultaneous deployers. Before building, wait for active work and protected external test
+   sessions to finish so Docker builds do not compete with their bounded audits. Builds use
+   fresh `/opt/team9/releases/<SHA>` checkouts and the
    existing `measurement` Docker target with `team9-phase3:<SHA>` image tags.
 4. Require mounted storage and at least 2 GiB free on the root disk. Build and validate
    before interrupting production. Verify that main has not advanced before activation.
-5. Wait up to 1,900 seconds for active tester setup/runs, audits, remediations and upload
-   reservations. Stop nginx ingress, then gracefully stop all database writers. Recheck the
+5. Recheck active tester setup/runs, audits, remediations, upload reservations and protected
+   external system sessions, waiting up to 1,900 seconds. A PREPARING/READY isolated session
+   receives a 1,900-second lease at setup, periodically renewed by authorized business
+   activity to protect gaps between jobs; older payloads fall back to setup time.
+   Expiry only releases this deployment
+   guard, without deleting the session or its evidence. Failed/cleaned sessions do not block.
+   No public request can set that internal deadline.
+   Stop nginx ingress, then gracefully stop all database writers. Recheck the
    stopped databases: if an old request accepted new work while shutdown finished, restart
    the old release and defer without migrating. This closes the initial idle-check race.
 6. Back up the quiescent SQLite stores at `/data/deployment-backups/<time>-<SHA>/`, including

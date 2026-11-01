@@ -167,7 +167,14 @@ Do not run `compose config` without `--quiet` in recorded logs: env_file values 
 Install a host boot service that depends on the EBS mount and Docker, loads the protected
 Compose interpolation file, runs the exact `up -d` command, and uses the same immutable release
 path. `restart: unless-stopped` restarts containers; the mount dependency protects host reboots.
-One API and one worker only. Nginx readiness can race startup briefly; check it after all processes
+Use one API container and one worker container. Production starts the worker with
+`--concurrency 2`, which permits two independently leased operations and drains running work
+on SIGTERM. Its 240-second container stop grace covers the existing bounded execution stages;
+retain the 15-second queue, 60-second audit and 180-second remediation limits. Account for two
+512 MiB engine children plus the API, worker and tester when changing host capacity. Two slots
+do not guarantee arbitrary concurrent boundary suites: coordinate full grading runs and drain
+every accepted boundary upload before submitting dependent cases.
+Nginx readiness can race startup briefly; check it after all processes
 are up. Verify a valid certificate using an HTTPS client without `-k`, and test `/system/docs`,
 `/tester/docs`, `/system/api/v1/health`, rejected credentials and authenticated real workbook
 flow. Check security groups and host sockets to prove direct APIs are unreachable publicly.
@@ -179,10 +186,17 @@ suffixes/credentials/queries. Grader tester-run read timeout must be at least 1,
 On API restart and authorized status polling, expired queue deadlines/leases become controlled
 failures. Workers also recover them before a claim. A live lease is never stolen; no audit is
 replayed after lease expiration. The worker polls every 0.25s and queue deadline defaults to 15s.
-Under sustained load, uploads may accept then fail with `QUEUE_TIMEOUT`; tune with measured
-load and agreed tester polling budgets. An unavailable DB may prevent immediate failure storage;
+Under sustained load, Phase 4 audits may accept then fail with `PROCESSING_TIMEOUT` and
+`details.stage="queue"`; retained Phase 3 errors keep their original codes. Tune capacity using
+measured load without increasing the specified deadlines. An unavailable DB may prevent immediate failure storage;
 recovery records the failure when storage returns. JSON logs emit IDs, status/code/duration,
 not workbook data/tokens/alt text. No Prometheus/CloudWatch metrics pipeline is installed.
+
+External isolated sessions protect deployment between requests through a renewable internal
+1,900-second lease. Only authenticated allowed session activity renews it; expiry does not
+delete a session or change coverage. `/test/report` remains read-only. The deployment script
+waits before Docker builds and before activation. See [the November 1 investigation](../docs/implementation/hosted_failures_2026-11-01.md)
+for the incident evidence, the remaining cross-team target discrepancy and verification scope.
 
 Use SQLite's online backup API (or stop both writers before a full volume snapshot); copying
 only the live `.sqlite3` file can lose WAL data. An operator backup example inside the running
