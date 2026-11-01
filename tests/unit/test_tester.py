@@ -801,6 +801,9 @@ def test_processing_failure_is_a_system_error_with_separate_failure_assertion(
     client, _ = make_client(fake)
     report = SuiteReport.model_validate_json(run_once(client).content)
     assert outcomes(report)["P3-AUDIT-CLEAN"] == ("error", "system")
+    assert "AUDIT_TIMEOUT" in next(
+        result.message for result in report.results if result.test_id == "P3-AUDIT-CLEAN"
+    )
     assert outcomes(report)["P3-AUDIT-FAILURE-ENVELOPE"] == ("pass", None)
     assert report.coverage.system.covered == 4  # AC-03/04/05/18 did not execute
 

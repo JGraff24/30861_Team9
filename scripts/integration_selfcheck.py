@@ -145,13 +145,16 @@ def main() -> int:
                 if port
                 else [sys.executable, "-m", module]
             )
-            process = subprocess.Popen(
-                command,
-                cwd=state,
-                env=environment,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
+            # The actual worker emits allowlisted JSON events without workbook
+            # contents or credentials. Retain those events for CI diagnosis.
+            with (state / "worker.log").open("ab") as worker_log:
+                process = subprocess.Popen(
+                    command,
+                    cwd=state,
+                    env=environment,
+                    stdout=subprocess.DEVNULL,
+                    stderr=worker_log if module == "app.jobs.worker" else subprocess.DEVNULL,
+                )
             processes.append(process)
             if port:
                 deadline = time.monotonic() + 20
@@ -269,6 +272,16 @@ def main() -> int:
         finally:
             for process in reversed(processes):
                 stop(process)
+            if output:
+                events = []
+                for line in (state / "worker.log").read_text().splitlines():
+                    try:
+                        event = json.loads(line)
+                    except ValueError:
+                        continue
+                    if isinstance(event, dict) and event.get("event") == "job_finished":
+                        events.append(json.dumps(event))
+                (output / "worker-events.jsonl").write_text("\n".join(events) + "\n")
 
 
 if __name__ == "__main__":

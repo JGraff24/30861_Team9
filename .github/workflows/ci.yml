@@ -64,19 +64,6 @@ jobs:
       - name: Show failing tests as annotations
         if: failure()
         run: uv run python -m scripts.junit_annotations "${{ runner.temp }}/pytest-junit.xml"
-      - name: Real API, worker and tester integration
-        if: runner.os == 'Linux'
-        run: uv run python -m scripts.integration_selfcheck
-      - name: Real Phase 4 API, worker and independent tester integration
-        if: runner.os == 'Linux'
-        run: uv run python -m scripts.integration_selfcheck --phase4 --evidence-dir "${{ runner.temp }}/phase4-real-integration"
-      - name: Retain real Phase 4 integration evidence
-        if: always() && runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: phase4-real-integration
-          path: ${{ runner.temp }}/phase4-real-integration
-          if-no-files-found: ignore
       - name: Build and smoke installed production image
         if: runner.os == 'Linux'
         env:
@@ -108,6 +95,19 @@ jobs:
               assert client.get("/").status_code == 200
           print(json.dumps({"installed_image": "ok", "manifest": "2.1.1", "cases": len(suite.manifest.tests)}))
           PYTHON
+      - name: Real API, worker and tester integration
+        if: runner.os == 'Linux'
+        run: uv run python -m scripts.integration_selfcheck
+      - name: Real Phase 4 API, worker and independent tester integration
+        if: runner.os == 'Linux'
+        run: uv run python -m scripts.integration_selfcheck --phase4 --evidence-dir "${{ runner.temp }}/phase4-real-integration"
+      - name: Retain real Phase 4 integration evidence
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-real-integration
+          path: ${{ runner.temp }}/phase4-real-integration
+          if-no-files-found: ignore
       - name: OpenAPI catalogs are current
         run: uv run python -m scripts.export_schemas --check
       - name: Identity vectors

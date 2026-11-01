@@ -210,7 +210,8 @@ def poll_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> AuditResp
             raise CheckFailed(f"{action} reports a different ruleset.")
         if audit.status == AuditStatus.PROCESSING_FAILED:
             ctx.state["processing_failure"] = audit
-            raise SystemFault(f"{action} ended PROCESSING_FAILED with a controlled target error.")
+            code = audit.error.code[:64] if audit.error is not None else "missing error"
+            raise SystemFault(f"{action} ended PROCESSING_FAILED ({code}).")
         if ctx.clock() > give_up:
             raise CheckFailed(f"{action} exceeded its audit polling deadline.")
         if audit.status != AuditStatus.PROCESSING:
