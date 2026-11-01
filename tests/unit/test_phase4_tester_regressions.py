@@ -12,17 +12,84 @@ from tester.phase4 import checks, policy
 from tester.phase4.package import compare_packages, differences, parse_xml
 from tester.phase4.workbooks import phase4_fixtures
 from tester.store import TesterStore as Store
+from tester.suite import checks as phase3_checks
 from tester.suite.checks import CheckFailed, SuiteContext
 from tester.suite.manifest import SuiteConfigurationError, load_suite, restore_suite, snapshot_suite
 from tester.suite.registry import names
 from tests.support.fake_phase4 import FakePhase4
 from tests.unit.test_phase4_tester import (
     MANIFEST,
+    SMALL,
     _decisions,
     _effects,
     _rewrite,
     _sub,
+    run_phase4,
 )
+
+
+def test_intake_boundary_work_does_not_starve_later_accuracy_checks(tmp_path: Path, monkeypatch):
+    """A slow boundary audit occupies one worker until preparatory polling drains it."""
+
+    monkeypatch.setattr(phase3_checks, "UPLOAD_LIMIT_BYTES", SMALL["upload_limit"])
+    monkeypatch.setattr(phase3_checks, "WORKSHEET_LIMIT", SMALL["worksheet_limit"])
+    monkeypatch.setattr(phase3_checks, "NONEMPTY_CELL_LIMIT", SMALL["cell_limit"])
+
+    class BusyBoundaryTarget(FakePhase4):
+        boundary_names = {
+            "at-limit.xlsx",
+            "sheet-limit.xlsx",
+            "sheet-limit-chartsheet.xlsx",
+            "cell-limit.xlsx",
+        }
+
+        def __init__(self):
+            super().__init__(**SMALL)
+            self.boundary_jobs = set()
+
+        def start_audit(self, version, namespace, *, fault=True):
+            audit = super().start_audit(version, namespace, fault=fault)
+            if version.file_name in self.boundary_names:
+                self.boundary_jobs.add(audit.audit_id)
+            return audit
+
+        def finish(self, audit):
+            version = self.versions[audit.version_id]
+            queued_behind_boundary = (
+                version.file_name not in self.boundary_names and self.boundary_jobs
+            )
+            if queued_behind_boundary:
+                audit.review = [{"fault": True}]
+            super().finish(audit)
+            if queued_behind_boundary:
+                audit.error["code"] = "PROCESSING_TIMEOUT"
+                audit.error["message"] = "Processing deadline expired."
+                audit.error["details"] = {}
+                audit.report = self.build_report(audit, version)
+            self.boundary_jobs.discard(audit.audit_id)
+
+    target = BusyBoundaryTarget()
+    report = run_phase4(tmp_path, target)
+    results = {item["test_id"]: item for item in report["results"]}
+    assert results["P3-AUDIT-CLEAN"]["outcome"] == "pass", results["P3-AUDIT-CLEAN"]
+    assert results["P3-AUDIT-SEEDED"]["outcome"] == "pass", results["P3-AUDIT-SEEDED"]
+    assert all(item["outcome"] == "pass" for item in report["results"]), [
+        item for item in report["results"] if item["outcome"] != "pass"
+    ]
+    assert not target.boundary_jobs
+
+
+def test_boundary_audit_failure_remains_a_reported_system_error(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr(phase3_checks, "UPLOAD_LIMIT_BYTES", SMALL["upload_limit"])
+    monkeypatch.setattr(phase3_checks, "WORKSHEET_LIMIT", SMALL["worksheet_limit"])
+    monkeypatch.setattr(phase3_checks, "NONEMPTY_CELL_LIMIT", SMALL["cell_limit"])
+    report = run_phase4(tmp_path, FakePhase4(**SMALL, fail_audits_for={"cell-limit.xlsx"}))
+    results = {item["test_id"]: item for item in report["results"]}
+    boundary = results["P3-INPUT-CELLS-AT"]
+    assert (boundary["outcome"], boundary["source"]) == ("error", "system")
+    assert "TEST_AUDIT_FAILURE" in boundary["message"]
+    assert results["P3-AUDIT-CLEAN"]["outcome"] == "pass"
+    assert results["P3-AUDIT-SEEDED"]["outcome"] == "pass"
 
 
 @pytest.mark.parametrize(

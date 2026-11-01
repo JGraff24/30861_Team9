@@ -72,6 +72,24 @@ Docker image; no Docker daemon was available locally. The Phase 4 HTTP report is
 retained as a CI artifact. Temporary local reports contain automated observations,
 not fixture-review approvals.
 
+### CI follow-up
+
+The first Linux run passed **970 regression tests** (four live-configuration
+skips) and the legacy real HTTP workflow; Windows passed **318 tests** and the
+dependency audit passed. Its Phase 4 run returned **246 passes, two controlled
+audit errors and five dependent skips**, so main remained unchanged. A diagnostic
+follow-up also passed the actual production Docker build and installed-image smoke.
+
+A focused slow-worker simulation reproduced a scheduling defect in the tester:
+accepted boundary-size intake jobs were still running when unrelated accuracy
+uploads entered their 15-second queues. The tester now polls each accepted
+boundary audit to completion as preparation before continuing. It keeps the
+existing 80-second polling bound, reports genuine boundary audit failures, and
+awards no coverage for preparation. Finding expectations, deliberate concurrency
+checks, Phase 3 execution and the system's queue bound are unchanged. Both new
+regressions and the affected tester/contract suite passed (**193 tests**). Fresh
+exact-head CI and real-system verification remain the release gate.
+
 ## Limits and release handling
 
 Jackson explicitly excluded fixture reviews and fixture-review records. They were

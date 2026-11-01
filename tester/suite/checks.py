@@ -355,8 +355,27 @@ def upload_at_limit(ctx: SuiteContext) -> str:
         expect_status(response, 202, "Upload exactly at the byte limit")
     ctx.qualify()
     expect_status(response, 202, "Upload exactly at the byte limit")
-    accepted_ids(ctx, response, "Upload exactly at the byte limit")
+    ids = accepted_ids(ctx, response, "Upload exactly at the byte limit")
+    drain_intake_audit(ctx, ids, "Byte boundary audit")
     return "A valid workbook of exactly 25,000,000 bytes was accepted with 202."
+
+
+def drain_intake_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> None:
+    """Finish boundary-case work before submitting unrelated Phase 4 accuracy cases.
+
+    A large accepted boundary workbook can legally use most of the 60-second
+    audit budget. Leaving it queued/running would make this sequential suite
+    accidentally test overload against the separate 15-second queue bound.
+    Preparatory polling earns no coverage; genuine audit failures remain errors.
+    Legacy suite execution and independent finding expectations stay unchanged.
+    """
+    if ctx.suite.manifest.phase != "4":
+        return
+    ctx.setup_depth += 1
+    try:
+        poll_audit(ctx, ids, action)
+    finally:
+        ctx.setup_depth -= 1
 
 
 def _accepted_upload(ctx: SuiteContext, name: str) -> str:
@@ -458,7 +477,8 @@ def _limit_upload(ctx: SuiteContext, data: bytes, name: str, status: int, action
     ctx.qualify()
     if status == 202:
         expect_status(response, 202, action)
-        accepted_ids(ctx, response, action)
+        ids = accepted_ids(ctx, response, action)
+        drain_intake_audit(ctx, ids, action + " audit")
     else:
         project_error(response, status, action)
 
