@@ -56,12 +56,12 @@ scheduler or UI. The shared pack and specification are unchanged.
 
 | Check | Result |
 |---|---|
-| `pytest -q` (whole repository) | see PR description for the final count |
+| `pytest -q` (whole repository) | 1,045 passed, 5 skipped (live-tester acceptance needs a configured deployment) |
 | `tests/unit/test_phase5_tester.py` | profiles, oracle, manifest/catalog currency, full own and cross runs against the fake, six defect switches, drain preservation, error/system classification, abort/recovery profile, setup forwarding, no-resend |
 | `ruff check`, `ruff format --check`, `mypy --platform linux app tester scripts` | pass |
 | `scripts.check_phase5_policy`, `build_phase5_manifest --check`, `build_phase5_catalogs --check`, `export_schemas --check` | pass |
-| `scripts.tester_selfcheck --phase5` (real sockets, test-only fake) | pass |
-| `scripts.integration_selfcheck --phase5 --allow-failures` (real API + worker at `ca6becb`) | evidence in `docs/evidence/phase5/`; see below |
+| `scripts.tester_selfcheck --phase5 --profile own` and `--profile cross` (real sockets, test-only fake) | pass, no fail/error |
+| `scripts.integration_selfcheck --phase5 --allow-failures` (real API + worker at `ca6becb`) | 233 pass / 138 fail / 0 error / 24 skip; `docs/evidence/phase5/` |
 
 ### Real system at the Phase 4 baseline (what is still missing on the target side)
 
