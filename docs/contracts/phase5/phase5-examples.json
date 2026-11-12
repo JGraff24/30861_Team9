@@ -1,0 +1,725 @@
+{
+  "specification_version": "3.0.0",
+  "notice": "Formatting examples and negative schema/semantic vectors, not fixture results or deployments. Target URLs using example.invalid are deliberately non-working.",
+  "examples": [
+    {
+      "definition": "HealthResponse",
+      "value": {
+        "status": "AVAILABLE",
+        "apiVersion": "1.0",
+        "rulesetVersion": "2.0.0"
+      }
+    },
+    {
+      "definition": "ScheduleRequest",
+      "value": {
+        "enabled": true,
+        "intervalDays": 1,
+        "complianceDeadline": "2027-04-26"
+      }
+    },
+    {
+      "definition": "ScheduleRequest",
+      "value": {
+        "enabled": false,
+        "complianceDeadline": "2027-04-26"
+      },
+      "note": "Disables periodic audits, retains deadline reminder policy."
+    },
+    {
+      "definition": "ScheduleRequest",
+      "value": {
+        "enabled": false,
+        "complianceDeadline": null
+      },
+      "note": "Disables both policies under replacement semantics."
+    },
+    {
+      "definition": "ScheduleResponse",
+      "value": {
+        "workbookId": "wb-001",
+        "enabled": true,
+        "intervalDays": 1,
+        "complianceDeadline": "2027-04-26",
+        "versionId": "v-002",
+        "nextAuditAt": "2027-01-02T00:00:00Z",
+        "reminderDays": [
+          90,
+          30,
+          7
+        ]
+      }
+    },
+    {
+      "definition": "ScheduleResponse",
+      "value": {
+        "workbookId": "wb-001",
+        "enabled": false,
+        "intervalDays": null,
+        "complianceDeadline": null,
+        "versionId": "v-001",
+        "nextAuditAt": null,
+        "reminderDays": [
+          90,
+          30,
+          7
+        ]
+      },
+      "note": "Default read before any configuration."
+    },
+    {
+      "definition": "SystemSetupRequest",
+      "value": {
+        "session_id": "p5-main-001",
+        "setup": {}
+      }
+    },
+    {
+      "definition": "SystemSetupRequest",
+      "value": {
+        "session_id": "p5-fault-001",
+        "setup": {
+          "clock": {
+            "currentTime": "2027-01-25T00:00:00Z"
+          },
+          "faults": {
+            "scheduled_audit_failures": 1
+          }
+        }
+      }
+    },
+    {
+      "definition": "SystemSetupRequest",
+      "value": {
+        "session_id": "p5-next-001",
+        "setup": {
+          "cleanup_session_ids": [
+            "p5-old-001"
+          ]
+        }
+      }
+    },
+    {
+      "definition": "ClockRequest",
+      "value": {
+        "currentTime": "2027-01-26T00:00:00Z"
+      }
+    },
+    {
+      "definition": "ClockResponse",
+      "value": {
+        "currentTime": "2027-01-26T00:00:00Z",
+        "triggeredAudits": [
+          "a-002"
+        ],
+        "triggeredNotifications": [
+          "n-001"
+        ]
+      },
+      "note": "Acceptance only; poll audit a-002 through normal API."
+    },
+    {
+      "definition": "ClockResponse",
+      "value": {
+        "currentTime": "2027-01-26T00:00:00Z",
+        "triggeredAudits": [],
+        "triggeredNotifications": []
+      },
+      "note": "Same-time replay after prior commit and no newly due work."
+    },
+    {
+      "definition": "NotificationResponse",
+      "value": {
+        "notifications": [
+          {
+            "notificationId": "n-001",
+            "type": "COMPLIANCE_DEADLINE_REMINDER",
+            "workbookId": "wb-001",
+            "versionId": "v-002",
+            "scheduledFor": "2027-01-26T00:00:00Z",
+            "status": "DELIVERED",
+            "message": "This stored workbook version has unresolved accessibility findings or no completed successful audit. External workbook changes require a new upload."
+          }
+        ]
+      }
+    },
+    {
+      "definition": "NotificationResponse",
+      "value": {
+        "notifications": [
+          {
+            "notificationId": "n-002",
+            "type": "COMPLIANCE_DEADLINE_REMINDER",
+            "workbookId": "wb-001",
+            "versionId": "v-002",
+            "scheduledFor": "2027-01-26T00:00:00Z",
+            "status": "FAILED",
+            "message": "Reminder recording failed in the isolated test session."
+          }
+        ]
+      }
+    },
+    {
+      "definition": "NotificationResponse",
+      "value": {
+        "notifications": []
+      }
+    },
+    {
+      "definition": "ProjectError",
+      "value": {
+        "code": "CLOCK_REWIND",
+        "message": "The isolated test clock cannot move backward.",
+        "requestId": "req-001",
+        "details": {}
+      }
+    },
+    {
+      "definition": "ProjectError",
+      "value": {
+        "code": "TEST_SCHEDULED_AUDIT_FAILURE",
+        "message": "Scheduled audit failure requested by the isolated test session.",
+        "requestId": "job-002",
+        "details": {
+          "stage": "scheduled_audit",
+          "testOnly": true
+        }
+      }
+    },
+    {
+      "definition": "TestEndpointError",
+      "value": {
+        "message": "The target system could not prepare the session.",
+        "source": "system"
+      }
+    },
+    {
+      "definition": "TestResult",
+      "value": {
+        "test_id": "P5-EXPECTED-FAULT",
+        "outcome": "pass",
+        "message": "The requested fault produced the expected failed audit and preserved the source."
+      }
+    },
+    {
+      "definition": "TestResult",
+      "value": {
+        "test_id": "P5-UNEXPECTED-FAILURE",
+        "outcome": "error",
+        "message": "An unexpected internal audit failure prevented finding evaluation.",
+        "source": "system"
+      }
+    },
+    {
+      "definition": "TestResult",
+      "value": {
+        "test_id": "P5-NO-RESPONSE",
+        "outcome": "error",
+        "message": "No project response was available before the request deadline.",
+        "source": "communication"
+      }
+    },
+    {
+      "definition": "SystemReport",
+      "value": {
+        "session_id": "p5-main-001",
+        "coverage": {
+          "code": {
+            "covered": null,
+            "total": null,
+            "basis": "Source lines in declared engine scope; target instrumentation unavailable."
+          }
+        }
+      }
+    },
+    {
+      "definition": "CrossTeamSuiteReport",
+      "value": {
+        "session_id": "p5-main-001",
+        "target_url": "https://team12.example.invalid/system",
+        "results": [
+          {
+            "test_id": "EXAMPLE-ONLY",
+            "outcome": "pass",
+            "message": "Formatting example only; this is not an executed suite."
+          }
+        ],
+        "coverage": {
+          "code": {
+            "covered": null,
+            "total": null,
+            "basis": "Source lines in declared engine scope; target instrumentation unavailable."
+          },
+          "component": {
+            "covered": 11,
+            "total": 12,
+            "basis": "Pod E specification 3.0.0 C1-C12; qualifying HTTP assertions executed. C9 browser UI excluded."
+          },
+          "system": {
+            "covered": 17,
+            "total": 18,
+            "basis": "AC-01 through AC-18, counted once per executed qualifying assertion. AC-17 UI not executed; AC-09 automated preservation only."
+          }
+        }
+      },
+      "note": "No model field on a cross-team report. Counts are illustrative.",
+      "profile": "cross"
+    },
+    {
+      "definition": "OwnTeamSuiteReport",
+      "value": {
+        "session_id": "p5-main-001",
+        "target_url": "https://team9.example.invalid/system",
+        "results": [
+          {
+            "test_id": "EXAMPLE-ONLY",
+            "outcome": "pass",
+            "message": "Formatting example only; this is not an executed suite."
+          }
+        ],
+        "coverage": {
+          "code": {
+            "covered": null,
+            "total": null,
+            "basis": "Source lines in declared engine scope; target instrumentation unavailable."
+          },
+          "component": {
+            "covered": 11,
+            "total": 12,
+            "basis": "Pod E specification 3.0.0 C1-C12; qualifying HTTP assertions executed. C9 browser UI excluded."
+          },
+          "system": {
+            "covered": 17,
+            "total": 18,
+            "basis": "AC-01 through AC-18, counted once per executed qualifying assertion. AC-17 UI not executed; AC-09 automated preservation only."
+          },
+          "model": {
+            "covered": 6,
+            "total": 8,
+            "basis": "Illustrative team design 1.0.0; requirements-to-tests map https://team9.example.invalid/design/phase5. Two design requirements not evaluated."
+          }
+        }
+      },
+      "note": "Illustrative design counts only; each team supplies its actual complete map.",
+      "profile": "own"
+    },
+    {
+      "definition": "NewAuditReport",
+      "value": {
+        "reportVersion": "2.0.0",
+        "specificationVersion": "3.0.0",
+        "workbookId": "wb-001",
+        "versionId": "ver-002",
+        "auditId": "audit-002",
+        "fileName": "example-remediated.xlsx",
+        "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "sourceVersionId": "ver-001",
+        "auditDate": "2026-10-28T14:00:08Z",
+        "rulesetVersion": "2.0.0",
+        "status": "AUDIT_COMPLETE",
+        "checksPerformed": [
+          "ALT_TEXT",
+          "WORKSHEET_NAME",
+          "TABLE_HEADER",
+          "MERGED_CELLS",
+          "LINK_TEXT",
+          "COLOR_CONTRAST"
+        ],
+        "findings": [],
+        "decisions": [
+          {
+            "sourceAuditId": "audit-001",
+            "findingId": "2158dab481d977a4f2a1ef238977b3fd4197b85f46f6be9e622276e85938e52d",
+            "ruleId": "ALT_TEXT",
+            "worksheet": "Expenses",
+            "target": "xl/drawings/drawing1.xml#id=2",
+            "action": "APPLY",
+            "value": {
+              "title": "Monthly expenses",
+              "description": "Bar chart comparing monthly expenses from January through June."
+            }
+          }
+        ],
+        "approvedChanges": [
+          {
+            "sourceAuditId": "audit-001",
+            "findingId": "2158dab481d977a4f2a1ef238977b3fd4197b85f46f6be9e622276e85938e52d",
+            "ruleId": "ALT_TEXT",
+            "worksheet": "Expenses",
+            "target": "xl/drawings/drawing1.xml#id=2",
+            "action": "APPLY",
+            "value": {
+              "title": "Monthly expenses",
+              "description": "Bar chart comparing monthly expenses from January through June."
+            }
+          }
+        ],
+        "unresolvedFindings": [],
+        "manualReviewItems": [],
+        "limitations": [],
+        "remediationId": "rem-001",
+        "outputVersionId": "ver-002",
+        "outputId": "out-001",
+        "error": null
+      },
+      "note": "Illustrates unchanged report body with the new governing specification label."
+    },
+    {
+      "definition": "TeamDesignMap",
+      "value": {
+        "teamId": "example-team",
+        "designVersion": "1.0.0",
+        "mappingUrl": "https://example.invalid/design-map",
+        "requirements": [
+          {
+            "requirementId": "EXAMPLE-D-01",
+            "description": "Illustrative requirement; replace before adoption.",
+            "testIds": [
+              "EXAMPLE-ONLY"
+            ],
+            "qualifyingAssertion": "An actual assertion evaluates the named design requirement."
+          },
+          {
+            "requirementId": "EXAMPLE-D-02",
+            "description": "Illustrative untested requirement still belongs in total.",
+            "testIds": [],
+            "qualifyingAssertion": "No qualifying test is mapped yet."
+          }
+        ]
+      }
+    }
+  ],
+  "invalid_examples": [
+    {
+      "definition": "ScheduleRequest",
+      "value": {
+        "enabled": true,
+        "intervalDays": 0
+      },
+      "reason": "Enabled interval must be a strict integer in 1..90.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "ScheduleRequest",
+      "value": {
+        "enabled": true,
+        "intervalDays": 91
+      },
+      "reason": "Enabled interval must be a strict integer in 1..90.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "ScheduleRequest",
+      "value": {
+        "enabled": true,
+        "intervalDays": true
+      },
+      "reason": "Enabled interval must be a strict integer in 1..90.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "ScheduleRequest",
+      "value": {
+        "enabled": true,
+        "intervalDays": "30"
+      },
+      "reason": "Enabled interval must be a strict integer in 1..90.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "ScheduleRequest",
+      "value": {
+        "enabled": true,
+        "intervalDays": null
+      },
+      "reason": "Enabled interval must be a strict integer in 1..90.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "ScheduleRequest",
+      "value": {
+        "enabled": true,
+        "intervalDays": 1.0
+      },
+      "reason": "Decimal lexical form rejected by strict request parser.",
+      "validation_layer": "semantic"
+    },
+    {
+      "definition": "ScheduleRequest",
+      "value": {
+        "enabled": true
+      },
+      "reason": "Missing interval.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "ScheduleRequest",
+      "value": {
+        "enabled": false,
+        "complianceDeadline": "2027-02-29"
+      },
+      "reason": "Not a real calendar date.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "ClockRequest",
+      "value": {
+        "currentTime": "2027-01-01T00:00:00-05:00"
+      },
+      "reason": "UTC Z required.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "ClockRequest",
+      "value": {
+        "currentTime": "2027-01-01T00:00:00.1234567Z"
+      },
+      "reason": "At most six fractional digits.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "FaultConfiguration",
+      "value": {},
+      "reason": "A fault object must be nonempty.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "FaultConfiguration",
+      "value": {
+        "audit_failures": true
+      },
+      "reason": "Boolean is not integer 1.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "FaultConfiguration",
+      "value": {
+        "audit_failures": 1,
+        "report_failures": 1
+      },
+      "reason": "Ambiguous fault combination.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "FaultConfiguration",
+      "value": {
+        "arbitrary_exception": 1
+      },
+      "reason": "Unknown control forbidden.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "CrossTeamSuiteReport",
+      "value": {
+        "session_id": "p5-main-001",
+        "target_url": "https://team9.example.invalid/system",
+        "results": [
+          {
+            "test_id": "EXAMPLE-ONLY",
+            "outcome": "pass",
+            "message": "Formatting example only; this is not an executed suite."
+          }
+        ],
+        "coverage": {
+          "code": {
+            "covered": null,
+            "total": null,
+            "basis": "Source lines in declared engine scope; target instrumentation unavailable."
+          },
+          "component": {
+            "covered": 11,
+            "total": 12,
+            "basis": "Pod E specification 3.0.0 C1-C12; qualifying HTTP assertions executed. C9 browser UI excluded."
+          },
+          "system": {
+            "covered": 17,
+            "total": 18,
+            "basis": "AC-01 through AC-18, counted once per executed qualifying assertion. AC-17 UI not executed; AC-09 automated preservation only."
+          },
+          "model": {
+            "covered": 6,
+            "total": 8,
+            "basis": "Illustrative team design 1.0.0; requirements-to-tests map https://team9.example.invalid/design/phase5. Two design requirements not evaluated."
+          }
+        }
+      },
+      "reason": "model must be absent in a cross-team report.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "OwnTeamSuiteReport",
+      "value": {
+        "session_id": "p5-main-001",
+        "target_url": "https://team12.example.invalid/system",
+        "results": [
+          {
+            "test_id": "EXAMPLE-ONLY",
+            "outcome": "pass",
+            "message": "Formatting example only; this is not an executed suite."
+          }
+        ],
+        "coverage": {
+          "code": {
+            "covered": null,
+            "total": null,
+            "basis": "Source lines in declared engine scope; target instrumentation unavailable."
+          },
+          "component": {
+            "covered": 11,
+            "total": 12,
+            "basis": "Pod E specification 3.0.0 C1-C12; qualifying HTTP assertions executed. C9 browser UI excluded."
+          },
+          "system": {
+            "covered": 17,
+            "total": 18,
+            "basis": "AC-01 through AC-18, counted once per executed qualifying assertion. AC-17 UI not executed; AC-09 automated preservation only."
+          }
+        }
+      },
+      "reason": "model is required for an own-team report.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "CrossTeamSuiteReport",
+      "value": {
+        "session_id": "p5-main-001",
+        "target_url": "https://team12.example.invalid/system",
+        "results": [
+          {
+            "test_id": "EXAMPLE-ONLY",
+            "outcome": "pass",
+            "message": "Formatting example only; this is not an executed suite."
+          }
+        ],
+        "coverage": {
+          "code": {
+            "covered": 0,
+            "total": null,
+            "basis": "Source lines in declared engine scope; target instrumentation unavailable."
+          },
+          "component": {
+            "covered": 11,
+            "total": 12,
+            "basis": "Pod E specification 3.0.0 C1-C12; qualifying HTTP assertions executed. C9 browser UI excluded."
+          },
+          "system": {
+            "covered": 17,
+            "total": 18,
+            "basis": "AC-01 through AC-18, counted once per executed qualifying assertion. AC-17 UI not executed; AC-09 automated preservation only."
+          }
+        }
+      },
+      "reason": "Unavailable counts must both be null.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "CrossTeamSuiteReport",
+      "value": {
+        "session_id": "p5-main-001",
+        "target_url": "https://team12.example.invalid/system",
+        "results": [
+          {
+            "test_id": "EXAMPLE-ONLY",
+            "outcome": "pass",
+            "message": "Formatting example only; this is not an executed suite."
+          }
+        ],
+        "coverage": {
+          "code": {
+            "covered": null,
+            "total": null,
+            "basis": "Source lines in declared engine scope; target instrumentation unavailable."
+          },
+          "component": {
+            "covered": 13,
+            "total": 12,
+            "basis": "Pod E specification 3.0.0 C1-C12; qualifying HTTP assertions executed. C9 browser UI excluded."
+          },
+          "system": {
+            "covered": 17,
+            "total": 18,
+            "basis": "AC-01 through AC-18, counted once per executed qualifying assertion. AC-17 UI not executed; AC-09 automated preservation only."
+          }
+        }
+      },
+      "reason": "covered exceeds total.",
+      "validation_layer": "semantic"
+    },
+    {
+      "definition": "TestResult",
+      "value": {
+        "test_id": "X",
+        "outcome": "error",
+        "message": "Missing source."
+      },
+      "reason": "Error source is required.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "TestResult",
+      "value": {
+        "test_id": "X",
+        "outcome": "pass",
+        "message": "Spurious source.",
+        "source": "system"
+      },
+      "reason": "Non-error results omit source.",
+      "validation_layer": "schema"
+    },
+    {
+      "definition": "FaultConfiguration",
+      "value": {
+        "audit_failures": 1.0
+      },
+      "reason": "Fault counter decimal lexical form is not a strict integer.",
+      "validation_layer": "semantic"
+    }
+  ],
+  "http_exchanges": [
+    {
+      "method": "PUT",
+      "path": "/api/v1/workbooks/wb-001/schedule",
+      "request": {
+        "enabled": true,
+        "intervalDays": 30,
+        "complianceDeadline": "2027-04-26"
+      },
+      "success_status": 200,
+      "response_definition": "ScheduleResponse"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workbooks/wb-001/schedule",
+      "request_body_present": false,
+      "success_status": 200,
+      "response_definition": "ScheduleResponse"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workbooks/wb-001/notifications",
+      "request_body_present": false,
+      "success_status": 200,
+      "response_definition": "NotificationResponse"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/test/clock",
+      "request": {
+        "currentTime": "2027-01-26T00:00:00Z"
+      },
+      "headers": {
+        "X-Test-Session": "p5-main-001"
+      },
+      "credential_role": "creating-test-admin",
+      "success_status": 200,
+      "response_definition": "ClockResponse"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workbooks/wb-001",
+      "request_body_present": false,
+      "success_status": 204,
+      "response_body_present": false
+    }
+  ]
+}

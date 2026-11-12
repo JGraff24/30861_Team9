@@ -3,7 +3,7 @@
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import PurePosixPath
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import (
     AfterValidator,
@@ -327,9 +327,26 @@ class SystemCoverage(ContractModel):
     code: CoverageMeasure
 
 
+def _model_key_not_nullable(schema: dict[str, Any]) -> None:
+    # Present only on own-team Phase 5 reports, and then never null (specification 3.0.0 §14).
+    options = schema["properties"]["model"].get("anyOf", [])
+    schema["properties"]["model"] = next(o for o in options if o.get("type") != "null")
+
+
 class SuiteCoverage(SystemCoverage):
+    model_config = ConfigDict(json_schema_extra=_model_key_not_nullable)
     component: CoverageMeasure
     system: CoverageMeasure
+    # Own-team Phase 5 runs only. Cross-team runs and every earlier report omit the key
+    # entirely: it is never serialized as null or as a placeholder.
+    model: CoverageMeasure | None = Field(default=None, exclude_if=lambda value: value is None)
+
+    @model_validator(mode="before")
+    @classmethod
+    def no_null_model(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "model" in data and data["model"] is None:
+            raise ValueError("coverage.model is either a measure or absent, never null")
+        return data
 
 
 class SystemReport(ContractModel):

@@ -49,10 +49,34 @@ def main() -> int:
         action="store_true",
         help="Run the real ruleset 2.0.0 system and corrected Phase 4 independent suite",
     )
-    args = parser.parse_args()
-    manifest_path = (
-        REPO / "tests/fixtures" / ("manifest-phase4.json" if args.phase4 else "manifest.json")
+    parser.add_argument(
+        "--phase5",
+        action="store_true",
+        help=(
+            "Run the Phase 5 independent suite (own-team profile) against the real system. "
+            "Until the Phase 5 system work lands, its new operations are reported as gaps."
+        ),
     )
+    parser.add_argument(
+        "--allow-failures",
+        action="store_true",
+        help="record fail/error outcomes as evidence instead of failing the process",
+    )
+    args = parser.parse_args()
+    if args.phase5:
+        args.phase4 = True  # same real ruleset 2.0.0 system configuration and worker capacity
+    manifest_path = (
+        REPO
+        / "tests/fixtures"
+        / (
+            "manifest-phase5.json"
+            if args.phase5
+            else "manifest-phase4.json"
+            if args.phase4
+            else "manifest.json"
+        )
+    )
+    read_timeout = 2430 if args.phase5 else 1830 if args.phase4 else 630
     suite = load_suite(manifest_path, check_names())
     output = args.evidence_dir.resolve() if args.evidence_dir else None
     if output:
@@ -61,7 +85,8 @@ def main() -> int:
     target = f"http://127.0.0.1:{system_port}"
     tester_url = f"http://127.0.0.1:{tester_port}"
     tokens = {
-        name: secrets.token_urlsafe(32) for name in ("A", "B", "reviewer", "admin", "operator")
+        name: secrets.token_urlsafe(32)
+        for name in ("A", "B", "reviewer", "admin", "admin2", "operator")
     }
     principals = {
         hashlib.sha256(tokens[name].encode()).hexdigest(): {"subject": name, "role": role}
@@ -70,6 +95,8 @@ def main() -> int:
             ("B", "user"),
             ("reviewer", "reviewer"),
             ("admin", "test_admin"),
+            # A second test-admin exercises the Phase 5 foreign-admin clock boundary.
+            ("admin2", "test_admin"),
         )
     }
     revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO, text=True).strip()
@@ -107,7 +134,9 @@ def main() -> int:
             "TESTER_DB_PATH": str(state / "tester.sqlite3"),
             "SYSTEM_TOKEN_HASHES_JSON": json.dumps(principals),
             "REVIEWER_GRANTS_JSON": json.dumps({"reviewer": ["A"]}),
-            "TEST_SESSION_USERS_JSON": json.dumps({"admin": ["A", "B", "reviewer"]}),
+            "TEST_SESSION_USERS_JSON": json.dumps(
+                {"admin": ["A", "B", "reviewer"], "admin2": ["A", "B", "reviewer"]}
+            ),
             "ENABLE_TEST_INTERFACE": "true",
             "ENABLE_CODE_MEASUREMENT": "true",
             "TESTER_OPERATOR_TOKEN_HASHES_JSON": json.dumps(
@@ -121,10 +150,14 @@ def main() -> int:
                         "userB": tokens["B"],
                         "reviewer": tokens["reviewer"],
                         "test-admin": tokens["admin"],
+                        "test-adminB": tokens["admin2"],
                     }
                 }
             ),
             "FIXTURE_MANIFEST_PATH": str(manifest_path),
+            # Trusted Phase 5 profile: this local target is Team 9's own system.
+            "TESTER_TEAM_ID": "team9",
+            "TARGET_TEAM_MAP_JSON": json.dumps({target: "team9"}),
         }
         processes: list[subprocess.Popen[bytes]] = []
 
@@ -220,7 +253,7 @@ def main() -> int:
             with httpx.Client(
                 base_url=tester_url,
                 trust_env=False,
-                timeout=1830 if args.phase4 else 630,
+                timeout=read_timeout,
                 headers={"Authorization": f"Bearer {tokens['operator']}"},
             ) as client:
                 setup = client.post("/test/setup", json={"target_url": target})
@@ -257,15 +290,19 @@ def main() -> int:
                 for result in report["results"]:
                     if result["outcome"] in ("fail", "error"):
                         print(json.dumps(result), flush=True)
-                if counts.get("fail", 0) or counts.get("error", 0):
+                if (counts.get("fail", 0) or counts.get("error", 0)) and not args.allow_failures:
                     return 1
+            if args.phase5:
+                # One complete own-team run is the evidence; the repeated acceptance runs are
+                # exercised against the fake by scripts.tester_selfcheck --phase5.
+                return 0
             acceptance = subprocess.run(
                 [sys.executable, "-m", "pytest", "-q", "tests/acceptance"],
                 cwd=REPO,
                 env=environment
                 | {
                     "TEAM9_SUITE_MANIFEST": str(manifest_path),
-                    "TEAM9_RUN_READ_TIMEOUT": "1830" if args.phase4 else "630",
+                    "TEAM9_RUN_READ_TIMEOUT": str(read_timeout),
                     "TEAM9_TESTER_URL": tester_url,
                     "TEAM9_TARGET_URL": target,
                     "TEAM9_TESTER_TOKEN": tokens["operator"],

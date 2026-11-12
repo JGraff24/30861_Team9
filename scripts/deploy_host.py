@@ -310,11 +310,14 @@ from tester.suite.manifest import load_suite
 from tester.suite.registry import names
 settings = TesterSettings(_env_file=None)
 suite = load_suite(settings.fixture_manifest_path, names())
-if (suite.manifest.phase != '4' or suite.manifest.manifest_version != '2.1.1'
+# Phase 4 (2.1.1, 1,800 s) or Phase 5 (3.0.0, 2,400 s) suites; anything else is refused.
+expected = {'4': ('2.1.1', '2.1.0', 1800, 1830), '5': ('3.0.0', '3.0.0', 2400, 2430)}
+wanted = expected.get(suite.manifest.phase)
+if (wanted is None or suite.manifest.manifest_version != wanted[0]
         or suite.manifest.ruleset_version != '2.0.0'
-        or suite.manifest.specification_version != '2.1.0'
-        or suite.manifest.limits is None or suite.manifest.limits.suite_seconds != 1800
-        or suite.manifest.limits.run_read_timeout_seconds < 1830):
+        or suite.manifest.specification_version != wanted[1]
+        or suite.manifest.limits is None or suite.manifest.limits.suite_seconds != wanted[2]
+        or suite.manifest.limits.run_read_timeout_seconds < wanted[3]):
     raise RuntimeError('Private tester suite is incompatible')
 with urlopen('http://127.0.0.1:8001/openapi.json', timeout=5) as response:
     operation = json.load(response)['paths']['/test/report']['get']

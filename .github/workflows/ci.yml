@@ -4,7 +4,7 @@ name: ci
 
 on:
   push:
-    branches: [main, "phase3/**", "phase4/**", "bootstrap/**"]
+    branches: [main, "phase3/**", "phase4/**", "phase5/**", "bootstrap/**"]
   pull_request:
   # Opt-in live run against a deployed tester. Never part of push/PR checks.
   workflow_dispatch:
@@ -19,9 +19,15 @@ on:
       suite:
         description: "Manifest the deployed tester serves"
         required: true
-        default: phase3
+        default: phase5
         type: choice
-        options: [phase3, phase4]
+        options: [phase3, phase4, phase5]
+      expect_profile:
+        description: "Phase 5 report profile the tester's trusted config should produce"
+        required: true
+        default: own
+        type: choice
+        options: [own, cross]
 
 permissions:
   contents: read
@@ -60,7 +66,7 @@ jobs:
         run: uv run pytest -q --junitxml=${{ runner.temp }}/pytest-junit.xml
       - name: Portable tester, schema and foundation checks (Windows)
         if: runner.os == 'Windows'
-        run: uv run pytest tests/unit/test_tester.py tests/unit/test_tester_deadlines.py tests/unit/test_phase4_tester.py tests/unit/test_models.py tests/unit/test_foundation.py tests/contract --durations=15 --junitxml=${{ runner.temp }}/pytest-junit.xml
+        run: uv run pytest tests/unit/test_tester.py tests/unit/test_tester_deadlines.py tests/unit/test_phase4_tester.py tests/unit/test_phase5_tester.py tests/unit/test_models.py tests/unit/test_foundation.py tests/contract --durations=15 --junitxml=${{ runner.temp }}/pytest-junit.xml
       - name: Show failing tests as annotations
         if: failure()
         run: uv run python -m scripts.junit_annotations "${{ runner.temp }}/pytest-junit.xml"
@@ -93,7 +99,15 @@ jobs:
               }
               assert client.post("/api/v1/workbooks").status_code == 401
               assert client.get("/").status_code == 200
-          print(json.dumps({"installed_image": "ok", "manifest": "2.1.1", "cases": len(suite.manifest.tests)}))
+          from pathlib import Path
+          import tester
+          from tester.phase4 import contract
+          suite5 = load_suite(Path(tester.__file__).parent / "fixtures" / "manifest-phase5.json", names())
+          assert suite5.manifest.manifest_version == "3.0.0" and len(suite5.manifest.tests) == 395
+          assert TesterSettings().tester_design_map_path is not None
+          with contract.use_pack("phase5"):
+              assert len(contract.definitions()) == 59
+          print(json.dumps({"installed_image": "ok", "manifest": "2.1.1", "cases": len(suite.manifest.tests), "phase5_cases": len(suite5.manifest.tests)}))
           PYTHON
       - name: Real API, worker and tester integration
         if: runner.os == 'Linux'
@@ -116,6 +130,12 @@ jobs:
         run: uv run python -m scripts.check_phase4_policy
       - name: Phase 4 manifest matches the normative test plan
         run: uv run python -m scripts.build_phase4_manifest --check
+      - name: Phase 5 policy vectors, examples and wire schemas
+        run: uv run python -m scripts.check_phase5_policy
+      - name: Phase 5 manifest matches the normative test plan
+        run: uv run python -m scripts.build_phase5_manifest --check
+      - name: Phase 5 coverage catalogs and design mapping are current
+        run: uv run python -m scripts.build_phase5_catalogs --check
       - name: Synthetic fixtures match generator
         run: uv run python -m scripts.make_synthetic_fixtures --check
       - name: Live process smoke test
@@ -125,6 +145,35 @@ jobs:
       - name: Live Phase 4 tester self-check (test-only Phase 4 fake target)
         if: runner.os == 'Linux'
         run: uv run python -m scripts.tester_selfcheck --phase4
+      - name: Live Phase 5 tester self-check, own-team profile (test-only Phase 5 fake target)
+        if: runner.os == 'Linux'
+        run: uv run python -m scripts.tester_selfcheck --phase5 --profile own
+
+  phase5-real-integration:
+    # Own-team Phase 5 run of the independent suite against the real API and worker, in its
+    # own job because the whole suite may use up to the 2,400 s budget. Until the Phase 5
+    # system work merges, its new operations are expected gaps: the job keeps the report and
+    # run record as evidence and fails only on a tester/harness defect, not on target outcomes.
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install uv (pinned, same as README)
+        run: python -m pip install uv==0.13.1
+      - name: Install locked dependencies
+        run: uv sync --locked --group dev
+      - name: Real Phase 5 independent suite against the current system (evidence)
+        run: uv run python -m scripts.integration_selfcheck --phase5 --allow-failures --evidence-dir "${{ runner.temp }}/phase5-real-integration"
+      - name: Retain real Phase 5 integration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase5-real-integration
+          path: ${{ runner.temp }}/phase5-real-integration
+          if-no-files-found: ignore
 
   dependency-audit:
     runs-on: ubuntu-latest
@@ -150,7 +199,7 @@ jobs:
     # TEAM9_TESTER_TOKEN (operator token); the token is never printed or uploaded.
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     env:
       TEAM9_TESTER_URL: ${{ secrets.TEAM9_TESTER_URL }}
       TEAM9_TESTER_TOKEN: ${{ secrets.TEAM9_TESTER_TOKEN }}
@@ -158,6 +207,7 @@ jobs:
       # Inputs reach the shell only through env, never interpolated into scripts.
       TARGET_REVISION: ${{ inputs.target_revision }}
       SUITE: ${{ inputs.suite }}
+      TEAM9_EXPECT_PROFILE: ${{ inputs.suite == 'phase5' && inputs.expect_profile || '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -174,10 +224,14 @@ jobs:
             exit 1
           fi
       - name: Live acceptance checks
-        run: uv run pytest tests/acceptance
+        run: |
+          if [ "$SUITE" = "phase5" ]; then export TEAM9_RUN_READ_TIMEOUT=2430; fi
+          uv run pytest tests/acceptance
       - name: Full suite run and sanitized record
         run: |
-          if [ "$SUITE" = "phase4" ]; then
+          if [ "$SUITE" = "phase5" ]; then
+            MANIFEST=tests/fixtures/manifest-phase5.json
+          elif [ "$SUITE" = "phase4" ]; then
             MANIFEST=tests/fixtures/manifest-phase4.json
           else
             MANIFEST=tests/fixtures/manifest.json

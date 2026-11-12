@@ -24,7 +24,8 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-Proto https;
         proxy_connect_timeout 5s;
-        proxy_read_timeout 1900s;
-        proxy_send_timeout 1900s;
+        # Phase 5 suites run up to 2,400 s; callers wait at least 2,430 s (spec 3.0.0 §12).
+        proxy_read_timeout 2460s;
+        proxy_send_timeout 2460s;
     }
 }

@@ -10,11 +10,20 @@ from starlette.concurrency import run_in_threadpool
 from starlette.types import Receive, Scope, Send
 
 from tests.support.fake_phase4 import FakePhase4
+from tests.support.fake_phase5 import FakePhase5
 from tests.support.fake_system import FakeSystem
 
-# FAKE_TARGET_PHASE=4 serves the test-only Phase 4 fake; the default stays Phase 3.
+# FAKE_TARGET_PHASE=4/5 serves the test-only Phase 4/5 fake; the default stays Phase 3.
+_PHASE = os.environ.get("FAKE_TARGET_PHASE")
+# Over real sockets the tester sleeps in real time between polls, so the Phase 5 live
+# self-check finishes accepted work on the first poll (busy-window cases then skip as
+# unobservable; the in-process unit tests exercise them with a virtual clock).
 fake: FakeSystem | FakePhase4 = (
-    FakePhase4() if os.environ.get("FAKE_TARGET_PHASE") == "4" else FakeSystem()
+    FakePhase5(processing_polls=0, remediation_polls=0, large_polls=0)
+    if _PHASE == "5"
+    else FakePhase4()
+    if _PHASE == "4"
+    else FakeSystem()
 )
 
 

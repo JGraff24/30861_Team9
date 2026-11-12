@@ -31,7 +31,7 @@ def operation_status(manifest: SuiteManifest, report: SuiteReport) -> list[dict[
     phase = manifest.phase
     rows = []
     for operation in manifest.operations:
-        delivered = operation.phase4 if phase == "4" else operation.phase3
+        delivered = {"5": operation.phase5, "4": operation.phase4}.get(phase, operation.phase3)
         tests = [test for test in manifest.tests if operation.number in test.operations]
         by_path = {
             path: [outcomes.get(t.test_id, Outcome.SKIP) for t in tests if t.path == path]
@@ -77,6 +77,12 @@ def run_record(
     ended_at: datetime | None = None,
 ) -> dict[str, Any]:
     report = SuiteReport.model_validate_json(report_bytes)
+    if manifest.phase == "5":
+        # The stored bytes must still match their frozen own/cross profile.
+        from tester.phase5.profile import check_report_profile
+
+        document = json.loads(report_bytes)
+        check_report_profile(document, "own" if "model" in document["coverage"] else "cross")
     if {result.test_id for result in report.results} != {test.test_id for test in manifest.tests}:
         raise ValueError("stored report does not match the supplied suite manifest")
     counts = Counter(result.outcome.value for result in report.results)
@@ -105,6 +111,11 @@ def run_record(
             if result.outcome != Outcome.PASS
         ],
         "coverage": report.coverage.model_dump(mode="json"),
+        **(
+            {"report_profile": "own" if report.coverage.model is not None else "cross"}
+            if manifest.phase == "5"
+            else {}
+        ),
         "operation_status": operation_status(manifest, report),
         "acceptance_status": {
             criterion: {
@@ -127,7 +138,7 @@ def run_record(
                 "completeness": (
                     "exercised-criterion evidence only; per-AC human evidence is tracked "
                     "separately and outcomes do not prove every boundary"
-                    if manifest.phase == "4"
+                    if manifest.integrated
                     else "partial Phase 3 scope; outcomes do not prove every boundary"
                 ),
             }
@@ -144,7 +155,7 @@ def run_record(
         ],
         "pending_confirmation": manifest.pending_confirmation,
     }
-    if manifest.phase == "4":
+    if manifest.integrated:
         canonical = json.dumps(
             manifest.model_dump(mode="json"),
             sort_keys=True,
