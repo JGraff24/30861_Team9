@@ -47,16 +47,20 @@ scheduler or UI. The shared pack and specification are unchanged.
   grant from userA only. Foreign-admin clock cases need an optional `test-adminB` credential.
 - Fault/clock isolation probes write one clean workbook into ordinary data and remove it by
   owner deletion.
+- Same-due scheduled audits are expected in `workbookId` order compared as plain strings.
+- Notification IDs only have to be unique among notifications, not across all resource IDs.
 - Injected messages for remediation, report and scheduled-audit faults follow the §11 pattern;
   synchronous `TEST_STORAGE_FAILURE` details are not asserted (unspecified).
-- AC-18 is tester-observed end-to-end real time; it fails a run beyond 75 s (15 s queue + 60 s
-  engine) and accepts a controlled failure as the stated alternative while disclosing it.
+- AC-18 records upload and acceptance-to-terminal real time; it fails a run that needs more than
+  75 s from acceptance (15 s queue + 60 s engine). Only a controlled `*_TIMEOUT` failure counts
+  as the stated alternative (disclosed, never a success); any other failure of the valid
+  boundary workbook is `error`/`system`.
 
 ## Verification
 
 | Check | Result |
 |---|---|
-| `pytest -q` (whole repository) | 1,045 passed, 5 skipped (live-tester acceptance needs a configured deployment) |
+| `pytest -q` (whole repository) | 1,046 passed, 5 skipped (live-tester acceptance needs a configured deployment) |
 | `tests/unit/test_phase5_tester.py` | profiles, oracle, manifest/catalog currency, full own and cross runs against the fake, six defect switches, drain preservation, error/system classification, abort/recovery profile, setup forwarding, no-resend |
 | `ruff check`, `ruff format --check`, `mypy --platform linux app tester scripts` | pass |
 | `scripts.check_phase5_policy`, `build_phase5_manifest --check`, `build_phase5_catalogs --check`, `export_schemas --check` | pass |

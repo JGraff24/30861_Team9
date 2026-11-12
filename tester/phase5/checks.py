@@ -16,6 +16,7 @@ otherwise the case is skipped as unobservable and says so.
 
 import hashlib
 import json
+import re
 from collections.abc import Callable, Mapping
 from datetime import datetime, timedelta
 from typing import Any
@@ -66,6 +67,7 @@ CLOCK_PATH = "/api/v1/test/clock"
 DEADLINE = "2027-04-26"  # frozen reminder vector; thresholds 2027-01-26 / 03-27 / 04-19
 LEAP_DEADLINE = "2028-04-26"  # leap-year vector; thresholds 2028-01-27 / 03-27 / 04-19
 REMINDER = "COMPLIANCE_DEADLINE_REMINDER"
+CONTROLLED_TIMEOUT = re.compile(r"[A-Z0-9_]*TIMEOUT")
 SOURCE_LIMIT = "Scheduled audits check the stored version only."
 INJECTED = {
     "remediation_failures": (
@@ -182,7 +184,13 @@ def advance(
             f"expected {format_timestamp(moment)}."
         )
     clocks(ctx)[session] = moment
-    fresh(ctx, [*body["triggeredAudits"], *body["triggeredNotifications"]], action)
+    fresh(ctx, list(body["triggeredAudits"]), action)
+    # Notification IDs are their own identifier space: the contract does not require them to
+    # differ from workbook/version/audit IDs, only never to be listed twice.
+    seen: set[str] = ctx.state.setdefault("p5:notification_ids", set())
+    if seen & set(body["triggeredNotifications"]):
+        raise CheckFailed(f"{action} listed an already recorded notification ID again.")
+    seen.update(body["triggeredNotifications"])
     for name, expected, key in (
         ("audits", expected_audits, "triggeredAudits"),
         ("notifications", expected_notifications, "triggeredNotifications"),
@@ -2212,6 +2220,9 @@ def access_p5(ctx: SuiteContext) -> str:
 
 def fault_p5(ctx: SuiteContext) -> str:
     fault = str(ctx.parameters["fault"])
+    if fault == "notification_failures":
+        # This scenario arms its own single namespace (one armed counter per fault family).
+        return _notification_fault(ctx, "Notification fault")
     session = namespace(ctx, f"Fault {fault}", {"faults": {fault: 1}})
     return FAULT_CASES[fault](ctx, session)
 
@@ -2343,11 +2354,6 @@ def _f_scheduled(ctx: SuiteContext, session: str) -> str:
     return _scheduled_failure_then_recovery(ctx, session, ids, "Scheduled fault")
 
 
-def _f_notification(ctx: SuiteContext, session: str) -> str:
-    del session
-    return _notification_fault(ctx, "Notification fault (AC-14)")
-
-
 def _f_deletion(ctx: SuiteContext, session: str) -> str:
     ids, _ = audited_in(ctx, "clean_all_six", session, "Deletion-fault workbook")
     return _delete_fail_once(ctx, session, ids, "clean_all_six")
@@ -2359,7 +2365,6 @@ FAULT_CASES: dict[str, Callable[[SuiteContext, str], str]] = {
     "remediation_failures": _f_remediation,
     "storage_failures": _f_storage,
     "scheduled_audit_failures": _f_scheduled,
-    "notification_failures": _f_notification,
     "deletion_failures": _f_deletion,
 }
 
@@ -2882,37 +2887,46 @@ def performance_run(ctx: SuiteContext) -> str:
         "/api/v1/workbooks",
         files=multipart(ctx.suite.bytes_of(fixture), accepted.upload_name),
     )
-    upload_seconds = ctx.clock() - started
+    accepted_at = ctx.clock()
+    upload_seconds = accepted_at - started
     ids: dict[str, str] = ok(ctx, response, 202, "UploadResponse", f"Performance upload {run}")
     fresh(ctx, [ids["workbookId"], ids["versionId"], ids["auditId"]], f"Performance upload {run}")
     observations: dict[int, Json] = ctx.state.setdefault("p5:performance", {})
     audit = poll_audit(ctx, ids, f"Performance audit {run}", allow_failure=True)
     elapsed = ctx.clock() - started
+    processing = ctx.clock() - accepted_at
     record: Json = {
         "run": run,
         "upload_seconds": round(upload_seconds, 3),
+        "accepted_to_terminal_seconds": round(processing, 3),
         "end_to_end_seconds": round(elapsed, 3),
         "status": audit["status"],
     }
     observations[run] = record
-    bound = limit(ctx, "audit_poll_seconds", 80)
     if audit["status"] == "PROCESSING_FAILED":
         error = audit["error"] or {}
-        record["controlled_failure"] = str(error.get("code"))[:64]
-        if elapsed > bound:
-            raise CheckFailed(
-                f"Run {run} failed after {elapsed:.1f} s, beyond the {bound} s bound."
+        code = str(error.get("code"))[:64]
+        record["failure_code"] = code
+        if not CONTROLLED_TIMEOUT.fullmatch(code):
+            # Only a controlled timeout is AC-18's stated failure alternative. The 2.1.0 code
+            # list is open ("include PROCESSING_TIMEOUT"), so any *_TIMEOUT code qualifies; any
+            # other failure of a valid boundary workbook is an unexpected internal failure (§14).
+            raise SystemFault(
+                f"Run {run} ended PROCESSING_FAILED ({code}) after {processing:.1f} s; this "
+                "is not the controlled timeout alternative."
             )
+        record["controlled_failure"] = code
         return (
             f"Run {run}: controlled failure {record['controlled_failure']} after {elapsed:.1f} s "
             f"(upload {upload_seconds:.1f} s); a controlled failure is not a successful audit."
         )
     expected = check_audit(ctx, audit, fixture, f"Performance audit {run}")
     record["findings"] = [list(row) for row in expected]
-    if elapsed > 75:
+    # Bounds apply from acceptance (15 s queue + 60 s engine); upload has its own 35 s bound.
+    if processing > 75:
         raise CheckFailed(
-            f"Run {run} took {elapsed:.1f} s end to end, beyond the 15 s queue + 60 s engine "
-            "bounds."
+            f"Run {run} took {processing:.1f} s from acceptance, beyond the 15 s queue + 60 s "
+            "engine bounds."
         )
     return (
         f"Run {run}: exact findings in {elapsed:.1f} s end to end (upload {upload_seconds:.1f} s), "

@@ -664,3 +664,38 @@ def test_fast_target_reports_unobservable_windows_as_clean_skips(tmp_path: Path)
     assert not [r for r in report["results"] if "Background acceptance" in r["message"]]
     skipped = {r["test_id"] for r in report["results"] if r["outcome"] == "skip"}
     assert {"P5-SCHEDULE-BUSY-AUDIT", "P5-DELETE-ACTIVE-AUDIT"} <= skipped
+
+
+def test_performance_run_accepts_only_the_controlled_timeout_alternative(tmp_path: Path) -> None:
+    """AC-18: a controlled *_TIMEOUT is the stated alternative; other failures are error/system."""
+    for code, outcome in (
+        ("PROCESSING_TIMEOUT", "pass"),
+        ("AUDIT_TIMEOUT", "pass"),
+        ("WORKER_LOST", "error"),
+    ):
+        fake = FakePhase5(**SMALL)
+        finish = fake.finish
+
+        def failing(
+            audit: Any, fake: FakePhase5 = fake, finish: Any = finish, code: str = code
+        ) -> None:
+            finish(audit)
+            version = fake.versions[audit.version_id]
+            if version.file_name == "performance-250000-cells.xlsx":
+                audit.status, audit.findings = "PROCESSING_FAILED", []
+                audit.error = {
+                    "code": code,
+                    "message": "Processing stopped.",
+                    "requestId": "job-x",
+                    "details": {"stage": "engine"},
+                }
+                version.stable_status = "PROCESSING_FAILED"
+                audit.report = fake.build_report(audit, version)
+
+        fake.finish = failing  # type: ignore[method-assign]
+        report, _ = run_phase5(tmp_path / code, fake)
+        results = {r["test_id"]: r for r in report["results"]}
+        run_one = results["P5-PERFORMANCE-RUN-1"]
+        assert run_one["outcome"] == outcome, run_one
+        assert run_one.get("source") == ("system" if outcome == "error" else None)
+        assert results["P5-PERFORMANCE-COMPARE"]["outcome"] == "skip"

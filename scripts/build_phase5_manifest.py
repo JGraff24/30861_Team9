@@ -372,6 +372,11 @@ def build() -> dict[str, Any]:
             "ProjectError shape are asserted.",
             "Scheduled-audit, notification, report and remediation injected messages follow the "
             "section 11 pattern '<Operation> failure requested by the isolated test session.'",
+            "AC-18 accepts any PROCESSING_FAILED code ending TIMEOUT as the controlled timeout "
+            "alternative: 2.1.0 lists PROCESSING_TIMEOUT in an open list (Team 9 emits it). Any "
+            "other failure of the boundary workbook is error/system. Pod should fix one code.",
+            "Same-due scheduled audits are expected in workbookId order compared as plain "
+            "code-point strings (section 9 does not state the comparison).",
             "Ordinary-namespace probes (fault/clock isolation) upload one clean workbook as userA "
             "and remove it with owner deletion; a failed deletion leaves it behind.",
             "Inherited Phase 4 pending items (link targets, check order, formula links, x14 "

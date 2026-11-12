@@ -392,6 +392,8 @@
     "P5-CLOCK-NOT-READY and P5-FAULT-REJECT-DISABLED are unobservable over HTTP on a deployment whose fault/clock capability is enabled; they report skips.",
     "Synchronous TEST_STORAGE_FAILURE details are not specified; only the code and ProjectError shape are asserted.",
     "Scheduled-audit, notification, report and remediation injected messages follow the section 11 pattern '<Operation> failure requested by the isolated test session.'",
+    "AC-18 accepts any PROCESSING_FAILED code ending TIMEOUT as the controlled timeout alternative: 2.1.0 lists PROCESSING_TIMEOUT in an open list (Team 9 emits it). Any other failure of the boundary workbook is error/system. Pod should fix one code.",
+    "Same-due scheduled audits are expected in workbookId order compared as plain code-point strings (section 9 does not state the comparison).",
     "Ordinary-namespace probes (fault/clock isolation) upload one clean workbook as userA and remove it with owner deletion; a failed deletion leaves it behind.",
     "Inherited Phase 4 pending items (link targets, check order, formula links, x14 rename, stale-audit observability) are unchanged; see manifest-phase4.json."
   ],

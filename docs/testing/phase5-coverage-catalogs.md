@@ -6,7 +6,7 @@ no run result and claims no coverage achieved.
 
 | Input | Version | SHA256 |
 |---|---|---|
-| Runnable manifest `tests/fixtures/manifest-phase5.json` | 3.0.0 | `1b1ed08bb3a5887f991f74d9cb2b82791dbdb65c0188cd073147695d4aadc1fb` |
+| Runnable manifest `tests/fixtures/manifest-phase5.json` | 3.0.0 | `68192ece6ea50101b667e17683cb3fc0831e9f202f8c27a99e39bbc2bac4b676` |
 | Normative plan `docs/contracts/phase5/phase5-test-plan.json` | 3.0.0 | `bef526a2fc3c037cbc8f814f76c3c18c47c6bac0d07ad69dfed96a941db76503` |
 | Team 9 design map `docs/design/team9-design-map.json` | 0.1.0 | `8d8c0719c91b584601bdf89b904170cd06bb6f667707b940d8d59ce98a7654ec` |
 
