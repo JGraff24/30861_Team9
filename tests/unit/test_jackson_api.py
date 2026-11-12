@@ -325,7 +325,7 @@ def test_missing_integrations_are_unavailable(tmp_path: Path) -> None:
     with TestClient(app) as client:
         assert client.get("/api/v1/health").status_code == 503
         assert client.get("/test/report").status_code == 404
-        assert len(client.get("/openapi.json").json()["paths"]) == 13
+        assert len(client.get("/openapi.json").json()["paths"]) == 16
 
 
 def test_persistence_failure_is_controlled(client: TestClient, services: SystemServices) -> None:

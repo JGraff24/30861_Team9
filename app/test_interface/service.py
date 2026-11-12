@@ -1,5 +1,6 @@
 """Session policy and orchestration; all persistence belongs to the repository."""
 
+from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 
 from pydantic import ValidationError
@@ -87,6 +88,10 @@ class PersistentSessionService:
             raise ProjectException(
                 403, "FAULTS_DISABLED", "Isolated audit failure control is disabled."
             )
+        if "clock" in request.setup and not self.settings.enable_test_clock:
+            raise ProjectException(
+                403, "TEST_CLOCK_DISABLED", "Isolated clock capability is disabled."
+            )
         cleanup = request.setup.get("cleanup_session_ids", [])
         assert isinstance(cleanup, list)
         if session_id in cleanup:
@@ -109,7 +114,13 @@ class PersistentSessionService:
             created_at=now,
             revision=self.settings.deployment_sha,
             cleanup_error=None,
-            audit_failures_remaining=1 if faults is not None else 0,
+            audit_failures_remaining=1
+            if isinstance(faults, dict) and "audit_failures" in faults
+            else 0,
+            faults_remaining={key: 1 for key in faults if key != "audit_failures"}
+            if isinstance(faults, dict)
+            else {},
+            clock_current_time=self._initial_clock(request.setup),
             deployment_protected_until=now + timedelta(seconds=DEPLOYMENT_PROTECTION_SECONDS),
         )
         self.repository.create_test_session(session)
@@ -134,3 +145,12 @@ class PersistentSessionService:
         except RecordNotFoundError:
             # Cleanup can reserve CLEANED after the readiness read but before aggregation.
             raise ProjectException(404, "SESSION_NOT_FOUND", "Test session was cleaned.") from None
+
+    def _initial_clock(self, setup: Mapping[str, object]) -> datetime | None:
+        if not self.settings.enable_test_clock:
+            return None
+        from app.contracts.phase5 import timestamp
+
+        clock = setup.get("clock", {"currentTime": "2027-01-01T00:00:00Z"})
+        assert isinstance(clock, dict)
+        return timestamp(clock["currentTime"])

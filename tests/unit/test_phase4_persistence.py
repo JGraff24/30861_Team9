@@ -230,7 +230,7 @@ def test_empty_initialization_and_reopening(repository: SQLiteRepository) -> Non
     reopened.initialize()
     assert reopened.health()
     with reopened._db() as db:
-        assert db.execute("PRAGMA user_version").fetchone()[0] == 2
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 3
         assert db.execute("PRAGMA foreign_key_check").fetchall() == []
         assert db.execute("SELECT count(*) FROM record_order").fetchone()[0] == 0
 

@@ -252,3 +252,13 @@ starting the candidate privately. Only a failure before proxy publication may re
 snapshots and the old image. After proxy startup is attempted, automatic recovery retains the
 new databases and image, records the unfinished publication and requires an explicit safe
 retry. Never restore a pre-release backup over data accepted after publication.
+
+## Phase 5 backend rollout
+
+The current backend upgrades metadata to schema 3 and adds scheduling, reminders and
+recoverable owner deletion. Follow [Jackson's Phase 5 operations and restore procedure](../docs/implementation/jackson_phase5.md)
+for backup registration/migration, the deletion journal, required S3 version permissions,
+clock/fault enablement and monitoring. Those instructions supersede the earlier schema-1
+and future-deletion notes above. The worker retains two execution slots. Deployment and
+proxy protection is now 2,700 seconds for a 2,400-second Phase 5 suite; caller read timeouts
+must be at least 2,430 seconds. The existing Phase 4 tester is not relabeled as a Phase 5 suite.

@@ -284,7 +284,7 @@ class ReportDecision(ContractModel):
 class AuditReport(ContractModel):
     model_config = ConfigDict(json_schema_extra=audit_report_schema)
     reportVersion: Literal["2.0.0"]
-    specificationVersion: Literal["2.1.0"]
+    specificationVersion: Literal["2.1.0", "3.0.0"]
     workbookId: Identifier
     versionId: Identifier
     auditId: Identifier
@@ -367,6 +367,8 @@ class RemediationJob(ContractModel):
     output_audit_id: Identifier
     output_id: Identifier
     blob_key: NonemptyText
+
+    test_remediation_failure: bool = False
 
 
 class OutputRecord(ContractModel):

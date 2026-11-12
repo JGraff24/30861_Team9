@@ -172,7 +172,7 @@ class Deployment:
                         protected_until = (
                             "CASE WHEN json_extract(payload, '$.deployment_protected_until') "
                             "IS NULL THEN julianday(json_extract(payload, '$.created_at')) "
-                            "+ 1900.0/86400.0 ELSE "
+                            "+ 2700.0/86400.0 ELSE "
                             "julianday(json_extract(payload, '$.deployment_protected_until')) END"
                         )
                         busy += database.execute(
@@ -188,6 +188,8 @@ class Deployment:
                             "SELECT count(*) FROM remediation_jobs "
                             "WHERE state IN ('QUEUED','RUNNING')"
                         ).fetchone()[0]
+                    if "deletions" in tables:
+                        busy += database.execute("SELECT count(*) FROM deletions").fetchone()[0]
                     if "upload_staging" in tables:
                         busy += database.execute(
                             "SELECT count(*) FROM upload_staging "
@@ -197,9 +199,9 @@ class Deployment:
         return busy
 
     def wait_idle(self, data: Path) -> None:
-        # Phase 4 suites run up to 1,800 s. Both pre-build and pre-activation
+        # Phase 5 suites run up to 2,400 s. Both pre-build and pre-activation
         # drains leave ingress live; the stopped-writer check closes the race.
-        deadline = time.monotonic() + 1900
+        deadline = time.monotonic() + 2700
         while self.active_work(data):
             if time.monotonic() >= deadline:
                 raise TimeoutError(
@@ -216,7 +218,22 @@ class Deployment:
         private_write(
             destination / "previous-release.json", json.dumps({"directory": str(previous)})
         )
-        metadata = {}
+        # Move earlier system content copies into the registered deletion surface.
+        content_root = data / "deletion-backups"
+        content_root.mkdir(mode=0o700, exist_ok=True)
+        system_info = (data / "system/system.sqlite3").stat()
+        os.chown(content_root, system_info.st_uid, system_info.st_gid)
+        for legacy in (data / "deployment-backups").glob("*/system.sqlite3"):
+            content_dir = content_root / legacy.parent.name
+            content_dir.mkdir(mode=0o700, exist_ok=True)
+            os.chown(content_dir, system_info.st_uid, system_info.st_gid)
+            moved = content_dir / "system.sqlite3"
+            if moved.exists():
+                raise RuntimeError("Duplicate registered content backup requires operator review")
+            os.replace(legacy, moved)
+            os.chown(moved, system_info.st_uid, system_info.st_gid)
+            os.chmod(moved, stat.S_IMODE(system_info.st_mode))
+        metadata: dict[str, dict[str, Any]] = {}
         for name, path in (
             ("system.sqlite3", data / "system/system.sqlite3"),
             ("tester.sqlite3", data / "tester/tester.sqlite3"),
@@ -235,11 +252,23 @@ class Deployment:
                 if time.monotonic() >= backup_deadline:
                     raise TimeoutError("SQLite backup deadline exceeded")
 
+            backup_path = destination / name
+            if name == "system.sqlite3":
+                content_root = data / "deletion-backups"
+                content_root.mkdir(mode=0o700, exist_ok=True)
+                os.chown(content_root, info.st_uid, info.st_gid)
+                content_dir = content_root / destination.name
+                content_dir.mkdir(mode=0o700)
+                os.chown(content_dir, info.st_uid, info.st_gid)
+                backup_path = content_dir / name
+                metadata[name]["content_path"] = str(backup_path)
             with (
                 sqlite3.connect(path.as_uri() + "?mode=ro", uri=True) as source,
-                sqlite3.connect(destination / name) as target,
+                sqlite3.connect(backup_path) as target,
             ):
                 source.backup(target, pages=128, progress=progress)
+            os.chown(backup_path, info.st_uid, info.st_gid)
+            os.chmod(backup_path, stat.S_IMODE(info.st_mode))
         private_write(destination / "database-metadata.json", json.dumps(metadata))
         return destination
 
@@ -255,7 +284,10 @@ class Deployment:
             try:
                 with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as target:
                     staged = Path(target.name)
-                    with (backup / name).open("rb") as source:
+                    backup_source = Path(info.get("content_path", str(backup / name)))
+                    if name == "system.sqlite3" and not backup_source.exists():
+                        backup_source = data / "deletion-backups" / backup.name / name
+                    with backup_source.open("rb") as source:
                         shutil.copyfileobj(source, target)
                     target.flush()
                     os.fchown(target.fileno(), info["uid"], info["gid"])
@@ -310,11 +342,13 @@ from tester.suite.manifest import load_suite
 from tester.suite.registry import names
 settings = TesterSettings(_env_file=None)
 suite = load_suite(settings.fixture_manifest_path, names())
-if (suite.manifest.phase != '4' or suite.manifest.manifest_version != '2.1.1'
-        or suite.manifest.ruleset_version != '2.0.0'
-        or suite.manifest.specification_version != '2.1.0'
-        or suite.manifest.limits is None or suite.manifest.limits.suite_seconds != 1800
-        or suite.manifest.limits.run_read_timeout_seconds < 1830):
+profile = (suite.manifest.phase, suite.manifest.manifest_version,
+           suite.manifest.specification_version)
+expected = {('4', '2.1.1', '2.1.0'): (1800, 1830), ('5', '3.0.0', '3.0.0'): (2400, 2430)}
+bounds = expected.get(profile)
+if (bounds is None or suite.manifest.ruleset_version != '2.0.0'
+        or suite.manifest.limits is None or suite.manifest.limits.suite_seconds != bounds[0]
+        or suite.manifest.limits.run_read_timeout_seconds < bounds[1]):
     raise RuntimeError('Private tester suite is incompatible')
 with urlopen('http://127.0.0.1:8001/openapi.json', timeout=5) as response:
     operation = json.load(response)['paths']['/test/report']['get']
@@ -491,7 +525,7 @@ except HTTPError as error:
             try:
                 # Existing long tester responses may finish gracefully. Once this
                 # returns no new public request can enter the old or new writers.
-                self.compose(previous, self.config, "stop", "--timeout", "1900", "proxy")
+                self.compose(previous, self.config, "stop", "--timeout", "2700", "proxy")
                 self.compose(
                     previous, self.config, "stop", "--timeout", "90", "system", "worker", "tester"
                 )

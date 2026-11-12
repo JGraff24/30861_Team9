@@ -37,6 +37,8 @@ from app.services.assembly import assemble
 from app.services.projects import record_measurement, verify_validation
 from app.services.reports import validate_evaluation, validate_finding_ids
 from app.storage.blobs import S3BlobStore, sha256
+from app.storage.locks import workbook_storage_lock
+from app.storage.sqlite import SQLiteRepository
 
 # `python -m app.jobs.worker` sets __name__ to __main__; keep the configured app logger.
 logger = logging.getLogger("app.jobs.worker")
@@ -100,6 +102,14 @@ class AuditWorker:
             data = blobs.read_source(version.blob_key)
             if sha256(data) != version.source_sha256 or len(data) != version.size_bytes:
                 raise IntegrityError("Source integrity differs before processing")
+            if job.test_scheduled_audit_failure:
+                stage = "scheduled_audit"
+                raise ProjectException(
+                    500,
+                    "TEST_SCHEDULED_AUDIT_FAILURE",
+                    "Scheduled audit failure requested by the isolated test session.",
+                    {"stage": stage, "testOnly": True},
+                )
             if job.test_audit_failure:
                 if job.session_id is None:
                     raise IntegrityError("Test fault cannot apply to ordinary data")
@@ -180,6 +190,14 @@ class AuditWorker:
                 raise IntegrityError("Audit evaluation missing")
             validate_evaluation(result.evaluation, audit.ruleset_version)
             validate_finding_ids(result.evaluation, version.source_sha256, audit.ruleset_version)
+            stage = "report"
+            if job.test_report_failure:
+                raise ProjectException(
+                    500,
+                    "TEST_REPORT_FAILURE",
+                    "Report failure requested by the isolated test session.",
+                    {"stage": stage, "testOnly": True},
+                )
             stage = "publication"
             repository.complete_audit(
                 job.job_id, self.worker_id, result.evaluation, datetime.now(UTC)
@@ -216,9 +234,13 @@ class AuditWorker:
                     self.worker_id,
                     ProjectError(
                         code=code,
-                        message="Workbook processing failed.",
+                        message=exc.message
+                        if isinstance(exc, ProjectException) and exc.code.startswith("TEST_")
+                        else "Workbook processing failed.",
                         requestId=job.job_id,
-                        details={"stage": stage},
+                        details=exc.details
+                        if isinstance(exc, ProjectException) and exc.code.startswith("TEST_")
+                        else {"stage": stage},
                     ),
                     datetime.now(UTC),
                 )
@@ -312,6 +334,14 @@ class AuditWorker:
             data = blobs.read_source(version.blob_key)
             if sha256(data) != version.source_sha256 or len(data) != version.size_bytes:
                 raise IntegrityError("Source integrity differs before remediation")
+            if job.test_remediation_failure:
+                stage = "remediation"
+                raise ProjectException(
+                    500,
+                    "TEST_REMEDIATION_FAILURE",
+                    "Remediation failure requested by the isolated test session.",
+                    {"stage": stage, "testOnly": True},
+                )
             has_edits = any(decision.action == "APPLY" for decision in record.decisions)
             engine = require_correction_engine(services.engine) if has_edits else None
             limits = ProcessingLimits()
@@ -453,66 +483,72 @@ class AuditWorker:
             remaining()
             stage = "storage"
             candidate_hash = sha256(candidate)
-            repository.register_candidate(job.job_id, self.worker_id, candidate_hash)
-            digest = blobs.put_source(job.blob_key, candidate)
-            stored = True
-            if digest != candidate_hash or blobs.read_source(job.blob_key) != candidate:
-                raise StorageError("Output storage verification failed")
-            remaining()
-            completed_at = datetime.now(UTC)
-            output_version = VersionRecord(
-                version_id=job.output_version_id,
-                workbook_id=job.workbook_id,
-                owner_subject=version.owner_subject,
-                session_id=version.session_id,
-                file_name=filename,
-                source_sha256=candidate_hash,
-                blob_key=job.blob_key,
-                size_bytes=len(candidate),
-                worksheet_count=output_validated.worksheet_count,
-                nonempty_cell_count=output_validated.nonempty_cell_count,
-                created_at=completed_at,
-                status=VersionStatus.REMEDIATED,
-                latest_audit_id=job.output_audit_id,
-                source_version_id=job.version_id,
-                validated=output_validated,
-            )
-            output_audit = AuditRecord(
-                audit_id=job.output_audit_id,
-                workbook_id=job.workbook_id,
-                version_id=job.output_version_id,
-                owner_subject=version.owner_subject,
-                session_id=version.session_id,
-                ruleset_version=record.ruleset_version,
-                status=AuditStatus.PROCESSING,
-                started_at=record.created_at,
-                completed_at=None,
-                findings=[],
-                limitations=[],
-                error=None,
-            )
-            stage = "publication"
-            cleanup_safe = False
-            try:
-                repository.complete_remediation(
-                    job.job_id,
-                    self.worker_id,
-                    output_version,
-                    output_audit,
-                    result.evaluation,
-                    completed_at,
+            with workbook_storage_lock(services.settings.metadata_db_path, job.workbook_id):
+                repository.register_candidate(job.job_id, self.worker_id, candidate_hash)
+                digest = blobs.put_source(job.blob_key, candidate)
+                stored = True
+                if digest != candidate_hash or blobs.read_source(job.blob_key) != candidate:
+                    raise StorageError("Output storage verification failed")
+                remaining()
+                completed_at = datetime.now(UTC)
+                effective = (
+                    repository.effective_now(job.session_id)
+                    if isinstance(repository, SQLiteRepository)
+                    else completed_at
                 )
-            except Exception:
-                # A lost commit acknowledgement must not delete bytes belonging to a
-                # committed output. Confirm immutable identity before compensating.
-                committed = repository.get_remediation(job.remediation_id)
-                if committed is None or (
-                    committed.status != "REMEDIATED"
-                    or committed.output_version_id != job.output_version_id
-                    or committed.output_id != job.output_id
-                    or committed.audit_id != job.output_audit_id
-                ):
-                    raise
+                output_version = VersionRecord(
+                    version_id=job.output_version_id,
+                    workbook_id=job.workbook_id,
+                    owner_subject=version.owner_subject,
+                    session_id=version.session_id,
+                    file_name=filename,
+                    source_sha256=candidate_hash,
+                    blob_key=job.blob_key,
+                    size_bytes=len(candidate),
+                    worksheet_count=output_validated.worksheet_count,
+                    nonempty_cell_count=output_validated.nonempty_cell_count,
+                    created_at=effective,
+                    status=VersionStatus.REMEDIATED,
+                    latest_audit_id=job.output_audit_id,
+                    source_version_id=job.version_id,
+                    validated=output_validated,
+                )
+                output_audit = AuditRecord(
+                    audit_id=job.output_audit_id,
+                    workbook_id=job.workbook_id,
+                    version_id=job.output_version_id,
+                    owner_subject=version.owner_subject,
+                    session_id=version.session_id,
+                    ruleset_version=record.ruleset_version,
+                    status=AuditStatus.PROCESSING,
+                    started_at=record.created_at,
+                    completed_at=None,
+                    findings=[],
+                    limitations=[],
+                    error=None,
+                )
+                stage = "publication"
+                cleanup_safe = False
+                try:
+                    repository.complete_remediation(
+                        job.job_id,
+                        self.worker_id,
+                        output_version,
+                        output_audit,
+                        result.evaluation,
+                        completed_at,
+                    )
+                except Exception:
+                    # A lost commit acknowledgement must not delete bytes belonging to a
+                    # committed output. Confirm immutable identity before compensating.
+                    committed = repository.get_remediation(job.remediation_id)
+                    if committed is None or (
+                        committed.status != "REMEDIATED"
+                        or committed.output_version_id != job.output_version_id
+                        or committed.output_id != job.output_id
+                        or committed.audit_id != job.output_audit_id
+                    ):
+                        raise
             published = True
             code = "REMEDIATION_SUCCEEDED"
         except LeaseConflictError:
@@ -529,6 +565,8 @@ class AuditWorker:
                     if stage in {"source", "source_integrity"}
                     else "STORAGE_FAILED"
                 )
+            elif isinstance(exc, ProjectException) and exc.code.startswith("TEST_"):
+                code = exc.code
             elif isinstance(exc, StorageError):
                 code = "STORAGE_FAILED"
             elif isinstance(exc, EngineExecutionError) and exc.kind == ExecutionErrorKind.TIMEOUT:
@@ -549,9 +587,13 @@ class AuditWorker:
                     self.worker_id,
                     ProjectError(
                         code=code,
-                        message=f"Remediation failed during {stage.replace('_', ' ')}.",
+                        message=exc.message
+                        if isinstance(exc, ProjectException) and exc.code.startswith("TEST_")
+                        else f"Remediation failed during {stage.replace('_', ' ')}.",
                         requestId=job.job_id,
-                        details={"stage": stage},
+                        details=exc.details
+                        if isinstance(exc, ProjectException) and exc.code.startswith("TEST_")
+                        else {"stage": stage},
                     ),
                     datetime.now(UTC),
                 )
@@ -606,16 +648,46 @@ def run_workers(services: SystemServices, concurrency: int, stop_requested: Even
         try:
             while not stop_requested.is_set():
                 worker._cleanup_candidates(max_items=1)
+                from app.services.lifecycle import LifecycleService
+
+                LifecycleService(services).recover_deletions()
                 stop_requested.wait(1)
         except BaseException as exc:
             stop_requested.set()
             logger.error("worker_housekeeper_failed", extra={"exceptionType": type(exc).__name__})
             raise RuntimeError("Worker housekeeping stopped unexpectedly") from None
 
+    def scheduler() -> None:
+        from app.services.lifecycle import LifecycleService
+
+        try:
+            lifecycle = LifecycleService(services)
+            last_monitor = 0.0
+            while not stop_requested.is_set():
+                try:
+                    lifecycle.tick()
+                    if time.monotonic() - last_monitor >= 30:
+                        logger.info(
+                            "backend_monitor", extra=lifecycle.repository.monitoring_snapshot()
+                        )
+                        last_monitor = time.monotonic()
+                except (ProjectException, StorageError):
+                    logger.error("scheduler_tick_failed", extra={"stage": "scheduling"})
+                stop_requested.wait(1)
+        except BaseException as exc:
+            stop_requested.set()
+            logger.error(
+                "scheduler_stopped_unexpectedly", extra={"exceptionType": type(exc).__name__}
+            )
+            raise RuntimeError("Scheduler stopped unexpectedly") from None
+
     with ThreadPoolExecutor(
-        max_workers=concurrency + 1, thread_name_prefix="workbook-worker"
+        max_workers=concurrency + 2, thread_name_prefix="workbook-worker"
     ) as pool:
-        futures = [pool.submit(slot) for _ in range(concurrency)] + [pool.submit(housekeeping)]
+        futures = [pool.submit(slot) for _ in range(concurrency)] + [
+            pool.submit(housekeeping),
+            pool.submit(scheduler),
+        ]
         for future in as_completed(futures):
             future.result()
 

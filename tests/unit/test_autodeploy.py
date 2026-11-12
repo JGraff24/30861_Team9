@@ -171,13 +171,14 @@ def test_success_updates_all_services_and_keeps_sqlite_backups(host: Host) -> No
     assert starts[0][2][-3:] == ("system", "worker", "tester")
     assert starts[1][2][-1] == "proxy"
     assert host.private_healthy == ["team9-phase3:" + SHA]
-    assert host.timeline.index("stop --timeout 1900 proxy") < host.timeline.index("backup")
+    assert host.timeline.index("stop --timeout 2700 proxy") < host.timeline.index("backup")
     assert host.timeline.index("stop --timeout 90 system worker tester") < host.timeline.index(
         "backup"
     )
     assert host.timeline.index("backup") < host.timeline.index("private checks")
     assert not host.publication.exists()
-    assert (Path(state["backup"]) / "system.sqlite3").is_file()
+    metadata = json.loads((Path(state["backup"]) / "database-metadata.json").read_text())
+    assert Path(metadata["system.sqlite3"]["content_path"]).is_file()
     assert (Path(state["backup"]) / "tester.sqlite3").is_file()
     assert host.config.stat().st_mode & 0o777 == 0o600
     assert (host.root / "config/runtime.env").read_text() == "PRIVATE_UNCHANGED=yes\n"
@@ -247,7 +248,7 @@ def test_busy_tester_defers_deployment_without_stopping_services(
     data = Path(deploy_host.read_env(host.config)["EBS_DATA_DIR"])
     with sqlite3.connect(data / "tester/tester.sqlite3") as database:
         database.execute("INSERT INTO tester_sessions VALUES ('RUNNING')")
-    clock = iter([0.0, 1901.0])
+    clock = iter([0.0, 2701.0])
     monkeypatch.setattr(deploy_host.time, "monotonic", lambda: next(clock))
     with pytest.raises(TimeoutError, match="Active audit/tester work"):
         host.update()
@@ -378,7 +379,7 @@ def test_deployment_timeout_allows_graceful_recovery_before_killing(
 
         def wait(self, timeout: int | None = None) -> int:
             events.append(("wait", timeout))
-            if timeout == 2400 or (timeout == 180 and force_kill):
+            if timeout == 7200 or (timeout == 180 and force_kill):
                 raise subprocess.TimeoutExpired("deployer", timeout)
             return 1
 
@@ -390,7 +391,7 @@ def test_deployment_timeout_allows_graceful_recovery_before_killing(
 
     monkeypatch.setattr(deploy_poll.subprocess, "Popen", lambda *a, **kw: Process())
     assert deploy_poll.execute(tmp_path / "candidate.py", SHA, REPOSITORY) == 124
-    assert events[:3] == [("wait", 2400), ("terminate", None), ("wait", 180)]
+    assert events[:3] == [("wait", 7200), ("terminate", None), ("wait", 180)]
     assert (("kill", None) in events) == force_kill
 
 
@@ -409,7 +410,7 @@ def test_phase4_active_work_defers_deployment_without_stopping_services(
     monkeypatch.setattr(
         host, "backup", lambda *args: pytest.fail("backup began during active Phase 4 work")
     )
-    clock = iter([0.0, 1901.0])
+    clock = iter([0.0, 2701.0])
     monkeypatch.setattr(deploy_host.time, "monotonic", lambda: next(clock))
     with pytest.raises(TimeoutError, match="Active audit/tester work"):
         host.update()
@@ -572,7 +573,7 @@ def test_private_failure_restores_real_phase3_schema_records_permissions_and_wal
         assert not any(args[0] == "up" and args[-1] == "proxy" for _, _, args in host.events)
         SQLiteRepository(path).initialize()
         with sqlite3.connect(path) as db:
-            assert db.execute("PRAGMA user_version").fetchone()[0] == 2
+            assert db.execute("PRAGMA user_version").fetchone()[0] == 3
         Path(str(path) + "-wal").write_bytes(b"stale migrated WAL must not be replayed")
         Path(str(path) + "-shm").write_bytes(b"stale migrated shared memory")
         raise RuntimeError("private migration readiness failed")
@@ -829,8 +830,8 @@ def test_proxy_grace_period_is_not_cut_short_by_the_compose_command_timeout(
         return ""
 
     monkeypatch.setattr(deployment, "run", run)
-    deployment.compose(tmp_path, tmp_path / "config.env", "stop", "--timeout", "1900", "proxy")
-    assert bounds[0] >= 1900 + 30
+    deployment.compose(tmp_path, tmp_path / "config.env", "stop", "--timeout", "2700", "proxy")
+    assert bounds[0] >= 2700 + 30
 
 
 def put_remote_session(
@@ -880,7 +881,7 @@ def test_external_test_session_between_jobs_defers_before_any_build(
     monkeypatch.setattr(
         host, "prepare_release", lambda *args: pytest.fail("Build competes with remote grading")
     )
-    clock = iter([0.0, 1901.0])
+    clock = iter([0.0, 2701.0])
     monkeypatch.setattr(deploy_host.time, "monotonic", lambda: next(clock))
     original = host.config.read_bytes()
     with pytest.raises(TimeoutError, match="Active audit/tester work"):
@@ -942,7 +943,7 @@ def test_new_remote_session_after_build_is_still_protected_before_activation(
         put_remote_session(host)
 
     monkeypatch.setattr(host, "prepare_release", build_then_remote_setup)
-    clock = iter([0.0, 0.0, 1901.0])
+    clock = iter([0.0, 0.0, 2701.0])
     monkeypatch.setattr(deploy_host.time, "monotonic", lambda: next(clock))
     with pytest.raises(TimeoutError, match="Active audit/tester work"):
         host.update()

@@ -4,7 +4,9 @@ import base64
 import hashlib
 import os
 import re
+import shutil
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
@@ -96,6 +98,25 @@ class FilesystemBlobStore:
             path.unlink(missing_ok=True)
         except OSError as exc:
             raise StorageError("Source rollback failed") from exc
+
+    def delete_workbook_sources(
+        self, workbook_id: str, session_id: str | None, deadline: float
+    ) -> None:
+        namespace = f"tests/{session_id}" if session_id else "ordinary"
+        path = self._path(f"{namespace}/{workbook_id}/deletion/source").parent.parent
+        try:
+            if time.monotonic() >= deadline:
+                raise StorageError("Deletion deadline exceeded")
+            if path.exists():
+                shutil.rmtree(path)
+            if path.parent.exists():
+                directory = os.open(path.parent, os.O_RDONLY)
+                try:
+                    os.fsync(directory)
+                finally:
+                    os.close(directory)
+        except OSError as exc:
+            raise StorageError("Workbook content cleanup failed") from exc
 
     def delete_test_source(self, key: str, session_id: str) -> None:
         check_test_key(key, session_id)
@@ -212,3 +233,39 @@ class S3BlobStore:
     def delete_test_source(self, key: str, session_id: str) -> None:
         check_test_key(key, session_id)
         self._delete(key)
+
+    def delete_workbook_sources(
+        self, workbook_id: str, session_id: str | None, deadline: float
+    ) -> None:
+        namespace = f"tests/{session_id}" if session_id else "ordinary"
+        prefix = self._key(f"{namespace}/{workbook_id}/deletion/source").rsplit("/", 2)[0] + "/"
+        try:
+            # Enumerate exact workbook-prefix versions, including delete markers and null versions.
+            versions = []
+            for page in self.client.get_paginator("list_object_versions").paginate(
+                Bucket=self.bucket, Prefix=prefix
+            ):
+                if time.monotonic() >= deadline:
+                    raise StorageError("Deletion deadline exceeded")
+                for item in [*page.get("Versions", []), *page.get("DeleteMarkers", [])]:
+                    if not item["Key"].startswith(prefix):
+                        raise IntegrityError("S3 cleanup escaped workbook prefix")
+                    versions.append({"Key": item["Key"], "VersionId": item["VersionId"]})
+            for start in range(0, len(versions), 1000):
+                if time.monotonic() >= deadline:
+                    raise StorageError("Deletion deadline exceeded")
+                response = self.client.delete_objects(
+                    Bucket=self.bucket,
+                    Delete={"Objects": versions[start : start + 1000], "Quiet": True},
+                )
+                if response.get("Errors"):
+                    raise StorageError("S3 version deletion incomplete")
+            for page in self.client.get_paginator("list_object_versions").paginate(
+                Bucket=self.bucket, Prefix=prefix
+            ):
+                if page.get("Versions") or page.get("DeleteMarkers"):
+                    raise StorageError("S3 retained workbook versions")
+        except StorageError:
+            raise
+        except Exception as exc:
+            raise StorageError("S3 workbook deletion failed") from exc
