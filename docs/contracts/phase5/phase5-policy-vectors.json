@@ -1,0 +1,259 @@
+{
+  "specification_version": "3.0.0",
+  "clock_initial_default": "2027-01-01T00:00:00Z",
+  "intervals": [
+    {
+      "name": "minimum",
+      "enabled": true,
+      "intervalDays": 1,
+      "valid": true
+    },
+    {
+      "name": "maximum",
+      "enabled": true,
+      "intervalDays": 90,
+      "valid": true
+    },
+    {
+      "name": "zero",
+      "enabled": true,
+      "intervalDays": 0,
+      "valid": false
+    },
+    {
+      "name": "over",
+      "enabled": true,
+      "intervalDays": 91,
+      "valid": false
+    },
+    {
+      "name": "bool",
+      "enabled": true,
+      "intervalDays": true,
+      "valid": false
+    },
+    {
+      "name": "string",
+      "enabled": true,
+      "intervalDays": "30",
+      "valid": false
+    },
+    {
+      "name": "decimal",
+      "enabled": true,
+      "intervalDays": 1.0,
+      "valid": false
+    }
+  ],
+  "cadence": [
+    {
+      "name": "one_day_exact",
+      "due": "2027-01-02T00:00:00Z",
+      "intervalDays": 1,
+      "now": "2027-01-02T00:00:00Z",
+      "audits": 1,
+      "nextAuditAt": "2027-01-03T00:00:00Z"
+    },
+    {
+      "name": "coalesce_without_drift",
+      "due": "2027-01-02T00:00:00Z",
+      "intervalDays": 1,
+      "now": "2027-01-05T12:00:00Z",
+      "audits": 1,
+      "nextAuditAt": "2027-01-06T00:00:00Z"
+    },
+    {
+      "name": "before_due",
+      "due": "2027-01-02T00:00:00Z",
+      "intervalDays": 1,
+      "now": "2027-01-01T23:59:59.999999Z",
+      "audits": 0,
+      "nextAuditAt": "2027-01-02T00:00:00Z"
+    },
+    {
+      "name": "ninety_days",
+      "due": "2027-04-01T00:00:00Z",
+      "intervalDays": 90,
+      "now": "2027-04-01T00:00:00Z",
+      "audits": 1,
+      "nextAuditAt": "2027-06-30T00:00:00Z"
+    }
+  ],
+  "initial_due": [
+    {
+      "now": "2027-01-01T00:00:00Z",
+      "intervalDays": 90,
+      "expected": "2027-04-01T00:00:00Z"
+    },
+    {
+      "now": "2028-01-01T00:00:00Z",
+      "intervalDays": 90,
+      "expected": "2028-03-31T00:00:00Z"
+    }
+  ],
+  "reminder_dates": [
+    {
+      "deadline": "2027-04-26",
+      "expected": {
+        "90": "2027-01-26T00:00:00Z",
+        "30": "2027-03-27T00:00:00Z",
+        "7": "2027-04-19T00:00:00Z"
+      }
+    },
+    {
+      "deadline": "2028-04-26",
+      "expected": {
+        "90": "2028-01-27T00:00:00Z",
+        "30": "2028-03-27T00:00:00Z",
+        "7": "2028-04-19T00:00:00Z"
+      }
+    }
+  ],
+  "reminder_eligibility": [
+    {
+      "latestStatus": null,
+      "findingCount": 0,
+      "eligible": true
+    },
+    {
+      "latestStatus": "PROCESSING",
+      "findingCount": 0,
+      "eligible": true
+    },
+    {
+      "latestStatus": "PROCESSING_FAILED",
+      "findingCount": 0,
+      "eligible": true
+    },
+    {
+      "latestStatus": "AUDIT_COMPLETE",
+      "findingCount": 0,
+      "eligible": false
+    },
+    {
+      "latestStatus": "REVIEW_REQUIRED",
+      "findingCount": 2,
+      "eligible": true
+    },
+    {
+      "latestStatus": "REMEDIATION_AVAILABLE",
+      "findingCount": 1,
+      "eligible": true
+    }
+  ],
+  "reminder_crossing": [
+    {
+      "name": "exact_threshold",
+      "configuredAt": "2027-01-25T00:00:00Z",
+      "old": "2027-01-25T00:00:00Z",
+      "new": "2027-01-26T00:00:00Z",
+      "deadline": "2027-04-26",
+      "alreadyConsidered": [],
+      "expectedOffsets": [
+        90
+      ]
+    },
+    {
+      "name": "jump_all_three",
+      "configuredAt": "2027-01-01T00:00:00Z",
+      "old": "2027-01-01T00:00:00Z",
+      "new": "2027-04-20T00:00:00Z",
+      "deadline": "2027-04-26",
+      "alreadyConsidered": [],
+      "expectedOffsets": [
+        90,
+        30,
+        7
+      ]
+    },
+    {
+      "name": "no_backfill",
+      "configuredAt": "2027-02-01T00:00:00Z",
+      "old": "2027-02-01T00:00:00Z",
+      "new": "2027-03-27T00:00:00Z",
+      "deadline": "2027-04-26",
+      "alreadyConsidered": [],
+      "expectedOffsets": [
+        30
+      ]
+    },
+    {
+      "name": "repeat_timestamp",
+      "configuredAt": "2027-01-01T00:00:00Z",
+      "old": "2027-01-26T00:00:00Z",
+      "new": "2027-01-26T00:00:00Z",
+      "deadline": "2027-04-26",
+      "alreadyConsidered": [
+        90
+      ],
+      "expectedOffsets": []
+    },
+    {
+      "name": "configure_exactly_due",
+      "configuredAt": "2027-01-26T00:00:00Z",
+      "old": "2027-01-26T00:00:00Z",
+      "new": "2027-01-26T00:00:00Z",
+      "deadline": "2027-04-26",
+      "alreadyConsidered": [],
+      "expectedOffsets": [
+        90
+      ]
+    }
+  ],
+  "profiles": {
+    "own": {
+      "required": [
+        "code",
+        "component",
+        "system",
+        "model"
+      ]
+    },
+    "cross": {
+      "required": [
+        "code",
+        "component",
+        "system"
+      ],
+      "forbidden": [
+        "model"
+      ]
+    }
+  },
+  "outcome_vectors": [
+    {
+      "observation": "Expected project rejection and all asserted safety effects match.",
+      "expectedOutcome": "pass",
+      "source": null
+    },
+    {
+      "observation": "Schema-valid completed findings differ from the independent oracle.",
+      "expectedOutcome": "fail",
+      "source": null
+    },
+    {
+      "observation": "An unexpected target internal processing failure prevents evaluation.",
+      "expectedOutcome": "error",
+      "source": "system"
+    },
+    {
+      "observation": "No response before network deadline.",
+      "expectedOutcome": "error",
+      "source": "communication"
+    },
+    {
+      "observation": "A required prerequisite did not execute successfully; this case never ran.",
+      "expectedOutcome": "skip",
+      "source": null
+    }
+  ],
+  "invariants": [
+    "Clock jumps never change real leases, queue deadlines or suite budgets.",
+    "A busy due version causes atomic clock rejection, not partial dispatch.",
+    "Returning to an old deadline cannot reissue a considered key.",
+    "Latest committed creation sequence includes generated outputs and excludes re-audit ordering.",
+    "A repeated exact schedule PUT preserves nextAuditAt.",
+    "Deadline-only updates preserve the periodic cadence.",
+    "A successful clean pre-dispatch audit suppresses reminders even if this clock call enqueues a new audit."
+  ]
+}

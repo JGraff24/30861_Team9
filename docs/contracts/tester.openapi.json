@@ -421,6 +421,9 @@
           },
           "system": {
             "$ref": "#/components/schemas/CoverageMeasure"
+          },
+          "model": {
+            "$ref": "#/components/schemas/CoverageMeasure"
           }
         },
         "required": [

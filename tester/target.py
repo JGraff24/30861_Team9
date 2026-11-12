@@ -19,9 +19,11 @@ import httpx
 from app.config import AppEnvironment
 from tester.config import TargetAuth, validate_base_url
 
-Identity = Literal["userA", "userB", "reviewer", "test-admin"]
+Identity = Literal["userA", "userB", "reviewer", "test-admin", "test-adminB"]
+Method = Literal["GET", "POST", "PUT", "DELETE"]
 Resolver = Callable[..., list[Any]]
-ResponseObserver = Callable[[str, str, str | None, httpx.Response], None]
+# (method, path, X-Test-Session, identity, response) for every completed call.
+ResponseObserver = Callable[[str, str, str | None, str | None, httpx.Response], None]
 
 GET_RETRIES = 3
 MAX_RESPONSE_BYTES = 2_097_152
@@ -37,6 +39,10 @@ class CommunicationError(Exception):
 
 class DeadlineExceeded(Exception):
     """The overall tester budget is spent; the tester, not the target, stops work."""
+
+
+class MissingCredential(Exception):
+    """An optional identity (for example a second test-admin) is not provisioned."""
 
 
 def check_address(host: str, environment: AppEnvironment, resolver: Resolver) -> None:
@@ -99,18 +105,24 @@ class TargetClient:
     def remaining(self) -> float:
         return self.deadline - self._clock()
 
+    def has_identity(self, identity: Identity) -> bool:
+        return identity != "test-adminB" or self._access.test_admin_b is not None
+
     def _token(self, identity: Identity) -> str:
         secret = {
             "userA": self._access.user_a,
             "userB": self._access.user_b,
             "reviewer": self._access.reviewer,
             "test-admin": self._access.test_admin,
+            "test-adminB": self._access.test_admin_b,
         }[identity]
+        if secret is None:
+            raise MissingCredential(f"identity {identity} is not provisioned for this target")
         return secret.get_secret_value()
 
     def request(
         self,
-        method: Literal["GET", "POST"],
+        method: Method,
         path: str,
         *,
         identity: Identity | None = None,
@@ -122,6 +134,9 @@ class TargetClient:
         **kwargs: Any,
     ) -> httpx.Response:
         """One bounded call. Only GET is retried, and only after transport failures.
+
+        PUT, POST and DELETE are never resent automatically (section 12); explicit schedule PUT
+        replay, identical clock replay and owner DELETE recovery are deliberate test steps.
 
         `max_bytes` bounds the response body; Phase 4 raises it to the section 10 JSON and
         binary transport limits so large outputs are never silently truncated.
@@ -214,6 +229,10 @@ class TargetClient:
             raise CommunicationError("request total deadline reached")
         if self.response_observer is not None:
             self.response_observer(
-                method, path, httpx.Headers(request_headers).get("x-test-session"), value
+                method,
+                path,
+                httpx.Headers(request_headers).get("x-test-session"),
+                identity if raw_token is None else None,
+                value,
             )
         return value

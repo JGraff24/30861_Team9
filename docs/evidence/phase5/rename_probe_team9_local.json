@@ -1,0 +1,242 @@
+{
+  "namespace": "t9-rename-probe-4874e9d01e13478b",
+  "summary": {
+    "variants": 10,
+    "classification_disagreements": [],
+    "rewrite_disagreements": [],
+    "apply_refused": []
+  },
+  "results": [
+    {
+      "variant": "no_references",
+      "description": "Generic Sheet1 with no reference to it anywhere (control).",
+      "sha256": "5c1db60bb68ccc29910be92b2cc5b0bfa3f88a4e2183a91289ab2e81bf4c2937",
+      "interpretation_question": null,
+      "upload_status": 202,
+      "audit_status": "REMEDIATION_AVAILABLE",
+      "worksheet_name_findings": [
+        {
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "other_findings": [],
+      "target_matches": true,
+      "finding_id_matches": true,
+      "classification_matches": true,
+      "apply_status": 202,
+      "remediation_status": "REMEDIATED",
+      "comparator_problems": [],
+      "output_worksheet_name_findings": []
+    },
+    {
+      "variant": "formula_unquoted",
+      "description": "Report!A1 =Sheet1!B2.",
+      "sha256": "c9817c1cec66f38d71e8ba3f06e98ce02ceb281b7356ebafd7287bba9ccd2534",
+      "interpretation_question": null,
+      "upload_status": 202,
+      "audit_status": "REMEDIATION_AVAILABLE",
+      "worksheet_name_findings": [
+        {
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "other_findings": [],
+      "target_matches": true,
+      "finding_id_matches": true,
+      "classification_matches": true,
+      "apply_status": 202,
+      "remediation_status": "REMEDIATED",
+      "comparator_problems": [],
+      "output_worksheet_name_findings": []
+    },
+    {
+      "variant": "formula_quoted",
+      "description": "Report!A1 ='Sheet1'!B3.",
+      "sha256": "60cb4ca8d1c49226874cc1429c64a0091482e4b0b5327e60d35b541b4c456dbd",
+      "interpretation_question": null,
+      "upload_status": 202,
+      "audit_status": "REMEDIATION_AVAILABLE",
+      "worksheet_name_findings": [
+        {
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "other_findings": [],
+      "target_matches": true,
+      "finding_id_matches": true,
+      "classification_matches": true,
+      "apply_status": 202,
+      "remediation_status": "REMEDIATED",
+      "comparator_problems": [],
+      "output_worksheet_name_findings": []
+    },
+    {
+      "variant": "formula_range",
+      "description": "Report!A1 =SUM(Sheet1!B2:B3).",
+      "sha256": "162316092c9d2e92e862051d5f7b882ab8cad2f94bb83a84c43782147ec81ae0",
+      "interpretation_question": null,
+      "upload_status": 202,
+      "audit_status": "REMEDIATION_AVAILABLE",
+      "worksheet_name_findings": [
+        {
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "other_findings": [],
+      "target_matches": true,
+      "finding_id_matches": true,
+      "classification_matches": true,
+      "apply_status": 202,
+      "remediation_status": "REMEDIATED",
+      "comparator_problems": [],
+      "output_worksheet_name_findings": []
+    },
+    {
+      "variant": "literals_only",
+      "description": "Ordinary text 'Sheet1!B2' and a string literal LEN(\"Sheet1\"); neither may change.",
+      "sha256": "f4cd157e8b1a95627c47282e2036ea75af7f6558c4b37b94f891b094db7c3882",
+      "interpretation_question": null,
+      "upload_status": 202,
+      "audit_status": "REMEDIATION_AVAILABLE",
+      "worksheet_name_findings": [
+        {
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "other_findings": [],
+      "target_matches": true,
+      "finding_id_matches": true,
+      "classification_matches": true,
+      "apply_status": 202,
+      "remediation_status": "REMEDIATED",
+      "comparator_problems": [],
+      "output_worksheet_name_findings": []
+    },
+    {
+      "variant": "defined_name",
+      "description": "Workbook defined name Totals=Sheet1!$B$2:$B$3.",
+      "sha256": "cb25b3a7bf77312e72c52120e29bc0898f45c7c7efc6acba7dbdfccc34f3ed7c",
+      "interpretation_question": null,
+      "upload_status": 202,
+      "audit_status": "REMEDIATION_AVAILABLE",
+      "worksheet_name_findings": [
+        {
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "other_findings": [],
+      "target_matches": true,
+      "finding_id_matches": true,
+      "classification_matches": true,
+      "apply_status": 202,
+      "remediation_status": "REMEDIATED",
+      "comparator_problems": [],
+      "output_worksheet_name_findings": []
+    },
+    {
+      "variant": "validation",
+      "description": "Report!C1 list validation =Sheet1!$B$2:$B$3.",
+      "sha256": "7a22ceb75682528960a47fef6d6878e3ce727d798615967b9e37e05301a31c44",
+      "interpretation_question": null,
+      "upload_status": 202,
+      "audit_status": "REMEDIATION_AVAILABLE",
+      "worksheet_name_findings": [
+        {
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "other_findings": [],
+      "target_matches": true,
+      "finding_id_matches": true,
+      "classification_matches": true,
+      "apply_status": 202,
+      "remediation_status": "REMEDIATED",
+      "comparator_problems": [],
+      "output_worksheet_name_findings": []
+    },
+    {
+      "variant": "conditional_x14",
+      "description": "Report!D1 cross-sheet conditional formula Sheet1!$B$2>5 in the x14 extension (xm:f).",
+      "sha256": "a0543fa58bee4a4fcd3860b294242a2e25566ac64e8e4556f8e3fdfba323e30f",
+      "interpretation_question": "Specification 2.1.0 \u00a78.4 makes an 'unsupported formula extension' MANUAL_REVIEW while requiring conditional-formatting references to be rewritten. Team 9 reads the x14 conditional formula (as Excel 2010+ writes cross-sheet rules) as supported; a team reading it as an unsupported extension would classify this rename MANUAL_REVIEW.",
+      "upload_status": 202,
+      "audit_status": "REMEDIATION_AVAILABLE",
+      "worksheet_name_findings": [
+        {
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "other_findings": [],
+      "target_matches": true,
+      "finding_id_matches": true,
+      "classification_matches": true,
+      "apply_status": 202,
+      "remediation_status": "REMEDIATED",
+      "comparator_problems": [],
+      "output_worksheet_name_findings": []
+    },
+    {
+      "variant": "hyperlink_location",
+      "description": "Report!E1 internal hyperlink location Sheet1!A1.",
+      "sha256": "f9d02ace774f5bfb650de1037b3ce17a741980ff82d0776b74c4774db6015667",
+      "interpretation_question": null,
+      "upload_status": 202,
+      "audit_status": "REMEDIATION_AVAILABLE",
+      "worksheet_name_findings": [
+        {
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "other_findings": [],
+      "target_matches": true,
+      "finding_id_matches": true,
+      "classification_matches": true,
+      "apply_status": 202,
+      "remediation_status": "REMEDIATED",
+      "comparator_problems": [],
+      "output_worksheet_name_findings": []
+    },
+    {
+      "variant": "chart_series",
+      "description": "Described chart whose series reads Sheet1!$B$2:$B$3.",
+      "sha256": "f47ab8fea1e28c86e1adc4a64f8c85095ca42d1b9d6708a91c89c680d6bacf99",
+      "interpretation_question": null,
+      "upload_status": 202,
+      "audit_status": "REMEDIATION_AVAILABLE",
+      "worksheet_name_findings": [
+        {
+          "worksheet": "Sheet1",
+          "target": "xl/worksheets/sheet1.xml#sheetId=1",
+          "classification": "REQUIRES_USER_INPUT"
+        }
+      ],
+      "other_findings": [],
+      "target_matches": true,
+      "finding_id_matches": true,
+      "classification_matches": true,
+      "apply_status": 202,
+      "remediation_status": "REMEDIATED",
+      "comparator_problems": [],
+      "output_worksheet_name_findings": []
+    }
+  ],
+  "target_url": "http://127.0.0.1:41095"
+}

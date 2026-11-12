@@ -187,7 +187,7 @@ def poll_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> AuditResp
     limits = ctx.suite.manifest.limits
     seconds = float(limits.audit_poll_seconds) if limits is not None else AUDIT_POLL_SECONDS
     give_up = ctx.clock() + seconds
-    if ctx.suite.manifest.phase == "4":
+    if ctx.suite.manifest.integrated:
         from tester.suite.async_work import tracker_for
 
         give_up = tracker_for(ctx).deadline("audit", ids.auditId, ctx.session_id, seconds)
@@ -212,7 +212,7 @@ def poll_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> AuditResp
             raise CheckFailed(f"{action} response identifiers differ from the requested resource.")
         if audit.rulesetVersion != ctx.suite.manifest.ruleset_version:
             raise CheckFailed(f"{action} reports a different ruleset.")
-        if ctx.suite.manifest.phase == "4" and audit.status != AuditStatus.PROCESSING:
+        if ctx.suite.manifest.integrated and audit.status != AuditStatus.PROCESSING:
             tracker_for(ctx).complete("audit", ids.auditId, ctx.session_id)
         if audit.status == AuditStatus.PROCESSING_FAILED:
             ctx.state["processing_failure"] = audit
@@ -377,7 +377,7 @@ def drain_intake_audit(ctx: SuiteContext, ids: UploadResponse, action: str) -> N
     Preparatory polling earns no coverage; genuine audit failures remain errors.
     Legacy suite execution and independent finding expectations stay unchanged.
     """
-    if ctx.suite.manifest.phase != "4":
+    if not ctx.suite.manifest.integrated:
         return
     ctx.setup_depth += 1
     try:
@@ -624,7 +624,7 @@ def determinism(ctx: SuiteContext) -> str:
         or [(f.message, f.recommendation) for f in audit.findings] != prose
     ):
         raise CheckFailed(f"Audit {run} of identical bytes returned different findings or prose.")
-    if ctx.suite.manifest.phase == "4":
+    if ctx.suite.manifest.integrated:
         first = require(ctx, "seeded_audit", "the valid first completed audit")
         if (audit.limitations, audit.status) != (first.limitations, first.status):
             raise CheckFailed(f"Audit {run} of identical bytes changed limitations or status.")

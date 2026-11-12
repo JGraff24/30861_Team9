@@ -242,6 +242,20 @@ class TesterStore:
         if changed != 1:
             raise RuntimeError("final reports are written once by the running suite")
 
+    def report_digests(self, target_url: str) -> dict[str, str]:
+        """SHA256 of every finalized stored report for one target (read-only evidence check)."""
+        import hashlib
+
+        if not self.exists():
+            return {}
+        with self._connect() as db:
+            rows = db.execute(
+                "SELECT session_id, report FROM tester_sessions "
+                "WHERE target_url = ? AND report IS NOT NULL",
+                (target_url,),
+            ).fetchall()
+        return {row["session_id"]: hashlib.sha256(row["report"]).hexdigest() for row in rows}
+
     def recover_preparing(self) -> None:
         """A stopped process's uncertain setup is not replayed; queue compensation."""
         with self._connect(write=True) as db:
