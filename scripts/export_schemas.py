@@ -31,6 +31,13 @@ from app.contracts.phase4 import (
     RemediationResponse,
     ReviewResponse,
 )
+from app.contracts.phase5 import (
+    ClockRequest,
+    ClockResponse,
+    NotificationResponse,
+    ScheduleRequest,
+    ScheduleResponse,
+)
 from app.main import create_app as create_system
 from tester.config import TesterSettings
 from tester.main import create_app as create_tester
@@ -53,6 +60,11 @@ def schema_documents() -> dict[str, dict[str, object]]:
         HistoryResponse,
         AuditReport,
         ProjectError,
+        ScheduleRequest,
+        ScheduleResponse,
+        NotificationResponse,
+        ClockRequest,
+        ClockResponse,
         SystemSetupRequest,
         SetupResponse,
         SystemReport,
@@ -76,11 +88,12 @@ def schema_documents() -> dict[str, dict[str, object]]:
         )
         document.setdefault("components", {}).setdefault("schemas", {}).update(schemas["$defs"])
         document["x-foundation-status"] = (
-            "Phase 4 backend contracts; execution requires installed Phase 4 engine capability"
+            "Phase 5 backend scheduling/deletion services; "
+            "isolated clock HTTP route is owned by Ryan"
             if name == "system"
             else "Independent tester setup/run/report delivered"
         )
-        document["x-team9-contract-profile"] = "2.1.0" if name == "system" else "1.0.0"
+        document["x-team9-contract-profile"] = "3.0.0" if name == "system" else "1.0.0"
         document["x-instructor-interface-version"] = "0.4.2"
         documents[name] = document
     return documents

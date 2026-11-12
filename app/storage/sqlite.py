@@ -4,8 +4,9 @@ import logging
 import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from uuid import uuid4
 
 from app.contracts.errors import (
     DuplicateIdentifierError,
@@ -37,7 +38,17 @@ from app.contracts.phase4 import (
     RemediationJob,
     RemediationRecord,
 )
+from app.contracts.phase5 import (
+    ClockResponse,
+    Notification,
+    NotificationResponse,
+    ScheduleRequest,
+    ScheduleResponse,
+    add_days,
+    reminder_time,
+)
 from app.services.reports import make_audit_result, report_snapshot
+from app.test_interface.activity import DEPLOYMENT_PROTECTION_SECONDS
 
 logger = logging.getLogger(__name__)
 
@@ -64,15 +75,19 @@ SCHEMA_V1 = (
 class SQLiteRepository:
     def __init__(self, path: Path) -> None:
         self.path = path
+        self._initialization_failed = False
 
     @contextmanager
     def _db(self, *, write: bool = False) -> Iterator[sqlite3.Connection]:
+        if self._initialization_failed:
+            raise StorageError("Metadata initialization requires recovery")
         connection = None
         try:
             connection = sqlite3.connect(self.path, timeout=5, isolation_level=None)
             connection.execute("PRAGMA foreign_keys=ON")
             connection.execute("PRAGMA busy_timeout=5000")
             connection.execute("PRAGMA synchronous=FULL")
+            connection.execute("PRAGMA secure_delete=ON")
             if write:
                 connection.execute("BEGIN IMMEDIATE")
             yield connection
@@ -89,12 +104,22 @@ class SQLiteRepository:
                 connection.close()
 
     def initialize(self) -> None:
+        self._initialization_failed = False
+        try:
+            self._initialize_schema()
+        except BaseException:
+            # Startup must fail closed even if migration reached schema 3 before
+            # the independent deletion journal could be read/replayed.
+            self._initialization_failed = True
+            raise
+
+    def _initialize_schema(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         with self._db() as db:
             db.execute("PRAGMA journal_mode=WAL")
         with self._db(write=True) as db:
             version = db.execute("PRAGMA user_version").fetchone()[0]
-            if version > 2:
+            if version > 3:
                 raise StorageError("Metadata schema is newer than this release")
             if version == 0:
                 for statement in SCHEMA_V1:
@@ -103,11 +128,15 @@ class SQLiteRepository:
             if version < 2:
                 self._migrate_phase4(db)
                 db.execute("PRAGMA user_version=2")
+            if version < 3:
+                self._migrate_phase5(db)
+                db.execute("PRAGMA user_version=3")
+        self._restore_deletion_fences()
 
     def health(self) -> bool:
         try:
             with self._db() as db:
-                return db.execute("PRAGMA user_version").fetchone()[0] == 2 and (
+                return db.execute("PRAGMA user_version").fetchone()[0] == 3 and (
                     db.execute("SELECT count(*) FROM jobs").fetchone() is not None
                 )
         except StorageError:
@@ -135,6 +164,7 @@ class SQLiteRepository:
         if version.blob_key != f"{namespace}/{workbook.workbook_id}/{version.version_id}/source":
             raise IntegrityError("Source key does not match upload namespace")
         with self._db(write=True) as db:
+            self._writable(db, workbook.workbook_id)
             if workbook.session_id is not None:
                 session = self._session(db, workbook.session_id)
                 if session.state != SessionState.READY:
@@ -145,8 +175,6 @@ class SQLiteRepository:
                 "SELECT deadline FROM upload_staging WHERE version_id=?", (version.version_id,)
             ).fetchone()
             if staging is not None:
-                from datetime import UTC
-
                 if datetime.fromisoformat(staging[0]) <= datetime.now(UTC):
                     raise StorageError("Upload storage reservation expired")
             existing = db.execute(
@@ -163,6 +191,15 @@ class SQLiteRepository:
                         workbook.owner_subject,
                         workbook.model_dump_json(),
                     ),
+                )
+            effective = self._effective_now(db, version.session_id, version.created_at)
+            version = version.model_copy(update={"created_at": effective})
+            audit = audit.model_copy(update={"started_at": effective})
+            if existing is None:
+                workbook = workbook.model_copy(update={"created_at": effective})
+                db.execute(
+                    "UPDATE workbooks SET payload=? WHERE id=?",
+                    (workbook.model_dump_json(), workbook.workbook_id),
                 )
             job = self._consume_fault(db, job)
             self._reserve_operation(db, version.version_id, "audit", job.job_id)
@@ -199,6 +236,8 @@ class SQLiteRepository:
 
     def get_version(self, workbook_id: str, version_id: str) -> VersionRecord | None:
         with self._db() as db:
+            if self._deleting(db, workbook_id):
+                return None
             row = db.execute(
                 "SELECT payload FROM versions WHERE id=? AND workbook_id=?",
                 (version_id, workbook_id),
@@ -207,6 +246,8 @@ class SQLiteRepository:
 
     def get_audit(self, workbook_id: str, version_id: str, audit_id: str) -> AuditRecord | None:
         with self._db() as db:
+            if self._deleting(db, workbook_id):
+                return None
             row = db.execute(
                 "SELECT a.payload FROM audits a JOIN versions v ON a.version_id=v.id "
                 "WHERE a.id=? AND v.id=? AND v.workbook_id=?",
@@ -270,7 +311,10 @@ class SQLiteRepository:
         )
         if audit.status != AuditStatus.PROCESSING or version.status != VersionStatus.PROCESSING:
             raise LeaseConflictError("Audit already terminal")
-        updated = make_audit_result(audit, evaluation, error, completed_at)
+        effective_completion = max(
+            audit.started_at, self._effective_now(db, job.session_id, completed_at)
+        )
+        updated = make_audit_result(audit, evaluation, error, effective_completion)
         status = updated.status.value
         if version.source_version_id is not None and error is None:
             status = "REMEDIATED"
@@ -484,8 +528,6 @@ class SQLiteRepository:
                 ),
                 (session_id,),
             ).fetchone()
-            from datetime import UTC
-
             staging_active = any(
                 datetime.fromisoformat(row[0]) > datetime.now(UTC)
                 for row in db.execute(
@@ -553,6 +595,11 @@ class SQLiteRepository:
                 (session_id,),
             )
             db.execute("DELETE FROM upload_staging WHERE session_id=?", (session_id,))
+            for table in ("schedules", "reminder_occurrences", "notifications", "deletions"):
+                db.execute(f"DELETE FROM {table} WHERE session_id=?", (session_id,))
+            session = session.model_copy(
+                update={"clock_current_time": None, "faults_remaining": {}}
+            )
             workbook_ids = "SELECT id FROM workbooks WHERE session_id=?"
             db.execute(
                 f"DELETE FROM idempotency WHERE workbook_id IN ({workbook_ids})", (session_id,)
@@ -768,6 +815,9 @@ class SQLiteRepository:
         if job.session_id is None:
             return job
         session = SQLiteRepository._session(db, job.session_id)
+        report_failure = SQLiteRepository._take_fault(db, job.session_id, "report_failures")
+        if report_failure:
+            return job.model_copy(update={"test_report_failure": True})
         if not session.audit_failures_remaining:
             return job
         SQLiteRepository._save_session(
@@ -784,6 +834,8 @@ class SQLiteRepository:
 
     def get_workbook(self, workbook_id: str) -> WorkbookRecord | None:
         with self._db() as db:
+            if self._deleting(db, workbook_id):
+                return None
             row = db.execute("SELECT payload FROM workbooks WHERE id=?", (workbook_id,)).fetchone()
             return WorkbookRecord.model_validate_json(row[0]) if row else None
 
@@ -796,6 +848,7 @@ class SQLiteRepository:
         if row is None:
             raise RecordNotFoundError("Version not found")
         current = VersionRecord.model_validate_json(row[0])
+        SQLiteRepository._writable(db, current.workbook_id)
         if (
             current.owner_subject != version.owner_subject
             or current.session_id != version.session_id
@@ -834,6 +887,9 @@ class SQLiteRepository:
                 and job.queue_deadline > job.created_at
             ):
                 raise IntegrityError("Reaudit relationships differ")
+            audit = audit.model_copy(
+                update={"started_at": self._effective_now(db, current.session_id, audit.started_at)}
+            )
             self._reserve_operation(db, current.version_id, "audit", job.job_id)
             db.execute(
                 "INSERT INTO audits VALUES (?,?,?)",
@@ -855,6 +911,7 @@ class SQLiteRepository:
 
     def history_records(self, workbook_id: str) -> tuple[list[VersionRecord], list[AuditRecord]]:
         with self._db() as db:
+            self._writable(db, workbook_id)
             versions = [
                 VersionRecord.model_validate_json(row[0])
                 for row in db.execute(
@@ -932,6 +989,20 @@ class SQLiteRepository:
             )
             if replay:
                 return replay
+            remediation = remediation.model_copy(
+                update={
+                    "created_at": self._effective_now(
+                        db, current.session_id, remediation.created_at
+                    )
+                }
+            )
+            job = job.model_copy(
+                update={
+                    "test_remediation_failure": self._take_fault(
+                        db, current.session_id, "remediation_failures"
+                    )
+                }
+            )
             self._reserve_operation(db, current.version_id, "remediation", job.job_id)
             if current.latest_audit_id != remediation.source_audit_id:
                 raise ProjectException(409, "STALE_AUDIT", "Use the latest accepted audit.")
@@ -1047,12 +1118,18 @@ class SQLiteRepository:
             row = db.execute(
                 "SELECT payload FROM remediations WHERE id=?", (remediation_id,)
             ).fetchone()
-            return RemediationRecord.model_validate_json(row[0]) if row else None
+            if row is None:
+                return None
+            record = RemediationRecord.model_validate_json(row[0])
+            return None if self._deleting(db, record.workbook_id) else record
 
     def get_output(self, output_id: str) -> OutputRecord | None:
         with self._db() as db:
             row = db.execute("SELECT payload FROM outputs WHERE id=?", (output_id,)).fetchone()
-            return OutputRecord.model_validate_json(row[0]) if row else None
+            if row is None:
+                return None
+            record = OutputRecord.model_validate_json(row[0])
+            return None if self._deleting(db, record.workbook_id) else record
 
     @staticmethod
     def _remediation_job(db: sqlite3.Connection, job_id: str) -> RemediationJob:
@@ -1101,8 +1178,6 @@ class SQLiteRepository:
             raise LeaseConflictError("Worker has no live remediation lease")
 
     def register_candidate(self, job_id: str, worker_id: str, digest: str) -> None:
-        from datetime import UTC
-
         with self._db(write=True) as db:
             job = self._remediation_job(db, job_id)
             self._live_remediation(job, worker_id, datetime.now(UTC))
@@ -1112,6 +1187,7 @@ class SQLiteRepository:
 
     def reserve_upload_blob(self, version: VersionRecord, deadline: datetime) -> None:
         with self._db(write=True) as db:
+            self._writable(db, version.workbook_id)
             if (
                 db.execute(
                     "SELECT 1 FROM versions WHERE id=? OR blob_key=?",
@@ -1148,8 +1224,6 @@ class SQLiteRepository:
             )
 
     def pending_blob_cleanup(self) -> list[tuple[str, str]]:
-        from datetime import UTC
-
         with self._db() as db:
             failed = [
                 (row[0], row[1])
@@ -1237,7 +1311,11 @@ class SQLiteRepository:
                 and audit.status == AuditStatus.PROCESSING
             ):
                 raise IntegrityError("Published output provenance differs")
-            updated_audit = make_audit_result(audit, evaluation, None, completed_at)
+            effective = self._effective_now(db, job.session_id, completed_at)
+            version = version.model_copy(update={"created_at": max(version.created_at, effective)})
+            updated_audit = make_audit_result(
+                audit, evaluation, None, max(effective, audit.started_at)
+            )
             updated_version = version.model_copy(update={"status": VersionStatus.REMEDIATED})
             updated_remediation = remediation.model_copy(
                 update={
@@ -1342,3 +1420,568 @@ class SQLiteRepository:
                 self._fail_remediation(db, job, error)
                 count += 1
         return count
+
+    @staticmethod
+    def _migrate_phase5(db: sqlite3.Connection) -> None:
+        # Existing payloads and immutable report bytes are untouched.
+        for statement in (
+            "CREATE TABLE schedules (workbook_id TEXT PRIMARY KEY REFERENCES workbooks(id), "
+            "session_id TEXT, payload TEXT NOT NULL, deadline_since TEXT NOT NULL)",
+            "CREATE TABLE reminder_occurrences (workbook_id TEXT REFERENCES workbooks(id), "
+            "session_id TEXT, deadline TEXT, offset INTEGER, PRIMARY "
+            "KEY(workbook_id,deadline,offset))",
+            "CREATE TABLE notifications (sequence INTEGER PRIMARY KEY AUTOINCREMENT, "
+            "workbook_id TEXT REFERENCES workbooks(id), session_id TEXT, "
+            "scheduled_for TEXT, payload TEXT)",
+            "CREATE TABLE deletions (workbook_id TEXT PRIMARY KEY, session_id "
+            "TEXT, owner TEXT NOT NULL)",
+            "CREATE TABLE deleted_workbooks (workbook_id TEXT PRIMARY KEY)",
+            "CREATE INDEX notification_order ON notifications(workbook_id,scheduled_for,sequence)",
+        ):
+            db.execute(statement)
+
+    @staticmethod
+    def _deleting(db: sqlite3.Connection, wid: str) -> bool:
+        return (
+            db.execute("SELECT 1 FROM deletions WHERE workbook_id=?", (wid,)).fetchone() is not None
+        )
+
+    @staticmethod
+    def _writable(db: sqlite3.Connection, wid: str) -> None:
+        if (
+            SQLiteRepository._deleting(db, wid)
+            or db.execute("SELECT 1 FROM deleted_workbooks WHERE workbook_id=?", (wid,)).fetchone()
+        ):
+            raise ProjectException(404, "NOT_FOUND", "Workbook is unavailable.")
+
+    @staticmethod
+    def _effective_now(db: sqlite3.Connection, sid: str | None, real: datetime) -> datetime:
+        if sid is None:
+            return real
+        session = SQLiteRepository._session(db, sid)
+        return session.clock_current_time or real
+
+    def effective_now(self, session_id: str | None) -> datetime:
+        with self._db() as db:
+            return self._effective_now(db, session_id, datetime.now(UTC))
+
+    @staticmethod
+    def _take_fault(db: sqlite3.Connection, sid: str | None, key: str) -> bool:
+        if sid is None:
+            return False
+        session = SQLiteRepository._session(db, sid)
+        if not session.faults_remaining.get(key):
+            return False
+        remaining = dict(session.faults_remaining)
+        remaining[key] = 0
+        SQLiteRepository._save_session(
+            db, session.model_copy(update={"faults_remaining": remaining})
+        )
+        return True
+
+    def consume_storage_fault(self, session_id: str | None) -> bool:
+        with self._db(write=True) as db:
+            return self._take_fault(db, session_id, "storage_failures")
+
+    @staticmethod
+    def _newest(db: sqlite3.Connection, wid: str) -> VersionRecord:
+        row = db.execute(
+            "SELECT v.payload FROM versions v JOIN record_order o ON o.record_id=v.id "
+            "AND o.kind='version' WHERE v.workbook_id=? ORDER BY o.sequence DESC LIMIT 1",
+            (wid,),
+        ).fetchone()
+        if row is None:
+            raise ProjectException(404, "NOT_FOUND", "Stored version is unavailable.")
+        return VersionRecord.model_validate_json(row[0])
+
+    @staticmethod
+    def _schedule(db: sqlite3.Connection, wid: str) -> ScheduleResponse:
+        SQLiteRepository._writable(db, wid)
+        version = SQLiteRepository._newest(db, wid)
+        row = db.execute("SELECT payload FROM schedules WHERE workbook_id=?", (wid,)).fetchone()
+        if row:
+            return ScheduleResponse.model_validate_json(row[0]).model_copy(
+                update={"versionId": version.version_id}
+            )
+        return ScheduleResponse(
+            workbookId=wid,
+            enabled=False,
+            intervalDays=None,
+            complianceDeadline=None,
+            versionId=version.version_id,
+            nextAuditAt=None,
+            reminderDays=(90, 30, 7),
+        )
+
+    def get_schedule(self, workbook_id: str) -> ScheduleResponse:
+        with self._db() as db:
+            return self._schedule(db, workbook_id)
+
+    def configure_schedule(self, workbook_id: str, request: ScheduleRequest) -> ScheduleResponse:
+        with self._db(write=True) as db:
+            previous = self._schedule(db, workbook_id)
+            version = self._newest(db, workbook_id)
+            now = self._effective_now(db, version.session_id, datetime.now(UTC))
+            next_due = previous.nextAuditAt
+            if not request.enabled:
+                next_due = None
+            elif not previous.enabled or request.intervalDays != previous.intervalDays:
+                assert request.intervalDays is not None
+                next_due = add_days(now, request.intervalDays)
+            response = ScheduleResponse(
+                **(
+                    request.model_dump()
+                    | {
+                        "workbookId": workbook_id,
+                        "versionId": version.version_id,
+                        "nextAuditAt": next_due,
+                        "reminderDays": (90, 30, 7),
+                    }
+                )
+            )
+            old = db.execute(
+                "SELECT deadline_since FROM schedules WHERE workbook_id=?", (workbook_id,)
+            ).fetchone()
+            since = (
+                old[0]
+                if old and previous.complianceDeadline == request.complianceDeadline
+                else now.isoformat()
+            )
+            db.execute(
+                "INSERT INTO schedules VALUES (?,?,?,?) ON CONFLICT(workbook_id) DO UPDATE SET "
+                "payload=excluded.payload,deadline_since=excluded.deadline_since",
+                (workbook_id, version.session_id, response.model_dump_json(), since),
+            )
+            return response
+
+    def get_notifications(self, workbook_id: str) -> NotificationResponse:
+        with self._db() as db:
+            self._writable(db, workbook_id)
+            records = [
+                Notification.model_validate_json(row[0])
+                for row in db.execute(
+                    "SELECT payload FROM notifications WHERE workbook_id=? ORDER BY "
+                    "scheduled_for,sequence",
+                    (workbook_id,),
+                )
+            ]
+            return NotificationResponse(notifications=records)
+
+    def process_schedules(
+        self,
+        current_time: datetime,
+        *,
+        session_id: str | None = None,
+        ruleset_version: str = "2.0.0",
+        queue_seconds: float = 15,
+        owner_subject: str | None = None,
+    ) -> ClockResponse:
+        """One durable claim transaction. Test clock callers supply the creating admin subject.
+
+        Ordinary ticks skip busy versions; isolated advances reject the entire work set.
+        Queue/lease timestamps are always real UTC, independently of effective calendar time.
+        """
+        with self._db(write=True) as db:
+            session = None
+            if session_id is not None:
+                session = self._session(db, session_id)
+                if session.owner_subject != owner_subject:
+                    raise ProjectException(
+                        403, "FORBIDDEN", "Session belongs to another administrator."
+                    )
+                if session.state != SessionState.READY:
+                    raise ProjectException(409, "SESSION_NOT_READY", "Test session is not ready.")
+                if session.clock_current_time is None:
+                    raise ProjectException(
+                        409, "LEGACY_SESSION_CLOCK", "Prepare a fresh clock session."
+                    )
+                if current_time < session.clock_current_time:
+                    raise ProjectException(400, "CLOCK_REWIND", "Test time cannot move backward.")
+                if db.execute(
+                    "SELECT 1 FROM deletions WHERE session_id=?", (session_id,)
+                ).fetchone():
+                    raise ProjectException(
+                        409, "DELETION_IN_PROGRESS", "Workbook cleanup is pending."
+                    )
+            rows = db.execute(
+                "SELECT workbook_id,payload,deadline_since FROM schedules "
+                "WHERE session_id IS ? AND workbook_id NOT IN (SELECT workbook_id FROM deletions)",
+                (session_id,),
+            ).fetchall()
+            audits: list[tuple[datetime, str, ScheduleResponse, VersionRecord]] = []
+            reminders: list[tuple[datetime, str, int, str, VersionRecord, bool]] = []
+            for wid, payload, since in rows:
+                policy = ScheduleResponse.model_validate_json(payload)
+                version = self._newest(db, wid)
+                # Capture eligibility before this transaction accepts any new audit.
+                audit_row = db.execute(
+                    "SELECT payload FROM audits WHERE id=?", (version.latest_audit_id,)
+                ).fetchone()
+                audit = AuditRecord.model_validate_json(audit_row[0]) if audit_row else None
+                eligible = (
+                    audit is None
+                    or audit.status in (AuditStatus.PROCESSING, AuditStatus.PROCESSING_FAILED)
+                    or bool(audit.findings)
+                )
+                if (
+                    policy.enabled
+                    and policy.nextAuditAt is not None
+                    and policy.nextAuditAt <= current_time
+                ):
+                    busy = db.execute(
+                        "SELECT 1 FROM active_operations WHERE version_id=?", (version.version_id,)
+                    ).fetchone()
+                    if busy and session_id is not None:
+                        raise ProjectException(
+                            409, "ACTIVE_OPERATION", "A due version has active work."
+                        )
+                    if not busy:
+                        audits.append((policy.nextAuditAt, wid, policy, version))
+                if policy.complianceDeadline:
+                    for offset in (90, 30, 7):
+                        due = reminder_time(policy.complianceDeadline, offset)
+                        if (
+                            due is not None
+                            and datetime.fromisoformat(since) <= due <= current_time
+                            and not db.execute(
+                                "SELECT 1 FROM reminder_occurrences WHERE workbook_id=? "
+                                "AND deadline=? "
+                                "AND offset=?",
+                                (wid, policy.complianceDeadline, offset),
+                            ).fetchone()
+                        ):
+                            reminders.append(
+                                (due, wid, offset, policy.complianceDeadline, version, eligible)
+                            )
+            if session_id is not None and (len(audits) > 1000 or len(reminders) > 3000):
+                raise ProjectException(
+                    409, "CLOCK_WORK_LIMIT", "Scheduled work exceeds the atomic processing limit."
+                )
+            if session_id is None:
+                audits = sorted(audits, key=lambda a: (a[0], a[1]))[:1000]
+                reminders = sorted(reminders, key=lambda r: (r[0], r[1], -r[2]))[:3000]
+            # Precompute every calendar result before mutating anything (including faults).
+            plans = []
+            for due, wid, policy, version in sorted(audits, key=lambda a: (a[0], a[1])):
+                assert policy.intervalDays is not None
+                interval = timedelta(days=policy.intervalDays)
+                steps = (current_time - due) // interval + 1
+                next_due = add_days(due, steps * policy.intervalDays)
+                plans.append((due, wid, policy, version, next_due))
+            audit_ids: list[str] = []
+            notification_ids: list[str] = []
+            real = datetime.now(UTC)
+            for due, wid, policy, version, next_due in plans:
+                aid, jid = uuid4().hex, uuid4().hex
+                audit = AuditRecord(
+                    audit_id=aid,
+                    workbook_id=wid,
+                    version_id=version.version_id,
+                    owner_subject=version.owner_subject,
+                    session_id=session_id,
+                    ruleset_version=ruleset_version,
+                    status=AuditStatus.PROCESSING,
+                    started_at=current_time,
+                    completed_at=None,
+                    findings=[],
+                    limitations=[],
+                    error=None,
+                )
+                job = JobRecord(
+                    job_id=jid,
+                    audit_id=aid,
+                    workbook_id=wid,
+                    version_id=version.version_id,
+                    session_id=session_id,
+                    state=JobState.QUEUED,
+                    created_at=real,
+                    queue_deadline=real + timedelta(seconds=queue_seconds),
+                    worker_id=None,
+                    lease_expires_at=None,
+                    test_scheduled_audit_failure=self._take_fault(
+                        db, session_id, "scheduled_audit_failures"
+                    ),
+                )
+                self._reserve_operation(db, version.version_id, "audit", jid)
+                db.execute(
+                    "INSERT INTO audits VALUES (?,?,?)",
+                    (aid, version.version_id, audit.model_dump_json()),
+                )
+                db.execute(
+                    "INSERT INTO jobs VALUES (?,?,?,?)",
+                    (jid, aid, job.state, job.model_dump_json()),
+                )
+                version = version.model_copy(
+                    update={"latest_audit_id": aid, "status": VersionStatus.PROCESSING}
+                )
+                db.execute(
+                    "UPDATE versions SET payload=? WHERE id=?",
+                    (version.model_dump_json(), version.version_id),
+                )
+                self._order(db, wid, "audit", aid)
+                policy = policy.model_copy(update={"nextAuditAt": next_due})
+                db.execute(
+                    "UPDATE schedules SET payload=? WHERE workbook_id=?",
+                    (policy.model_dump_json(), wid),
+                )
+                audit_ids.append(aid)
+                logger.info(
+                    "scheduled_audit_accepted",
+                    extra={
+                        "schedulerId": jid,
+                        "auditId": aid,
+                        "workbookId": wid,
+                        "sessionId": session_id,
+                        "dispatchLag": (current_time - due).total_seconds(),
+                    },
+                )
+            for due, wid, offset, deadline, version, eligible in sorted(
+                reminders, key=lambda r: (r[0], r[1], -r[2])
+            ):
+                db.execute(
+                    "INSERT INTO reminder_occurrences VALUES (?,?,?,?)",
+                    (wid, session_id, deadline, offset),
+                )
+                if not eligible:
+                    continue
+                failed = self._take_fault(db, session_id, "notification_failures")
+                notification = Notification(
+                    notificationId=uuid4().hex,
+                    workbookId=wid,
+                    versionId=version.version_id,
+                    scheduledFor=due,
+                    status="FAILED" if failed else "DELIVERED",
+                    message="Reminder recording failed in the isolated test session."
+                    if failed
+                    else (
+                        f"The supplied compliance deadline is {offset} days away. "
+                        "Review the stored workbook findings."
+                    ),
+                )
+                db.execute(
+                    "INSERT INTO "
+                    "notifications(workbook_id,session_id,scheduled_for,payload) VALUES "
+                    "(?,?,?,?)",
+                    (
+                        wid,
+                        session_id,
+                        due.isoformat(timespec="microseconds"),
+                        notification.model_dump_json(),
+                    ),
+                )
+                notification_ids.append(notification.notificationId)
+                logger.log(
+                    logging.ERROR if failed else logging.INFO,
+                    "notification_recorded",
+                    extra={
+                        "workbookId": wid,
+                        "sessionId": session_id,
+                        "status": notification.status,
+                    },
+                )
+            if session is not None:
+                # Fault consumption may have updated this same session payload.
+                session = self._session(db, session.session_id)
+                self._save_session(
+                    db,
+                    session.model_copy(
+                        update={
+                            "clock_current_time": current_time,
+                            "deployment_protected_until": max(
+                                session.deployment_protected_until or real,
+                                real + timedelta(seconds=DEPLOYMENT_PROTECTION_SECONDS),
+                            ),
+                        }
+                    ),
+                )
+            return ClockResponse(
+                currentTime=current_time,
+                triggeredAudits=audit_ids,
+                triggeredNotifications=notification_ids,
+            )
+
+    def deletion_owner(self, workbook_id: str) -> tuple[str, str | None] | None:
+        with self._db() as db:
+            row = db.execute(
+                "SELECT owner,session_id FROM deletions WHERE workbook_id=?", (workbook_id,)
+            ).fetchone()
+            return (row[0], row[1]) if row else None
+
+    def begin_workbook_deletion(
+        self, workbook_id: str, owner: str, session_id: str | None
+    ) -> list[str]:
+        with self._db(write=True) as db:
+            pending = db.execute(
+                "SELECT owner,session_id FROM deletions WHERE workbook_id=?", (workbook_id,)
+            ).fetchone()
+            if pending:
+                if tuple(pending) != (owner, session_id):
+                    raise ProjectException(404, "NOT_FOUND", "Workbook is unavailable.")
+            else:
+                row = db.execute(
+                    "SELECT owner,session_id FROM workbooks WHERE id=?", (workbook_id,)
+                ).fetchone()
+                if row is None or row[1] != session_id:
+                    raise ProjectException(404, "NOT_FOUND", "Workbook is unavailable.")
+                if row[0] != owner:
+                    raise ProjectException(
+                        403, "FORBIDDEN", "Only the owner may delete this workbook."
+                    )
+                self._recover(db, datetime.now(UTC))
+                if db.execute(
+                    "SELECT 1 FROM active_operations a JOIN versions v ON a.version_id=v.id "
+                    "WHERE v.workbook_id=?",
+                    (workbook_id,),
+                ).fetchone():
+                    raise ProjectException(409, "ACTIVE_OPERATION", "Workbook has active work.")
+                prefix = f"tests/{session_id}" if session_id else "ordinary"
+                if db.execute(
+                    "SELECT 1 FROM upload_staging WHERE blob_key LIKE ? AND "
+                    "julianday(deadline)>julianday(?)",
+                    (f"{prefix}/{workbook_id}/%", datetime.now(UTC).isoformat()),
+                ).fetchone():
+                    raise ProjectException(409, "ACTIVE_OPERATION", "Workbook upload is active.")
+                if self._take_fault(db, session_id, "deletion_failures"):
+                    # Commit consumption, then report failure without reserving/removing anything.
+                    return ["TEST_DELETION_FAILURE"]
+                db.execute("INSERT INTO deletions VALUES (?,?,?)", (workbook_id, session_id, owner))
+            return self._workbook_blob_keys(db, workbook_id, session_id)
+
+    @staticmethod
+    def _workbook_blob_keys(db: sqlite3.Connection, wid: str, sid: str | None) -> list[str]:
+        prefix = f"tests/{sid}" if sid else "ordinary"
+        return [
+            row[0]
+            for row in db.execute(
+                "SELECT blob_key FROM versions WHERE workbook_id=? UNION "
+                "SELECT j.blob_key FROM remediation_jobs j JOIN remediations r ON "
+                "j.remediation_id=r.id "
+                "JOIN versions v ON r.source_version_id=v.id WHERE v.workbook_id=? UNION "
+                "SELECT blob_key FROM upload_staging WHERE blob_key LIKE ? UNION "
+                "SELECT blob_key FROM retired_blobs WHERE blob_key LIKE ?",
+                (wid, wid, f"{prefix}/{wid}/%", f"{prefix}/{wid}/%"),
+            )
+        ]
+
+    @staticmethod
+    def _erase_workbook(db: sqlite3.Connection, wid: str) -> None:
+        """FK-ordered erasure also used on registered metadata backup copies."""
+        for table in (
+            "schedules",
+            "reminder_occurrences",
+            "notifications",
+            "idempotency",
+            "outputs",
+            "record_order",
+        ):
+            db.execute(f"DELETE FROM {table} WHERE workbook_id=?", (wid,))
+        db.execute(
+            "DELETE FROM remediation_jobs WHERE remediation_id IN (SELECT r.id FROM remediations r "
+            "JOIN versions v ON r.source_version_id=v.id WHERE v.workbook_id=?)",
+            (wid,),
+        )
+        db.execute(
+            "DELETE FROM remediations WHERE source_version_id IN (SELECT id FROM "
+            "versions WHERE workbook_id=?)",
+            (wid,),
+        )
+        db.execute(
+            "DELETE FROM reports WHERE audit_id IN (SELECT a.id FROM audits a JOIN "
+            "versions v ON a.version_id=v.id WHERE v.workbook_id=?)",
+            (wid,),
+        )
+        db.execute(
+            "DELETE FROM jobs WHERE audit_id IN (SELECT a.id FROM audits a JOIN "
+            "versions v ON a.version_id=v.id WHERE v.workbook_id=?)",
+            (wid,),
+        )
+        db.execute(
+            "DELETE FROM active_operations WHERE version_id IN (SELECT id FROM "
+            "versions WHERE workbook_id=?)",
+            (wid,),
+        )
+        db.execute(
+            "DELETE FROM audits WHERE version_id IN (SELECT id FROM versions WHERE workbook_id=?)",
+            (wid,),
+        )
+        db.execute("DELETE FROM versions WHERE workbook_id=?", (wid,))
+        db.execute("DELETE FROM workbooks WHERE id=?", (wid,))
+        db.execute("INSERT OR IGNORE INTO deleted_workbooks VALUES (?)", (wid,))
+
+    def finish_workbook_deletion(self, workbook_id: str) -> None:
+        with self._db(write=True) as db:
+            row = db.execute(
+                "SELECT session_id FROM deletions WHERE workbook_id=?", (workbook_id,)
+            ).fetchone()
+            if row is None:
+                raise ProjectException(404, "NOT_FOUND", "Deletion reservation is unavailable.")
+            prefix = f"tests/{row[0]}" if row[0] else "ordinary"
+            for table in ("upload_staging", "retired_blobs"):
+                db.execute(
+                    f"DELETE FROM {table} WHERE blob_key LIKE ?", (f"{prefix}/{workbook_id}/%",)
+                )
+            self._erase_workbook(db, workbook_id)
+        self.compact_deleted_content()
+        with self._db(write=True) as db:
+            db.execute("DELETE FROM deletions WHERE workbook_id=?", (workbook_id,))
+
+    def compact_deleted_content(self) -> None:
+        # Remove freed pages and WAL copies before acknowledging deletion. No transaction
+        # may hold an old content snapshot; otherwise leave the reservation recoverable.
+        with self._db() as db:
+            if db.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()[0]:
+                raise StorageError("Content checkpoint is busy")
+            db.execute("VACUUM")
+            if db.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()[0]:
+                raise StorageError("Content checkpoint is busy")
+
+    def monitoring_snapshot(self) -> dict[str, int]:
+        with self._db() as db:
+            return {
+                "queueDepth": db.execute(
+                    "SELECT count(*) FROM jobs WHERE state='QUEUED'"
+                ).fetchone()[0]
+                + db.execute(
+                    "SELECT count(*) FROM remediation_jobs WHERE state='QUEUED'"
+                ).fetchone()[0],
+                "failedJobs": db.execute(
+                    "SELECT count(*) FROM jobs WHERE state='FAILED'"
+                ).fetchone()[0]
+                + db.execute(
+                    "SELECT count(*) FROM remediation_jobs WHERE state='FAILED'"
+                ).fetchone()[0],
+                "notificationFailures": db.execute(
+                    "SELECT count(*) FROM notifications WHERE "
+                    "json_extract(payload,'$.status')='FAILED'"
+                ).fetchone()[0],
+                "pendingDeletions": db.execute("SELECT count(*) FROM deletions").fetchone()[0],
+            }
+
+    def record_deletion(self, workbook_id: str) -> None:
+        # Deliberately separate from restorable content-bearing database backups.
+        journal = self.path.with_suffix(self.path.suffix + ".deletions")
+        try:
+            with sqlite3.connect(journal, timeout=2) as db:
+                db.execute("PRAGMA synchronous=FULL")
+                db.execute("CREATE TABLE IF NOT EXISTS deleted (workbook_id TEXT PRIMARY KEY)")
+                db.execute("INSERT OR IGNORE INTO deleted VALUES (?)", (workbook_id,))
+        except sqlite3.Error as exc:
+            raise StorageError("Deletion journal unavailable") from exc
+
+    def _restore_deletion_fences(self) -> None:
+        journal = self.path.with_suffix(self.path.suffix + ".deletions")
+        if not journal.exists():
+            return
+        try:
+            with sqlite3.connect(journal, timeout=2) as ledger:
+                deleted = [row[0] for row in ledger.execute("SELECT workbook_id FROM deleted")]
+            with self._db(write=True) as db:
+                for wid in deleted:
+                    db.execute(
+                        "INSERT OR IGNORE INTO deletions SELECT id,session_id,owner FROM "
+                        "workbooks WHERE id=?",
+                        (wid,),
+                    )
+                    db.execute("INSERT OR IGNORE INTO deleted_workbooks VALUES (?)", (wid,))
+        except sqlite3.Error as exc:
+            raise StorageError("Deletion journal replay failed") from exc

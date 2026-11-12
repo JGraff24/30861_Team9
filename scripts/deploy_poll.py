@@ -83,7 +83,7 @@ def deployed_sha(root: Path) -> str:
 def execute(candidate: Path, sha: str, repository: str) -> int:
     with subprocess.Popen([sys.executable, str(candidate), sha, repository]) as process:
         try:
-            return process.wait(timeout=2400)
+            return process.wait(timeout=7200)
         except subprocess.TimeoutExpired:
             # Allow the host's SIGTERM handler time to restore the previous release.
             process.terminate()

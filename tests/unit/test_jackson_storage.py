@@ -115,7 +115,7 @@ def test_schema_initialize_is_idempotent_and_foreign_keys(repository: SQLiteRepo
         assert db.execute("PRAGMA foreign_keys").fetchone()[0] == 1
         assert db.execute("PRAGMA journal_mode").fetchone()[0] == "wal"
         assert db.execute("PRAGMA busy_timeout").fetchone()[0] == 5000
-        assert db.execute("PRAGMA user_version").fetchone()[0] == 2
+        assert db.execute("PRAGMA user_version").fetchone()[0] == 3
     with sqlite3.connect(repository.path) as db:
         db.execute("PRAGMA user_version=99")
     with pytest.raises(StorageError):

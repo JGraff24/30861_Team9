@@ -32,7 +32,9 @@ from app.contracts.phase4 import (
     RemediationResponse,
     ReviewResponse,
 )
+from app.contracts.phase5 import NotificationResponse, ScheduleRequest, ScheduleResponse
 from app.contracts.ports import SystemServices
+from app.services.lifecycle import LifecycleService
 from app.services.projects import ProjectService
 
 MAX_JSON_REQUEST_BYTES = 1_048_576
@@ -193,6 +195,7 @@ def download_responses(media_type: str, schema: dict[str, Any]) -> dict[int | st
 def create_router(services: SystemServices) -> APIRouter:
     router = APIRouter(prefix="/api/v1")
     projects = ProjectService(services)
+    lifecycle = LifecycleService(services)
 
     def context(request: Request, *ids: str) -> tuple[Principal, str | None]:
         if services.auth_service is None:
@@ -384,5 +387,61 @@ def create_router(services: SystemServices) -> APIRouter:
         if len(data) > MAX_JSON_RESPONSE_BYTES:
             raise ProjectException(500, "RESULT_TOO_LARGE", "Serialized report exceeds its limit.")
         return attachment(data, name, "application/json")
+
+    @router.get(
+        "/workbooks/{workbookId}/schedule",
+        response_model=ScheduleResponse,
+        responses=ERRORS,
+        openapi_extra=operation(),
+    )
+    def get_schedule(request: Request, workbookId: str) -> Response:
+        user, session = context(request, workbookId)
+        return json_response(lifecycle.get_schedule(workbookId, user, session))
+
+    @router.put(
+        "/workbooks/{workbookId}/schedule",
+        response_model=ScheduleResponse,
+        responses=ERRORS,
+        openapi_extra=operation(body=request_definition(ScheduleRequest)),
+    )
+    async def configure_schedule(request: Request, workbookId: str) -> Response:
+        user, session = await run_in_threadpool(context, request, workbookId)
+        await run_in_threadpool(projects.authorize_workbook, workbookId, user, session, True)
+        body = await read_json(request)
+        return json_response(
+            await run_in_threadpool(lifecycle.configure_schedule, workbookId, user, session, body)
+        )
+
+    @router.get(
+        "/workbooks/{workbookId}/notifications",
+        response_model=NotificationResponse,
+        responses=ERRORS,
+        openapi_extra=operation(),
+    )
+    def notifications(request: Request, workbookId: str) -> Response:
+        user, session = context(request, workbookId)
+        return json_response(lifecycle.get_notifications(workbookId, user, session))
+
+    @router.delete(
+        "/workbooks/{workbookId}",
+        status_code=204,
+        response_class=Response,
+        responses=ERRORS,
+        openapi_extra=operation(),
+    )
+    async def delete_workbook(request: Request, workbookId: str) -> Response:
+        import asyncio
+
+        user, session = await run_in_threadpool(context, request, workbookId)
+        try:
+            async with asyncio.timeout(29):
+                await run_in_threadpool(lifecycle.delete_workbook, workbookId, user, session)
+        except TimeoutError:
+            raise ProjectException(
+                500,
+                "DELETION_FAILED",
+                "Workbook cleanup is incomplete; the owner may retry deletion.",
+            ) from None
+        return Response(status_code=204, headers={"Cache-Control": "no-store"})
 
     return router
