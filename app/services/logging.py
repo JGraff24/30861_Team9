@@ -13,6 +13,12 @@ class SafeJSONFormatter(logging.Formatter):
             "event": record.getMessage(),
         }
         for key in (
+            "schedulerId",
+            "dispatchLag",
+            "queueDepth",
+            "failedJobs",
+            "notificationFailures",
+            "pendingDeletions",
             "requestId",
             "jobId",
             "auditId",

@@ -27,7 +27,7 @@ def test_deployment_renderer(tmp_path: Path) -> None:
     nginx = (output / "nginx.conf").read_text()
     assert "server_name review.invalid;" in nginx
     assert "proxy_set_header Host $host;" in nginx
-    assert "proxy_read_timeout 1900s;" in nginx
+    assert "proxy_read_timeout 2700s;" in nginx
     assert subprocess.run(command, cwd=root, env=env, capture_output=True).returncode != 0
     env["SERVER_NAME"] = "bad; injected"
     command[-1] = str(tmp_path / "invalid")
@@ -115,7 +115,7 @@ def test_designated_production_target_overrides_only_release_capabilities() -> N
         "FIXTURE_MANIFEST_PATH: /service/.venv/lib/python3.12/site-packages/"
         "tester/fixtures/manifest-phase4.json" in source
     )
-    assert 'TESTER_RUN_TIMEOUT_SECONDS: "1800"' in source
+    assert 'TESTER_RUN_TIMEOUT_SECONDS: "2400"' in source
     assert "env_file: ${TEAM9_ENV_FILE:" in source
     assert "SYSTEM_TOKEN_HASHES_JSON:" not in source
     assert "TARGET_AUTH_MAP_JSON:" not in source

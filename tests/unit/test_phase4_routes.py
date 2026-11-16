@@ -93,9 +93,9 @@ def test_new_routes_are_present_and_catalog_is_valid(boundary_client: TestClient
     document = boundary_client.get("/openapi.json").json()
     validate(document)
     assert document["openapi"] == "3.1.1"
-    assert document["x-specification-version"] == "2.1.0"
+    assert document["x-specification-version"] == "3.0.0"
     business = {path for path in document["paths"] if path.startswith("/api/v1/")}
-    assert len(business) == 13
+    assert len(business) == 16
     assert document["paths"]["/api/v1/health"]["get"]["security"] == []
     for path in business - {"/api/v1/health"}:
         for operation in document["paths"][path].values():
@@ -103,12 +103,12 @@ def test_new_routes_are_present_and_catalog_is_valid(boundary_client: TestClient
             assert operation["responses"]["409"]["content"]["application/json"]["schema"] == {
                 "$ref": "#/components/schemas/ProjectError"
             }
-            assert (
-                "X-Request-ID"
-                in operation["responses"]["200" if "get" in document["paths"][path] else "202"][
-                    "headers"
-                ]
+            success = next(
+                response
+                for code, response in operation["responses"].items()
+                if code in {"200", "202", "204"}
             )
+            assert "X-Request-ID" in success["headers"]
 
 
 def test_download_disposition_preserves_unicode_without_header_injection() -> None:
@@ -454,6 +454,8 @@ def shared_schema_validate(definition: str, value: object) -> None:
 
     path = Path(__file__).parents[2] / "docs/contracts/phase4/phase4-wire-schemas.json"
     definitions = json.loads(path.read_text(encoding="utf-8"))["$defs"]
+    # Phase 5 changes only new snapshot labels; the retained Phase 4 schema stays byte-identical.
+    definitions["AuditReport"]["properties"]["specificationVersion"] = {"enum": ["2.1.0", "3.0.0"]}
     Draft202012Validator(
         {"$defs": definitions, "$ref": f"#/$defs/{definition}"}, format_checker=FormatChecker()
     ).validate(value)

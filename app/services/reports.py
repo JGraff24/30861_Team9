@@ -132,12 +132,16 @@ def make_audit_result(
         audit.model_dump()
         | {
             "status": status,
-            "completed_at": completed_at,
+            "completed_at": max(completed_at, audit.started_at),
             "findings": findings,
             "limitations": sorted(set(evaluation.limitations)) if evaluation else [],
             "error": error,
             "review_context": evaluation.review_context if evaluation else None,
-            "checks_performed": evaluation.checks_performed if evaluation else [],
+            "checks_performed": (
+                evaluation.checks_performed
+                if evaluation
+                else (RULE_IDS if error and error.code == "TEST_REPORT_FAILURE" else [])
+            ),
         }
     )
     bounded_json(result.model_dump(mode="json"))
@@ -171,7 +175,7 @@ def report_snapshot(
                 )
     report = AuditReport(
         reportVersion="2.0.0",
-        specificationVersion="2.1.0",
+        specificationVersion="3.0.0",
         workbookId=version.workbook_id,
         versionId=version.version_id,
         auditId=audit.audit_id,

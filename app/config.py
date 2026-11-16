@@ -61,6 +61,10 @@ class SystemSettings(EnvironmentSettings):
     engine_memory_limit_mib: Annotated[int, Field(gt=0)] = 512
     enable_test_interface: bool = False
     enable_test_audit_faults: bool = False
+    enable_test_clock: bool = False
+    managed_metadata_backup_root: Path | None = None
+    managed_metadata_backups: list[Path] = Field(default_factory=list)
+    managed_blob_backups: list[Path] = Field(default_factory=list)
     test_session_users: dict[NonemptyText, list[NonemptyText]] = Field(
         default_factory=dict,
         validation_alias="TEST_SESSION_USERS_JSON",

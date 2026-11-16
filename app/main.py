@@ -25,6 +25,7 @@ from app.contracts.phase4 import (
     ReauditRequest,
     RemediationRequest,
 )
+from app.contracts.phase5 import ScheduleRequest
 from app.contracts.ports import (
     AuthService,
     BlobStore,
@@ -105,7 +106,7 @@ def create_app(
         title="Team 9 system",
         version="0.4.0",
         description=(
-            "Phase 4 backend contracts and durable workbook operations. "
+            "Phase 5 scheduling, notifications, deletion and durable workbook operations. "
             "Engine capability is checked at runtime."
         ),
         root_path=container.settings.api_root_path,
@@ -228,7 +229,7 @@ def create_app(
         _, catalog = models_json_schema(
             [
                 (model, "serialization")
-                for model in (AuditReport, ReauditRequest, RemediationRequest)
+                for model in (AuditReport, ReauditRequest, RemediationRequest, ScheduleRequest)
             ],
             ref_template="#/components/schemas/{model}",
         )
@@ -256,14 +257,32 @@ def create_app(
                     }
         document["paths"]["/api/v1/health"]["get"]["security"] = []
         document["x-operation-status"] = {
-            "delivered-backend-routes": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "S", "V", "R"],
-            "pending-business-operations": [11, 12, 13, 14],
+            "delivered-backend-routes": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                14,
+                "S",
+                "V",
+                "R",
+                "G",
+            ],
+            "pending-business-operations": [13],
             "integration-note": (
                 "Health checks storage and configured ruleset capability. "
                 "Phase 4 audit/correction execution requires the Phase 4 engine port."
             ),
         }
-        document["x-specification-version"] = "2.1.0"
+        document["x-specification-version"] = "3.0.0"
         document["x-target-ruleset-version"] = "2.0.0"
         return document
 

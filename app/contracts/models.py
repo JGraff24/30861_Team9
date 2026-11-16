@@ -237,10 +237,27 @@ class SystemSetupRequest(ContractModel):
                         "pattern": "^[A-Za-z0-9_-]+$",
                     },
                 },
+                "clock": {
+                    "type": "object",
+                    "properties": {"currentTime": {"type": "string", "format": "date-time"}},
+                    "required": ["currentTime"],
+                    "additionalProperties": False,
+                },
                 "faults": {
                     "type": "object",
-                    "properties": {"audit_failures": {"type": "integer", "const": 1}},
-                    "required": ["audit_failures"],
+                    "properties": {
+                        name: {"type": "integer", "const": 1}
+                        for name in (
+                            "audit_failures",
+                            "report_failures",
+                            "storage_failures",
+                            "remediation_failures",
+                            "scheduled_audit_failures",
+                            "notification_failures",
+                            "deletion_failures",
+                        )
+                    },
+                    "minProperties": 1,
                     "additionalProperties": False,
                 },
             },
@@ -250,21 +267,28 @@ class SystemSetupRequest(ContractModel):
 
     @model_validator(mode="after")
     def known_setup_keys(self) -> Self:
-        if set(self.setup) - {"cleanup_session_ids", "faults"}:
+        if set(self.setup) - {"cleanup_session_ids", "faults", "clock"}:
             raise ValueError("unknown setup keys")
         if "cleanup_session_ids" in self.setup:
             from pydantic import TypeAdapter
 
             TypeAdapter(list[Identifier]).validate_python(self.setup["cleanup_session_ids"])
+        if "clock" in self.setup:
+            from app.contracts.phase5 import ClockRequest
+
+            ClockRequest.model_validate(self.setup["clock"])
         if "faults" in self.setup:
+            from app.contracts.phase5 import FAULT_KEYS
+
             faults = self.setup["faults"]
             if not (
                 isinstance(faults, dict)
-                and set(faults) == {"audit_failures"}
-                and type(faults["audit_failures"]) is int
-                and faults["audit_failures"] == 1
+                and bool(faults)
+                and set(faults) <= FAULT_KEYS
+                and all(type(value) is int and value == 1 for value in faults.values())
+                and not {"audit_failures", "report_failures"} <= set(faults)
             ):
-                raise ValueError("faults requires exactly audit_failures integer 1")
+                raise ValueError("faults requires supported, unambiguous integer 1 controls")
         return self
 
 
@@ -512,6 +536,8 @@ class JobRecord(ContractModel):
     worker_id: NonemptyText | None
     lease_expires_at: UTCDateTime | None
     test_audit_failure: bool = False
+    test_report_failure: bool = False
+    test_scheduled_audit_failure: bool = False
 
 
 class TestSession(ContractModel):
@@ -524,6 +550,10 @@ class TestSession(ContractModel):
     revision: NonemptyText
     cleanup_error: NonemptyText | None
     audit_failures_remaining: Annotated[StrictInt, Field(ge=0, le=1)] = 0
+    clock_current_time: UTCDateTime | None = None
+    faults_remaining: dict[str, Annotated[StrictInt, Field(ge=0, le=1)]] = Field(
+        default_factory=dict
+    )
     # Internal optional metadata; never returned by the instructor interface.
     deployment_protected_until: UTCDateTime | None = None
 
