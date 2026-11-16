@@ -133,7 +133,10 @@ uncertain setup/upload/re-audit/run POST. Each prepared tester session permits o
 Trusted server configuration selects own/cross profiles using `TESTER_TEAM_ID` and exact
 `TARGET_TEAM_MAP_JSON` entries. Production Compose explicitly declares its own system URL
 through `TESTER_OWN_TARGET_URL`, derived from the operator-supplied `SERVER_NAME`; that exact
-approved URL is merged into the trusted map without replacing cross-team entries. Own-team reports require `coverage.model` and a complete valid
+approved URL is merged into the trusted map. Production also declares Team 12's unchanged URL
+as `team12` through `TESTER_DEPLOYMENT_TEAM_MAP_JSON`. These deployment identities preserve
+private map entries and existing credentials; conflicting identities fail configuration.
+Both exact URLs must remain approved in private configuration. Own-team reports require `coverage.model` and a complete valid
 design map; cross-team reports omit the key entirely. Grader setup has no credentials or team
 flags. `pass`, `fail`, `error` and `skip` remain distinct. Coverage means evaluated scope, not
 acceptance: an HTTP-only run cannot count UI component C9 or AC-17. Code measurement covers
@@ -300,8 +303,9 @@ visible; no rules or expectations were changed to suppress it.
 Use [the deployment runbook](deploy/README.md) and [automatic deployment procedure](deploy/AUTODEPLOY.md).
 Development Compose is `docker compose -f deploy/compose.yaml up --build` with private inputs;
 use `http://system:8000` in the Docker tester's exact target maps. Production uses persistent
-storage, private S3, HTTPS, two worker slots and the installed Phase 5 manifest. Production declares its own exact system identity; private cross-team
-URL→team entries must be configured before reciprocal setup. Push CI for the exact main SHA
+storage, private S3, HTTPS, two worker slots and the installed Phase 5 manifest. Production declares
+both its own exact system identity and Team 12's existing URL. Their credentials and target
+approvals remain in private configuration. Push CI for the exact main SHA
 controls automatic host activation; a local branch is not a deployment.
 
 Schema 3 preserves earlier audits/reports. Successful deletion must also purge registered

@@ -4,14 +4,14 @@ Prepared by Dixon (Team 9), November 12 2026; integration configuration updated 
 Every value marked **pending** must come from Team 12 or the pod record (ADOPTION.md), never
 from a guess.
 
-## Inputs still needed
+## Known inputs and remaining deployment checks
 
 | Item | Status | Where it goes |
 |---|---|---|
-| Team 12 system base URL (no `/test` suffix, query, fragment or credentials; HTTPS) | **pending** | `ALLOWED_TARGET_URLS` |
-| Private credentials: `userA`, `userB`, `reviewer` (read grant from userA only), `test-admin` | **pending** | `TARGET_AUTH_MAP_JSON[<url>]` (private env, never committed or printed) |
+| Team 12 system base URL | `https://13.184.14.226.sslip.io`, confirmed unchanged by Jackson November 16 | Existing private `ALLOWED_TARGET_URLS` |
+| Private credentials: `userA`, `userB`, `reviewer` (read grant from userA only), `test-admin` | Confirmed unchanged by Jackson; reuse existing private values, verify deployed configuration | `TARGET_AUTH_MAP_JSON[<url>]` (private env, never committed or printed) |
 | Optional second test-admin `test-adminB` for the foreign-admin clock cases | **pending** (without it two cases skip) | same map |
-| Team 12 team ID as Team 12 records it | **pending** | `TARGET_TEAM_MAP_JSON[<url>]` |
+| Team 12 identity in Team 9's trusted tester configuration | `team12`, explicitly supplied by production Compose | `TESTER_DEPLOYMENT_TEAM_MAP_JSON` merged with private `TARGET_TEAM_MAP_JSON` |
 | Designated test deployment with clock and fault capabilities enabled | **pending confirmation** | Team 12 configuration |
 | Team 12 target release SHA/tag for the run record | **pending** | `run_suite.py --target-revision` |
 | Pod adoption of specification/pack 3.0.0 and this suite's manifest/fixture hashes | **pending** | ADOPTION.md |
@@ -21,7 +21,8 @@ from a guess.
 ```
 FIXTURE_MANIFEST_PATH=<wheel>/tester/fixtures/manifest-phase5.json   # or tests/fixtures/...
 TESTER_TEAM_ID=team9
-TARGET_TEAM_MAP_JSON={"<team12 url>": "<team12 id>"}   # exact URL; different team => cross
+TESTER_DEPLOYMENT_TEAM_MAP_JSON={"https://13.184.14.226.sslip.io":"team12"}
+# Existing TARGET_TEAM_MAP_JSON entries are preserved; conflicting identities are rejected.
 ALLOWED_TARGET_URLS=[..., "<team12 url>"]
 TARGET_AUTH_MAP_JSON={"<team12 url>": {"userA": ..., "userB": ..., "reviewer": ..., "test-admin": ...}}
 ```
@@ -29,6 +30,10 @@ TARGET_AUTH_MAP_JSON={"<team12 url>": {"userA": ..., "userB": ..., "reviewer": .
 The profile is decided only by this trusted configuration and is frozen with the session at
 setup: a cross-team report omits `coverage.model` entirely, and the tester never needs Team 12's
 design map. The instructor setup body stays exactly `{"target_url": ...}`.
+
+The required tokens and URL are unchanged; no new required token exchange is needed.
+The optional second administrator enables two additional checks. Deployment readiness checks
+both declared identities and their credential entries without contacting Team 12.
 
 The hosted tester proxy now allows 2,700 s (`deploy/nginx.conf.template`), the Phase 5 plan
 carries the 2,400 s suite budget, and `scripts/run_suite.py` reads the 2,430 s caller timeout

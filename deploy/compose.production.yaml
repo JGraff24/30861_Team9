@@ -45,7 +45,9 @@ services:
       FIXTURE_MANIFEST_PATH: /service/.venv/lib/python3.12/site-packages/tester/fixtures/manifest-phase5.json
       TESTER_TEAM_ID: team9
       TESTER_OWN_TARGET_URL: https://${SERVER_NAME:?Set deployed hostname}/system
-      # Additional exact cross-team mappings remain in the private env_file.
+      # Team 12 retains its Phase 4 URL and private target credentials.
+      TESTER_DEPLOYMENT_TEAM_MAP_JSON: '{"https://13.184.14.226.sslip.io":"team12"}'
+      # Merge deployment identities with additional mappings in the private env_file.
       TESTER_RUN_TIMEOUT_SECONDS: "2400"
       AWS_EC2_METADATA_DISABLED: "true"
     command: ["uvicorn", "tester.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8001", "--no-access-log"]

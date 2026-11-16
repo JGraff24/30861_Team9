@@ -102,6 +102,11 @@ class TesterSettings(EnvironmentSettings):
     target_team_map: dict[NonemptyText, NonemptyText] = Field(
         default_factory=dict, validation_alias="TARGET_TEAM_MAP_JSON"
     )
+    # Public identities declared by the trusted deployment, merged without replacing
+    # private targets or credentials. All URLs still require explicit approval.
+    tester_deployment_team_map: dict[NonemptyText, NonemptyText] = Field(
+        default_factory=dict, validation_alias="TESTER_DEPLOYMENT_TEAM_MAP_JSON"
+    )
     tester_design_map_path: Path | None = Field(
         default_factory=lambda: next(
             (
@@ -132,6 +137,12 @@ class TesterSettings(EnvironmentSettings):
             raise ValueError("allowed target URLs must be unique")
         if set(self.target_auth_map) - set(self.allowed_target_urls):
             raise ValueError("target access map keys must be exact approved base URLs")
+        for url, team in self.tester_deployment_team_map.items():
+            validate_base_url(url, self.app_env)
+            mapped = self.target_team_map.get(url)
+            if mapped is not None and mapped != team:
+                raise ValueError("deployment target conflicts with its configured team identity")
+        self.target_team_map = {**self.target_team_map, **self.tester_deployment_team_map}
         if self.tester_own_target_url is not None:
             own = self.tester_own_target_url
             validate_base_url(own, self.app_env)
