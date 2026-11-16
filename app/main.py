@@ -25,7 +25,7 @@ from app.contracts.phase4 import (
     ReauditRequest,
     RemediationRequest,
 )
-from app.contracts.phase5 import ScheduleRequest
+from app.contracts.phase5 import ClockRequest, ScheduleRequest
 from app.contracts.ports import (
     AuthService,
     BlobStore,
@@ -229,7 +229,13 @@ def create_app(
         _, catalog = models_json_schema(
             [
                 (model, "serialization")
-                for model in (AuditReport, ReauditRequest, RemediationRequest, ScheduleRequest)
+                for model in (
+                    AuditReport,
+                    ReauditRequest,
+                    RemediationRequest,
+                    ScheduleRequest,
+                    ClockRequest,
+                )
             ],
             ref_template="#/components/schemas/{model}",
         )

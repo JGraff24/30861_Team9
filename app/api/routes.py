@@ -1,5 +1,6 @@
-"""Phase 4 business HTTP boundary, with authorization before request semantics."""
+"""Business HTTP boundary, with authorization before request semantics."""
 
+import asyncio
 import json
 import re
 import unicodedata
@@ -32,11 +33,18 @@ from app.contracts.phase4 import (
     RemediationResponse,
     ReviewResponse,
 )
-from app.contracts.phase5 import NotificationResponse, ScheduleRequest, ScheduleResponse
+from app.contracts.phase5 import (
+    ClockRequest,
+    ClockResponse,
+    NotificationResponse,
+    ScheduleRequest,
+    ScheduleResponse,
+)
 from app.contracts.ports import SystemServices
 from app.services.lifecycle import LifecycleService
 from app.services.projects import ProjectService
 
+CLOCK_TIMEOUT_SECONDS = 10
 MAX_JSON_REQUEST_BYTES = 1_048_576
 MAX_JSON_RESPONSE_BYTES = 67_108_864
 XLSX_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -430,8 +438,6 @@ def create_router(services: SystemServices) -> APIRouter:
         openapi_extra=operation(),
     )
     async def delete_workbook(request: Request, workbookId: str) -> Response:
-        import asyncio
-
         user, session = await run_in_threadpool(context, request, workbookId)
         try:
             async with asyncio.timeout(29):
@@ -443,5 +449,46 @@ def create_router(services: SystemServices) -> APIRouter:
                 "Workbook cleanup is incomplete; the owner may retry deletion.",
             ) from None
         return Response(status_code=204, headers={"Cache-Control": "no-store"})
+
+    @router.post(
+        "/test/clock",
+        response_model=ClockResponse,
+        responses=ERRORS,
+        openapi_extra=operation(body=request_definition(ClockRequest))
+        | {
+            "parameters": [
+                {
+                    **SESSION_PARAMETER,
+                    "required": True,
+                    "description": "READY namespace owned by the creating test administrator.",
+                }
+            ]
+        },
+    )
+    async def advance_clock(request: Request) -> Response:
+        # This capability gate deliberately precedes authentication/body parsing.
+        session = request.headers.get("x-test-session")
+        if not services.settings.enable_test_clock or session is None:
+            raise ProjectException(404, "TEST_CLOCK_DISABLED", "Isolated clock is unavailable.")
+        if services.auth_service is None:
+            raise ProjectException(503, "SERVICE_UNAVAILABLE", "Authentication unavailable.")
+        try:
+            async with asyncio.timeout(CLOCK_TIMEOUT_SECONDS):
+                principal = await run_in_threadpool(
+                    services.auth_service.require_test_admin, bearer(request)
+                )
+                session = _identifier(session)
+                await run_in_threadpool(lifecycle.authorize_clock, principal, session)
+                body = await read_json(request)
+                return json_response(
+                    await run_in_threadpool(lifecycle.advance_clock, principal, session, body)
+                )
+        except TimeoutError:
+            # The transaction may have committed: explicit same-time replay is safe.
+            raise ProjectException(
+                503,
+                "SERVICE_UNAVAILABLE",
+                "Clock response timed out; check by repeating the same time.",
+            ) from None
 
     return router

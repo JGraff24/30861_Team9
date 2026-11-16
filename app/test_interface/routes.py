@@ -2,7 +2,6 @@
 
 import asyncio
 from collections.abc import Awaitable, Callable
-from json import JSONDecodeError
 from typing import Any
 
 from fastapi import APIRouter, Request
@@ -10,6 +9,7 @@ from fastapi.responses import JSONResponse
 from pydantic import TypeAdapter, ValidationError
 from starlette.concurrency import run_in_threadpool
 
+from app.api.routes import read_json
 from app.contracts.errors import DuplicateIdentifierError, ProjectException, SessionBusyError
 from app.contracts.models import (
     Identifier,
@@ -24,7 +24,7 @@ from app.contracts.ports import SystemServices
 SETUP_TIMEOUT_SECONDS = 30
 REPORT_TIMEOUT_SECONDS = 10
 ERRORS: dict[int | str, dict[str, Any]] = {
-    status: {"model": TestEndpointError} for status in (400, 401, 403, 404, 409, 500, 503)
+    status: {"model": TestEndpointError} for status in (400, 401, 403, 404, 409, 413, 500, 503)
 }
 AUTH: dict[str, Any] = {"security": [{"BearerAuth": []}]}
 
@@ -73,8 +73,8 @@ def create_router(services: SystemServices) -> APIRouter:
     async def setup(request: Request) -> JSONResponse:
         async def action(principal: Principal) -> JSONResponse:
             try:
-                body = SystemSetupRequest.model_validate(await request.json())
-            except (ValidationError, JSONDecodeError, UnicodeDecodeError):
+                body = SystemSetupRequest.model_validate(await read_json(request))
+            except ValidationError:
                 raise ProjectException(400, "INVALID_REQUEST", "Invalid test request.") from None
             assert services.session_service is not None
             await run_in_threadpool(

@@ -1,0 +1,92 @@
+{
+  "date": "2026-11-16",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "python": "3.12.15",
+  "branch": "feature/ryan-phase5-ui",
+  "base": "842c1e7665915ce98683e8e3a865a034ff5f67ec",
+  "combinedVerificationCommit": "459d6b4f8a7b544c9117bcf4a1c3abedac5f5935",
+  "sourceManifest": "ryan_source_manifest.json",
+  "httpCandidateManifest": "ryan_http_candidate_manifest.json",
+  "localRegression": {
+    "passed": 1063,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 4,
+    "seconds": 251.517
+  },
+  "combinedRegression": {
+    "passed": 1115,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 5,
+    "seconds": 379.597
+  },
+  "postTypeNarrowingRetest": {
+    "ownFake": "pass",
+    "crossFake": "pass",
+    "seconds": 13.58
+  },
+  "independentHttpSuite": {
+    "profile": "own",
+    "passed": 392,
+    "skipped": 3,
+    "failed": 0,
+    "errors": 0,
+    "launcherWallWindowSeconds": 895.66,
+    "timingScope": "Upper bound from launcher log creation through persisted report; includes startup/prechecks. AC-18 test durations use monotonic time."
+  },
+  "browsers": {
+    "legacySimulated": 26,
+    "phase5Simulated": 16,
+    "realStack": 2,
+    "basePrefixes": [
+      "/",
+      "/system"
+    ]
+  },
+  "accessibility": {
+    "axeVersion": "4.11.0",
+    "scans": 84,
+    "violations": 0,
+    "incompleteRules": [
+      "color-contrast"
+    ],
+    "manualKeyboardValidation": "PENDING",
+    "minimumComputedTextContrast": 8.137418719154375
+  },
+  "staticChecks": {
+    "ruff": "pass",
+    "format": "pass",
+    "mypyPrimary": "pass (103 source files)",
+    "mypyCombined": "pass (117 source files)",
+    "schemas": "pass",
+    "javascriptSyntax": "pass",
+    "installedWheel": "pass",
+    "processSmoke": "pass",
+    "dependencyAudit": "no known vulnerabilities in pinned runtime/measurement requirements",
+    "pack": "passed unchanged hash manifest, 59 definitions, 26 valid and 21 negative examples"
+  },
+  "actions": {
+    "prCreated": false,
+    "pushed": false,
+    "deployed": false,
+    "sharedPackModified": false
+  },
+  "performanceDetail": {
+    "artifact": "ryan_performance.json",
+    "measuredRuns": 15,
+    "success": 15,
+    "controlledFailure": 0,
+    "uncontrolled": 0,
+    "findingsIdenticalPerWorkload": true,
+    "maxEndToEndSeconds": 27.52,
+    "maxEngineSeconds": 21.079,
+    "maxQueueSeconds": 0.203,
+    "clock": "real monotonic; includes validation, queue, engine, worker and end-to-end split",
+    "revision": {
+      "commit": "459d6b4f8a7b544c9117bcf4a1c3abedac5f5935",
+      "branch": "HEAD",
+      "dirtyPaths": []
+    }
+  }
+}

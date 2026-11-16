@@ -1,0 +1,16 @@
+{"base": "", "scenario": "workflow", "status": "pass", "target": "simulated"}
+{"base": "", "scenario": "empty", "status": "pass", "target": "simulated"}
+{"base": "", "scenario": "reviewer", "status": "pass", "target": "simulated"}
+{"base": "", "scenario": "lost-save", "status": "pass", "target": "simulated"}
+{"base": "", "scenario": "busy", "status": "pass", "target": "simulated"}
+{"base": "", "scenario": "predelete", "status": "pass", "target": "simulated"}
+{"base": "", "scenario": "partial", "status": "pass", "target": "simulated"}
+{"base": "", "scenario": "lost-delete", "status": "pass", "target": "simulated"}
+{"base": "/system", "scenario": "workflow", "status": "pass", "target": "simulated"}
+{"base": "/system", "scenario": "empty", "status": "pass", "target": "simulated"}
+{"base": "/system", "scenario": "reviewer", "status": "pass", "target": "simulated"}
+{"base": "/system", "scenario": "lost-save", "status": "pass", "target": "simulated"}
+{"base": "/system", "scenario": "busy", "status": "pass", "target": "simulated"}
+{"base": "/system", "scenario": "predelete", "status": "pass", "target": "simulated"}
+{"base": "/system", "scenario": "partial", "status": "pass", "target": "simulated"}
+{"base": "/system", "scenario": "lost-delete", "status": "pass", "target": "simulated"}

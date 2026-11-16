@@ -33,10 +33,38 @@ Results support human review and are not a compliance determination.</p>
 <button id="refresh-history" type="button">Refresh history</button>
 <ul id="history"></ul>
 </section>
+<section id="lifecycle-panel" hidden aria-labelledby="schedule-heading">
+<h2 id="schedule-heading">Schedule and notifications</h2>
+<p>Scheduled audits check the stored version only. Changes to an external workbook cannot be detected until a new version is uploaded.</p>
+<div id="lifecycle-data">
+<dl id="schedule-summary"></dl>
+<form id="schedule-form" aria-describedby="schedule-help">
+<label for="schedule-enabled">Periodic audits</label>
+<select id="schedule-enabled"><option value="false">Disabled</option><option value="true">Enabled</option></select>
+<label for="schedule-interval">Interval in days (1–90)</label>
+<input id="schedule-interval" type="number" min="1" max="90" step="1">
+<label for="schedule-deadline">Institution-supplied deadline (optional)</label>
+<input id="schedule-deadline" type="date" min="0001-01-01" max="9999-12-31">
+<p id="schedule-help">Disabling periodic audits keeps deadline reminders. Clear the deadline to stop reminders too. Saving replaces the full schedule settings.</p>
+<button id="clear-deadline" type="button">Clear deadline</button>
+<button id="save-schedule" type="submit">Save schedule</button>
+</form>
+<button id="refresh-lifecycle" type="button">Refresh schedule and notifications</button>
+<h3>Notification history</h3>
+<p>DELIVERED means recorded here, not an email delivery.</p>
+<p id="notifications-empty"></p><ul id="notifications"></ul>
+</div>
+<div id="delete-controls" hidden>
+<h3>Delete workbook</h3>
+<p id="delete-state" role="status"></p>
+<button id="delete-workbook" type="button">Delete workbook…</button>
+</div>
+</section>
 <section id="results" aria-labelledby="results-heading" hidden>
 <h2 id="results-heading" tabindex="-1">Results</h2>
 <dl id="metadata"></dl>
 <p id="selection-note"></p>
+<p>Scheduled audits check the stored version only. Changes to an external workbook cannot be detected until a new version is uploaded.</p>
 <div class="actions">
 <button id="source-download" type="button">Download selected workbook</button>
 <button id="report-download" type="button">Download audit report (JSON)</button>
@@ -60,4 +88,10 @@ Results support human review and are not a compliance determination.</p>
 <p id="status" role="status" aria-live="polite" aria-atomic="true"></p>
 <p id="error" role="alert"></p>
 <button id="retry" type="button" hidden>Resume pending operation</button>
+<dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description">
+<h2 id="delete-title">Confirm workbook deletion</h2>
+<p id="delete-description"></p>
+<button id="cancel-delete" type="button" autofocus>Cancel</button>
+<button id="confirm-delete" type="button">Confirm deletion</button>
+</dialog>
 </main></body></html>

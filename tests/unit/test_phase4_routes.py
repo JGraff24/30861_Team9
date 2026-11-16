@@ -95,7 +95,7 @@ def test_new_routes_are_present_and_catalog_is_valid(boundary_client: TestClient
     assert document["openapi"] == "3.1.1"
     assert document["x-specification-version"] == "3.0.0"
     business = {path for path in document["paths"] if path.startswith("/api/v1/")}
-    assert len(business) == 16
+    assert len(business) == 17
     assert document["paths"]["/api/v1/health"]["get"]["security"] == []
     for path in business - {"/api/v1/health"}:
         for operation in document["paths"][path].values():
