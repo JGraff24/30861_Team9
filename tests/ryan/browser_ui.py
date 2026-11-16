@@ -80,6 +80,20 @@ def check(browser, base, scenario):
                         "status": "PROCESSING",
                     },
                 )
+        elif path.endswith("/schedule"):
+            r.fulfill(
+                json={
+                    "workbookId": "w",
+                    "enabled": False,
+                    "intervalDays": None,
+                    "complianceDeadline": None,
+                    "versionId": "v",
+                    "nextAuditAt": None,
+                    "reminderDays": [90, 30, 7],
+                }
+            )
+        elif path.endswith("/notifications"):
+            r.fulfill(json={"notifications": []})
         elif path.endswith("/history"):
             r.fulfill(
                 json={

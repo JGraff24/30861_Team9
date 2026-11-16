@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "schema_definitions": 59,
+  "valid_examples": 26,
+  "negative_examples_rejected": 21,
+  "plan_entries": 435,
+  "new_plan_entries": 186,
+  "counts_by_tier": {
+    "hosted_http": 357,
+    "local_integration": 57,
+    "manual_release": 21
+  },
+  "hash_manifest_checked": true,
+  "scope": "Artifact consistency only; no implementation tests, human acceptance, adoption or deployment verified."
+}

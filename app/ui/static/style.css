@@ -15,4 +15,8 @@ legend { font-weight: 650; }
 section { border-top: 1px solid #c6d2dc; margin-top: 1.5rem; padding-top: 1rem; }
 .hint { font-size: .95rem; }
 [hidden] { display: none !important; }
+dialog { max-width: min(36rem, 85vw); padding: 1.5rem; color: #172b3a; border: 2px solid #516374; }
+dialog::backdrop { background: rgb(0 0 0 / 50%); }
+#delete-description { overflow-wrap: anywhere; }
+#confirm-delete { background: #9b1c20; border-color: #9b1c20; }
 @media (max-width: 40rem) { main { margin: 0; padding: 1rem; } button { max-width: 100%; } }

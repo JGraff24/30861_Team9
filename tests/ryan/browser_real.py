@@ -187,12 +187,23 @@ def download(page: Any, control: str) -> bytes:
     return Path(saved.value.path()).read_bytes()
 
 
-def exercise(browser: Any, target: str, tokens: dict[str, str], prefix: str) -> None:
+def exercise(
+    browser: Any,
+    target: str,
+    tokens: dict[str, str],
+    prefix: str,
+    axe_script: Path | None = None,
+    evidence: Path = Path("/tmp/ryan-real-scans"),
+) -> None:
     from playwright.sync_api import expect
 
+    from tests.ryan.browser_phase5 import scan
+
+    scan_name = "system" if prefix else "root"
     page = browser.new_page(accept_downloads=True)
     page.set_default_timeout(30000)
     connect(page, target, tokens["owner"])
+    scan(page, axe_script, evidence, scan_name + "-upload")
     source = source_workbook()
     page.get_by_label("Excel workbook (.xlsx)").set_input_files(
         {
@@ -203,6 +214,7 @@ def exercise(browser: Any, target: str, tokens: dict[str, str], prefix: str) -> 
     )
     page.get_by_role("button", name="Upload and check").click()
     loaded(page)
+    scan(page, axe_script, evidence, scan_name + "-findings")
     selected = metadata(page)
     assert selected["Ruleset"] == "2.0.0"
     assert selected["Status"] == "REMEDIATION_AVAILABLE"
@@ -237,6 +249,7 @@ def exercise(browser: Any, target: str, tokens: dict[str, str], prefix: str) -> 
         page.get_by_label("New worksheet name").fill("Student results")
         assert page.get_by_label("Confirmed header row").input_value() == "1"
         assert page.get_by_label("Confirmed header row").get_attribute("readonly") is not None
+        scan(page, axe_script, evidence, scan_name + "-correction-forms")
         attempts: list[tuple[str, str]] = []
 
         def lose_first_ack(route: Any) -> None:
@@ -265,6 +278,7 @@ def exercise(browser: Any, target: str, tokens: dict[str, str], prefix: str) -> 
         ]
         assert "value" not in submitted["decisions"][2]
         output = download(page, "output-download")
+        scan(page, axe_script, evidence, scan_name + "-output")
         output_selected = metadata(page)
         assert output_selected["Version"] != version_id
         assert output_selected["Source version"] == version_id
@@ -344,6 +358,9 @@ def exercise(browser: Any, target: str, tokens: dict[str, str], prefix: str) -> 
     assert reviewer.locator("#send-decisions").is_hidden()
     assert reviewer.locator("#findings select").count() == 0
     assert download(reviewer, "source-download") == output
+    expect(reviewer.locator("#schedule-form")).to_be_hidden()
+    expect(reviewer.locator("#delete-controls")).to_be_hidden()
+    scan(reviewer, axe_script, evidence, scan_name + "-reviewer")
     foreign = browser.new_page()
     connect(foreign, target, tokens["other"])
     foreign.get_by_label("Existing workbook ID").fill(workbook_id)
@@ -352,6 +369,37 @@ def exercise(browser: Any, target: str, tokens: dict[str, str], prefix: str) -> 
     assert foreign.locator("#results").is_hidden()
     assert foreign.locator("#history-panel").is_hidden()
     assert all(not origin["localStorage"] for origin in page.context.storage_state()["origins"])
+    # Exercise new controls through the real routes and persistence, after legacy review flows.
+    page.get_by_label("Existing workbook ID").fill(workbook_id)
+    page.get_by_role("button", name="Open history", exact=True).click()
+    expect(page.locator("#schedule-summary")).to_contain_text(output_selected["Version"])
+    page.get_by_label("Periodic audits").select_option("true")
+    page.get_by_label("Interval in days").fill("1")
+    page.get_by_label("Institution-supplied deadline").fill("2028-04-26")
+    page.locator("#save-schedule").click()
+    expect(page.locator("#status")).to_have_text("Schedule saved.")
+    with httpx.Client(base_url=target, headers=auth, timeout=30, trust_env=False) as http:
+        schedule = http.get(f"/api/v1/workbooks/{workbook_id}/schedule").json()
+        assert schedule["enabled"] and schedule["intervalDays"] == 1
+        assert schedule["versionId"] == output_selected["Version"]
+        assert schedule["complianceDeadline"] == "2028-04-26"
+        scan(page, axe_script, evidence, scan_name + "-schedule")
+        page.locator("#delete-workbook").click()
+        scan(page, axe_script, evidence, scan_name + "-delete-confirmation")
+        page.keyboard.press("Escape")
+        assert http.get(source_audit + "/report").status_code == 200
+        page.locator("#delete-workbook").click()
+        page.locator("#confirm-delete").click()
+        expect(page.locator("#status")).to_have_text(f"Workbook {workbook_id} deleted.")
+        for path in (
+            source_path + "/source",
+            source_audit + "/report",
+            f"/api/v1/workbooks/{workbook_id}/schedule",
+            f"/api/v1/workbooks/{workbook_id}/notifications",
+        ):
+            assert http.get(path).status_code == 404
+        assert http.get(f"/api/v1/workbooks/{other_workbook}/history").status_code == 200
+    scan(foreign, axe_script, evidence, scan_name + "-authorization-error")
     print(
         json.dumps(
             {
@@ -370,6 +418,9 @@ def exercise(browser: Any, target: str, tokens: dict[str, str], prefix: str) -> 
                     "foreign owner refused",
                     "cross-workbook version destination",
                     "stale audit explicit refresh",
+                    "persisted schedule follows generated version",
+                    "reviewer readonly lifecycle",
+                    "delete confirmation/cancel and complete removal",
                 ],
             }
         ),
@@ -385,6 +436,8 @@ def main() -> None:
     parser.add_argument(
         "--service-python", default=sys.executable, help="Locked Python for API/worker."
     )
+    parser.add_argument("--axe-script", type=Path)
+    parser.add_argument("--evidence-dir", type=Path, default=Path("/tmp/ryan-real-scans"))
     args = parser.parse_args()
     from playwright.sync_api import sync_playwright
 
@@ -393,7 +446,7 @@ def main() -> None:
         try:
             for prefix in ("", "/system"):
                 with local_system(prefix, args.service_python) as (target, tokens):
-                    exercise(browser, target, tokens, prefix)
+                    exercise(browser, target, tokens, prefix, args.axe_script, args.evidence_dir)
         finally:
             browser.close()
 
