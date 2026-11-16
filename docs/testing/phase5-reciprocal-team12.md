@@ -1,6 +1,6 @@
 # Phase 5 reciprocal testing: Team 9 tester against Team 12
 
-Prepared by Dixon (Team 9), November 12 2026; integration configuration updated November 16. No Phase 5 run against Team 12 is claimed. Hosted testing was deferred at Jackson's request.
+Prepared by Dixon (Team 9), November 12 2026; integration configuration updated November 16. No Phase 5 run against Team 12 is claimed. Hosted testing is pending deployment of the new Team 9 system/website, matching worker and independent tester, plus confirmation of target capabilities and private configuration.
 Every value marked **pending** must come from Team 12 or the pod record (ADOPTION.md), never
 from a guess.
 
@@ -35,6 +35,11 @@ carries the 2,400 s suite budget, and `scripts/run_suite.py` reads the 2,430 s c
 from the manifest. The integrated production Compose now selects the Phase 5 manifest; activating it with the private exact URL→team map and confirming the deployed release remain coordinated release steps; the deploy probe already accepts either suite.
 
 ## Running it
+
+Before these steps, deploy and verify Team 9's Phase 5 system/website and worker, and
+its new independent tester. Record the active source/image SHA and confirm suite 3.0.0
+and trusted own/cross target identities. Merging source to main alone does not deploy or
+validate those services. Confirm Team 12's actual Phase 5 release separately.
 
 1. Pre-flight (no suite run): `python -m scripts.rename_probe --target-url <url> --output
    rename-team12.json` gathers the isolated rename evidence for the open investigation

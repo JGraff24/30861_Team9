@@ -1,6 +1,8 @@
 # Dylan — Phase 5 workbook processing and audit engine
 
-Current integration: PRs #16–#19 are combined on `integration/phase5`. See the
+Current integration: PRs #16–#19 are combined for the Phase 5 main release. Hosted testing
+requires deployment of both the new system/website with its worker and the independent
+tester. See the
 [Phase 5 integration record](../evidence/phase5_integration.md) and
 [Class Access Guide](../Team9_Class_Access_Guide_Phase5.md) for the current assembled
 configuration and fresh evidence. The contribution-specific results and handoff boundaries

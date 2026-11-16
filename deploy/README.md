@@ -2,7 +2,7 @@
 
 The existing AWS deployment serves the website at
 https://3.139.178.70.sslip.io/system/ and the tester API documentation at
-https://3.139.178.70.sslip.io/tester/docs. Hosted testing of this integration was deferred at Jackson's request on November 16, 2026; these registered URLs do not identify a deployed Phase 5 release. For shared class application credentials and
+https://3.139.178.70.sslip.io/tester/docs. Hosted Phase 5 testing requires deployment of both the new system/website (with its compatible worker) and the new independent tester. The registered URLs do not identify an active Phase 5 release; confirm both deployed revisions and the tester suite/profile before testing. For shared class application credentials and
 instructions, use the [Phase 5 Class Access Guide](../docs/Team9_Class_Access_Guide_Phase5.md) ([PDF](../docs/Team9_Class_Access_Guide_Phase5.pdf)).
 The [original Phase 3 guide (historical PDF)](../docs/Team9_Class_Access_Guide.pdf) is retained
 at its existing path.
@@ -260,3 +260,14 @@ for backup registration/migration, the deletion journal, required S3 version per
 clock/fault enablement and monitoring. Those instructions govern all schema-3 content copies and deletion recovery. The worker retains two execution slots. Deployment and
 proxy protection is now 2,700 seconds for a 2,400-second Phase 5 suite; caller read timeouts
 must be at least 2,430 seconds. Production now selects the actual 395-case Phase 5 manifest 3.0.0, not the historical Phase 4 suite. Configure TESTER_TEAM_ID=team9 and the exact TARGET_TEAM_MAP_JSON in the private runtime inputs before setup. Own-team setup requires the packaged design map; the draft map still needs team confirmation. No live release is claimed by these source changes.
+
+## Phase 5 hosted-test prerequisite
+
+Merge/push CI, deployment and hosted acceptance are separate milestones. After successful
+push CI for the exact main SHA, use the existing host release process to activate the Phase 5
+system/website, matching worker and independent tester together. Confirm their image/source
+identities, the new lifecycle routes/UI, tester manifest 3.0.0 (395 cases), exact private target
+identity map and own-team design map. Health remains ruleset 2.0.0 in both phases and cannot
+prove that the new tester or website is deployed. Complete the backup/journal and S3 permission
+steps above before activation. Only then run hosted own-team and reciprocal suites. No hosted
+release or passing hosted run is established by the retained local verification reports.

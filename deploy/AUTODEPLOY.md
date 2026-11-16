@@ -193,4 +193,10 @@ versioned S3 deletion permissions and restore fencing. Set the private exact URL
 for every approved tester target; production selects tester team `team9`, manifest 3.0.0 and
 a 2,400-second suite. The source change alone does not update private host configuration.
 The 2,700-second guard must defer deployment while evaluations remain protected.
-Hosted validation was deferred for this integration at Jackson's request.
+Hosted validation requires deployment of **both the Phase 5 system/website with its matching
+worker and the new Phase 5 independent tester**. Successful main CI makes the source eligible
+for the host poller; inspect actual deployment state and running identities before testing.
+Confirm tester suite 3.0.0 (395 cases) and private own/cross profile configuration. An unchanged
+health response or restored Wi-Fi connection does not establish that either release is active.
+Record the deployment SHA/image and then retain hosted own-team/reciprocal reports separately
+from the local integration evidence.

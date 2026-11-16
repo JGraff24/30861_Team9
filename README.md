@@ -50,11 +50,15 @@ Use the privately supplied class credentials; local installations generate separ
 | System base / docs | https://3.139.178.70.sslip.io/system / https://3.139.178.70.sslip.io/system/docs |
 | Tester base / docs | https://3.139.178.70.sslip.io/tester / https://3.139.178.70.sslip.io/tester/docs |
 
-These are the existing registered addresses, not a claim that this branch is deployed.
-Hosted testing was deferred at Jackson's request on November 16, 2026 because of the current
-Wi-Fi connection. Use [local integration evidence](docs/evidence/phase5_integration.md)
-for this combined source and verify the deployed release separately before class testing.
-Health alone cannot distinguish Phase 4 from Phase 5; both return exactly:
+Hosted Phase 5 testing requires deployment of **both the new system/website and the new
+independent tester**, with the compatible worker and private configuration. The registered
+addresses above do not establish that those releases are active. Earlier connectivity trouble
+also prevented hosted testing, but restoring connectivity alone is insufficient. After main CI
+passes, complete the [deployment procedure](deploy/AUTODEPLOY.md), confirm the system/worker
+release SHA, tester suite **3.0.0** and own/cross profile configuration, then run hosted own-team
+and reciprocal checks. [Local integration evidence](docs/evidence/phase5_integration.md)
+remains separate from deployed acceptance. Health alone cannot distinguish Phase 4 from
+Phase 5; both return exactly:
 
 ```json
 {"status":"AVAILABLE","apiVersion":"1.0","rulesetVersion":"2.0.0"}

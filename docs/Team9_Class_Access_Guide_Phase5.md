@@ -5,10 +5,13 @@ Specification / suite 3.0.0 · Audit ruleset 2.0.0
 
 ## Access and release status
 
-This guide describes the combined Phase 5 source from PRs #16–#19. Hosted Phase 5 validation is **pending**. The addresses
-below are the existing registered endpoints. Verify the deployed release and Phase 5
-configuration before using them for a graded run. Local verification is recorded in
-[the integration record](evidence/phase5_integration.md).
+This guide describes the combined Phase 5 source from PRs #16–#19. **Deploy the new
+system/website and independent tester, with the matching worker, before hosted testing.**
+Hosted Phase 5 validation remains pending until both releases and their private configuration
+are confirmed. The addresses below are existing registered endpoints; a main merge or an
+available health response alone does not establish that Phase 5 is active. Confirm the deployed
+release SHA and tester suite 3.0.0 before a graded run. Local verification and the deployment
+sequence are recorded in [the integration record](evidence/phase5_integration.md).
 
 | Service | Address |
 |---|---|

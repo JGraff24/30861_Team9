@@ -2,10 +2,15 @@
 
 Prepared November 16, 2026 for Jackson's request to combine the four Phase 5 PRs,
 run checks and the system suite, update documentation and create a Phase 5 class guide.
-Hosted testing was subsequently deferred at Jackson's explicit request because of the
-current Wi-Fi connection. This record distinguishes local source verification from
-hosted release and human acceptance. Jackson subsequently instructed that completion
-remain local: do not merge into main or push. The four GitHub PRs are left open.
+Hosted Phase 5 testing is **pending deployment of both the Phase 5 system/website and
+the independent tester**, including the compatible worker and trusted private configuration.
+The earlier Wi-Fi issue prevented access, but restored connectivity alone does not establish
+a Phase 5 deployment. Existing registered endpoints and ruleset-2 health are insufficient.
+
+Jackson first requested a local-only handoff. On November 16, 2026, Jackson superseded that
+restriction and authorized merging to main, publishing the integration and cleaning up
+completed branches. Local verification below remains tied to its original source revision;
+source publication, deployment and hosted acceptance are separate milestones.
 
 ## Integrated inputs
 
@@ -17,7 +22,8 @@ remain local: do not merge into main or push. The four GitHub PRs are left open.
 | [#19](https://github.com/JGraff24/30861_Team9/pull/19) | Ryan: clock, measured execution and UI | `7c25eb9cdb3dcd9043b12413760f3541299bbcbb` |
 
 Base: main `ca6becbefc32ed1462be2dfee54a8230c7361e8a`. Local branch:
-`integration/phase5`. All four heads are preserved in the merge ancestry; #19 already
+`integration/phase5` was the assembly branch (eligible for removal after merge). All four
+heads are preserved in the merge ancestry; #19 already
 includes #17. The combined source plus integration fixes is commit
 `0b6312b` (documentation/evidence are added afterward).
 
@@ -144,7 +150,8 @@ not CI for the combined branch:
 
 The integration uses Phase 5's inherited assertions and new-report schema rather than
 relabeling current reports or weakening the frozen Phase 4 pack. Fresh combined Linux/Windows
-CI still requires publishing this branch/PR; no such result is claimed here.
+CI is required before the authorized main merge. The publication record below tracks that
+check separately from the earlier individual PR results.
 
 ## Acceptance boundaries
 
@@ -167,7 +174,9 @@ immutable HTTP report. Code coverage is measured child execution in `app/workboo
 
 ## Outstanding release and human work
 
-- Hosted testing: deferred by Jackson; no hosted own-team or Team 12 reciprocal result.
+- Deploy the Phase 5 system/website, compatible worker **and Phase 5 tester** before hosted
+  testing. Confirm the active source/image SHA and tester suite 3.0.0 with trusted own/cross
+  identity configuration. No hosted own-team or Team 12 reciprocal result exists yet.
 - Docker, Linux memory enforcement and fresh Windows execution: unavailable on this macOS
   host. CI is configured to run the Linux image/runtime and Windows portable checks after
   publication. Earlier individual PR CI results are not combined-source proof.
@@ -182,4 +191,20 @@ immutable HTTP report. Code coverage is measured child execution in `app/workboo
 - Retain the Team 12 rename investigation and its independent expectations until joint
   evidence resolves it. No rule/oracle was weakened in this integration.
 
-No main-branch merge, push, cloud modification or deployment is claimed by local verification.
+## Publication and deployment sequence
+
+1. Publish the assembled integration for fresh combined Linux/Windows/image/integration CI.
+2. After those checks pass, merge its complete history into main and remove only branches
+   whose commits are retained on main. Preserve unique unmerged work.
+3. Successful **push CI for the exact main SHA** makes that source eligible for the existing
+   host poller. A merge or green CI is not evidence that the host actually updated.
+4. Deploy the system/website and matching worker together, and the independent tester from
+   the Phase 5 image. Retain the proxy's 2,700-second bounds. Confirm schema-3 migration,
+   registered backups/deletion journal, S3 version permissions and the private exact
+   URL→team map before activation. The tester must serve the 395-case suite 3.0.0.
+5. Confirm running release/image identities, system routes/UI, tester manifest/profile and
+   HTTPS reachability. Record actual deployment evidence, then execute hosted own-team and
+   reciprocal runs, retaining their unchanged reports and source/fixture hashes.
+
+The local reports above claim no cloud modification, active hosted release or passing
+hosted test. Deployment and hosted results remain unverified until those steps execute.
