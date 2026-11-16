@@ -21,17 +21,23 @@ sequence are recorded in [the integration record](evidence/phase5_integration.md
 | Tester base | https://3.139.178.70.sslip.io/tester |
 | Tester API documentation | https://3.139.178.70.sslip.io/tester/docs |
 
-Use the class credentials already supplied through the course's private access channel.
-The earlier [Phase 4 guide](Team9_Class_Access_Guide_Phase4.pdf) retains the existing shared class credential reference. This guide
-creates no new credentials. Ask the team for private provisioning if you do not have access;
-do not post tokens in reports, screenshots or repository issues.
+The following application credentials are intentionally shared for class demonstrations and
+testing. Use the tokens exactly as shown, without a `Bearer` prefix in the website or API
+documentation's **Authorize** dialog. Other HTTP clients use `Authorization: Bearer TOKEN`.
+Local installations use their own credentials.
 
-| Identity | Use |
-|---|---|
-| userA / userB | Upload, review, correct, schedule and delete their own workbooks |
-| reviewer | Read workbooks explicitly granted to that identity, including schedule and notifications |
-| test-admin | Prepare/read owned isolated system sessions and advance their test clocks |
-| operator | Set up, run and read the independent tester |
+| Identity | Token | Use |
+|---|---|---|
+| userA | `QMxgTEcsbuHJaVRV7M1h4NwEaPqeYMEEJHtV9o6OMPA` | First owner; upload, review, correct, schedule and delete owned workbooks |
+| userB | `hRawDUIYyjy_glcn_NLxc6-QZPeWIdpy_-lLW6lSwIg` | Second owner; independent workbooks and ownership-isolation testing |
+| reviewer | `P7jbZevd0ZZ7KzAoPICUG9E-DHz9MoATPgw4H0EtC_M` | Read-only access to userA's granted workbooks, schedules and notifications |
+| test-admin | `7f5pJMFZF1vy5x_UU_SeXmG6UhdAFM3J1uZKw90PCb8` | Prepare/read owned isolated system sessions and advance their test clocks; no ordinary workbook access |
+| operator | `nrTr9hMvQ472w9OfyfLLYxF7sjaN5_-WDfKXmjtVsBk` | Set up, run and read the independent tester; not a website identity |
+
+The shared credential set has no second independent `test-adminB` token. The suite can run
+without it; the two foreign-admin clock cases are skipped. Provision that additional identity
+privately to exercise those cases. Do not substitute the existing test-admin token, because
+the check requires a different administrator.
 
 A test-admin gains no ordinary workbook access. An operator token is for the tester,
 not the website. People using the same token share the same application identity.
@@ -203,5 +209,4 @@ clears the page's review state. Reconnect with a granted identity if access is d
 This source integration does not establish human Excel no-repair inspection, other-team fixture
 review, keyboard/assistive-technology acceptance, five-real-workbook precision, live backup/S3
 restoration or pod adoption. See the integration record and
-[manual UI checklist](evidence/phase5/ryan_manual_validation.md). Prior Phase 3/4 guides and
-reports remain historical records; use this guide for the current Phase 5 workflow.
+[manual UI checklist](evidence/phase5/ryan_manual_validation.md) for the separate evidence records.
