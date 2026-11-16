@@ -193,6 +193,11 @@ immutable HTTP report. Code coverage is measured child execution in `app/workboo
 
 ## Publication and deployment sequence
 
+[Integration PR #20](https://github.com/JGraff24/30861_Team9/pull/20) tracks the complete
+source merge and its fresh combined CI. Use its final merge state and checks for publication
+evidence; no local report is being relabeled as a hosted result. The original PR heads are
+retained through a normal merge commit. Branch cleanup follows verified ancestry on main.
+
 1. Publish the assembled integration for fresh combined Linux/Windows/image/integration CI.
 2. After those checks pass, merge its complete history into main and remove only branches
    whose commits are retained on main. Preserve unique unmerged work.
