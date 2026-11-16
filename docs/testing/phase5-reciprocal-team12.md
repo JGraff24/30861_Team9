@@ -1,6 +1,6 @@
 # Phase 5 reciprocal testing: Team 9 tester against Team 12
 
-Prepared by Dixon (Team 9), November 12 2026. Nothing here has been run against Team 12 yet.
+Prepared by Dixon (Team 9), November 12 2026; integration configuration updated November 16. No Phase 5 run against Team 12 is claimed. Hosted testing was deferred at Jackson's request.
 Every value marked **pending** must come from Team 12 or the pod record (ADOPTION.md), never
 from a guess.
 
@@ -30,11 +30,9 @@ The profile is decided only by this trusted configuration and is frozen with the
 setup: a cross-team report omits `coverage.model` entirely, and the tester never needs Team 12's
 design map. The instructor setup body stays exactly `{"target_url": ...}`.
 
-The hosted tester proxy now allows 2,460 s (`deploy/nginx.conf.template`), the Phase 5 plan
+The hosted tester proxy now allows 2,700 s (`deploy/nginx.conf.template`), the Phase 5 plan
 carries the 2,400 s suite budget, and `scripts/run_suite.py` reads the 2,430 s caller timeout
-from the manifest. Switching the deployed tester from the Phase 4 to the Phase 5 manifest
-(`deploy/compose.production.yaml`, `FIXTURE_MANIFEST_PATH`) is a release step to coordinate
-with the deployment owner; the deploy probe already accepts either suite.
+from the manifest. The integrated production Compose now selects the Phase 5 manifest; activating it with the private exact URL→team map and confirming the deployed release remain coordinated release steps; the deploy probe already accepts either suite.
 
 ## Running it
 

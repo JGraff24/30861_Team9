@@ -71,20 +71,23 @@ Leaving the log viewer does not stop deployment. A build can take several minute
 4. Require mounted storage and at least 2 GiB free on the root disk. Build and validate
    before interrupting production. Verify that main has not advanced before activation.
 5. Recheck active tester setup/runs, audits, remediations, upload reservations and protected
-   external system sessions, waiting up to 1,900 seconds. A PREPARING/READY isolated session
-   receives a 1,900-second lease at setup, periodically renewed by authorized business
-   activity to protect gaps between jobs; older payloads fall back to setup time.
+   external system sessions, waiting up to 2,700 seconds. A PREPARING/READY isolated session
+   receives a 2,700-second lease at setup, periodically renewed by authorized business
+   activity when less than 2,400 seconds remain, and by successful clock advances, to protect gaps between jobs; older payloads fall back to setup time.
    Expiry only releases this deployment
    guard, without deleting the session or its evidence. Failed/cleaned sessions do not block.
    No public request can set that internal deadline.
    Stop nginx ingress, then gracefully stop all database writers. Recheck the
    stopped databases: if an old request accepted new work while shutdown finished, restart
    the old release and defer without migrating. This closes the initial idle-check race.
-6. Back up the quiescent SQLite stores at `/data/deployment-backups/<time>-<SHA>/`, including
-   their original ownership and permissions. Change only the image/SHA in `compose.env`.
+6. Back up quiescent system content metadata under the registered
+   `/data/deletion-backups/<time>-<SHA>/system.sqlite3` tree, retaining ownership/mode.
+   Migrate prior deployment system backups into that registered tree. Keep independent tester
+   backups/private configuration in the host-only deployment-backups tree. Preserve the newest
+   content-free deletion journal separately; never roll it back with content snapshots. Change only the image/SHA in `compose.env`.
    Start the candidate system, worker and tester with nginx still stopped. Verify their image
-   identities, exact ruleset-2 health, trusted isolated-fault configuration, installed Phase 4
-   fixture manifest/hashes and 1,800-second suite budget, tester schema and authentication.
+   identities, exact ruleset-2 health, trusted isolated-fault configuration, installed Phase 5
+   fixture manifest/hashes and 2,400-second suite budget, tester schema and authentication.
    These private probes issue only read requests and create no workbooks or test sessions.
 7. Record `/opt/team9/config/publication-state.json` and start nginx only after private checks
    pass. From this point a request may be accepted, so earlier database backups cannot be
@@ -95,8 +98,8 @@ The single-host activation interrupts ingress while writers stop, databases are 
 the candidate is checked. Requests racing shutdown may fail. The readiness check does not
 replace CI integration or claim a new full live-suite run.
 
-Production Compose explicitly selects ruleset `2.0.0`, the installed Phase 4 manifest and the
-required isolated audit-failure control for this designated shared test deployment. These
+Production Compose explicitly selects ruleset `2.0.0`, the installed Phase 5 manifest and the
+required isolated fault and test-clock controls for this designated shared test deployment. These
 operational overrides take precedence over retained Phase 3 environment values. Credentials,
 reviewer grants, target access maps, bucket/prefix and retained mounts stay in the existing
 private configuration. Outside this designated topology, the fault control remains disabled
@@ -164,7 +167,7 @@ If the API rate limit is reached, later timer ticks retry after GitHub allows re
 
 Images, checkouts and backups are retained. Monitor the 16 GiB root disk and 20 GiB data disk
 and remove reviewed obsolete build artifacts as needed. Local backups do not replace off-host
-disaster recovery. Deployment never deletes EBS, S3 objects, application data or old backups.
+disaster recovery. Deployment preserves EBS/S3 content and registered backups. Phase 5 owner deletion separately purges the selected workbook from retained application-managed copies; preserve its independent deletion journal across restores.
 Existing certificate renewal continues using the same Compose project name.
 
 Disable future automatic checks with:
@@ -180,3 +183,14 @@ An already-running deployment continues. Inspect its service/journal before main
 - [AWS project managed policies](https://docs.aws.amazon.com/accounts/latest/reference/scps-and-rcps-for-projects.html)
 - [GitHub REST rate limits](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api)
 - [systemd timers](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html)
+
+## Phase 5 activation prerequisites
+
+Use the [integrated release record](../docs/evidence/phase5_integration.md) and
+[backend restore procedure](../docs/implementation/jackson_phase5.md) before activation.
+Schema 3 is incompatible with Phase 4 binaries. Inventory/register content backups and verify
+versioned S3 deletion permissions and restore fencing. Set the private exact URL→team map
+for every approved tester target; production selects tester team `team9`, manifest 3.0.0 and
+a 2,400-second suite. The source change alone does not update private host configuration.
+The 2,700-second guard must defer deployment while evaluations remain protected.
+Hosted validation was deferred for this integration at Jackson's request.

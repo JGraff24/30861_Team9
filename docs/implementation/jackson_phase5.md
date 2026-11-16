@@ -1,5 +1,11 @@
 # Jackson — Phase 5 backend, persistence and deployment
 
+Current integration: PRs #16–#19 are combined on `integration/phase5`. See the
+[Phase 5 integration record](../evidence/phase5_integration.md) and
+[Class Access Guide](../Team9_Class_Access_Guide_Phase5.md) for the current assembled
+configuration and fresh evidence. The contribution-specific results and handoff boundaries
+below retain their original revision context.
+
 This contribution implements Jackson's backend scope against specification 3.0.0 and ruleset 2.0.0. The supplied ZIP and its shared files were read without modification; a scratch extraction under `/tmp` passed its hash/schema/example/vector validator (59 definitions, 26 examples, 21 negatives, 435 assertion inventory entries). The pack is an implementation target, not evidence of pod adoption or passing hosted acceptance. Audit rules, finding identities, correction behavior, independent tester expectations and historical report bytes remain governed by their existing contracts.
 
 ## Backend interfaces and behavior

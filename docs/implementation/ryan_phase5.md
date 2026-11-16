@@ -1,5 +1,11 @@
 # Ryan — Phase 5 testing interface, measured execution and UI
 
+Current integration: PRs #16–#19 are combined on `integration/phase5`. See the
+[Phase 5 integration record](../evidence/phase5_integration.md) and
+[Class Access Guide](../Team9_Class_Access_Guide_Phase5.md) for the current assembled
+configuration and fresh evidence. The contribution-specific results and handoff boundaries
+below retain their original revision context.
+
 Implements Ryan's Phase 5 testing-interface and UI scope on Jackson's backend
 PR #17 (`842c1e7`), against specification 3.0.0 and ruleset 2.0.0. The shared
 specification/context pack and independent workbook expectations are unchanged.

@@ -1,179 +1,145 @@
 # 30861_Team9
 
-Excel Accessibility Hub — Phase 4 workbook auditing, human review and supported corrections.
+Excel Accessibility Hub — Phase 5 workbook auditing, human review, supported corrections,
+periodic audits, deadline reminders and workbook deletion.
 
-The system accepts authenticated `.xlsx` uploads, preserves their original bytes, and runs
-six accessibility checks through a durable worker. Owners review findings and approve
-supported corrections, then download a separate generated workbook and its JSON audit
-report. An independent HTTP tester exposes the instructor setup/run/report interface.
+Upload an authenticated `.xlsx` copy, review six accessibility checks, explicitly approve
+supported corrections, and download a separate generated workbook and immutable JSON report.
+Schedules follow the newest stored version. Persistent in-application reminders use the supplied
+deadline. Results support human review and are not a compliance determination.
 
-Results support human review. An empty finding list or a generated output is not a
-compliance determination. Scheduling, reminders, test-clock controls and ordinary workbook
-deletion remain Phase 5 work.
+## Specification and versions
 
-## Shared specification and versions
+The [Phase 5 shared specification](docs/contracts/phase5/Phase5_Shared_Specification.md)
+and its [context pack](docs/contracts/phase5/README.md) define the current contract.
+All 21 adopted pack files match the supplied ZIP byte for byte. Pack validation establishes
+artifact consistency; pod adoption and human acceptance are separate records.
 
-The current intra-pod contract is the
-[Phase 4 Shared Implementation Specification](docs/contracts/phase4/Phase4_Shared_Specification.md).
-Read it with the [pack README](docs/contracts/phase4/README.md) and
-[correction note](docs/contracts/phase4/CORRECTIONS.md).
-
-| Version | Current target |
+| Item | Current source target |
 |---|---|
-| Shared specification | **2.1.0** |
-| Audit ruleset | **2.0.0** |
-| Corrected context pack | **2.1.1** |
-| Executable suite manifest | **2.1.1**, 253 cases |
-| Business API generation | `/api/v1`, health `apiVersion: "1.0"` |
+| Specification, context pack and executable suite | **3.0.0** |
+| Six-rule audit ruleset | **2.0.0** |
+| New audit report | `reportVersion: "2.0.0"`, `specificationVersion: "3.0.0"` |
+| Business API / OpenAPI | `/api/v1`, health `apiVersion: "1.0"` / OpenAPI 3.1.1 |
+| Independent suite | **395 cases**: 253 inherited + 142 Phase 5 cases |
+| System metadata schema | **3**, additive migration from schemas 1/2 |
+| Suite / caller / proxy limits | **2,400 / at least 2,430 / 2,700 seconds** |
 
-The correction note supersedes the baseline document's suite target of 2.1.0. It fixes
-the HSL half-up tint expectations for base `336699`: `-0.5` produces `1A334D`, and `0.5`
-produces `8CB3D9`. The intended formula, specification version and ruleset are unchanged.
-The [wire schemas](docs/contracts/phase4/phase4-wire-schemas.json),
-[examples](docs/contracts/phase4/phase4-examples.json),
-[policy vectors](docs/contracts/phase4/phase4-policy-vectors.json) and
-[test inventory](docs/contracts/phase4/phase4-test-plan.json) accompany the specification.
-The inventory describes required assertions; the
-[executable manifest](tests/fixtures/manifest-phase4.json) binds the runnable cases.
+The pack's 435 normative assertion entries are an inventory, not the executable case count.
+The [manifest](tests/fixtures/manifest-phase5.json) binds runnable cases; the
+[coverage catalogs](docs/testing/phase5-coverage-catalogs.md) distinguish hosted, local and
+human checks. The [design map](docs/design/team9-design-map.json) remains draft 0.1.0 and
+requires team confirmation. Historical reports keep their original versions and bytes.
 
-Historical audits and retained reports keep their original versions and results.
-The [Phase 3 contract](docs/contracts/phase3.md) and
-[Phase 3 integration record](docs/evidence/phase3_integration.md) are historical references.
+The [Phase 4 pack](docs/contracts/phase4/README.md), including corrected half-up tint vectors,
+continues to govern unchanged audit/editor behavior. Finding identities, safe correction
+profiles and independent expected workbook results are unchanged.
 
-## Phase 4 capabilities
+## Class access and website
 
-| Rule | Screening scope | Supported correction after approval |
-|---|---|---|
-| `ALT_TEXT` | Missing alternative-text titles/descriptions and objects needing manual review | Set title and description on supported DrawingML objects |
-| `WORKSHEET_NAME` | Generic worksheet names | Rename supported sheets and update understood references |
-| `TABLE_HEADER` | Table headers and qualifying plain ranges | Confirm a safe proposed header range or enable a supported table header |
-| `MERGED_CELLS` | Populated merged cells | Manual review |
-| `LINK_TEXT` | Ambiguous hyperlink labels | Replace the label of a supported simple cell link |
-| `COLOR_CONTRAST` | Color-only meaning and contrast within the declared display policy | Manual review |
+Use the new **[Phase 5 Class Access Guide](docs/Team9_Class_Access_Guide_Phase5.md)**
+([PDF](docs/Team9_Class_Access_Guide_Phase5.pdf)) for upload, correction, scheduling,
+notifications, deletion and instructor testing. The
+[Phase 4 PDF](docs/Team9_Class_Access_Guide_Phase4.pdf) and
+[Phase 3 PDF](docs/Team9_Class_Access_Guide.pdf) remain historical references.
+Use the privately supplied class credentials; local installations generate separate tokens.
 
-Unsafe or unsupported corrections remain manual findings. The system does not invent
-alternative text, evaluate formulas, follow hyperlink destinations, run macros, or edit an
-external live workbook. Only explicitly approved supported changes are applied.
-
-New uploads receive fresh version identities. Manual re-audits create new immutable audits
-on the selected version. Review context comes from the same inventory and safety assessment
-as the audit. Remediation builds a separate candidate, validates it, verifies preservation
-and approved effects, and audits the output before publication. Downloads verify stored
-integrity. Reports retain findings, decisions, committed changes, unresolved items,
-limitations and provenance; later work does not rewrite an earlier report.
-
-`REMEDIATION_AVAILABLE` means supported corrections await decisions. `REVIEW_REQUIRED`
-means the findings require manual review. A generated version's `REMEDIATED` status means
-an output was committed; its audit can still contain unresolved findings. `DECLINE` and
-`MARK_REVIEWED` record decisions without changing workbook content.
-
-## Instructor guides and hosted access
-
-Use the **Phase 4 guide** for current instructor access, review/correction steps and hosted
-testing. The original Phase 3 PDF remains available at its existing path for historical reference.
-
-| Guide | Updated | Scope |
-|---|---|---|
-| [Phase 4 Class Access Guide (PDF)](docs/Team9_Class_Access_Guide_Phase4.pdf) | November 1, 2026 | Six-rule review, remediation, version history, downloads and the 2.1.1 tester suite |
-| [Phase 3 Class Access Guide (PDF, historical)](docs/Team9_Class_Access_Guide.pdf) | October 18, 2026 | Original two-rule upload/audit workflow and Phase 3 tester timing |
-
-Both guides retain the shared class application credentials for the deployed instance;
-local installations use their own generated credentials. The Phase 4 guide includes a
-target-health check before running the suite.
-
-| Service | URL |
+| Service | Registered address |
 |---|---|
 | Website | https://3.139.178.70.sslip.io/system/ |
-| System base URL | https://3.139.178.70.sslip.io/system |
-| System API documentation | https://3.139.178.70.sslip.io/system/docs |
-| Tester base URL | https://3.139.178.70.sslip.io/tester |
-| Tester API documentation | https://3.139.178.70.sslip.io/tester/docs |
+| System base / docs | https://3.139.178.70.sslip.io/system / https://3.139.178.70.sslip.io/system/docs |
+| Tester base / docs | https://3.139.178.70.sslip.io/tester / https://3.139.178.70.sslip.io/tester/docs |
 
-Before a Phase 4 exercise, check the selected target's `GET /api/v1/health` relative to its
-base URL. Team 9's endpoint is
-https://3.139.178.70.sslip.io/system/api/v1/health. The public Phase 4 response is exactly:
+These are the existing registered addresses, not a claim that this branch is deployed.
+Hosted testing was deferred at Jackson's request on November 16, 2026 because of the current
+Wi-Fi connection. Use [local integration evidence](docs/evidence/phase5_integration.md)
+for this combined source and verify the deployed release separately before class testing.
+Health alone cannot distinguish Phase 4 from Phase 5; both return exactly:
 
 ```json
 {"status":"AVAILABLE","apiVersion":"1.0","rulesetVersion":"2.0.0"}
 ```
 
-For website uploads, enter the Phase 4 guide's **userA** token in **User access token** without
-a `Bearer` prefix and choose **Connect**. Then select an `.xlsx` workbook and choose
-**Upload and check**.
+Enter a **userA** token without `Bearer` in **User access token**, choose **Connect**, select
+an `.xlsx`, and choose **Upload and check**. Save the workbook ID. Review findings and
+limitations; supply explicit input for supported **APPLY** actions, submit decisions, and
+wait for verification. Download the generated workbook and its JSON report. **Open history**
+selects earlier versions/audits; **New version of workbook in history** uploads external edits.
+**Re-audit selected version** creates a fresh audit without changing the version order.
+Credentials and pending recovery information remain in the tab's memory.
 
-Review the findings and limitations, select actions, and provide the requested values for
-**APPLY**. Choose **Submit selected decisions**, wait for verification, and download the
-separate remediated workbook and its JSON audit report. Save the workbook ID and use
-**Open history** to select versions/audits. Choose **New version of workbook in history**
-for another upload, or **Re-audit selected version** before correcting older work.
+| Rule | Scope | Supported correction after approval |
+|---|---|---|
+| `ALT_TEXT` | Missing alternative text and objects requiring review | Set title/description on supported DrawingML objects |
+| `WORKSHEET_NAME` | Generic worksheet names | Rename supported sheets and understood references |
+| `TABLE_HEADER` | Table headers and qualifying plain ranges | Confirm a safe header range or enable a supported table header |
+| `MERGED_CELLS` | Populated merged cells | Manual review |
+| `LINK_TEXT` | Ambiguous hyperlink labels | Replace a supported simple cell-link label |
+| `COLOR_CONTRAST` | Color-only meaning and declared contrast policy | Manual review |
 
-Owners can mutate their own resources. A **reviewer** connects with an explicitly granted
-read-only identity and opens a granted workbook by ID. **test-admin** credentials authorize
-system testing endpoints and grant no business access. **operator** credentials authorize
-the independent tester. People using the same token share the same application identity.
+Unsafe/unsupported corrections remain findings. The system does not invent alternative text,
+evaluate formulas, follow hyperlinks or run macros. Generated `REMEDIATED` status means an
+output was committed; unresolved findings may remain. The **MANUAL REVIEW** action records the
+wire decision `MANUAL_REVIEW`; neither it nor **DECLINE** edits workbook content.
 
-Credentials, drafts and pending recovery state stay in the browser tab's memory. Keep the
-tab open and use **Resume pending operation** after uncertain remediation acceptance.
-After an uncertain upload or re-audit, inspect history before retrying.
+## Phase 5 lifecycle
 
-For hosted testing, open the tester API documentation and **Authorize** with Team 9's
-**operator** token without a `Bearer` prefix. Execute `POST /test/setup` with one of
-these exact approved targets:
+In **Schedule and notifications**, owners select periodic auditing, an integer interval of
+1–90 days, and an optional institution-supplied deadline. **Save schedule** replaces all settings.
+Disabling periodic auditing leaves deadline reminders enabled; clear the deadline to stop them.
+The summary shows enabled state, next due time and selected version. Reviewers have read-only
+schedule and notification access when explicitly granted.
+
+Scheduled audits check the stored version only. Changes to an external workbook cannot be
+detected until a new version is uploaded. The schedule follows the newest committed version,
+including generated outputs, without postponing the due time. Missed intervals coalesce into
+one audit while retaining the original cadence. Failed occurrences remain inspectable; a later
+interval or manual re-audit creates a new attempt.
+
+Reminders occur at UTC midnight 90, 30 and 7 days before the supplied deadline when the newest
+version lacks a successful clean audit. They are durably deduplicated. **DELIVERED** means a
+record is visible in **Notification history**, not email delivery. Earlier threshold instants
+are not backfilled when a deadline is first configured. Use **Refresh schedule and notifications**
+to retrieve current records.
+
+**Delete workbook…** opens a confirmation identifying the workbook. A successful deletion
+removes all versions, outputs, reports, findings, schedules and notifications, including registered
+application-managed copies. Active work returns a conflict. Partial cleanup retains a recovery
+reservation and hides content; the original owner can explicitly resume cleanup. See the guide
+for recovery and the [backend runbook](docs/implementation/jackson_phase5.md) for backup/journal
+requirements. Ordinary users cannot control the isolated test clock.
+
+## Independent tester
+
+Authorize in tester `/docs` with the privately supplied **operator** token, without `Bearer`.
+Call `POST /test/setup` once with exactly:
 
 ```json
-{"target_url":"https://13.184.14.226.sslip.io"}
+{"target_url":"https://3.139.178.70.sslip.io/system"}
 ```
 
-Use `https://3.139.178.70.sslip.io/system` as `target_url` for a Team 9 self-test.
-Team 12's target credentials are configured privately on the server; keep using Team 9's
-operator token to authenticate to Team 9's tester. The setup body needs no token fields.
+Require 201, save `session_id`, then call `POST /test/run` once with
+`{"session_id":"RETURNED_ID"}`. Retrieve the same stored report with `GET /test/report`.
+The Phase 5 caller read timeout must be at least **2,430 seconds**. After a lost run response,
+retrieve the report and poll 409 within the original deadline. Never automatically repeat an
+uncertain setup/upload/re-audit/run POST. Each prepared tester session permits one run.
 
-Require setup to return 201, retain its `session_id`, then execute `POST /test/run` once
-with `{"session_id":"PASTE_RETURNED_SESSION_ID"}`. Retrieve the stored report through
-`GET /test/report` with the same session ID. Use a client read timeout of at least
-1,830 seconds for Phase 4 (630 for a retained Phase 3 installation). After a lost run response,
-retrieve the report rather than repeating the run POST; poll 409 report responses within
-the original deadline. Do not automatically retry an uncertain setup POST. Each prepared
-session runs once.
+Trusted server configuration selects own/cross profiles using `TESTER_TEAM_ID` and exact
+`TARGET_TEAM_MAP_JSON` entries. Own-team reports require `coverage.model` and a complete valid
+design map; cross-team reports omit the key entirely. Grader setup has no credentials or team
+flags. `pass`, `fail`, `error` and `skip` remain distinct. Coverage means evaluated scope, not
+acceptance: an HTTP-only run cannot count UI component C9 or AC-17. Code measurement covers
+`app/workbooks` and `app/audit`; API, storage and UI code are excluded. Auxiliary clock namespaces
+are not summed into the main session's line counts.
 
-For reciprocal testing, Team 12 uses its own tester and operator token, targeting
-`https://3.139.178.70.sslip.io/system` with Team 9's system credentials.
-
-## Phase 4 tester
-
-The independent suite has 253 hosted cases generated from the corrected 2.1.1 pack,
-Team 9's synthetic fixture packs and its own package comparator. It uses frozen fixture
-bytes and expectations independent of production rule/editor helpers. Phase 4 is the default.
-Phase 4 runs take up to 1,800 seconds, so callers need a read
-timeout of at least 1,830 seconds. See
-[the Phase 4 implementation notes](docs/implementation/dixon_phase4.md) and the
-[adopted specification pack](docs/contracts/phase4/).
-
-`pass`, `fail`, `error` and `skip` remain distinct report outcomes. HTTP-only component
-coverage excludes the review UI. Code coverage measures `app/workbooks` and `app/audit`,
-including editing and preservation, and excludes API, storage and UI code. Coverage
-percentages alone do not establish acceptance.
-
-## Phase 5 tester (suite 3.0.0)
-
-The [Phase 5 pack](docs/contracts/phase5/) (specification 3.0.0, ruleset 2.0.0) is adopted
-byte for byte. Its [runnable manifest](tests/fixtures/manifest-phase5.json) has 395 hosted
-cases: the 253 Phase 4 cases with their IDs and order, then 142 new scheduling, reminder,
-isolated-clock, deletion, authorization, controlled-failure, tester-profile and AC-18
-performance cases. Runs take up to 2,400 seconds; callers and proxies need at least 2,430.
-The Phase 4 manifest stays the default until the deployed tester is switched (see
-[reciprocal runbook](docs/testing/phase5-reciprocal-team12.md)).
-
-Reports follow the instructor profile rules: own-team runs carry `coverage.model` over the
-[Team 9 design map](docs/design/), cross-team runs omit the key, and trusted tester
-configuration (`TESTER_TEAM_ID`, `TARGET_TEAM_MAP_JSON`) decides which. An unexpected
-target processing failure that prevents evaluation is `error`/`system`. See the
-[Phase 5 implementation notes](docs/implementation/dixon_phase5.md) and the generated
-[coverage catalogs](docs/testing/phase5-coverage-catalogs.md).
+The existing Team 12 address is `https://13.184.14.226.sslip.io`; confirm its Phase 5 capability,
+release SHA, trusted identity map and private access before reciprocal testing. See the
+[reciprocal run procedure](docs/testing/phase5-reciprocal-team12.md). No reciprocal run or
+hosted Phase 5 result is claimed by this integration.
 
 ## Local setup
 
-Use Python 3.12 and uv 0.13.1. Install uv if needed:
+Use Python 3.12 and uv 0.13.1:
 
 ```sh
 python3 -m venv .uv-tool
@@ -181,43 +147,33 @@ python3 -m venv .uv-tool
 export PATH="$PWD/.uv-tool/bin:$PATH"
 uv python install 3.12
 uv sync --locked --group dev
-```
-
-On Windows, use `.uv-tool\Scripts\python.exe` and add `.uv-tool\Scripts` to PATH.
-Run the system and worker on Linux/WSL or macOS; Linux enforces the process memory cap.
-The independent tester also has Windows CI checks. Use one system API, one durable worker
-and one tester API process with separate persistent SQLite stores.
-Production runs that worker with `--concurrency 2`: two bounded execution slots prevent
-one large audit from blocking every other session. The default local command uses one slot.
-
-Both settings classes read `.env`; environment variables take precedence. No credential is
-valid by default. Generate private loopback development credentials explicitly:
-
-```sh
 uv run python -m scripts.create_dev_tokens --local-only
 ```
 
-This creates ignored `.env.local` with POSIX mode 0600 and refuses overwrites/production.
-Copy it privately to `.env` if that file does not exist, preserving its permissions.
-The target token map includes user A/B, reviewer and test-admin credentials; the local operator
-token is stored in the private file. Keep these generated local credentials out of commands,
-Git, images and evidence.
+The generator writes ignored `.env.local` with mode 0600 and refuses overwrite/production.
+Copy it privately to `.env` if absent, preserving permissions. On Windows, use the
+`.uv-tool\Scripts` equivalents. The service/worker require Linux/WSL or macOS; Linux enforces
+the process memory cap. Portable tester checks also run in Windows CI.
 
-For full Phase 4 tester runs against an isolated local target, set these trusted server
-options in the private configuration:
+For a full isolated Phase 5 suite, set these in private server configuration:
 
 ```dotenv
 ENABLE_TEST_INTERFACE=true
 ENABLE_TEST_AUDIT_FAULTS=true
+ENABLE_TEST_CLOCK=true
+ENABLE_CODE_MEASUREMENT=true
+FIXTURE_MANIFEST_PATH=tests/fixtures/manifest-phase5.json
+TESTER_RUN_TIMEOUT_SECONDS=2400
+TESTER_TEAM_ID=team9
+TARGET_TEAM_MAP_JSON={"http://127.0.0.1:8000":"team9"}
 ```
 
-The generator leaves these disabled. The one-shot fault control applies only through an
-authorized test-admin setup for a fresh isolated session. Set
-`ENABLE_CODE_MEASUREMENT=true` if actual line measurement is wanted. The development
-dependency group includes coverage; production uses the optional `measurement` extra.
-Use ordinary user credentials in the UI, available at `http://127.0.0.1:8000/`.
+Also configure the exact allowed target, its private `TARGET_AUTH_MAP_JSON`, operator hashes,
+reviewer grants and session users. No token is valid by default. The clock/fault switches apply
+only to fresh isolated sessions and remain disabled by default outside the designated test
+configuration. Coverage is optional at runtime (`uv sync --locked --no-dev --extra measurement`).
 
-Run in three terminals from the repository root:
+Run three terminals from the repository root:
 
 ```sh
 ./scripts/run_system.sh
@@ -225,172 +181,123 @@ Run in three terminals from the repository root:
 ./scripts/run_tester.sh
 ```
 
-Equivalent commands:
+Equivalent commands are `uv run --locked uvicorn app.main:create_app --factory --host 127.0.0.1
+--port 8000 --no-access-log`, `uv run --locked python -m app.jobs.worker`, and `uv run --locked
+uvicorn tester.main:create_app --factory --host 127.0.0.1 --port 8001 --no-access-log`.
+Use `http://127.0.0.1:8000/`, system `/docs` on port 8000 and tester `/docs` on port 8001.
+API/worker share one persistent store; tester uses a separate store. Production uses two worker
+slots with graceful draining. Coordinate full-suite windows on the single host.
 
-```sh
-uv run --locked uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000 --no-access-log
-uv run --locked python -m app.jobs.worker
-uv run --locked uvicorn tester.main:create_app --factory --host 127.0.0.1 --port 8001 --no-access-log
-```
-
-System docs: `http://127.0.0.1:8000/docs`; tester docs: `http://127.0.0.1:8001/docs`.
-State under `state/` survives restart. Stop processes with Ctrl+C.
-
-System and tester use separate persistent SQLite stores. Phase 4 is the default. For
-explicit legacy Phase 3 development/regression runs, select both `RULESET_VERSION=1.0.0`
-and `FIXTURE_MANIFEST_PATH=tests/fixtures/manifest.json`. This does not change the versions
-or results of existing records.
-
-## Assembly and routes
-
-Concrete server-owned defaults now assemble the four owners' implementations:
-
-| Setting | Default factory |
-|---|---|
-| `ENGINE_FACTORY` | `app.audit.engine:OoxmlWorkbookEngine` |
-| `RUNNER_FACTORY` | `app.measurement.runner:MeasuredEngineRunner` |
-| `SESSION_SERVICE_FACTORY` | `app.test_interface.service:PersistentSessionService` |
-| `TEST_ROUTER_FACTORY` | `app.test_interface.routes:create_router` |
-| `UI_ROUTER_FACTORY` | `app.ui.routes:create_router` |
-
-Explicit injected services remain available for tests. Factory overrides are trusted server
-configuration. No HTTP caller selects a factory. Disabled/missing integrations fail explicitly.
-Coverage is optional at runtime: install `uv sync --locked --no-dev --extra measurement` when
-enabled, or build the Docker `measurement` target for both system and worker.
+## Routes and recovery
 
 The [system](docs/contracts/system.openapi.json) and
-[tester](docs/contracts/tester.openapi.json) OpenAPI catalogs use version 3.1.1.
-These thirteen business paths are relative to the registered system base URL; retain
-`/system` for the hosted target.
+[tester](docs/contracts/tester.openapi.json) catalogs contain actual schemas and authentication.
+The system has 18 business operations over 17 business paths (health is public); the clock POST
+shares the existing test-admin authentication exception. System `/test/setup` and `/test/report`
+are additional instructor paths; the tester adds `/test/run`.
 
-| Business operation | Method and path |
+| Operation | Method and path relative to system base |
 |---|---|
-| Public health | `GET /api/v1/health` |
-| Initial upload | `POST /api/v1/workbooks` |
-| New upload version | `POST /api/v1/workbooks/{workbookId}/versions` |
-| Version retrieval | `GET /api/v1/workbooks/{workbookId}/versions/{versionId}` |
-| Audit retrieval | `GET /api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}` |
+| Upload / new version | `POST /api/v1/workbooks` / `POST /api/v1/workbooks/{workbookId}/versions` |
+| Version / audit reads | `GET /api/v1/workbooks/{workbookId}/versions/{versionId}` / append `/audits/{auditId}` |
 | Manual re-audit | `POST /api/v1/workbooks/{workbookId}/versions/{versionId}/audits` |
 | Stored review context | `GET /api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}/review` |
-| Submit decisions | `POST /api/v1/workbooks/{workbookId}/versions/{versionId}/remediations` |
-| Remediation polling | `GET /api/v1/remediations/{remediationId}` |
-| Source/selected-version download | `GET /api/v1/workbooks/{workbookId}/versions/{versionId}/source` |
-| Generated output download | `GET /api/v1/outputs/{outputId}/workbook` |
-| JSON audit report download | `GET /api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}/report` |
+| Submit decisions / poll | `POST /api/v1/workbooks/{workbookId}/versions/{versionId}/remediations` / `GET /api/v1/remediations/{remediationId}` |
+| Source / report | `GET /api/v1/workbooks/{workbookId}/versions/{versionId}/source` / append `/audits/{auditId}/report` to the version path |
+| Generated workbook | `GET /api/v1/outputs/{outputId}/workbook` |
 | History | `GET /api/v1/workbooks/{workbookId}/history` |
+| Schedule | `GET` / `PUT /api/v1/workbooks/{workbookId}/schedule` |
+| Notifications | `GET /api/v1/workbooks/{workbookId}/notifications` |
+| Isolated clock | `POST /api/v1/test/clock` |
+| Owner deletion | `DELETE /api/v1/workbooks/{workbookId}` |
 
-Owner/reviewer permissions and namespace checks precede blob reads. Derived records
-inherit their source owner and namespace. Remediation requires an `Idempotency-Key`:
-identical retries with the same key/body recover the original acceptance; changed requests
-under that key conflict. Processing failure does not publish a successful partial output.
+Owners mutate their own resources; granted reviewers read. Test-admin credentials prepare/measure
+owned namespaces and advance their clocks, with no business access. `X-Test-Session` selects an
+isolated namespace; omission selects ordinary data. Authorization precedes workbook-byte reads.
+Derived resources inherit ownership/namespace. Remediation uses `Idempotency-Key`: identical
+key/body recovers the original acceptance; a changed request conflicts. The UI retains pending
+recovery in memory; keep the tab open and use **Resume pending operation** where offered.
+After uncertain uploads/re-audits, inspect history before retrying.
 
-With the test interface enabled, the system also exposes POST `/test/setup` and GET
-`/test/report`. The tester exposes POST `/test/setup`, POST `/test/run`, and GET `/test/report`.
-Configure its exact `ALLOWED_TARGET_URLS`, `TARGET_AUTH_MAP_JSON` and operator hashes privately.
-Never retry uncertain setup/upload/run POSTs; recover a lost run response by reading its report.
+Fresh isolated sessions use a persistent simulated clock starting `2027-01-01T00:00:00Z`.
+Clock advancement accepts jobs and records reminders atomically; poll returned audits before
+subsequent assertions. Busy due work rejects the entire advance. Explicit identical-time replay
+recovers a lost acknowledgment without reissuing accepted events. Ordinary data uses real UTC;
+queues, leases, execution deadlines and suite budgets always use real time.
 
-Tester business calls use `X-Test-Session` for isolation, apart from deliberate negative
-probes. Ordinary UI data is outside those namespaces. Cleanup is caller-owned and refuses
-active work; ordinary deletion remains unavailable.
+## Verification and acceptance
 
-## Verification
-
-[Phase 4 integration CI run 39](https://github.com/JGraff24/30861_Team9/actions/runs/41323937522)
-passed on the source merged in [PR #12](https://github.com/JGraff24/30861_Team9/pull/12):
-
-- Linux: **972 passed, 4 skipped**; Windows portable checks: **318 passed**.
-  The four ordinary-pytest skips require live configuration exercised by the self-checks.
-- Real Phase 4 API/worker/engine/SQLite/filesystem/independent HTTP suite:
-  **253/253 cases and 4 live tester acceptance tests passed**.
-- Legacy real HTTP suite: **63 passed, 1 intentional observational-fault skip**, plus
-  **4 live tester acceptance tests**. Separately labelled fake-target self-checks passed.
-- Browser verification: **26 simulated cases and 2 real workflows** passed.
-- Lint, formatting, strict typing, catalogs, policy vectors, fixture/manifest checks,
-  the actual production Docker build/smoke and locked runtime dependency audit passed.
-
-The [integration record](docs/evidence/phase4_integration.md) describes the changes and
-verification scope. The merged PR retains the final CI results and the resolved
-boundary-upload queue contention. CI retains the real Phase 4 report and worker events
-as an artifact; simulated targets are labelled separately from actual integration.
-
-Reproduce the repository checks:
+Fresh commands, results, integration fixes and limitations are recorded in
+[the Phase 5 integration record](docs/evidence/phase5_integration.md). PR #16–#19 contribution
+records remain historical evidence for their own source revisions. The combined local
+regression passed **1,113 tests, 7 skipped**; the real Phase 5 HTTP suite returned
+**392 pass / 0 fail / 0 error / 3 skip** in about eight minutes. These are local results,
+not a hosted release or completed human acceptance. Browser checks passed **42 simulated
+scenarios and 2 real-stack flows**, with **84 axe scans / zero violations**. Detailed boundary
+measurements completed **15/15 successful runs**, with identical findings per workload and
+a maximum engine time of **12.893 seconds**.
 
 ```sh
-uv sync --locked --group dev
 uv lock --check
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy --platform linux app tester scripts
 uv run pytest -q
+uv run python docs/contracts/phase5/validate_pack.py
 uv run python -m scripts.export_schemas --check
 uv run python -m scripts.check_identity
 uv run python -m scripts.check_phase4_policy
+uv run python -m scripts.check_phase5_policy
 uv run python -m scripts.build_phase4_manifest --check
+uv run python -m scripts.build_phase5_manifest --check
+uv run python -m scripts.build_phase5_catalogs --check
 uv run python -m scripts.make_synthetic_fixtures --check
 uv run python -m scripts.smoke_foundation
-uv run python -m scripts.integration_selfcheck --evidence-dir /tmp/team9-integration-evidence
-uv run python -m scripts.integration_selfcheck --phase4 --evidence-dir /tmp/team9-phase4-evidence
+uv run python -m scripts.integration_selfcheck --phase5 --evidence-dir /tmp/team9-phase5-evidence
 ```
 
-The integration self-check uses random temporary loopback ports, isolated databases and private
-credentials. It tests the real engine/API/worker, restart persistence, the selected tester suite,
-report retention and four live tester acceptance checks. It contacts no AWS or Team 12 endpoint.
-Two Linux memory-limit tests skip on macOS. Live acceptance tests skip in an ordinary pytest run;
-the integration self-check configures and runs them. CI runs the full suite and real integration
-on Linux; portable tester/schema checks also run on Windows.
+The real integration check creates private temporary credentials, loopback ports and isolated
+stores, tests restart persistence, then runs the independent suite. It contacts no cloud/pod
+endpoint. Its fail/error outcomes fail CI. Frozen Phase 4 suite 2.1.1 requires new-report label
+2.1.0, so use Phase 5 suite 3.0.0 for the integrated system; its first 253 cases retain the
+inherited assertions and identities. Explicit legacy Phase 3 regression uses
+`RULESET_VERSION=1.0.0` and `FIXTURE_MANIFEST_PATH=tests/fixtures/manifest.json`.
 
-The separate `scripts.tester_selfcheck` uses a labeled fake target to test the tester itself.
-Fixture reviews and review records were excluded by Jackson; no such reviews are claimed.
-Browser automation lives in `tests/ryan/browser_ui.py` and `tests/ryan/browser_real.py`
-and requires optional Playwright tooling; automated API results do
-not establish manual keyboard/screen-reader conformance.
-
-Runtime dependency scanning (requires network):
+`scripts.tester_selfcheck --phase5 --profile own` and `--profile cross` use a labeled fake to
+verify tester behavior. They do not verify the system. Browser scripts under `tests/ryan/`
+require optional Playwright/Chromium and axe tooling; see
+[Ryan's instructions](docs/implementation/ryan_phase5.md). Runtime dependency scanning requires
+network access:
 
 ```sh
 uv export --locked --no-dev --extra measurement --no-emit-project --format requirements-txt --output-file /tmp/team9-runtime-requirements.txt > /dev/null
 uv run pip-audit --require-hashes --disable-pip --cache-dir /tmp/team9-audit-cache -r /tmp/team9-runtime-requirements.txt
 ```
 
-For an approved target, set `TEAM9_TESTER_TOKEN` privately and run:
-
-```sh
-uv run python -m scripts.run_suite --tester-url http://127.0.0.1:8001 --target-url http://127.0.0.1:8000 --target-revision unknown --manifest tests/fixtures/manifest-phase4.json --output report.json --record run-record.json
-```
-
-This selects the Phase 4 manifest and its read timeout. The opt-in GitHub Actions
-`live-suite` workflow requires configured access secrets; select **phase4** explicitly
-because its manual form retains a legacy Phase 3 default. Hosted reciprocal runs and
-manual accessibility assessments are distinct from local/CI evidence. Automated checks
-alone do not establish full Phase 4 acceptance.
+Automated results do not close the human acceptance gates: Excel no-repair inspections,
+other-team fixture/answer-key review, keyboard/interface validation, five-real-workbook
+precision adjudication and pod adoption. Live S3/version/backup deletion, restore and monitoring
+response also require deployment evidence. The outstanding Team 12 rename investigation remains
+visible; no rules or expectations were changed to suppress it.
 
 ## Ownership and deployment
 
-| Owner | Responsibility | Phase 4 implementation notes |
+| Owner | Scope | Phase 5 notes |
 |---|---|---|
-| Jackson | Backend APIs, authorization, persistence, immutable storage, durable jobs, integration and deployment | [Backend](docs/implementation/jackson_phase4.md) |
-| Dylan | Workbook interpretation, six audit rules, safe OOXML corrections and preservation | [Engine](docs/implementation/dylan_phase4.md) |
-| Dixon | Independent HTTP tester, fixtures, answer keys and tester CI | [Tester](docs/implementation/dixon_phase4.md) |
-| Ryan | System testing interface, session measurement, execution limits and review UI | [UI and measurement](docs/implementation/ryan_phase4.md) |
+| Jackson | APIs, persistence, lifecycle, durable jobs, integration/deployment | [Backend](docs/implementation/jackson_phase5.md) |
+| Dylan | Deterministic six-rule engine, preservation and evidence tooling | [Engine](docs/implementation/dylan_phase5.md) |
+| Dixon | Independent tester, fixtures, coverage profiles and CI | [Tester](docs/implementation/dixon_phase5.md) |
+| Ryan | Test clock, measurement, lifecycle UI and accessibility | [UI](docs/implementation/ryan_phase5.md) |
 
-Owner handoffs retain their original contribution-time context. Use the integration
-record, merged PR and current shared pack for later resolutions, including the tint
-correction; earlier handoff statements about absent modules or pending tint agreement
-are historical.
+Use [the deployment runbook](deploy/README.md) and [automatic deployment procedure](deploy/AUTODEPLOY.md).
+Development Compose is `docker compose -f deploy/compose.yaml up --build` with private inputs;
+use `http://system:8000` in the Docker tester's exact target maps. Production uses persistent
+storage, private S3, HTTPS, two worker slots and the installed Phase 5 manifest. Its private
+URL→team identity map must be configured before tester setup. Push CI for the exact main SHA
+controls automatic host activation; a local branch is not a deployment.
 
-Development Compose: `docker compose -f deploy/compose.yaml up --build` with private `.env.local`.
-Configure the tester target/access map for `http://system:8000`; container loopback refers to
-itself. Use `TEAM9_BUILD_TARGET=measurement` when enabling coverage. Named volumes preserve
-system/tester state independently. The existing production deployment uses EC2, persistent
-storage, private S3 and HTTPS. See the deployment runbook for operation and the original
-provisioning templates, and [automatic deployment](deploy/AUTODEPLOY.md) for CI-gated updates
-of the existing host. Additional provisioning requires separate operator authorization.
-
-System schema 2 migrations preserve Phase 3 records; tester sessions retain immutable
-fixture-plan snapshots. Original and generated workbooks, historical audits and retained
-reports survive restart and release. The CD poller requires successful **push CI for the
-exact main SHA**. It drains active work, stops writers before backup/migration, and checks
-the candidate privately before opening ingress. Pre-publication rollback can restore the
-quiescent database snapshots. Once ingress may have opened, recovery retains the new data
-and pinned release. Green CI verifies source; confirm host health and deployment state
-through the runbook before assuming that a particular release is active.
+Schema 3 preserves earlier audits/reports. Successful deletion must also purge registered
+managed content copies. Preserve the newest independent deletion journal across restore;
+never restore an older journal or Phase 4 binary after an acknowledged Phase 5 deletion.
+See the backend runbook before activation. This integration does not provision resources or
+change the running host.

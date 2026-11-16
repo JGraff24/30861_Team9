@@ -1,5 +1,11 @@
 # Dylan — Phase 5 workbook processing and audit engine
 
+Current integration: PRs #16–#19 are combined on `integration/phase5`. See the
+[Phase 5 integration record](../evidence/phase5_integration.md) and
+[Class Access Guide](../Team9_Class_Access_Guide_Phase5.md) for the current assembled
+configuration and fresh evidence. The contribution-specific results and handoff boundaries
+below retain their original revision context.
+
 Target: specification 3.0.0, ruleset 2.0.0 (unchanged), pack 3.0.0. Base: `main` at
 `ca6becb` (the reviewed Phase 4 baseline). This contribution changes **no production
 code**: no rule, finding identity, finding target, correction profile, tint policy,

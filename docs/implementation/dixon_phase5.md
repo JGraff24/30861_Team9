@@ -1,5 +1,11 @@
 # Dixon Phase 5 implementation: independent tester and CI
 
+Current integration: PRs #16–#19 are combined on `integration/phase5`. See the
+[Phase 5 integration record](../evidence/phase5_integration.md) and
+[Class Access Guide](../Team9_Class_Access_Guide_Phase5.md) for the current assembled
+configuration and fresh evidence. The contribution-specific results and handoff boundaries
+below retain their original revision context.
+
 Branch `phase5/dixon-tester`, based on `main` at `ca6becb` (the reviewed Phase 4 baseline).
 Target contract: Pod E specification/pack 3.0.0 (ruleset 2.0.0, suite target 3.0.0), copied
 byte for byte into `docs/contracts/phase5/` (hashes verified by `SHA256SUMS.txt` and a unit

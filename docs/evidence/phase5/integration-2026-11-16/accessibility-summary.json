@@ -1,0 +1,3500 @@
+{
+  "scans": 84,
+  "violations": 0,
+  "minimumComputedTextContrast": 8.137418719154375,
+  "manualAcceptance": "Pending; automated scans and samples do not establish human keyboard/interface or full contrast acceptance.",
+  "results": [
+    {
+      "file": "browser-phase5/root-busy-confirmation.json",
+      "sha256": "92234f7991559a2c72cebc161512582758b9a1579e65c0e1599999df79bec49a",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-busy-connect.json",
+      "sha256": "eb131617405986d7f765f2d3d0bb96dff6eee23f43393eb90f55e2cdf49d25ec",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-busy-error.json",
+      "sha256": "dacfba475c3b8329f6b69dcad65af99d1356d484130cc7a5cae3d3fa6522ce01",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-busy-invalid-interval.json",
+      "sha256": "820925970e33bba263e60c83ab071c7b611e22927c927bc52278d4835a3b68e0",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-busy-schedule.json",
+      "sha256": "efb0366ee5ca3046896b861fba27ab3b6f5e7bf5485c2e7abff5ca02818163bb",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-empty-confirmation.json",
+      "sha256": "ea6eef0e01fcdfcc29e203193f9e1cbb25b258fab208edbe4cfc7be0478f1c05",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-empty-connect.json",
+      "sha256": "0889718a303d8766dc86b025778e5da8fcd2589dcea9a07b65c9941b87621b3e",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-empty-invalid-interval.json",
+      "sha256": "9187c1eb72af6a7c0de233ae73a12b1979debfd51a5128ee7bd17e07f46739b7",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-empty-schedule.json",
+      "sha256": "29ad3dc5ba9fb150af2acffea55ab24b0ef65c229f617d10fe8dc6874fe12766",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-lost-delete-confirmation.json",
+      "sha256": "7be96212a71636bdfc52cef2e69629b56bce5d34bb90b48f3070547c58fe939a",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-lost-delete-connect.json",
+      "sha256": "ea430fe74157c4b6f9c110ce96d0873ce9b0cf63e7211f7587f7b6701ad615fb",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-lost-delete-error.json",
+      "sha256": "f16ad93044dac6ee87a23143a62f4532442b8e77f6496d2cf0c1fddbe7a9860c",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-lost-delete-invalid-interval.json",
+      "sha256": "80cab101ecfe5ec132def2dbb1184e7f437329804fe6d6bfd86f4f18d9fecfae",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-lost-delete-schedule.json",
+      "sha256": "9c9957b96163e11fc2683612e4f391211de886d71a4b5b69519ddff327abb194",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-lost-save-confirmation.json",
+      "sha256": "a01b5b06ce0ed66ca097e67c126fdeb3da2062c3523856ba62099baf985d53a3",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-lost-save-connect.json",
+      "sha256": "4336f1df329e105b687c913026e587da6c70cc35fd97150c8052cb251350d6f8",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-lost-save-invalid-interval.json",
+      "sha256": "bebe9e3c32aab83030e7ae6d779b7282502083d6b97171d3b86cd623927d3f3d",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-lost-save-schedule.json",
+      "sha256": "a068327b1ce1a4c33616e9a504b70b5d341c4187bda67a6048143f35175fc1ee",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-partial-confirmation.json",
+      "sha256": "d5b064dcfced9766e4d964f6bede90803bf1383e4b9efeb6647033995aefeff1",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-partial-connect.json",
+      "sha256": "cddc1aab01730488b7b9febb815f6c8a26dad09b0610e04db5bdfe0e57ac41dc",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-partial-error.json",
+      "sha256": "0ecedf92aebc4142eedbff71444b8f3d32874258df61224c724f85d1ee7bd074",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-partial-invalid-interval.json",
+      "sha256": "04bf3bfe1773ff65d527985d4e01f16ef7ee67fac3070da903e081cd387283b3",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-partial-schedule.json",
+      "sha256": "bdb0c54c9de33f0198f7b9e36e637b53851048ed198bb19ebe0a75eb0cf0dfec",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-predelete-confirmation.json",
+      "sha256": "f7961e609f25239f994ee9d201e0d43781e90da7e1fe0304c62634251bdd2c9b",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-predelete-connect.json",
+      "sha256": "47905b96eab140e0712d7fcbb4af9361228e5f22ece0a294fca05b9e09c6c13f",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-predelete-error.json",
+      "sha256": "17ad385031b7f5f87f868cfd0196d81e3f3923395e66cd55576da9ba0b67c74a",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-predelete-invalid-interval.json",
+      "sha256": "f8484c2688ce937d1ddb01196d2c990ef9816089802521e4555c41cb990aabd8",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-predelete-schedule.json",
+      "sha256": "213afba99b47418b6f46263bb73ea57683d93fbf879f2ef20874943359305282",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-reviewer-connect.json",
+      "sha256": "f15e197979df27e948e0ff68cd1599e0cad39168b29979801ecc45cca004b2bb",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-reviewer-schedule.json",
+      "sha256": "143bc312a4707f37ea719a266efaa9c4fde4336cbcd43bb3e2cac5e6035d8c52",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-workflow-confirmation.json",
+      "sha256": "6e1864473924c06623decf7e7730adf5ffb353fd21bcdd3b4e5d1e814c90d6aa",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-workflow-connect.json",
+      "sha256": "2968c15204a9e42f3be488d56e8ff355335c64e865059b3c4a2cefcc67128d33",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-workflow-invalid-interval.json",
+      "sha256": "1d3cab3273eaea5c46959ac099005488e1550fb0c82a9ab197c207adffd0f31b",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/root-workflow-schedule.json",
+      "sha256": "edb897496dafd140a928b2147e4c93131aceb0d73d952ede6179cffd9ff7c3f9",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-busy-confirmation.json",
+      "sha256": "82489c6560c3726ddeb7fec2b9943d027fde14522a38129d0e38fa102ef29a29",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-busy-connect.json",
+      "sha256": "57543d3a91803adfba92be07554611e587b18c7f186c65d225e98c3997cc0312",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-busy-error.json",
+      "sha256": "416be4770343f045d9fa4aa97df2034eb5b81accf617edb7bb5ce5323a4d893b",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-busy-invalid-interval.json",
+      "sha256": "18a9cad5c4a877f5348b431420c592cc5b9a47ce295f299d8503c44c65479e0c",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-busy-schedule.json",
+      "sha256": "f1e4958f5f473da7cf59a57cfabf8b6edbba516c63cf18422f08dc04957a9d53",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-empty-confirmation.json",
+      "sha256": "6a0c3bb523d3fa620c8c996598fdd77ac0f0d7783d8919669622fd7450fa6c4b",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-empty-connect.json",
+      "sha256": "c915e6c29058d78ab0f44148342d093f640dc92be452730b4f3803b9ab697ec3",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-empty-invalid-interval.json",
+      "sha256": "82d7f65615f10b2ec5c01eea4df968de589be972d118cf7f263f851e21d04064",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-empty-schedule.json",
+      "sha256": "f70ffb075ae8b6f823858218470b1ca7f4bcaa5386993887b3ac2d29765af8c3",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-lost-delete-confirmation.json",
+      "sha256": "f8d6d4023b7036e3c4b1963d30908b7a4826a52f4fe77a4aeba82ba85d3bc01a",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-lost-delete-connect.json",
+      "sha256": "645bb7d7c9a006b2fa599aa782325491570f226edeab93e69d8df75e137018e0",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-lost-delete-error.json",
+      "sha256": "83a4112c51ce5aa9ccc43ae5afeebc6d5ed252b4a38681a102dc3fc7bfa1cddc",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-lost-delete-invalid-interval.json",
+      "sha256": "2b91853c108c84b8bfacc2b59204617839197842b75e72de045dce72bdf46b60",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-lost-delete-schedule.json",
+      "sha256": "924ca6adb8a175310708b82065c6294e0cc9b7b08703eaad1631258d13ffe986",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-lost-save-confirmation.json",
+      "sha256": "023add63cdb4616f59c504703d528bd9dfc12e9f8e80154018bcd7f5b4e69c68",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-lost-save-connect.json",
+      "sha256": "2d960e0880925d3bcd620339acf8d40462135751ea1df3e7c0b865eef48bb39f",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-lost-save-invalid-interval.json",
+      "sha256": "b62896dbb871b66bec774471ef5b7ce0256cccc5d63532a81fb17f599c88b77a",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-lost-save-schedule.json",
+      "sha256": "63948a3709c6c40aadc3d345be4f785263188a69153f8b0b14d87339c49eb879",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-partial-confirmation.json",
+      "sha256": "577c2d33ed0dbbaba4f847a9141c60b5e7e65f559b179b6c7cdf7b0d567ed259",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-partial-connect.json",
+      "sha256": "a597916e0e2acb89153208155f5b9b34d62373eadf1f756cac35c139c36d65b2",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-partial-error.json",
+      "sha256": "cc7a8b88d4d172f2f8080ef0b6aa5ada65ed6f5456ea1a5663896f9e6f95af60",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-partial-invalid-interval.json",
+      "sha256": "ccd31be9a615345e0993539e8d893cca03fb5cabc3765aac6ef68aa32d262e5b",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-partial-schedule.json",
+      "sha256": "372a11b1c7bc9abb4671e23e1a27be3c68569ff988a3b9a740e70b3a46a19787",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-predelete-confirmation.json",
+      "sha256": "e4f846715c39ba9ae463eb624510774d9588a3829e672c0b3b900bcbd68545de",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-predelete-connect.json",
+      "sha256": "5ceb3470cb9f5d3b20ecb588cac97812f66a0d833514e7656f141393a3883a8b",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-predelete-error.json",
+      "sha256": "ecd8037571361c7562bfaf8dee264a8c200ffad52be46539ea12feb6f9cd34b3",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-predelete-invalid-interval.json",
+      "sha256": "cc6f86cc48c6988d47f267980051911c34c511d621cc9068a991ade6ce374a41",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-predelete-schedule.json",
+      "sha256": "f3cd3c431a3ef47ab64147fc0b0bbb9f39c713ad5e10124056ce34ae7baa31c1",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-reviewer-connect.json",
+      "sha256": "575018b82a15203b5788560eaf83220453dddf3f1f52a846783f6b553ca6cc82",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-reviewer-schedule.json",
+      "sha256": "c0f628ee76edec94deb8d530351693f09f86e095f28b4ad537a15a606f021c82",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-workflow-confirmation.json",
+      "sha256": "86d1985c5215895893f51de174e53034ad5e5b7edd0a836fcdc08e4c6ea5eb43",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-workflow-connect.json",
+      "sha256": "2038a2688a5286f6423dc5703cf8d0fde8783136f43ca158b4367cb9960c2242",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-workflow-invalid-interval.json",
+      "sha256": "e9c6863b0b95a0246f4099868f4cb08603c4a78d42322dad0fb16aab78992c4c",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-phase5/system-workflow-schedule.json",
+      "sha256": "3a212c06422b236864ed798629922b70f3bf782c592b8ac1f0e9a56c1221940f",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/root-authorization-error.json",
+      "sha256": "7c44a74bf7693416483ccc305af93b53d0b72a5fbefbcd3fe73cd59b8cf89aad",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/root-correction-forms.json",
+      "sha256": "53b6c3b686b0107ee321983e7088f3510d596826492df6e67ab0192ea461e130",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#decision-0-description",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/root-delete-confirmation.json",
+      "sha256": "40daf9d04ce4201086f9597a299512d2efca4a31048040ca63e970762ead9307",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/root-findings.json",
+      "sha256": "dc68904cb42eaf2ebe4f4374e956383c41518b0723461ab45826d14190e7c076",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/root-output.json",
+      "sha256": "98e2aceebe73e415aa86f1b547a0f2c39e34d9ab2310f50b770e20aeac8aa221",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/root-reviewer.json",
+      "sha256": "a8a0dde0cf95fbe8567498d2686364e29231beb3a02686d641d71d22459a3ab1",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/root-schedule.json",
+      "sha256": "c74b8724ab0980b79327e4c8222648bfc81d5e57f16d579f7230eb94974c6967",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/root-upload.json",
+      "sha256": "07cafddaf5e14e16e49f2c23e2b6af111213c924a59ba232126786f6565837c4",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/system-authorization-error.json",
+      "sha256": "5bac59dc1b57662fa4403dc937c323c2c1d92c6ed029ecb923a4e49fa231edbd",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/system-correction-forms.json",
+      "sha256": "a4ea097cfa962ddd4d659627c7025bd5514311c113689d4747a0c71e7144ce69",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#decision-0-description",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/system-delete-confirmation.json",
+      "sha256": "a0198bb668d673c702b141dd9599f850f4a613b50dd8476e6c889964378e2744",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/system-findings.json",
+      "sha256": "7c17806e102ab91465a433f5c360698adce3467e3d02ae682ca33e2a8717ed7f",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/system-output.json",
+      "sha256": "a13a3ebfa07c7178e8aeb1e5b2362112ce353673801744e2a2c517beb5dddeea",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/system-reviewer.json",
+      "sha256": "fe420a0accb0e5231dd75960b48f5d34193f957ad8fa02fc903dae4c8fe4c166",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/system-schedule.json",
+      "sha256": "c7ad6a9eee72449918feddae2cbeac127951646676b13c9a35a42ef588fc6c9e",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    },
+    {
+      "file": "browser-real/system-upload.json",
+      "sha256": "b2815e4dd894d7b26973186921cf695682b28bc6245f1fb694a5d4dc301f6ee7",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ],
+      "analyzer": {
+        "name": "axe-core",
+        "version": "4.11.0"
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "windowWidth": 1280,
+        "windowHeight": 720,
+        "orientationAngle": 0,
+        "orientationType": "landscape-primary"
+      }
+    }
+  ]
+}

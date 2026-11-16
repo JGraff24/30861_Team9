@@ -2,8 +2,8 @@
 
 The existing AWS deployment serves the website at
 https://3.139.178.70.sslip.io/system/ and the tester API documentation at
-https://3.139.178.70.sslip.io/tester/docs. For shared class application credentials and
-instructions, use the [Phase 4 Class Access Guide (PDF)](../docs/Team9_Class_Access_Guide_Phase4.pdf).
+https://3.139.178.70.sslip.io/tester/docs. Hosted testing of this integration was deferred at Jackson's request on November 16, 2026; these registered URLs do not identify a deployed Phase 5 release. For shared class application credentials and
+instructions, use the [Phase 5 Class Access Guide](../docs/Team9_Class_Access_Guide_Phase5.md) ([PDF](../docs/Team9_Class_Access_Guide_Phase5.pdf)).
 The [original Phase 3 guide (historical PDF)](../docs/Team9_Class_Access_Guide.pdf) is retained
 at its existing path.
 
@@ -31,7 +31,7 @@ replace or recreate the current AWS resources.
 - `aws.yaml`: reviewable CloudFormation for one EC2 instance, HTTPS security group, instance role,
   retained encrypted gp3 data volume, private encrypted source bucket and budget notification.
   Existing VPC/subnet and operator-chosen Amazon Linux 2023 AMI are inputs. Nothing auto-deploys.
-- `nginx.conf.template`: strips `/system/` and `/tester/`, 26 MiB HTTP body allowance and 1,900-second
+- `nginx.conf.template`: strips `/system/` and `/tester/`, 26 MiB HTTP body allowance and 2,700-second
   tester timeout. Application file limit remains exactly 25,000,000 bytes (plus 65,536 multipart bytes).
 - `iam-role-policy.json.template`, `bucket-policy.json.template`: reviewable policy examples for
   an existing bucket instead of CloudFormation. Do not apply both alternative plans blindly.
@@ -73,8 +73,8 @@ health returns 200 when storage and required integrations are available. Use
 `TEAM9_BUILD_TARGET=measurement` for development Compose when enabling code measurement.
 The tester is implemented and its manifest/fixtures are included in the installed wheel.
 The Docker build also copies the shared wire-schema source before building that wheel.
-Production selects its bundled Phase 4 manifest at
-`/service/.venv/lib/python3.12/site-packages/tester/fixtures/manifest-phase4.json`; there is no
+Production selects its bundled Phase 5 manifest at
+`/service/.venv/lib/python3.12/site-packages/tester/fixtures/manifest-phase5.json`; there is no
 source checkout under `/service/tester` in the runtime image.
 The Docker build copies fixture inputs before packaging and runs the installed wheel so
 package-relative fixture/UI paths resolve. Validate local image/Compose changes separately
@@ -126,8 +126,7 @@ only disables the SDK path. The API/worker child guard receives no AWS or bearer
 public ACL is sent. The role can Get/Put/Delete only the chosen source prefix; ListBucket is
 used by HeadBucket health. DeleteObject is required for compensating failed-upload cleanup
 and explicit test cleanup. IAM cannot distinguish a committed key from an uncommitted key in
-this application design; internal code is the deletion boundary. There is no ordinary deletion
-HTTP endpoint. Bucket versioning/Object Lock are not enabled in this template: adding them
+this application design; internal code is the deletion boundary. Owners can delete workbooks through the Phase 5 DELETE endpoint; cleanup includes stored object versions and registered managed backups. Bucket versioning/Object Lock are not enabled in this template: adding them
 requires lifecycle/cleanup/retention design and cost review.
 
 ## Build, TLS, release and startup
@@ -179,47 +178,47 @@ are up. Verify a valid certificate using an HTTPS client without `-k`, and test 
 `/tester/docs`, `/system/api/v1/health`, rejected credentials and authenticated real workbook
 flow. Check security groups and host sockets to prove direct APIs are unreachable publicly.
 The grader uses `https://$SERVER_NAME/system` and `https://$SERVER_NAME/tester` bases, never `/test`
-suffixes/credentials/queries. Grader tester-run read timeout must be at least 1,830 seconds for the Phase 4 suite.
+suffixes/credentials/queries. Grader tester-run read timeout must be at least 2,430 seconds for the Phase 5 suite.
 
 ## Recovery, backup, cleanup and rollback
 
 On API restart and authorized status polling, expired queue deadlines/leases become controlled
 failures. Workers also recover them before a claim. A live lease is never stolen; no audit is
 replayed after lease expiration. The worker polls every 0.25s and queue deadline defaults to 15s.
-Under sustained load, Phase 4 audits may accept then fail with `PROCESSING_TIMEOUT` and
+Under sustained load, six-rule audits may accept then fail with `PROCESSING_TIMEOUT` and
 `details.stage="queue"`; retained Phase 3 errors keep their original codes. Tune capacity using
 measured load without increasing the specified deadlines. An unavailable DB may prevent immediate failure storage;
 recovery records the failure when storage returns. JSON logs emit IDs, status/code/duration,
 not workbook data/tokens/alt text. No Prometheus/CloudWatch metrics pipeline is installed.
 
 External isolated sessions protect deployment between requests through a renewable internal
-1,900-second lease. Only authenticated allowed session activity renews it; expiry does not
+2,700-second lease. Only authenticated allowed session activity renews it; expiry does not
 delete a session or change coverage. `/test/report` remains read-only. The deployment script
 waits before Docker builds and before activation. See [the November 1 investigation](../docs/implementation/hosted_failures_2026-11-01.md)
 for the incident evidence, the remaining cross-team target discrepancy and verification scope.
 
-Use SQLite's online backup API (or stop both writers before a full volume snapshot); copying
-only the live `.sqlite3` file can lose WAL data. An operator backup example inside the running
-system container is:
+Use SQLite's online backup API (or stop both writers before a full volume snapshot);
+copying only the live `.sqlite3` file can lose WAL data. The deployment script creates
+registered system metadata backups under `/data/deletion-backups/<release>/system.sqlite3`,
+preserving ownership and permissions. API and worker mount that system-content tree for
+owner-deletion cleanup. Keep private Compose configuration and independent tester backups
+in the separate host-only tree. Do not create unregistered system content copies in the live
+state directory. Additional copies must be registered with the managed-backup settings and
+covered by the deletion/restore procedure before owner deletion is enabled.
 
-```sh
-docker compose -f deploy/compose.production.yaml exec -T system python -c 'import sqlite3; src=sqlite3.connect("/service/state/system.sqlite3"); dst=sqlite3.connect("/service/state/backup.sqlite3"); src.backup(dst); dst.close(); src.close()'
-```
+Off-host database/blob copies, replication and EBS snapshots need a separately authorized
+purge/restore procedure. Retaining an unmanaged content snapshot can violate acknowledged
+owner deletion. These actions and costs were not executed by this integration. Rehearse an
+isolated restore of metadata and source objects with the newest independent deletion journal;
+confirm deleted resources remain 404. Schema 3 upgrades schemas 1/2 transactionally. Never
+restore an older deletion journal with a content snapshot. See the backend Phase 5 runbook
+for the full procedure. Local deployment backups alone are not off-host disaster protection.
 
-Copy the backup to the separately authorized encrypted backup destination; snapshot EBS with a
-retention plan and back up tester data separately using Dixon's final storage procedure. Source
-bytes in S3 must be retained for referenced keys. Test restoring metadata+source keys in an
-isolated environment before calling backups verified. The example backup file is inside EBS
-and is not itself off-host protection. Snapshot/backup copy actions incur costs and remain
-unexecuted. The application schema currently supports version 1 only; startup refuses newer
-schemas. Future migrations require a matching restore/rollback plan.
-
-For scoped test resets, Ryan's future SessionService must call `begin_session_cleanup` with
-the owning administrator; it rejects active jobs and reserves CLEANED, returns only that test
-namespace's blob keys, deletes with `delete_test_source`, then calls `finish_session_cleanup`.
-Record partial deletion with `mark_session_failed`; retry the same reservation. Never reopen
-CLEANED or wipe global tables/blobs. These repository primitives are tested; no standalone reset
-HTTP operation or CLI bypass is delivered. Ordinary workbook deletion remains future work.
+For scoped test resets, the implemented session service uses administrator-owned cleanup
+reservations, rejects active jobs and removes only the owned namespace, including its clock,
+scheduler and reminder state. Partial cleanup retains a recoverable reservation. Ordinary owner
+workbook deletion is a separate Phase 5 API operation; it does not delete independent tester
+reports. Do not wipe global tables or bypass deletion journals.
 
 For rollback, stop API+worker, retain EBS/S3, select the previous reviewed image digest and its
 source SHA, ensure schema compatibility, then restart and run readiness/integrity checks. If a
@@ -227,7 +226,7 @@ schema migration is incompatible, restore the matching backup in an isolated vol
 Do not rewrite completed audit history or requeue stale work. Keep failed sources inspectable.
 If blob rollback fails or a process dies between blob put and metadata commit, an unreferenced
 blob can remain. Reconcile keys against metadata/backups during an operator maintenance window;
-never automatically delete committed/unknown keys. Full reconciliation tooling is Phase 4 work.
+never automatically delete committed/unknown keys. Use the Phase 5 registered-copy and deletion-journal procedure for retained content.
 
 ## References checked during preparation (2026-10-16)
 
@@ -238,7 +237,7 @@ never automatically delete committed/unknown keys. Full reconciliation tooling i
 - [Instance metadata options](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-options.html): operator review for containers and role access.
 - [EC2 pricing](https://aws.amazon.com/ec2/pricing/): verify current region/account costs at deployment; no price quote is recorded here.
 
-## Phase 4 activation and schema recovery
+## Historical Phase 4 activation and schema recovery
 
 Use the automatic release process described in [AUTODEPLOY.md](AUTODEPLOY.md) for the existing
 host. Production Compose explicitly overrides retained Phase 3 ruleset/manifest values and
@@ -255,10 +254,9 @@ retry. Never restore a pre-release backup over data accepted after publication.
 
 ## Phase 5 backend rollout
 
-The current backend upgrades metadata to schema 3 and adds scheduling, reminders and
+The integrated Phase 5 backend upgrades metadata to schema 3 and adds scheduling, reminders and
 recoverable owner deletion. Follow [Jackson's Phase 5 operations and restore procedure](../docs/implementation/jackson_phase5.md)
 for backup registration/migration, the deletion journal, required S3 version permissions,
-clock/fault enablement and monitoring. Those instructions supersede the earlier schema-1
-and future-deletion notes above. The worker retains two execution slots. Deployment and
+clock/fault enablement and monitoring. Those instructions govern all schema-3 content copies and deletion recovery. The worker retains two execution slots. Deployment and
 proxy protection is now 2,700 seconds for a 2,400-second Phase 5 suite; caller read timeouts
-must be at least 2,430 seconds. The existing Phase 4 tester is not relabeled as a Phase 5 suite.
+must be at least 2,430 seconds. Production now selects the actual 395-case Phase 5 manifest 3.0.0, not the historical Phase 4 suite. Configure TESTER_TEAM_ID=team9 and the exact TARGET_TEAM_MAP_JSON in the private runtime inputs before setup. Own-team setup requires the packaged design map; the draft map still needs team confirmation. No live release is claimed by these source changes.
