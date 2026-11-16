@@ -82,6 +82,8 @@ def settings(tmp_path: Path, **overrides: Any) -> SettingsForTester:
             digest(OTHER_OPERATOR): "other",
         },
         "fixture_manifest_path": MANIFEST,
+        # This fixture deliberately exercises the retained Phase 3 plan and deadline.
+        "tester_run_timeout_seconds": 600,
     } | overrides
     return SettingsForTester(**values)
 

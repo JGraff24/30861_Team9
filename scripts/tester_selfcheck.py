@@ -84,6 +84,7 @@ def main() -> int:
                 phase5_access_map() if args.phase5 else access_map()
             ),
             "FIXTURE_MANIFEST_PATH": str(manifest),
+            "TESTER_RUN_TIMEOUT_SECONDS": {"5": "2400", "4": "1800", "3": "600"}[phase],
             "FAKE_TARGET_PHASE": phase,
             # Trusted Phase 5 profile configuration (never part of a grader request).
             "TESTER_TEAM_ID": "team9",
