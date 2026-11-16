@@ -202,7 +202,13 @@ health response or restored Wi-Fi connection does not establish that either rele
 Record the deployment SHA/image and then retain hosted own-team/reciprocal reports separately
 from the local integration evidence.
 
-The Phase 5 private tester probe validates its own report profile and packaged design map
-before proxy publication. An invalid/missing profile prevents activation. This is a read-only
-configuration check and creates no target/tester sessions. The explicit own-system URL does
-not infer identity for similar hosts or unconfigured cross-team targets.
+Production declares its own URL through `TESTER_OWN_TARGET_URL` and the unchanged Team 12 URL
+`https://13.184.14.226.sslip.io` as `team12` through `TESTER_DEPLOYMENT_TEAM_MAP_JSON`. Settings
+merge these identities with `TARGET_TEAM_MAP_JSON`, preserving additional private entries and
+rejecting conflicts. Existing private approvals and target credentials are reused.
+
+The Phase 5 private tester probe validates both declared targets' report profiles and credential
+configuration, including the own-team packaged design map, before proxy publication. An invalid
+or missing profile/credential entry prevents activation. This read-only configuration check
+creates no target/tester sessions and does not establish that Team 12's remote service is ready.
+Identity is never inferred from similar hosts or supplied by a caller.

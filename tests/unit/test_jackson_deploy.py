@@ -125,6 +125,9 @@ def test_designated_production_target_overrides_only_release_capabilities() -> N
     assert 'ENABLE_TEST_CLOCK: "true"' in source
     assert "TESTER_TEAM_ID: team9" in source
     assert "TESTER_OWN_TARGET_URL: https://${SERVER_NAME:?Set deployed hostname}/system" in source
+    assert (
+        'TESTER_DEPLOYMENT_TEAM_MAP_JSON: \'{"https://13.184.14.226.sslip.io":"team12"}\'' in source
+    )
     assert "env_file: ${TEAM9_ENV_FILE:" in source
     assert "SYSTEM_TOKEN_HASHES_JSON:" not in source
     assert "TARGET_AUTH_MAP_JSON:" not in source

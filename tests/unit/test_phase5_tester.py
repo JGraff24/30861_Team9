@@ -9,7 +9,7 @@ import hashlib
 import json
 from collections import Counter
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import pytest
 from fastapi.testclient import TestClient
@@ -18,6 +18,7 @@ from pydantic import ValidationError
 from app.contracts.models import CoverageMeasure, Outcome, SuiteReport
 from scripts.build_phase5_manifest import build, render
 from scripts.check_phase5_policy import EXAMPLES, VECTORS, check_examples, check_policy
+from tester.config import TargetAuth
 from tester.config import TesterSettings as SettingsForTester
 from tester.main import TesterServices as ServicesForTester
 from tester.main import create_app
@@ -294,6 +295,65 @@ def test_explicit_own_target_rejects_ambiguous_configuration(
 ) -> None:
     with pytest.raises(ValidationError):
         settings(tmp_path, **({"tester_own_target_url": BASE_URL} | overrides))
+
+
+@pytest.mark.parametrize("kind", ["own", "cross"])
+def test_deployment_identities_allow_both_profiles_without_private_mappings(
+    tmp_path: Path, kind: Literal["own", "cross"]
+) -> None:
+    other = "http://127.0.0.1:8010"
+    own, cross = (BASE_URL, other) if kind == "own" else (other, BASE_URL)
+    report, raw = run_phase5(
+        tmp_path,
+        FakePhase5(**SMALL),
+        allowed_target_urls=[own, cross],
+        tester_own_target_url=own,
+        TESTER_DEPLOYMENT_TEAM_MAP_JSON={cross: "team12"},
+        TARGET_TEAM_MAP_JSON={},
+        tester_design_map_path=DESIGN if kind == "own" else None,
+    )
+    check_report_profile(report, kind)
+    assert (b'"model"' in raw) == (kind == "own")
+    assert not {"fail", "error"} & set(outcomes(report).values())
+
+
+def test_deployment_mapping_preserves_private_targets_and_credentials(tmp_path: Path) -> None:
+    cross = "http://127.0.0.1:8010"
+    additional = "http://127.0.0.1:8011"
+    configured = settings(
+        tmp_path,
+        allowed_target_urls=[BASE_URL, cross, additional],
+        tester_own_target_url=BASE_URL,
+        TESTER_DEPLOYMENT_TEAM_MAP_JSON={cross: "team12"},
+        TARGET_TEAM_MAP_JSON={additional: "team7"},
+    )
+    assert configured.target_team_map == {BASE_URL: "team9", cross: "team12", additional: "team7"}
+    assert configured.target_auth_map[BASE_URL] == TargetAuth.model_validate(access_map()[BASE_URL])
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"TARGET_TEAM_MAP_JSON": {BASE_URL: "team9", "http://127.0.0.1:8010": "team7"}},
+        {"allowed_target_urls": [BASE_URL]},
+        {"TESTER_DEPLOYMENT_TEAM_MAP_JSON": {BASE_URL: "team12"}},
+    ],
+)
+def test_deployment_mapping_rejects_conflicts_and_unapproved_targets(
+    tmp_path: Path, overrides: dict[str, Any]
+) -> None:
+    with pytest.raises(ValidationError):
+        settings(
+            tmp_path,
+            **(
+                {
+                    "allowed_target_urls": [BASE_URL, "http://127.0.0.1:8010"],
+                    "tester_own_target_url": BASE_URL,
+                    "TESTER_DEPLOYMENT_TEAM_MAP_JSON": {"http://127.0.0.1:8010": "team12"},
+                }
+                | overrides
+            ),
+        )
 
 
 @pytest.mark.parametrize(
