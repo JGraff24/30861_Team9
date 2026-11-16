@@ -1,0 +1,2649 @@
+{
+  "tool": "axe-core 4.11.0",
+  "browser": "Playwright 1.58.0 Chromium 145.0.7632.6 Ubuntu 24.04 fallback on Ubuntu 26.04",
+  "manualValidation": "PENDING",
+  "scanCount": 84,
+  "violationCount": 0,
+  "scans": [
+    {
+      "file": "simulated/root-busy-confirmation.json",
+      "sha256": "06b09a189ec70aea2ddd6770ca37b1568f9a43265f25a0d389a8bf3e44d58982",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-busy-connect.json",
+      "sha256": "08101de1ead961db5e841b79e6c5b23366bbea1d1d969a6de1516d645a3fed12",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-busy-error.json",
+      "sha256": "333f3b34fa8f51591698bf5267d08dced7eb6f4764764f65c1314eba5b8dc16e",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-busy-invalid-interval.json",
+      "sha256": "d677092b426de8346eefe49232da494342748fd17bb480dcb452d533a68d9e70",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-busy-schedule.json",
+      "sha256": "3602d2591e42f82b45c7be846f5c4c4b5a99b5218d810d669b6ac8e6ed9e2deb",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-empty-confirmation.json",
+      "sha256": "5b1dbc36e547291e7a747e1bc57554bab5980eaa7c775e733b67a5466a1b52c7",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-empty-connect.json",
+      "sha256": "2a4a4ac867a22b66e6a0d64089c6e38ce07df83327c6f207cbb2d2c2872fe95b",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-empty-invalid-interval.json",
+      "sha256": "595c1c67d6e56eb23518fe2d5cdccfb5a7e779d2cf431e49437b9e43f73201c3",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-empty-schedule.json",
+      "sha256": "8bdd08c6c20f99e74c4298f09117eaa15626225025a7558c077c8ea98d87b0ce",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-lost-delete-confirmation.json",
+      "sha256": "ae31a34dfee07734b450c2d8199051c512b73663f61a8cda72f9cec16f71d1c9",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-lost-delete-connect.json",
+      "sha256": "3551452c1402fe5458acc172644098f7f097866a319143f465b4cd5ae6812988",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-lost-delete-error.json",
+      "sha256": "7a00f04b9be96e476767921f51081145e2d90bfd2d0e29f1849c9440fd2eafd7",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-lost-delete-invalid-interval.json",
+      "sha256": "f336477078d33c00709441618346e9a0469af5c69a9590b48b4d435bd58d4d89",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-lost-delete-schedule.json",
+      "sha256": "7916da9d3cfeef652d03f05b216823fe64f19210185cf720167f79314edc78aa",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-lost-save-confirmation.json",
+      "sha256": "c3db2dc68ab173205334b33c1bb6850c7686429715b98645959ae1a95e8d3df0",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-lost-save-connect.json",
+      "sha256": "03cd4768ca6c05d0c5de0134747b630ec6d147137377b3c6c203f51b7fc3796a",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-lost-save-invalid-interval.json",
+      "sha256": "20541fd376ca47a54cee3f96b4d526614c9eb6f24e0faabded8c3e12ca321b4f",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-lost-save-schedule.json",
+      "sha256": "3d87e8b44253dbf755863511b62c725204103517ede6325627a1cabd0cb86d38",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-partial-confirmation.json",
+      "sha256": "285526ccb078b8c5b8bcd02e89017e7cec4b9e7fac26729c44fd872882884358",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-partial-connect.json",
+      "sha256": "75359d687f571d18bc052b91655bb525c36884ff83201893f3f6d2dc313a3c52",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-partial-error.json",
+      "sha256": "f8b46084e1f6565ced86a504ce79a0bf05845ab37ccd6afd7f440663ee8cddd9",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-partial-invalid-interval.json",
+      "sha256": "5ba5a1120f8184819216bd0ab8e5c56d3e6adc5f6b5a984d5ff1d7a37e6cbe57",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-partial-schedule.json",
+      "sha256": "8144d61fc6186a45cca44e51b23a1e46ea1c17ba1f907e5bfe60d439a1c49704",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-predelete-confirmation.json",
+      "sha256": "2f7867a359bfa80565405d99da877bfba404e829d7ff20c461b5ca0b62141d35",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-predelete-connect.json",
+      "sha256": "330117015df04e843c035a90fc41d149321120faee27dba15b108f1a62df6c1b",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-predelete-error.json",
+      "sha256": "79441f53a31f3066c13f6963291b33dee6add264689d0d1b3177c784b77d2c09",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-predelete-invalid-interval.json",
+      "sha256": "f75f87ee50068938cf84424a0589c79757d26e58e075dbafb4d684f17b05305a",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-predelete-schedule.json",
+      "sha256": "18d9c66008e713ea6a8e3dee0c89bc914f484e5e9aacf3ae49ffc91cfdb1c7f9",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-reviewer-connect.json",
+      "sha256": "9e38c4d4ed3d5029c90900ea67ff9deece68aa84901b19187a4512be64412600",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-reviewer-schedule.json",
+      "sha256": "9295e4d5ed7032149fbdf46e3c2d703d50748d2cbeead38757581dc918f717e4",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-workflow-confirmation.json",
+      "sha256": "d7d27bfd73fe5206d66fdf243f3005257231c0fcb9d430e99d90381e8d81d447",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-workflow-connect.json",
+      "sha256": "8030e0291676e67b64908585f2d184db9ae10c975e606d6e39649d9ec28347e7",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-workflow-invalid-interval.json",
+      "sha256": "484e262b325df92f85ac4472f5d687904fd3ece6858289412ea32bbf797f4523",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/root-workflow-schedule.json",
+      "sha256": "9441e9ea3c5c39bacad0ba9e0c447f6e905b105bb349847bf809fcb832a7f21f",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-busy-confirmation.json",
+      "sha256": "d0c42b9f3677fcbacd3f95038fbd1a462d5183576ebfef0aeeebfb554418bb31",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-busy-connect.json",
+      "sha256": "3b4e7b9e09f05c55bf048e7cf11b1dbe041c7d39b6239f3ef270984b317829e6",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-busy-error.json",
+      "sha256": "d7b782023cd29fc47e68086c7ea789055d577fa9dc22ab136cd77a82c1abe643",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-busy-invalid-interval.json",
+      "sha256": "320e95f11345a677503f2c113705a3c49a231bfe302386d1638bc0455eb4a68f",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-busy-schedule.json",
+      "sha256": "067d111a2521c5422bbecff0ca85d6a4289de7ba1eb4136561ebe385c75d5023",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-empty-confirmation.json",
+      "sha256": "2908cf15c3f824b436812d63d25f60fc27683a3047a69d7051b9624e2d406f1f",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-empty-connect.json",
+      "sha256": "74c00b3696dfd804560e5ea0e4af80187c3ae3ee678892d6a1ba725bf78d4335",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-empty-invalid-interval.json",
+      "sha256": "f478d618ec0262acf9cfb393414d4f515c1ffc2a370e0c1a67269705d6a39b19",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-empty-schedule.json",
+      "sha256": "050b223005b498c60eb04d91c0e864bd21eb5a819ad2599eb94e81b3d8ad2ae4",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-lost-delete-confirmation.json",
+      "sha256": "ea8ccac83fd8dcb112c86a9bcafc75efb5810b199d02aae33c3117870b07c256",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-lost-delete-connect.json",
+      "sha256": "d2c8a31ccac1c96e79227a3b5c87e2e682aa195c8f4ea7a75f5441834ed4252e",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-lost-delete-error.json",
+      "sha256": "54027f407a19c72bb43e54c06ad8ccba14976e22cb74a8e05936e41040467667",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-lost-delete-invalid-interval.json",
+      "sha256": "ad76bfb518dff5741eb85e88001bbadb814c2548ddd56ea554c06f0a90eb6347",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-lost-delete-schedule.json",
+      "sha256": "8d0eeb600abdfe81cb625d6fc87f7f7177e4e3606c79a4965c188242dcb41741",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-lost-save-confirmation.json",
+      "sha256": "62f5966d954eaed3b1352fde4a1c9adc40764f606136b223f7fc1d3c481f5e5d",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-lost-save-connect.json",
+      "sha256": "e99a894208160f73f6eba4d842e18d17ae0b605803c3f098a8ebc90598a1a488",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-lost-save-invalid-interval.json",
+      "sha256": "d7d0557836e3f58a9656c918dd75f583269559dd51ea6e4ff7ab142ee2d608d2",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-lost-save-schedule.json",
+      "sha256": "5ea1d5c65185b514f7f1b74dca393c0920edb48260f90ba0beeee131ae0249fb",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-partial-confirmation.json",
+      "sha256": "a5c9d6bd6fe317719c5bf809b9b446a26a21270d1656be27828d2b6142213eff",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-partial-connect.json",
+      "sha256": "4ae8cf1d5ca695299522a0c2ca192bd25e728d6d907246b4c4fcb84f21300de0",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-partial-error.json",
+      "sha256": "619ece1261f2a914eb1dfc1fd6b14d403adcc810e41003495e674d7d4b628c32",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-partial-invalid-interval.json",
+      "sha256": "428e3d26347608fb7245513190ec883f2cf703c385b7f4ca116bb6f0fae7444f",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-partial-schedule.json",
+      "sha256": "37846406df51607060e1d5c90ba69805a6d5f43dda91795f6e9080e2ded091fd",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-predelete-confirmation.json",
+      "sha256": "279be3e242472f0c9f9ef04034f399dddd2967b7292c18660cc76db3e480c525",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-predelete-connect.json",
+      "sha256": "d0ed8bc1ec575f8dd6248b466dc95136722b4f87ad054c964bc59844af6f1b0c",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-predelete-error.json",
+      "sha256": "99cec775f5721e5dfe5827cd8ac1cdde407cab70afdea45a7be3a82c952910fb",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-predelete-invalid-interval.json",
+      "sha256": "2cf4e671ee8c52c43bd778383aabdf3c7fd943cca7b8fad6fe0cfddc0afb518d",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-predelete-schedule.json",
+      "sha256": "a6f05b5f6570ae04c3f0f85bceab7d24206b4cc9e70236767a4c345f6eaa5638",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-reviewer-connect.json",
+      "sha256": "69e4541d9a3e0e7fe7e2d52d99f5b5f1f362ff61dea44a716b1395e6b82eff7d",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-reviewer-schedule.json",
+      "sha256": "d1fac3368cb69b196dd20239d034b41c932e108de1c33625b172590e8162faea",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-workflow-confirmation.json",
+      "sha256": "86d691791aa0dab12099f6583d4681d8661240aafeb013cae5ab98a6e3747285",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-workflow-connect.json",
+      "sha256": "71090cd55b4e9f466a46616b70279404156dfe1357aef7112c309b69d0c864e7",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-workflow-invalid-interval.json",
+      "sha256": "65bf4fb4702c8b77bebe8e91a8f857e6f1eb8dd9831ee816337af785a1e23145",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "simulated/system-workflow-schedule.json",
+      "sha256": "1c087aa81b3806d246d3f8737023fda061231ae91b0f43175c7d1929518e0a5e",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/root-authorization-error.json",
+      "sha256": "461e4e58abe3d9ff44ca44466a82bba15fd9fc5bbfb51395f60fb6afe4c2e48d",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/root-correction-forms.json",
+      "sha256": "f9ef6e01b13cfd0bd9352c1f3fde8fc20a17b0a26463f1741572e9002e5971d9",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#decision-0-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#decision-0-description",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/root-delete-confirmation.json",
+      "sha256": "59c647be158db45b92ff3386de8b29c67a70dec5a53e017b741a7beacee812db",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/root-findings.json",
+      "sha256": "3e4879e6f7564a29be9f3d9ef4423c27d4b6351dbc5712c827796ac852a99a57",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/root-output.json",
+      "sha256": "7eebb988a3403d6c960d91dead5380f2dbc52fabd6f37036fdc5b628f5064633",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/root-reviewer.json",
+      "sha256": "7b9b05f2b45e073e96ff127d3137aba371178cd9c104e084956898fcbbeddd8e",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/root-schedule.json",
+      "sha256": "8d95b34b774a2401dbe566ac3da03be9b8dbdae7578bc852e66a0a06ae89105a",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/root-upload.json",
+      "sha256": "834541fb929256e959376786b367f729ac1ff496dd7188c88d26f91c9fd8ea00",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/system-authorization-error.json",
+      "sha256": "e26bc6a4f04a31685abacd4905fba12dca2d42bbc478e838583b06f570147a45",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/system-correction-forms.json",
+      "sha256": "cc6cbf127bbb429f68a721fc1f3da613f9e72073fe94ae5439d99fb0df94de07",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#decision-0-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#decision-0-description",
+          "foreground": "rgb(0, 0, 0)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 21,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/system-delete-confirmation.json",
+      "sha256": "34fed8539f65ecb6822e46d9313f36e0e795e6fbd5ca688d8b991c147fb002d8",
+      "violations": 0,
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "targets": [
+            [
+              "#delete-description"
+            ]
+          ]
+        }
+      ],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#delete-description",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#confirm-delete",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(155, 28, 32)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/system-findings.json",
+      "sha256": "1875fb608bee59194bd975bffd2a760757e5154e9498a79b23364b816fd69888",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/system-output.json",
+      "sha256": "3e90d5088d216fee46c9ad0dccaea18da66f81aa8bd66dfc297b037eefde196e",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/system-reviewer.json",
+      "sha256": "96031d0afb15cc3ccb7adc12d5b3b252ac51d37092592258fba464581810fe1e",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/system-schedule.json",
+      "sha256": "ed4dea3b4adf7eee2be72210686136f865d3be5fd04e1147ce151f067d4072b4",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#save-schedule",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(23, 78, 120)",
+          "ratio": 8.759487393354423,
+          "minimum": 4.5
+        }
+      ]
+    },
+    {
+      "file": "real/system-upload.json",
+      "sha256": "4bfb1ebdbadd2c197f0d188c94fdc92863889e46f268020d717ebe752a43c24a",
+      "violations": 0,
+      "incomplete": [],
+      "computedContrast": [
+        {
+          "selector": "#error",
+          "foreground": "rgb(155, 28, 32)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 8.137418719154375,
+          "minimum": 4.5
+        },
+        {
+          "selector": "#status",
+          "foreground": "rgb(23, 43, 58)",
+          "background": "rgb(255, 255, 255)",
+          "ratio": 14.552206551498765,
+          "minimum": 4.5
+        }
+      ]
+    }
+  ]
+}

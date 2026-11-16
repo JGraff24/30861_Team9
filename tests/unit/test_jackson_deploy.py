@@ -27,14 +27,14 @@ def test_deployment_renderer(tmp_path: Path) -> None:
     nginx = (output / "nginx.conf").read_text()
     assert "server_name review.invalid;" in nginx
     assert "proxy_set_header Host $host;" in nginx
-    assert "proxy_read_timeout 1900s;" in nginx
+    assert "proxy_read_timeout 2700s;" in nginx
     assert subprocess.run(command, cwd=root, env=env, capture_output=True).returncode != 0
     env["SERVER_NAME"] = "bad; injected"
     command[-1] = str(tmp_path / "invalid")
     assert subprocess.run(command, cwd=root, env=env, capture_output=True).returncode != 0
 
 
-def test_docker_copied_source_builds_an_installed_phase4_wheel(tmp_path: Path) -> None:
+def test_docker_copied_source_builds_an_installed_phase5_wheel(tmp_path: Path) -> None:
     """Exercise the exact Docker COPY inputs without requiring a Docker daemon."""
     root = Path(__file__).resolve().parents[2]
     stage = tmp_path / "docker-copied-source"
@@ -77,6 +77,10 @@ def test_docker_copied_source_builds_an_installed_phase4_wheel(tmp_path: Path) -
             "tester/fixtures/manifest-phase4.json",
             "tester/fixtures/expectations-phase4.json",
             "tester/phase4/phase4-wire-schemas.json",
+            "tester/fixtures/manifest-phase5.json",
+            "tester/fixtures/expectations-phase5.json",
+            "tester/phase5/phase5-wire-schemas.json",
+            "tester/design/team9-design-map.json",
         ):
             assert asset in archive.namelist()
         archive.extractall(installed)
@@ -88,10 +92,12 @@ from tester.suite.registry import names
 from tester.phase4.contract import definitions
 settings = TesterSettings(_env_file=None)
 suite = load_suite(settings.fixture_manifest_path, names())
-assert settings.fixture_manifest_path.name == 'manifest-phase4.json'
-assert suite.manifest.phase == '4'
+assert settings.fixture_manifest_path.name == 'manifest-phase5.json'
+assert suite.manifest.phase == '5'
 assert suite.manifest.ruleset_version == '2.0.0'
-assert suite.manifest.limits.suite_seconds == 1800
+assert suite.manifest.limits.suite_seconds == 2400
+assert settings.tester_run_timeout_seconds == 2400
+assert len(suite.manifest.tests) == 395
 assert len(suite.data) >= 26
 assert definitions()
 """
@@ -113,9 +119,11 @@ def test_designated_production_target_overrides_only_release_capabilities() -> N
     assert 'ENABLE_TEST_AUDIT_FAULTS: "true"' in source
     assert (
         "FIXTURE_MANIFEST_PATH: /service/.venv/lib/python3.12/site-packages/"
-        "tester/fixtures/manifest-phase4.json" in source
+        "tester/fixtures/manifest-phase5.json" in source
     )
-    assert 'TESTER_RUN_TIMEOUT_SECONDS: "1800"' in source
+    assert 'TESTER_RUN_TIMEOUT_SECONDS: "2400"' in source
+    assert 'ENABLE_TEST_CLOCK: "true"' in source
+    assert "TESTER_TEAM_ID: team9" in source
     assert "env_file: ${TEAM9_ENV_FILE:" in source
     assert "SYSTEM_TOKEN_HASHES_JSON:" not in source
     assert "TARGET_AUTH_MAP_JSON:" not in source

@@ -1,34 +1,80 @@
-"""Validate wire bodies against the adopted Phase 4 JSON Schema pack (specification 2.1.0).
+"""Validate wire bodies against an adopted pod JSON Schema pack.
 
 The tester shares wire *schemas* with the system (allowed by §15) but validates them with its own
 JSON Schema 2020-12 validator, never with the system's DTOs. Semantic rules that the schema pack
 leaves to application validation (ownership, ordering, coherence) stay in the check handlers.
+
+Phase 4 runs validate against specification 2.1.0. A Phase 5 run selects the 3.0.0 pack for the
+whole run (`use_pack("phase5")`), so inherited Phase 4 checks see the retained definitions plus
+the explicit Phase 5 overrides: new audit reports carry specificationVersion 3.0.0 and
+timestamps have at most six fractional digits. Earlier stored reports are never re-validated.
 """
 
 import json
 import re
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from datetime import datetime, timedelta
 from functools import cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from jsonschema import Draft202012Validator, FormatChecker  # type: ignore[import-untyped]
 
+PackName = Literal["phase4", "phase5"]
 SCHEMA_FILE = "phase4-wire-schemas.json"
-_PACKAGED = Path(__file__).resolve().parent / SCHEMA_FILE
-_REPOSITORY = Path(__file__).resolve().parents[2] / "docs" / "contracts" / "phase4" / SCHEMA_FILE
+_ROOT = Path(__file__).resolve().parents[2]
+_FILES: dict[PackName, tuple[Path, Path, str]] = {
+    "phase4": (
+        Path(__file__).resolve().parent / "phase4-wire-schemas.json",
+        _ROOT / "docs" / "contracts" / "phase4" / "phase4-wire-schemas.json",
+        "2.1.0",
+    ),
+    "phase5": (
+        _ROOT / "tester" / "phase5" / "phase5-wire-schemas.json",
+        _ROOT / "docs" / "contracts" / "phase5" / "phase5-wire-schemas.json",
+        "3.0.0",
+    ),
+}
+# In a Phase 5 run every report the target produces is new, so it must be the 3.0.0 profile;
+# the retained legacy profile only describes reports stored before the migration.
+_ALIASES: dict[PackName, dict[str, str]] = {
+    "phase4": {},
+    "phase5": {"AuditReport": "NewAuditReport"},
+}
 SPECIFICATION_VERSION = "2.1.0"
 RULESET_VERSION = "2.0.0"
 REPORT_VERSION = "2.0.0"
+_ACTIVE: ContextVar[PackName] = ContextVar("tester_wire_pack", default="phase4")
 
 
 class ContractViolation(ValueError):
     """A body does not satisfy the named definition of the frozen pack."""
 
 
-def schema_path() -> Path:
-    """The wheel ships a copy beside this module; a checkout reads the adopted pack directly."""
-    return _PACKAGED if _PACKAGED.exists() else _REPOSITORY
+def active_pack() -> PackName:
+    return _ACTIVE.get()
+
+
+@contextmanager
+def use_pack(name: PackName) -> Iterator[None]:
+    """Select the pod pack for every validation in this context (one suite run)."""
+    token = _ACTIVE.set(name)
+    try:
+        yield
+    finally:
+        _ACTIVE.reset(token)
+
+
+def specification_version(name: PackName | None = None) -> str:
+    return _FILES[name or active_pack()][2]
+
+
+def schema_path(name: PackName | None = None) -> Path:
+    """The wheel ships a copy beside the tester package; a checkout reads the adopted pack."""
+    packaged, repository, _ = _FILES[name or active_pack()]
+    return packaged if packaged.exists() else repository
 
 
 RFC3339_UTC = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,9})?Z")
@@ -57,17 +103,37 @@ def _rfc3339(value: object) -> bool:
     return True
 
 
+def _calendar_date(value: object) -> bool:
+    if not isinstance(value, str):
+        return True
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value) is None:
+        return False
+    try:
+        datetime.strptime(value, "%Y-%m-%d")
+    except ValueError:
+        return False
+    return True
+
+
 _FORMATS = FormatChecker(formats=())
 _FORMATS.checks("date-time")(_rfc3339)
+_FORMATS.checks("date")(_calendar_date)
 
 
 @cache
-def pack() -> dict[str, Any]:
-    document: dict[str, Any] = json.loads(schema_path().read_text(encoding="utf-8"))
-    if not document.get("$id", "").endswith(f":{SPECIFICATION_VERSION}"):
-        raise RuntimeError("the packaged wire schemas are not specification 2.1.0")
+def _pack(name: PackName) -> dict[str, Any]:
+    document: dict[str, Any] = json.loads(schema_path(name).read_text(encoding="utf-8"))
+    version = specification_version(name)
+    if not document.get("$id", "").endswith(f"-{version}.json") and not document.get(
+        "$id", ""
+    ).endswith(f":{version}"):
+        raise RuntimeError(f"the packaged wire schemas are not specification {version}")
     Draft202012Validator.check_schema(document)
     return document
+
+
+def pack() -> dict[str, Any]:
+    return _pack(active_pack())
 
 
 def definitions() -> list[str]:
@@ -75,10 +141,11 @@ def definitions() -> list[str]:
 
 
 @cache
-def validator(definition: str) -> Draft202012Validator:
-    document = pack()
+def _validator(name: PackName, definition: str) -> Draft202012Validator:
+    document = _pack(name)
+    definition = _ALIASES[name].get(definition, definition)
     if definition not in document["$defs"]:
-        raise KeyError(f"unknown Phase 4 definition {definition}")
+        raise KeyError(f"unknown {name} definition {definition}")
     schema = {
         "$schema": document["$schema"],
         "$id": document["$id"],
@@ -86,6 +153,10 @@ def validator(definition: str) -> Draft202012Validator:
         "$ref": f"#/$defs/{definition}",
     }
     return Draft202012Validator(schema, format_checker=_FORMATS)
+
+
+def validator(definition: str) -> Draft202012Validator:
+    return _validator(active_pack(), definition)
 
 
 def violations(definition: str, body: object) -> list[str]:

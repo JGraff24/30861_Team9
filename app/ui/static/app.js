@@ -6,7 +6,8 @@
   const node = (tag, value) => { const n = document.createElement(tag); n.textContent = value; return n; };
   const enc = encodeURIComponent;
   let credential = "", role = null, busy = false, selected = null, workbookId = null;
-  let pending = null, output = null;
+  let pending = null, output = null, deleteTarget = null;
+  const deleteRecovery = new Set();
   const drafts = new Map();
   const key = s => `${s.workbookId}/${s.versionId}/${s.auditId}`;
   const versionPath = s => `/api/v1/workbooks/${enc(s.workbookId)}/versions/${enc(s.versionId)}`;
@@ -19,8 +20,13 @@
     el("token").disabled = busy || !!pending;
     el("upload").hidden = !owner();
     el("reaudit").hidden = !owner();
+    el("schedule-form").hidden = !owner();
+    el("delete-controls").hidden = !owner();
+    for (const field of el("schedule-form").querySelectorAll("input, select")) field.disabled = busy || !!pending;
+    el("schedule-interval").required = el("schedule-enabled").value === "true";
     el("submit").disabled = busy || !!pending || !owner();
-    el("upload-kind").options[1].disabled = !workbookId;
+    el("upload-kind").options[1].disabled = !workbookId || deleteRecovery.has(workbookId);
+    if (deleteRecovery.has(workbookId)) el("upload-kind").value = "new";
     text("upload-destination", workbookId
       ? `Additional versions will be uploaded to workbook ${workbookId}, shown in history.`
       : "Open a workbook's history before uploading an additional version.");
@@ -45,6 +51,7 @@
         try { body = await response.json(); } catch { body = {message: `Request failed (${response.status}).`}; }
         throw new ApiError(response, body);
       }
+      if (response.status === 204) return null;
       return binary ? {blob: await response.blob(), disposition: response.headers.get("Content-Disposition")} : await response.json();
     } finally { clearTimeout(timer); }
   }
@@ -60,7 +67,16 @@
     } finally { busy = false; controls(); }
   }
   async function history(requestedId = workbookId) {
-    const h = await api(`/api/v1/workbooks/${enc(requestedId)}/history`);
+    let h;
+    try { h = await api(`/api/v1/workbooks/${enc(requestedId)}/history`); }
+    catch (error) {
+      if (error.status === 404 && owner() && deleteRecovery.has(requestedId)) {
+        workbookId = requestedId; selected = null; output = null;
+        for (const id of ["results", "history-panel", "output-panel"]) el(id).hidden = true;
+        await lifecycle(); return;
+      }
+      throw error;
+    }
     if (selected && selected.workbookId !== h.workbookId) {
       // History chooses the new-version destination. Do not leave another
       // workbook's results or output beside that newly selected destination.
@@ -82,6 +98,48 @@
       el("history").append(item);
     }
     el("history-panel").hidden = false;
+    await lifecycle();
+  }
+  async function lifecycle() {
+    const wid = workbookId;
+    if (!wid) return;
+    el("lifecycle-panel").hidden = false;
+    el("lifecycle-data").hidden = true;
+    text("delete-state", deleteRecovery.has(wid)
+      ? `Deletion of workbook ${wid} is incomplete or unconfirmed. You may explicitly retry its cleanup.` : "");
+    text("delete-workbook", deleteRecovery.has(wid) ? "Retry workbook deletion…" : "Delete workbook…");
+    if (deleteRecovery.has(wid)) return;
+    text("status", "Loading schedule and notifications…");
+    const [schedule, history] = await Promise.all([
+      api(`/api/v1/workbooks/${enc(wid)}/schedule`),
+      api(`/api/v1/workbooks/${enc(wid)}/notifications`)
+    ]);
+    if (workbookId !== wid) return;
+    el("schedule-summary").replaceChildren();
+    for (const [name, value] of Object.entries({"Workbook ID": wid,
+      "Scheduled version": schedule.versionId, "Periodic audits": schedule.enabled ? "Enabled" : "Disabled",
+      "Interval (days)": schedule.intervalDays ?? "Not set", "Next audit (UTC)": schedule.nextAuditAt ?? "Not scheduled",
+      "Deadline": schedule.complianceDeadline ?? "Not set", "Reminder days before deadline": schedule.reminderDays.join(", ")})) {
+      el("schedule-summary").append(node("dt", name), node("dd", value));
+    }
+    el("schedule-enabled").value = String(schedule.enabled);
+    el("schedule-interval").value = schedule.intervalDays ?? "";
+    el("schedule-deadline").value = schedule.complianceDeadline ?? "";
+    for (const id of ["schedule-interval", "schedule-deadline"]) el(id).removeAttribute("aria-invalid");
+    el("notifications").replaceChildren();
+    for (const notice of history.notifications) {
+      el("notifications").append(node("li", `${notice.scheduledFor} — Version ${notice.versionId} — ${notice.status}: ${notice.message}`));
+    }
+    text("notifications-empty", history.notifications.length ? "" : "No notifications recorded.");
+    el("lifecycle-data").hidden = false;
+    text("status", "Schedule and notifications loaded.");
+  }
+  function clearWorkbook() {
+    selected = null; output = null; deleteRecovery.delete(workbookId); workbookId = null; drafts.clear();
+    for (const id of ["results", "history-panel", "output-panel", "lifecycle-panel"]) el(id).hidden = true;
+    for (const id of ["history", "metadata", "findings", "limitations", "notifications", "schedule-summary"]) el(id).replaceChildren();
+    text("output-status", ""); text("selection-note", "");
+    el("workbook-id").value = ""; el("upload-kind").value = "new";
   }
   function draftFor(s) {
     if (!drafts.has(key(s))) drafts.set(key(s), new Map());
@@ -246,7 +304,8 @@
   }
   el("connect").addEventListener("submit", event => { event.preventDefault(); task(async () => {
     credential = el("token").value; role = null; selected = null; workbookId = null; output = null; drafts.clear();
-    for (const id of ["workspace", "results", "history-panel", "output-panel"]) el(id).hidden = true;
+    deleteRecovery.clear(); deleteTarget = null;
+    for (const id of ["workspace", "results", "history-panel", "output-panel", "lifecycle-panel"]) el(id).hidden = true;
     text("identity", "");
     const identity = await api("/ui/identity"); role = identity.role;
     text("identity", owner() ? "Connected as an owner." : "Connected as a read-only reviewer. Open a granted workbook by ID.");
@@ -296,6 +355,75 @@
   el("report-download").addEventListener("click", () => task(() => download(auditPath(selected) + "/report", "audit-report.json")));
   el("output-download").addEventListener("click", () => task(() => download(`/api/v1/outputs/${enc(output.outputId)}/workbook`, "remediated.xlsx")));
   el("output-review").addEventListener("click", () => task(() => open(output)));
+  el("schedule-form").addEventListener("invalid", event => {
+    event.target.setAttribute("aria-invalid", "true");
+    text("error", event.target.id === "schedule-interval"
+      ? "Enter a whole-number interval from 1 to 90 days."
+      : "Enter a valid calendar deadline, or clear it to disable reminders.");
+  }, true);
+  el("schedule-form").addEventListener("input", event => {
+    event.target.removeAttribute("aria-invalid"); text("error", "");
+  });
+  el("schedule-enabled").addEventListener("change", controls);
+  el("clear-deadline").addEventListener("click", () => {
+    el("schedule-deadline").value = ""; el("schedule-deadline").focus();
+    text("status", "Deadline cleared in the form. Save schedule to stop future reminders.");
+  });
+  el("schedule-form").addEventListener("submit", event => { event.preventDefault(); task(async () => {
+    if (!owner() || !workbookId || deleteRecovery.has(workbookId)) return;
+    const wid = workbookId;
+    const interval = el("schedule-interval").value;
+    const enabled = el("schedule-enabled").value === "true";
+    if ((enabled || interval) && (!/^\d+$/.test(interval) || Number(interval) < 1 || Number(interval) > 90)) {
+      throw new Error("Enter a whole-number interval from 1 to 90 days.");
+    }
+    text("status", "Saving schedule…");
+    try {
+      await api(`/api/v1/workbooks/${enc(wid)}/schedule`, {method: "PUT",
+        headers: {"Content-Type": "application/json"}, body: JSON.stringify({enabled,
+          intervalDays: interval ? Number(interval) : null, complianceDeadline: el("schedule-deadline").value || null})});
+    } catch (error) {
+      if (!error.status || error.status >= 500) {
+        throw new Error(`Schedule save is unconfirmed. Refresh to check persisted settings before saving again. ${error.message}`);
+      }
+      throw error;
+    }
+    await lifecycle(); text("status", "Schedule saved.");
+  }); });
+  el("refresh-lifecycle").addEventListener("click", () => task(async () => {
+    await lifecycle(); text("status", "Schedule and notifications refreshed.");
+  }));
+  el("delete-workbook").addEventListener("click", () => {
+    if (!owner() || !workbookId || busy || pending) return;
+    deleteTarget = workbookId;
+    text("delete-description", `Delete workbook ${deleteTarget}? This removes all its stored versions, outputs, reports, history, schedules and notifications. This cannot be undone. Other workbooks are unaffected.`);
+    el("delete-dialog").showModal(); el("cancel-delete").focus();
+  });
+  el("cancel-delete").addEventListener("click", () => el("delete-dialog").close());
+  el("delete-dialog").addEventListener("close", () => { deleteTarget = null; });
+  el("confirm-delete").addEventListener("click", () => {
+    const wid = deleteTarget;
+    el("delete-dialog").close();
+    task(async () => {
+      if (!owner() || !wid || wid !== workbookId || pending) return;
+      text("status", `Deleting workbook ${wid}…`);
+      try {
+        await api(`/api/v1/workbooks/${enc(wid)}`, {method: "DELETE"});
+      } catch (error) {
+        if (error.status === 404 && deleteRecovery.has(wid)) {
+          clearWorkbook(); text("status", `Workbook ${wid} is no longer accessible. An earlier deletion may have completed.`);
+          el("workbook-id").focus(); return;
+        }
+        if (error.code === "DELETION_FAILED" || !error.status || (error.status >= 500 && error.code !== "TEST_DELETION_FAILURE")) {
+          deleteRecovery.add(wid); selected = null; output = null; drafts.clear();
+          for (const id of ["results", "history-panel", "output-panel", "lifecycle-data"]) el(id).hidden = true;
+          await lifecycle();
+        }
+        throw error;
+      }
+      clearWorkbook(); text("status", `Workbook ${wid} deleted.`); el("workbook-id").focus();
+    });
+  });
   el("retry").addEventListener("click", () => task(resume));
   controls();
 })();

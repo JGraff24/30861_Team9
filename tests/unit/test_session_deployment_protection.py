@@ -48,7 +48,7 @@ def stored_payload(services):
 
 def test_setup_protects_external_grading_between_jobs_and_after_restart(tmp_path):
     services, _, session = context(tmp_path)
-    assert session.deployment_protected_until == session.created_at + timedelta(seconds=1900)
+    assert session.deployment_protected_until == session.created_at + timedelta(seconds=2700)
     restarted = SQLiteRepository(services.settings.metadata_db_path)
     restarted.initialize()
     assert restarted.get_test_session("grading") == session
@@ -60,7 +60,7 @@ def test_allowed_business_activity_renews_durable_lease_without_changing_measure
     tmp_path, monkeypatch, role
 ):
     services, sessions, session = context(tmp_path)
-    later = session.created_at + timedelta(seconds=101)
+    later = session.created_at + timedelta(seconds=301)
 
     class Clock(datetime):
         @classmethod
@@ -75,7 +75,7 @@ def test_allowed_business_activity_renews_durable_lease_without_changing_measure
         "grading", Principal(subject="owner" if role == "user" else "reviewer", role=role)
     )
     protected = services.repository.get_test_session("grading")
-    assert protected.deployment_protected_until == later + timedelta(seconds=1900)
+    assert protected.deployment_protected_until == later + timedelta(seconds=2700)
     assert protected.created_at == session.created_at and protected.revision == session.revision
     before = stored_payload(services)
     assert (

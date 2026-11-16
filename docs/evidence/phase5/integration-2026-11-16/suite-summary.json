@@ -1,0 +1,271 @@
+{
+  "own": {
+    "counts": {
+      "pass": 392,
+      "skip": 3
+    },
+    "allPlannedIdsOnceInOrder": true,
+    "coverage": {
+      "code": {
+        "covered": 3065,
+        "total": 3542,
+        "basis": "Child line sets in app/workbooks and app/audit from validation, audit, and any correction calls; excludes API, storage, UI, and modules outside those paths."
+      },
+      "component": {
+        "covered": 11,
+        "total": 12,
+        "basis": "Shared component catalog C1-C12 (specification 3.0.0 section 15) in the frozen suite manifest; a component counts once when a test executed one of its predeclared qualifying assertions in this session, even if it failed. Setup, preparation, accepted-work draining and skipped tests earn nothing. HTTP-only run: C9 user interface needs retained browser/manual evidence and is never counted here, so covered is at most 11."
+      },
+      "system": {
+        "covered": 17,
+        "total": 18,
+        "basis": "Shared acceptance criteria AC-01 to AC-18 (denominator 18, specification 3.0.0 section 17): a criterion counts once when at least one mapped qualifying assertion executed, even if it failed. This is evaluated coverage, not acceptance. HTTP-only run: AC-17 needs browser/manual accessibility evidence and is never counted here; AC-09 counts only the automated preservation portion (Excel no-repair inspection is separate); AC-16 counts HTTP deletion evidence only (HTTPS, credential protection and backup/restore evidence are manual); AC-18 counts tester-observed real-time runs (target-side queue/engine timing is separate)."
+      },
+      "model": {
+        "covered": 19,
+        "total": 23,
+        "basis": "Team team9 Phase 5 design version 0.1.0: all 23 design requirements (map SHA256 8d8c0719c91b584601bdf89b904170cd06bb6f667707b940d8d59ce98a7654ec); requirements-to-tests mapping https://github.com/JGraff24/30861_Team9/blob/main/docs/design/team9-design-map.json. A requirement counts once when at least one mapped test executed its qualifying assertion in this session, even if it failed; setup, skips and unmapped or untested requirements earn nothing."
+      }
+    },
+    "skips": [
+      {
+        "test_id": "P5-CLOCK-NOT-READY",
+        "outcome": "skip",
+        "message": "Not executed: the HTTP interface offers no way to hold a known namespace in a preparing/failed state; SESSION_NOT_READY is left to target local integration."
+      },
+      {
+        "test_id": "P5-FAULT-REJECT-DISABLED",
+        "outcome": "skip",
+        "message": "Not executed: this deployment enables the fault capability (namespace t9-b69285018cb84022b0a8b5d0979ac9f8 was created), so the disabled-capability 403 is unobservable here."
+      },
+      {
+        "test_id": "P5-TESTER-CROSS-OMIT",
+        "outcome": "skip",
+        "message": "Not executed: this is an own-team session; the cross-team omission does not apply."
+      }
+    ]
+  },
+  "legacy": {
+    "counts": {
+      "pass": 63,
+      "skip": 1
+    },
+    "allPlannedIdsOnceInOrder": true,
+    "coverage": {
+      "code": {
+        "covered": 1393,
+        "total": 3542,
+        "basis": "Child line sets in app/workbooks and app/audit from validation, audit, and any correction calls; excludes API, storage, UI, and modules outside those paths."
+      },
+      "component": {
+        "covered": 6,
+        "total": 6,
+        "basis": "Phase 3 component catalog C1-C6 in tests/fixtures/manifest.json; a component counts when a recorded qualifying call/assertion executes, regardless of its final outcome."
+      },
+      "system": {
+        "covered": 7,
+        "total": 8,
+        "basis": "Phase 3 portions of AC-01/02/03/04/05/14/15/18 in tests/fixtures/manifest.json; an AC counts only when its predeclared assertion executes. This measures partial scope; AC-14 requires an observed controlled failure, not ordinary corrupt-input rejection."
+      }
+    },
+    "skips": [
+      {
+        "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+        "outcome": "skip",
+        "message": "Not executed: an observed controlled audit failure produced no usable result."
+      }
+    ]
+  },
+  "fake-phase3": {
+    "counts": {
+      "pass": 63,
+      "skip": 1
+    },
+    "allPlannedIdsOnceInOrder": true,
+    "coverage": {
+      "code": {
+        "covered": 40,
+        "total": 50,
+        "basis": "Fake audit/validation lines."
+      },
+      "component": {
+        "covered": 6,
+        "total": 6,
+        "basis": "Phase 3 component catalog C1-C6 in tests/fixtures/manifest.json; a component counts when a recorded qualifying call/assertion executes, regardless of its final outcome."
+      },
+      "system": {
+        "covered": 7,
+        "total": 8,
+        "basis": "Phase 3 portions of AC-01/02/03/04/05/14/15/18 in tests/fixtures/manifest.json; an AC counts only when its predeclared assertion executes. This measures partial scope; AC-14 requires an observed controlled failure, not ordinary corrupt-input rejection."
+      }
+    },
+    "skips": [
+      {
+        "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+        "outcome": "skip",
+        "message": "Not executed: an observed controlled audit failure produced no usable result."
+      }
+    ]
+  },
+  "fake-phase4": {
+    "counts": {
+      "pass": 253
+    },
+    "allPlannedIdsOnceInOrder": true,
+    "coverage": {
+      "code": {
+        "covered": 120,
+        "total": 400,
+        "basis": "Fake measured lines."
+      },
+      "component": {
+        "covered": 8,
+        "total": 9,
+        "basis": "Phase 4 component catalog C1-C9 (specification 2.1.0 section 16); a component counts when a recorded qualifying assertion executes, even if it fails; skipped paths earn nothing. This is an HTTP-only run: C9 review UI needs retained browser/manual evidence and is never counted here, so covered is at most 8."
+      },
+      "system": {
+        "covered": 11,
+        "total": 11,
+        "basis": "Exercised-criterion coverage of AC-01 to AC-11 (denominator 11): an AC counts when at least one mapped qualifying assertion executed, even if it failed. This is not acceptance success. AC-09 HTTP checks are only the automated preservation portion; Microsoft Excel no-repair inspection remains a separate human release gate."
+      }
+    },
+    "skips": []
+  },
+  "fake-phase5-own": {
+    "counts": {
+      "pass": 387,
+      "skip": 8
+    },
+    "allPlannedIdsOnceInOrder": true,
+    "coverage": {
+      "code": {
+        "covered": 120,
+        "total": 400,
+        "basis": "Fake measured lines."
+      },
+      "component": {
+        "covered": 11,
+        "total": 12,
+        "basis": "Shared component catalog C1-C12 (specification 3.0.0 section 15) in the frozen suite manifest; a component counts once when a test executed one of its predeclared qualifying assertions in this session, even if it failed. Setup, preparation, accepted-work draining and skipped tests earn nothing. HTTP-only run: C9 user interface needs retained browser/manual evidence and is never counted here, so covered is at most 11."
+      },
+      "system": {
+        "covered": 17,
+        "total": 18,
+        "basis": "Shared acceptance criteria AC-01 to AC-18 (denominator 18, specification 3.0.0 section 17): a criterion counts once when at least one mapped qualifying assertion executed, even if it failed. This is evaluated coverage, not acceptance. HTTP-only run: AC-17 needs browser/manual accessibility evidence and is never counted here; AC-09 counts only the automated preservation portion (Excel no-repair inspection is separate); AC-16 counts HTTP deletion evidence only (HTTPS, credential protection and backup/restore evidence are manual); AC-18 counts tester-observed real-time runs (target-side queue/engine timing is separate)."
+      },
+      "model": {
+        "covered": 19,
+        "total": 23,
+        "basis": "Team team9 Phase 5 design version 0.1.0: all 23 design requirements (map SHA256 8d8c0719c91b584601bdf89b904170cd06bb6f667707b940d8d59ce98a7654ec); requirements-to-tests mapping https://github.com/JGraff24/30861_Team9/blob/main/docs/design/team9-design-map.json. A requirement counts once when at least one mapped test executed its qualifying assertion in this session, even if it failed; setup, skips and unmapped or untested requirements earn nothing."
+      }
+    },
+    "skips": [
+      {
+        "test_id": "P4-REJECT-AUDIT-PROCESSING",
+        "outcome": "skip",
+        "message": "Not executed: the competing re-audit finished before the batch arrived, so no active operation could be observed."
+      },
+      {
+        "test_id": "P5-SCHEDULE-BUSY-AUDIT",
+        "outcome": "skip",
+        "message": "Not executed: the audit finished before the clock call, so the busy window was not observable (the clock call was accepted normally)."
+      },
+      {
+        "test_id": "P5-REMINDER-NO-AUDIT",
+        "outcome": "skip",
+        "message": "Not executed: the audit was not observed PROCESSING on both sides of the clock call, so the active window was not observable."
+      },
+      {
+        "test_id": "P5-REMINDER-PROCESSING",
+        "outcome": "skip",
+        "message": "Not executed: the audit was not observed PROCESSING on both sides of the clock call, so the active window was not observable."
+      },
+      {
+        "test_id": "P5-CLOCK-NOT-READY",
+        "outcome": "skip",
+        "message": "Not executed: the HTTP interface offers no way to hold a known namespace in a preparing/failed state; SESSION_NOT_READY is left to target local integration."
+      },
+      {
+        "test_id": "P5-DELETE-ACTIVE-AUDIT",
+        "outcome": "skip",
+        "message": "Not executed: the audit finished before the DELETE arrived, so the active window was not observable (the workbook was deleted normally)."
+      },
+      {
+        "test_id": "P5-FAULT-REJECT-DISABLED",
+        "outcome": "skip",
+        "message": "Not executed: this deployment enables the fault capability (namespace t9-1ab4bf87a1414b48b87b8952a3aaf092 was created), so the disabled-capability 403 is unobservable here."
+      },
+      {
+        "test_id": "P5-TESTER-CROSS-OMIT",
+        "outcome": "skip",
+        "message": "Not executed: this is an own-team session; the cross-team omission does not apply."
+      }
+    ]
+  },
+  "fake-phase5-cross": {
+    "counts": {
+      "pass": 387,
+      "skip": 8
+    },
+    "allPlannedIdsOnceInOrder": true,
+    "coverage": {
+      "code": {
+        "covered": 120,
+        "total": 400,
+        "basis": "Fake measured lines."
+      },
+      "component": {
+        "covered": 11,
+        "total": 12,
+        "basis": "Shared component catalog C1-C12 (specification 3.0.0 section 15) in the frozen suite manifest; a component counts once when a test executed one of its predeclared qualifying assertions in this session, even if it failed. Setup, preparation, accepted-work draining and skipped tests earn nothing. HTTP-only run: C9 user interface needs retained browser/manual evidence and is never counted here, so covered is at most 11."
+      },
+      "system": {
+        "covered": 17,
+        "total": 18,
+        "basis": "Shared acceptance criteria AC-01 to AC-18 (denominator 18, specification 3.0.0 section 17): a criterion counts once when at least one mapped qualifying assertion executed, even if it failed. This is evaluated coverage, not acceptance. HTTP-only run: AC-17 needs browser/manual accessibility evidence and is never counted here; AC-09 counts only the automated preservation portion (Excel no-repair inspection is separate); AC-16 counts HTTP deletion evidence only (HTTPS, credential protection and backup/restore evidence are manual); AC-18 counts tester-observed real-time runs (target-side queue/engine timing is separate)."
+      }
+    },
+    "skips": [
+      {
+        "test_id": "P4-REJECT-AUDIT-PROCESSING",
+        "outcome": "skip",
+        "message": "Not executed: the competing re-audit finished before the batch arrived, so no active operation could be observed."
+      },
+      {
+        "test_id": "P5-SCHEDULE-BUSY-AUDIT",
+        "outcome": "skip",
+        "message": "Not executed: the audit finished before the clock call, so the busy window was not observable (the clock call was accepted normally)."
+      },
+      {
+        "test_id": "P5-REMINDER-NO-AUDIT",
+        "outcome": "skip",
+        "message": "Not executed: the audit was not observed PROCESSING on both sides of the clock call, so the active window was not observable."
+      },
+      {
+        "test_id": "P5-REMINDER-PROCESSING",
+        "outcome": "skip",
+        "message": "Not executed: the audit was not observed PROCESSING on both sides of the clock call, so the active window was not observable."
+      },
+      {
+        "test_id": "P5-CLOCK-NOT-READY",
+        "outcome": "skip",
+        "message": "Not executed: the HTTP interface offers no way to hold a known namespace in a preparing/failed state; SESSION_NOT_READY is left to target local integration."
+      },
+      {
+        "test_id": "P5-DELETE-ACTIVE-AUDIT",
+        "outcome": "skip",
+        "message": "Not executed: the audit finished before the DELETE arrived, so the active window was not observable (the workbook was deleted normally)."
+      },
+      {
+        "test_id": "P5-FAULT-REJECT-DISABLED",
+        "outcome": "skip",
+        "message": "Not executed: this deployment enables the fault capability (namespace t9-6d96f4ee7ea34706b41f87663acfeb57 was created), so the disabled-capability 403 is unobservable here."
+      },
+      {
+        "test_id": "P5-TESTER-SELF-MODEL",
+        "outcome": "skip",
+        "message": "Not executed: this is a cross-team session; the own-team model profile does not apply."
+      }
+    ]
+  }
+}

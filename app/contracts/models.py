@@ -3,7 +3,7 @@
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import PurePosixPath
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import (
     AfterValidator,
@@ -237,10 +237,27 @@ class SystemSetupRequest(ContractModel):
                         "pattern": "^[A-Za-z0-9_-]+$",
                     },
                 },
+                "clock": {
+                    "type": "object",
+                    "properties": {"currentTime": {"type": "string", "format": "date-time"}},
+                    "required": ["currentTime"],
+                    "additionalProperties": False,
+                },
                 "faults": {
                     "type": "object",
-                    "properties": {"audit_failures": {"type": "integer", "const": 1}},
-                    "required": ["audit_failures"],
+                    "properties": {
+                        name: {"type": "integer", "const": 1}
+                        for name in (
+                            "audit_failures",
+                            "report_failures",
+                            "storage_failures",
+                            "remediation_failures",
+                            "scheduled_audit_failures",
+                            "notification_failures",
+                            "deletion_failures",
+                        )
+                    },
+                    "minProperties": 1,
                     "additionalProperties": False,
                 },
             },
@@ -250,21 +267,28 @@ class SystemSetupRequest(ContractModel):
 
     @model_validator(mode="after")
     def known_setup_keys(self) -> Self:
-        if set(self.setup) - {"cleanup_session_ids", "faults"}:
+        if set(self.setup) - {"cleanup_session_ids", "faults", "clock"}:
             raise ValueError("unknown setup keys")
         if "cleanup_session_ids" in self.setup:
             from pydantic import TypeAdapter
 
             TypeAdapter(list[Identifier]).validate_python(self.setup["cleanup_session_ids"])
+        if "clock" in self.setup:
+            from app.contracts.phase5 import ClockRequest
+
+            ClockRequest.model_validate(self.setup["clock"])
         if "faults" in self.setup:
+            from app.contracts.phase5 import FAULT_KEYS
+
             faults = self.setup["faults"]
             if not (
                 isinstance(faults, dict)
-                and set(faults) == {"audit_failures"}
-                and type(faults["audit_failures"]) is int
-                and faults["audit_failures"] == 1
+                and bool(faults)
+                and set(faults) <= FAULT_KEYS
+                and all(type(value) is int and value == 1 for value in faults.values())
+                and not {"audit_failures", "report_failures"} <= set(faults)
             ):
-                raise ValueError("faults requires exactly audit_failures integer 1")
+                raise ValueError("faults requires supported, unambiguous integer 1 controls")
         return self
 
 
@@ -327,9 +351,26 @@ class SystemCoverage(ContractModel):
     code: CoverageMeasure
 
 
+def _model_key_not_nullable(schema: dict[str, Any]) -> None:
+    # Present only on own-team Phase 5 reports, and then never null (specification 3.0.0 §14).
+    options = schema["properties"]["model"].get("anyOf", [])
+    schema["properties"]["model"] = next(o for o in options if o.get("type") != "null")
+
+
 class SuiteCoverage(SystemCoverage):
+    model_config = ConfigDict(json_schema_extra=_model_key_not_nullable)
     component: CoverageMeasure
     system: CoverageMeasure
+    # Own-team Phase 5 runs only. Cross-team runs and every earlier report omit the key
+    # entirely: it is never serialized as null or as a placeholder.
+    model: CoverageMeasure | None = Field(default=None, exclude_if=lambda value: value is None)
+
+    @model_validator(mode="before")
+    @classmethod
+    def no_null_model(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "model" in data and data["model"] is None:
+            raise ValueError("coverage.model is either a measure or absent, never null")
+        return data
 
 
 class SystemReport(ContractModel):
@@ -512,6 +553,8 @@ class JobRecord(ContractModel):
     worker_id: NonemptyText | None
     lease_expires_at: UTCDateTime | None
     test_audit_failure: bool = False
+    test_report_failure: bool = False
+    test_scheduled_audit_failure: bool = False
 
 
 class TestSession(ContractModel):
@@ -524,6 +567,10 @@ class TestSession(ContractModel):
     revision: NonemptyText
     cleanup_error: NonemptyText | None
     audit_failures_remaining: Annotated[StrictInt, Field(ge=0, le=1)] = 0
+    clock_current_time: UTCDateTime | None = None
+    faults_remaining: dict[str, Annotated[StrictInt, Field(ge=0, le=1)]] = Field(
+        default_factory=dict
+    )
     # Internal optional metadata; never returned by the instructor interface.
     deployment_protected_until: UTCDateTime | None = None
 

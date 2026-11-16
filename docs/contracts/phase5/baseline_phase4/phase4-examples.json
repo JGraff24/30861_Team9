@@ -1,0 +1,345 @@
+{
+  "notice": "Synthetic formatting examples and a golden hash vector only. The all-zero source hash does not identify a supplied workbook; the single-finding example is not an oracle for seeded_all_six. Credentials and live evidence are intentionally absent.",
+  "identity_vector": {
+    "input_array": [
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "2.0.0",
+      "ALT_TEXT",
+      "Sheet1",
+      "xl/drawings/drawing1.xml#id=2"
+    ],
+    "compact_utf8_text": "[\"0000000000000000000000000000000000000000000000000000000000000000\",\"2.0.0\",\"ALT_TEXT\",\"Sheet1\",\"xl/drawings/drawing1.xml#id=2\"]",
+    "expected_finding_id": "3f00eb9e00b43f60e672a109297c8d594eb12cd6753217be172a34101b01e859"
+  },
+  "examples": [
+    {
+      "definition": "HealthResponse",
+      "value": {
+        "status": "AVAILABLE",
+        "apiVersion": "1.0",
+        "rulesetVersion": "2.0.0"
+      }
+    },
+    {
+      "definition": "UploadResponse",
+      "value": {
+        "workbookId": "wb-001",
+        "versionId": "ver-001",
+        "auditId": "audit-001",
+        "status": "PROCESSING"
+      }
+    },
+    {
+      "definition": "VersionResponse",
+      "value": {
+        "workbookId": "wb-001",
+        "versionId": "ver-001",
+        "fileName": "example.xlsx",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "createdAt": "2026-10-28T14:00:00Z",
+        "status": "REMEDIATION_AVAILABLE",
+        "latestAuditId": "audit-001",
+        "sourceVersionId": null
+      }
+    },
+    {
+      "definition": "AuditResponse",
+      "value": {
+        "workbookId": "wb-001",
+        "versionId": "ver-001",
+        "auditId": "audit-001",
+        "rulesetVersion": "2.0.0",
+        "status": "REMEDIATION_AVAILABLE",
+        "startedAt": "2026-10-28T14:00:00Z",
+        "completedAt": "2026-10-28T14:00:02Z",
+        "findings": [
+          {
+            "findingId": "2158dab481d977a4f2a1ef238977b3fd4197b85f46f6be9e622276e85938e52d",
+            "ruleId": "ALT_TEXT",
+            "category": "NON_TEXT_CONTENT",
+            "worksheet": "Expenses",
+            "target": "xl/drawings/drawing1.xml#id=2",
+            "classification": "REQUIRES_USER_INPUT",
+            "message": "Picture 1 is missing its alternative text title and description.",
+            "recommendation": "Provide an alternative text title and description."
+          }
+        ],
+        "limitations": [],
+        "error": null
+      }
+    },
+    {
+      "definition": "RemediationRequest",
+      "headers": {
+        "Idempotency-Key": "remediation-request-001"
+      },
+      "value": {
+        "auditId": "audit-001",
+        "decisions": [
+          {
+            "findingId": "2158dab481d977a4f2a1ef238977b3fd4197b85f46f6be9e622276e85938e52d",
+            "action": "APPLY",
+            "value": {
+              "title": "Monthly expenses",
+              "description": "Bar chart comparing monthly expenses from January through June."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "definition": "RemediationAccepted",
+      "value": {
+        "remediationId": "rem-001",
+        "sourceVersionId": "ver-001",
+        "status": "REMEDIATING"
+      }
+    },
+    {
+      "definition": "RemediationResponse",
+      "value": {
+        "remediationId": "rem-001",
+        "status": "REMEDIATING",
+        "sourceVersionId": "ver-001",
+        "outputVersionId": null,
+        "outputId": null,
+        "auditId": null,
+        "error": null
+      }
+    },
+    {
+      "definition": "RemediationResponse",
+      "value": {
+        "remediationId": "rem-001",
+        "status": "REMEDIATED",
+        "sourceVersionId": "ver-001",
+        "outputVersionId": "ver-002",
+        "outputId": "out-001",
+        "auditId": "audit-002",
+        "error": null
+      }
+    },
+    {
+      "definition": "RemediationResponse",
+      "value": {
+        "remediationId": "rem-failed",
+        "status": "PROCESSING_FAILED",
+        "sourceVersionId": "ver-001",
+        "outputVersionId": null,
+        "outputId": null,
+        "auditId": null,
+        "error": {
+          "code": "PRESERVATION_FAILED",
+          "message": "An unapproved change was detected in the candidate workbook.",
+          "requestId": "job-001",
+          "details": {
+            "stage": "preservation"
+          }
+        }
+      }
+    },
+    {
+      "definition": "ReviewResponse",
+      "value": {
+        "workbookId": "wb-001",
+        "versionId": "ver-001",
+        "auditId": "audit-001",
+        "items": [
+          {
+            "findingId": "2158dab481d977a4f2a1ef238977b3fd4197b85f46f6be9e622276e85938e52d",
+            "allowedActions": [
+              "APPLY",
+              "DECLINE",
+              "MANUAL_REVIEW"
+            ],
+            "currentValue": {
+              "title": null,
+              "description": null
+            },
+            "reason": "Provide both alternative text fields."
+          }
+        ]
+      }
+    },
+    {
+      "definition": "ReauditRequest",
+      "value": {
+        "reason": "MANUAL_REAUDIT"
+      }
+    },
+    {
+      "definition": "ReauditResponse",
+      "value": {
+        "auditId": "audit-003",
+        "versionId": "ver-002",
+        "rulesetVersion": "2.0.0",
+        "status": "PROCESSING"
+      }
+    },
+    {
+      "definition": "HistoryResponse",
+      "value": {
+        "workbookId": "wb-001",
+        "versions": [
+          {
+            "versionId": "ver-001",
+            "sourceVersionId": null,
+            "status": "REMEDIATION_AVAILABLE",
+            "createdAt": "2026-10-28T14:00:00Z"
+          },
+          {
+            "versionId": "ver-002",
+            "sourceVersionId": "ver-001",
+            "status": "REMEDIATED",
+            "createdAt": "2026-10-28T14:00:08Z"
+          }
+        ],
+        "audits": [
+          {
+            "auditId": "audit-001",
+            "versionId": "ver-001",
+            "rulesetVersion": "2.0.0",
+            "status": "REMEDIATION_AVAILABLE"
+          },
+          {
+            "auditId": "audit-002",
+            "versionId": "ver-002",
+            "rulesetVersion": "2.0.0",
+            "status": "AUDIT_COMPLETE"
+          }
+        ]
+      }
+    },
+    {
+      "definition": "AuditReport",
+      "value": {
+        "reportVersion": "2.0.0",
+        "specificationVersion": "2.1.0",
+        "workbookId": "wb-001",
+        "versionId": "ver-002",
+        "auditId": "audit-002",
+        "fileName": "example-remediated.xlsx",
+        "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "sourceVersionId": "ver-001",
+        "auditDate": "2026-10-28T14:00:08Z",
+        "rulesetVersion": "2.0.0",
+        "status": "AUDIT_COMPLETE",
+        "checksPerformed": [
+          "ALT_TEXT",
+          "WORKSHEET_NAME",
+          "TABLE_HEADER",
+          "MERGED_CELLS",
+          "LINK_TEXT",
+          "COLOR_CONTRAST"
+        ],
+        "findings": [],
+        "decisions": [
+          {
+            "sourceAuditId": "audit-001",
+            "findingId": "2158dab481d977a4f2a1ef238977b3fd4197b85f46f6be9e622276e85938e52d",
+            "ruleId": "ALT_TEXT",
+            "worksheet": "Expenses",
+            "target": "xl/drawings/drawing1.xml#id=2",
+            "action": "APPLY",
+            "value": {
+              "title": "Monthly expenses",
+              "description": "Bar chart comparing monthly expenses from January through June."
+            }
+          }
+        ],
+        "approvedChanges": [
+          {
+            "sourceAuditId": "audit-001",
+            "findingId": "2158dab481d977a4f2a1ef238977b3fd4197b85f46f6be9e622276e85938e52d",
+            "ruleId": "ALT_TEXT",
+            "worksheet": "Expenses",
+            "target": "xl/drawings/drawing1.xml#id=2",
+            "action": "APPLY",
+            "value": {
+              "title": "Monthly expenses",
+              "description": "Bar chart comparing monthly expenses from January through June."
+            }
+          }
+        ],
+        "unresolvedFindings": [],
+        "manualReviewItems": [],
+        "limitations": [],
+        "remediationId": "rem-001",
+        "outputVersionId": "ver-002",
+        "outputId": "out-001",
+        "error": null
+      }
+    },
+    {
+      "definition": "TesterSetupRequest",
+      "value": {
+        "target_url": "https://target.example.edu/system"
+      }
+    },
+    {
+      "definition": "SystemSetupRequest",
+      "value": {
+        "session_id": "e3305d74-377a-4a3e-8e14-3d2d7fb2799b",
+        "setup": {}
+      }
+    },
+    {
+      "definition": "SuiteReport",
+      "value": {
+        "session_id": "e3305d74-377a-4a3e-8e14-3d2d7fb2799b",
+        "target_url": "https://target.example.edu/system",
+        "results": [
+          {
+            "test_id": "P4-SPECIMEN-PASS",
+            "outcome": "pass",
+            "message": "Expected behavior observed."
+          },
+          {
+            "test_id": "P4-SPECIMEN-FAIL",
+            "outcome": "fail",
+            "message": "Expected public health 200; received 401."
+          },
+          {
+            "test_id": "P4-SPECIMEN-ERROR",
+            "outcome": "error",
+            "message": "No target response before deadline.",
+            "source": "communication"
+          },
+          {
+            "test_id": "P4-SPECIMEN-SKIP",
+            "outcome": "skip",
+            "message": "No controlled processing failure was observed."
+          }
+        ],
+        "coverage": {
+          "code": {
+            "covered": null,
+            "total": null,
+            "basis": "Target instrumentation unavailable; no count inferred."
+          },
+          "component": {
+            "covered": 1,
+            "total": 9,
+            "basis": "Formatting specimen only; C9 UI not exercised by HTTP."
+          },
+          "system": {
+            "covered": 0,
+            "total": 11,
+            "basis": "Formatting specimen only; no real acceptance evidence."
+          }
+        }
+      }
+    },
+    {
+      "definition": "SystemSetupRequest",
+      "value": {
+        "session_id": "failure-session-001",
+        "setup": {
+          "faults": {
+            "audit_failures": 1
+          }
+        }
+      }
+    }
+  ]
+}

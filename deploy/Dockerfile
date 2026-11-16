@@ -9,6 +9,8 @@ COPY app ./app
 COPY tester ./tester
 COPY tests/fixtures ./tests/fixtures
 COPY docs/contracts/phase4/phase4-wire-schemas.json ./docs/contracts/phase4/phase4-wire-schemas.json
+COPY docs/contracts/phase5/phase5-wire-schemas.json ./docs/contracts/phase5/phase5-wire-schemas.json
+COPY docs/design ./docs/design
 RUN uv sync --locked --no-dev --no-editable
 
 FROM python:3.12-slim AS runtime

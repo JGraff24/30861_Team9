@@ -66,7 +66,7 @@ def main() -> None:
                         if time.monotonic() > deadline:
                             raise TimeoutError(f"{module} startup deadline exceeded")
                         time.sleep(0.1)
-                    expected = 13 if port == 8000 else 3
+                    expected = 17 if port == 8000 else 3
                     assert len(response.json()["paths"]) == expected
                     assert response.json()["openapi"] == "3.1.1"
                     assert client.get("/docs").status_code == 200
@@ -74,6 +74,10 @@ def main() -> None:
                         # Concrete defaults assemble all four owner modules.
                         assert client.get("/api/v1/health").status_code == 200
                         assert client.post("/api/v1/workbooks").status_code == 401
+                        assert (
+                            client.post("/api/v1/test/clock").json()["code"]
+                            == "TEST_CLOCK_DISABLED"
+                        )
                     assert client.get("/test/report").status_code == (404 if port == 8000 else 401)
                 print(f"{module}: port {port}; docs 200; {expected} actual route paths checked")
         finally:

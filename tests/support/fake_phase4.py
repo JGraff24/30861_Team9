@@ -386,6 +386,8 @@ class FakePhase4:
             raise project_error(400, "INVALID_REQUEST")
         name = part.get_filename() or ""
         data = part.get_payload(decode=True)
+        if not isinstance(data, bytes):
+            raise project_error(400, "INVALID_REQUEST")
         if name.endswith(".xlsm"):
             raise project_error(422, "MACRO_ENABLED_WORKBOOK_UNSUPPORTED")
         if not name.endswith(".xlsx"):

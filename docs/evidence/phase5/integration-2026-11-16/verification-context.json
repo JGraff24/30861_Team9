@@ -1,0 +1,54 @@
+{
+  "executionHost": "macOS-13.7.1-arm64-arm-64bit-Mach-O",
+  "python": "3.14.7",
+  "sourceRevision": "0b6312bc7b63605bd43441161a495860ec442f03",
+  "pytest": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "7",
+    "tests": "1120",
+    "time": "197.202",
+    "timestamp": "2026-11-16T14:03:11.081666-05:00",
+    "hostname": "Jacksons-MacBook-Air-2.local"
+  },
+  "skips": [
+    {
+      "class": "tests.acceptance.test_live_tester",
+      "test": "test_unauthenticated_calls_are_refused",
+      "reason": "live tester URL/target/token not configured"
+    },
+    {
+      "class": "tests.acceptance.test_live_tester",
+      "test": "test_unapproved_target_is_refused",
+      "reason": "live tester URL/target/token not configured"
+    },
+    {
+      "class": "tests.acceptance.test_live_tester",
+      "test": "test_single_use_session_and_stored_report",
+      "reason": "live tester URL/target/token not configured"
+    },
+    {
+      "class": "tests.acceptance.test_live_tester",
+      "test": "test_lost_run_response_is_recovered_without_another_run",
+      "reason": "live tester URL/target/token not configured"
+    },
+    {
+      "class": "tests.acceptance.test_live_tester",
+      "test": "test_report_profile_matches_trusted_configuration",
+      "reason": "live tester URL/target/token not configured"
+    },
+    {
+      "class": "tests.ryan.test_runner",
+      "test": "test_failures[memory-crash]",
+      "reason": "RLIMIT_AS enforcement requires Linux"
+    },
+    {
+      "class": "tests.unit.test_jackson_execution",
+      "test": "test_linux_memory_cap_is_enforced",
+      "reason": "RLIMIT_AS enforcement requires Linux"
+    }
+  ],
+  "hostedTesting": "Deferred by user; local loopback tests only",
+  "publication": "User requested no main merge or push"
+}

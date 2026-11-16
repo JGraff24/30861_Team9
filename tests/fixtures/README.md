@@ -1,5 +1,13 @@
 # Suite manifest and fixtures
 
+The default integrated suite is now **Phase 5 3.0.0**, `manifest-phase5.json`, with
+395 cases (253 inherited plus 142 new). `expectations-phase5.json` preserves the independent
+six-rule workbook expectations and adds the frozen performance fixture. Run the Phase 5
+manifest/policy/catalog checks documented in the root README. The pack contains 435 normative
+assertion entries across hosted, local and human evidence; it is not the executable count.
+Human fixture review remains pending. The inventory below retains Phase 3 contribution context;
+its former default and pending-delivery statements describe that historical phase.
+
 `manifest.json` is the tester's planned Phase 3 suite: fixed test order, the C1-C6 component
 catalog, the eight Phase 3 AC portions, and the components/ACs each test's qualifying assertion
 counts toward. `FIXTURE_MANIFEST_PATH` points here. `expectations.json` holds raw SHA256, ruleset,

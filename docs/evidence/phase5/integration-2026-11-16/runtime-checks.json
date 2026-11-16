@@ -1,0 +1,130 @@
+[
+  {
+    "check": "own-system",
+    "command": [
+      "-m",
+      "scripts.integration_selfcheck",
+      "--phase5",
+      "--evidence-dir",
+      "/Users/jacksongraff/Documents/GitHub/30861_Team9/docs/evidence/phase5/integration-2026-11-16/own"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 487.535
+  },
+  {
+    "check": "legacy-real",
+    "command": [
+      "-m",
+      "scripts.integration_selfcheck",
+      "--evidence-dir",
+      "/Users/jacksongraff/Documents/GitHub/30861_Team9/docs/evidence/phase5/integration-2026-11-16/legacy"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 125.473
+  },
+  {
+    "check": "fake-phase3",
+    "command": [
+      "-m",
+      "scripts.tester_selfcheck",
+      "--evidence-dir",
+      "/Users/jacksongraff/Documents/GitHub/30861_Team9/docs/evidence/phase5/integration-2026-11-16/fake-phase3"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 50.281
+  },
+  {
+    "check": "fake-phase4",
+    "command": [
+      "-m",
+      "scripts.tester_selfcheck",
+      "--phase4",
+      "--evidence-dir",
+      "/Users/jacksongraff/Documents/GitHub/30861_Team9/docs/evidence/phase5/integration-2026-11-16/fake-phase4"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 285.972
+  },
+  {
+    "check": "fake-phase5-own",
+    "command": [
+      "-m",
+      "scripts.tester_selfcheck",
+      "--phase5",
+      "--profile",
+      "own",
+      "--evidence-dir",
+      "/Users/jacksongraff/Documents/GitHub/30861_Team9/docs/evidence/phase5/integration-2026-11-16/fake-phase5-own"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 51.166
+  },
+  {
+    "check": "fake-phase5-cross",
+    "command": [
+      "-m",
+      "scripts.tester_selfcheck",
+      "--phase5",
+      "--profile",
+      "cross",
+      "--evidence-dir",
+      "/Users/jacksongraff/Documents/GitHub/30861_Team9/docs/evidence/phase5/integration-2026-11-16/fake-phase5-cross"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 51.373
+  },
+  {
+    "check": "browser-phase4",
+    "command": [
+      "-m",
+      "tests.ryan.browser_ui"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 9.275
+  },
+  {
+    "check": "browser-phase5",
+    "command": [
+      "-m",
+      "tests.ryan.browser_phase5",
+      "--axe-script",
+      "/tmp/team9-accessibility/node_modules/axe-core/axe.min.js",
+      "--evidence-dir",
+      "/Users/jacksongraff/Documents/GitHub/30861_Team9/docs/evidence/phase5/integration-2026-11-16/browser-phase5"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 22.284
+  },
+  {
+    "check": "browser-real",
+    "command": [
+      "-m",
+      "tests.ryan.browser_real",
+      "--axe-script",
+      "/tmp/team9-accessibility/node_modules/axe-core/axe.min.js",
+      "--evidence-dir",
+      "/Users/jacksongraff/Documents/GitHub/30861_Team9/docs/evidence/phase5/integration-2026-11-16/browser-real"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 22.737
+  },
+  {
+    "check": "performance",
+    "command": [
+      "-m",
+      "scripts.ac18_performance",
+      "--workload",
+      "cells",
+      "--workload",
+      "mixed",
+      "--workload",
+      "bytes",
+      "--mode",
+      "measured",
+      "--output",
+      "/Users/jacksongraff/Documents/GitHub/30861_Team9/docs/evidence/phase5/integration-2026-11-16/performance.json"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 174.475
+  }
+]

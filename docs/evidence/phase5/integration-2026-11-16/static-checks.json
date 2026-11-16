@@ -1,0 +1,159 @@
+[
+  {
+    "command": [
+      "/tmp/team9-uv-tool/bin/uv",
+      "lock",
+      "--check"
+    ],
+    "exitCode": 0,
+    "output": "Resolved 84 packages in 7ms\n"
+  },
+  {
+    "command": [
+      ".venv/bin/ruff",
+      "check",
+      "."
+    ],
+    "exitCode": 0,
+    "output": "All checks passed!\n"
+  },
+  {
+    "command": [
+      ".venv/bin/ruff",
+      "format",
+      "--check",
+      "."
+    ],
+    "exitCode": 0,
+    "output": "186 files already formatted\n"
+  },
+  {
+    "command": [
+      ".venv/bin/mypy",
+      "--platform",
+      "linux",
+      "app",
+      "tester",
+      "scripts"
+    ],
+    "exitCode": 0,
+    "output": "Success: no issues found in 117 source files\n"
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "docs/contracts/phase5/validate_pack.py"
+    ],
+    "exitCode": 0,
+    "output": "{\n  \"status\": \"passed\",\n  \"schema_definitions\": 59,\n  \"valid_examples\": 26,\n  \"negative_examples_rejected\": 21,\n  \"plan_entries\": 435,\n  \"new_plan_entries\": 186,\n  \"counts_by_tier\": {\n    \"hosted_http\": 357,\n    \"local_integration\": 57,\n    \"manual_release\": 21\n  },\n  \"hash_manifest_checked\": true,\n  \"scope\": \"Artifact consistency only; no implementation tests, human acceptance, adoption or deployment verified.\"\n}\n"
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "scripts.export_schemas",
+      "--check"
+    ],
+    "exitCode": 0,
+    "output": "system: checked schema catalog\ntester: checked schema catalog\n"
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "scripts.check_identity"
+    ],
+    "exitCode": 0,
+    "output": "502d6624551c9da5c9a80d7efcc04be1119dad4a16f55171487949600a177714\n65c48a7e1beb35c5e0068830b884d5d6f658793be5bcf21a1189a134f592ddc3\n780ab5b340613108fa0dd216616b987cf1929a01b527495cbf3d9e63057fd9e7\n"
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "scripts.check_phase4_policy"
+    ],
+    "exitCode": 0,
+    "output": "identity: 3 vectors\nwhite space: 25 code points, U+200B excluded\ngeneric names: 9 vectors\nambiguous labels: 7 vectors\ntheme order and 64-entry indexed palette\ncontrast: 7 vectors\ntint: 7 vectors\nheader components: 4 vectors\nduplicate-ID targets: 2 indexed paths\nexamples: 18 validate; identity vector matches\nwire schemas: 44 definitions\n"
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "scripts.check_phase5_policy"
+    ],
+    "exitCode": 0,
+    "output": "Phase 5 policy vectors and 26 valid / 21 invalid examples agree; 59 wire definitions\n"
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "scripts.build_phase4_manifest",
+      "--check"
+    ],
+    "exitCode": 0,
+    "output": "253 hosted cases bound to 73 checks\n"
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "scripts.build_phase5_manifest",
+      "--check"
+    ],
+    "exitCode": 0,
+    "output": "395 hosted cases bound to 101 checks\n"
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "scripts.build_phase5_catalogs",
+      "--check"
+    ],
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "scripts.make_synthetic_fixtures",
+      "--check"
+    ],
+    "exitCode": 0,
+    "output": "clean.xlsx: 9040 bytes sha256=e1de45e415b8552304a69050a86c5d605ab07eeaf96cef0c92dde6ba2d63e35e\nseeded_issues.xlsx: 11841 bytes sha256=6e54efe60ce3a45530f364168557ea7ceb085a454b3c02fe5927ab715b00d223\ncorrupt.xlsx: 264 bytes sha256=c51c63778cc8b7337c98ea4a62ee51d3abb17b537b28a64cfeffc0ef9d292265\nunicode.xlsx: 7687 bytes sha256=5d938a482bcb0f0bf84df3bfd9cc6dfedf7f0c57a0f9ac3357ef9b15520e1efd\nrepeated_ids.xlsx: 6570 bytes sha256=680d7d50899bfb4d2178acaafecbf9741f46fb0a9bdff1fb374670c50c813883\nmultiple_drawings.xlsx: 9631 bytes sha256=52fb02a37099b7ab9a0787e7858d36340155a1c5682dc7000fe35fa79ef2eb27\nzip_traversal.xlsx: 9148 bytes sha256=8643e444288c01475000843f03d8621e6c59660eb8a45974392a7e2ce3880ebc\nzip_duplicate.xlsx: 9475 bytes sha256=dd10f96a1ca5f1dac9caa59396acb6929f862b1ab7fd1123ccb2c110fdf9a98d\nxml_dtd.xlsx: 9086 bytes sha256=accad3c326749fcc2e1fc1aa77999d7a5bf74c9cb9fbc7e2244ae374947c4843\nmacro_parts.xlsx: 9187 bytes sha256=0b2819c85a29d598707f08a43371133fae7db386be8233c3a536d86e576663fe\nencrypted_zip.xlsx: 9184 bytes sha256=cde084966c1c048cfd860b82f492087521816a1bca32c9342cb5589d6782dd06\nprotected_sheet.xlsx: 3559 bytes sha256=390e3ea3f9f3768c52fddf67c146ff569e3a1fa81da1d9e0a3c888c56419e3dc\nprotected_structure.xlsx: 3602 bytes sha256=3b611ae68cd84e2bbffc17ad086886732e7409c689ec2e6bc6416de28758bc11\nin_cell_picture.xlsx: 8491 bytes sha256=63921a4e08cd90ee035afe125d94676dffabeaa7fd74aaf6c993fd7fe4088f1b\nimage_formula.xlsx: 3644 bytes sha256=edefdb8a4b567fe2ef4cb79e37aeb1b3c85116286c0d040ed8956b6a124effc5\nform_controls.xlsx: 9116 bytes sha256=53630b5946d30abdf056cfd12a6ebd124b19d6e9d318766e67f57af2dddcc53c\nvml_comments.xlsx: 5863 bytes sha256=dacd584e94b8647c37417ddae6714fa6e3a55471a7122ac7868f55578015029f\ninactive_protection.xlsx: 3559 bytes sha256=1f01f6857964fb9d52c04bee2457ab06ed5c0128bc5f793d0418568d867e21d7\nphase4/clean_all_six.xlsx: 10110 bytes sha256=916ac672e6b3ef914493312e6c63c7c94dc45c84a9381087dbee5966ceec33a7\nphase4/seeded_all_six.xlsx: 10036 bytes sha256=0b3b8eed0f295cece0fdf1da56c534acba5b2b2a84ce3082e953a903d2f907a6\nphase4/review_only.xlsx: 5489 bytes sha256=d1eb3d0da748009c75ae41b75991ca861e1e4a9b9086d7c467ae037d09159de7\nphase4/mixed_decisions.xlsx: 10070 bytes sha256=888056e1c67048ce1c7214e8848801ac6d102c2e96f0645835d337a988a5d6b4\nphase4/unsupported_edits.xlsx: 9488 bytes sha256=08ef768ac2cbae331fd6436718d27db1a75aa18393507a4bfa186da95005343d\nphase4/alt_supported.xlsx: 8321 bytes sha256=c6490ba00e7879f6dfb73cf5b07c95bd1375697d6d46bf812a16399e333fe57f\nphase4/link_supported.xlsx: 6732 bytes sha256=346a3d095c4b79d96b118389e999c71962dbab27edb5731c1a72e14cea0b5ad1\nphase4/header_range.xlsx: 5876 bytes sha256=ee2c92878ca27bf2830e8abd4a5d17df478de62a6e9fa8bae4ddb3b2e9956721\nphase4/header_disabled_table.xlsx: 6915 bytes sha256=28ef03661dbc430c66436f43225f11ec092ff122895b5d58996380a1bfc9c9e5\nphase4/rename_references.xlsx: 11884 bytes sha256=fabf363d00df9f6af44e791945d9d67dec8405dc9fadb516633a1684c8221d51\nphase4/preservation_rich.xlsx: 12576 bytes sha256=7e870c77e26a57bb97c34a76eb18cde4dd19be69edbcdf68af3a24ef2085fad7\nphase4/large_preservation.xlsx: 3007667 bytes sha256=d55c8af59d4d1b5c52299d403a9b5798411f425461c02e240364d78ce7f6eb05\nphase4/table_header_vectors.xlsx: 19203 bytes sha256=f6a1f5905e7b6c5d5ef11666f92614cacba1c96e8753a5c6168729ed30ab85b7\nphase4/merge_vectors.xlsx: 6453 bytes sha256=66c3f84e0d8367cac38dad9a18d4b5faa28d9d360908e38869d9734a09c73ede\nphase4/link_vectors.xlsx: 15441 bytes sha256=9f7b4a843c385d42fd135ee5af2272244d6430bf54c31cc92e12e4334b95399c\nphase4/contrast_vectors.xlsx: 22791 bytes sha256=71af778563435779715c64b1dda39e293c501b0aebd7c9439cc326ff495a5a0c\nphase4/tint_half_vectors.xlsx: 10613 bytes sha256=13be0503cf498e3f5417acce3e3773af0874a2f8a9b021226a45c9412cd66826\n"
+  },
+  {
+    "command": [
+      "node",
+      "--check",
+      "app/ui/static/app.js"
+    ],
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exitCode": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      ".venv/bin/pip-audit",
+      "--require-hashes",
+      "--disable-pip",
+      "--cache-dir",
+      "/tmp/team9-audit-cache",
+      "-r",
+      "/tmp/team9-runtime-requirements.txt"
+    ],
+    "exitCode": 0,
+    "output": "No known vulnerabilities found\n",
+    "note": "Recorded from the successful fresh tool invocation after locked runtime + measurement export."
+  }
+]

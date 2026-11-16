@@ -24,6 +24,7 @@ from app.contracts.models import (
 )
 from tester.config import TargetAuth, TesterSettings
 from tester.errors import TesterError, bad_request
+from tester.phase5.profile import ProfileError, classify
 from tester.store import ENDED, TesterSessionState, TesterStore
 from tester.suite.checks import SuiteContext
 from tester.suite.manifest import (
@@ -97,6 +98,24 @@ class TesterService:
             raise TesterError(
                 500, "Tester suite configuration is unavailable.", ErrorSource.TESTER
             ) from None
+        profile = None
+        if suite.manifest.phase == "5":
+            # Trusted configuration alone decides own/cross; it is frozen with the plan.
+            try:
+                profile = classify(
+                    request.target_url,
+                    tester_team=self.settings.tester_team_id,
+                    target_teams=self.settings.target_team_map,
+                    design_map_path=self.settings.tester_design_map_path,
+                    planned_ids=[test.test_id for test in suite.manifest.tests],
+                ).snapshot()
+            except ProfileError as exc:
+                logger.error("Tester report profile unavailable: %s", exc)
+                raise TesterError(
+                    500,
+                    "Tester report profile configuration is missing or invalid.",
+                    ErrorSource.TESTER,
+                ) from None
         session_id = str(uuid.uuid4())
         # Failed preparations always receive deferred compensation. Optional cleanup of
         # successfully retrieved namespaces remains an explicit operator setting.
@@ -109,7 +128,7 @@ class TesterService:
             operator,
             request.target_url,
             datetime.now(UTC),
-            plan=snapshot_suite(suite, self.settings.fixture_manifest_path),
+            plan=snapshot_suite(suite, self.settings.fixture_manifest_path, profile),
             setup=setup,
         )
         ready = False
@@ -207,6 +226,9 @@ class TesterService:
                 ctx = SuiteContext(
                     client, suite, request.session_id, sleep=self._sleep, clock=self._clock
                 )
+                target_url = session.target_url
+                # Read-only evidence: finalized reports must survive target-side deletions.
+                ctx.state["tester_report_digests"] = lambda: self.store.report_digests(target_url)
                 outcome = run_suite(ctx, session.target_url, progress)
             report, aborted, message = outcome.report, outcome.aborted, outcome.abort_message
         except Exception:

@@ -1,0 +1,412 @@
+{
+  "kind": "ac18-local-performance",
+  "specificationVersion": "3.0.0",
+  "rulesetVersion": "2.0.0",
+  "startedAt": "2026-11-16T18:22:35Z",
+  "revision": {
+    "commit": "459d6b4f8a7b544c9117bcf4a1c3abedac5f5935",
+    "branch": "HEAD",
+    "dirtyPaths": []
+  },
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "machine": "x86_64",
+    "processor": null,
+    "cpuCount": 16,
+    "python": "3.12.15",
+    "implementation": "CPython",
+    "memoryBytes": null
+  },
+  "system": "local real stack: in-process API, SQLite, filesystem storage, production worker loop and bounded engine children; not a hosted deployment",
+  "clock": "time.monotonic real elapsed time; no simulated time",
+  "measurements": [
+    {
+      "workload": "cells",
+      "description": "tester boundary generator: one worksheet, exactly 250,000 numeric cells",
+      "mode": "measured",
+      "modeDescription": "isolated test session with per-session code measurement",
+      "workbook": {
+        "sha256": "2e48fede3b950478fb95a3022465d5a1fc862a8e56e969fe622d042b68d730b0",
+        "bytes": 6906151
+      },
+      "settings": {
+        "productionBounds": true,
+        "workerConcurrency": 2,
+        "auditTimeoutSeconds": 60.0,
+        "validationTimeoutSeconds": 30.0,
+        "queueTimeoutSeconds": 15.0,
+        "engineMemoryLimitMiB": 512,
+        "memoryLimitEnforced": true
+      },
+      "runs": [
+        {
+          "run": 1,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 6.228,
+          "intakeValidationSeconds": 6.155,
+          "queueSeconds": 0.083,
+          "workerValidationSeconds": null,
+          "engineSeconds": 21.079,
+          "workerJobSeconds": 21.127,
+          "acceptanceToTerminalSeconds": 21.21,
+          "endToEndSeconds": 27.497,
+          "auditStatus": "REVIEW_REQUIRED",
+          "outcome": "SUCCESS",
+          "findingCount": 1,
+          "findingsDigest": "6b1f8b92f40bd5e81c5f7c0cfb49649c5312480dad334cc909c68919ddb648af",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 2,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 6.219,
+          "intakeValidationSeconds": 6.151,
+          "queueSeconds": 0.028,
+          "workerValidationSeconds": null,
+          "engineSeconds": 20.877,
+          "workerJobSeconds": 20.915,
+          "acceptanceToTerminalSeconds": 20.943,
+          "endToEndSeconds": 27.218,
+          "auditStatus": "REVIEW_REQUIRED",
+          "outcome": "SUCCESS",
+          "findingCount": 1,
+          "findingsDigest": "6b1f8b92f40bd5e81c5f7c0cfb49649c5312480dad334cc909c68919ddb648af",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 3,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 6.36,
+          "intakeValidationSeconds": 6.304,
+          "queueSeconds": 0.145,
+          "workerValidationSeconds": null,
+          "engineSeconds": 20.869,
+          "workerJobSeconds": 20.913,
+          "acceptanceToTerminalSeconds": 21.058,
+          "endToEndSeconds": 27.425,
+          "auditStatus": "REVIEW_REQUIRED",
+          "outcome": "SUCCESS",
+          "findingCount": 1,
+          "findingsDigest": "6b1f8b92f40bd5e81c5f7c0cfb49649c5312480dad334cc909c68919ddb648af",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 4,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 6.351,
+          "intakeValidationSeconds": 6.302,
+          "queueSeconds": 0.203,
+          "workerValidationSeconds": null,
+          "engineSeconds": 20.869,
+          "workerJobSeconds": 20.919,
+          "acceptanceToTerminalSeconds": 21.123,
+          "endToEndSeconds": 27.52,
+          "auditStatus": "REVIEW_REQUIRED",
+          "outcome": "SUCCESS",
+          "findingCount": 1,
+          "findingsDigest": "6b1f8b92f40bd5e81c5f7c0cfb49649c5312480dad334cc909c68919ddb648af",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 5,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 6.299,
+          "intakeValidationSeconds": 6.249,
+          "queueSeconds": 0.017,
+          "workerValidationSeconds": null,
+          "engineSeconds": 20.922,
+          "workerJobSeconds": 20.961,
+          "acceptanceToTerminalSeconds": 20.978,
+          "endToEndSeconds": 27.308,
+          "auditStatus": "REVIEW_REQUIRED",
+          "outcome": "SUCCESS",
+          "findingCount": 1,
+          "findingsDigest": "6b1f8b92f40bd5e81c5f7c0cfb49649c5312480dad334cc909c68919ddb648af",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        }
+      ],
+      "summary": {
+        "outcomes": {
+          "SUCCESS": 5,
+          "CONTROLLED_FAILURE": 0,
+          "UNCONTROLLED": 0
+        },
+        "allRunsSatisfyAc18": true,
+        "successfulFindingsIdentical": true,
+        "findingsDigests": [
+          "6b1f8b92f40bd5e81c5f7c0cfb49649c5312480dad334cc909c68919ddb648af"
+        ],
+        "findingsByRule": {
+          "TABLE_HEADER": 1
+        },
+        "maxEndToEndSeconds": 27.52,
+        "maxEngineSeconds": 21.079,
+        "maxQueueSeconds": 0.203
+      }
+    },
+    {
+      "workload": "mixed",
+      "description": "50 generic worksheets x 5,000 cells (250,000), headers, links and merges",
+      "mode": "measured",
+      "modeDescription": "isolated test session with per-session code measurement",
+      "workbook": {
+        "sha256": "93ffe15016f7fe91848e8529a4940f2d836419551bc16987aa8ad24ea437eab9",
+        "bytes": 6530748
+      },
+      "settings": {
+        "productionBounds": true,
+        "workerConcurrency": 2,
+        "auditTimeoutSeconds": 60.0,
+        "validationTimeoutSeconds": 30.0,
+        "queueTimeoutSeconds": 15.0,
+        "engineMemoryLimitMiB": 512,
+        "memoryLimitEnforced": true
+      },
+      "runs": [
+        {
+          "run": 1,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 6.192,
+          "intakeValidationSeconds": 6.146,
+          "queueSeconds": 0.123,
+          "workerValidationSeconds": null,
+          "engineSeconds": 20.226,
+          "workerJobSeconds": 20.265,
+          "acceptanceToTerminalSeconds": 20.388,
+          "endToEndSeconds": 26.587,
+          "auditStatus": "REMEDIATION_AVAILABLE",
+          "outcome": "SUCCESS",
+          "findingCount": 200,
+          "findingsDigest": "899ffe52520baaacf6adb36c6d53330b5345ef0954f2e38ad5ea4c05de27793c",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 2,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 5.994,
+          "intakeValidationSeconds": 5.949,
+          "queueSeconds": 0.05,
+          "workerValidationSeconds": null,
+          "engineSeconds": 19.917,
+          "workerJobSeconds": 19.969,
+          "acceptanceToTerminalSeconds": 20.019,
+          "endToEndSeconds": 26.028,
+          "auditStatus": "REMEDIATION_AVAILABLE",
+          "outcome": "SUCCESS",
+          "findingCount": 200,
+          "findingsDigest": "899ffe52520baaacf6adb36c6d53330b5345ef0954f2e38ad5ea4c05de27793c",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 3,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 6.145,
+          "intakeValidationSeconds": 6.099,
+          "queueSeconds": 0.143,
+          "workerValidationSeconds": null,
+          "engineSeconds": 20.379,
+          "workerJobSeconds": 20.442,
+          "acceptanceToTerminalSeconds": 20.585,
+          "endToEndSeconds": 26.742,
+          "auditStatus": "REMEDIATION_AVAILABLE",
+          "outcome": "SUCCESS",
+          "findingCount": 200,
+          "findingsDigest": "899ffe52520baaacf6adb36c6d53330b5345ef0954f2e38ad5ea4c05de27793c",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 4,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 6.153,
+          "intakeValidationSeconds": 6.099,
+          "queueSeconds": 0.106,
+          "workerValidationSeconds": null,
+          "engineSeconds": 20.227,
+          "workerJobSeconds": 20.287,
+          "acceptanceToTerminalSeconds": 20.393,
+          "endToEndSeconds": 26.555,
+          "auditStatus": "REMEDIATION_AVAILABLE",
+          "outcome": "SUCCESS",
+          "findingCount": 200,
+          "findingsDigest": "899ffe52520baaacf6adb36c6d53330b5345ef0954f2e38ad5ea4c05de27793c",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 5,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 6.196,
+          "intakeValidationSeconds": 6.151,
+          "queueSeconds": 0.029,
+          "workerValidationSeconds": null,
+          "engineSeconds": 20.432,
+          "workerJobSeconds": 20.476,
+          "acceptanceToTerminalSeconds": 20.505,
+          "endToEndSeconds": 26.735,
+          "auditStatus": "REMEDIATION_AVAILABLE",
+          "outcome": "SUCCESS",
+          "findingCount": 200,
+          "findingsDigest": "899ffe52520baaacf6adb36c6d53330b5345ef0954f2e38ad5ea4c05de27793c",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        }
+      ],
+      "summary": {
+        "outcomes": {
+          "SUCCESS": 5,
+          "CONTROLLED_FAILURE": 0,
+          "UNCONTROLLED": 0
+        },
+        "allRunsSatisfyAc18": true,
+        "successfulFindingsIdentical": true,
+        "findingsDigests": [
+          "899ffe52520baaacf6adb36c6d53330b5345ef0954f2e38ad5ea4c05de27793c"
+        ],
+        "findingsByRule": {
+          "LINK_TEXT": 50,
+          "MERGED_CELLS": 50,
+          "TABLE_HEADER": 50,
+          "WORKSHEET_NAME": 50
+        },
+        "maxEndToEndSeconds": 26.742,
+        "maxEngineSeconds": 20.432,
+        "maxQueueSeconds": 0.143
+      }
+    },
+    {
+      "workload": "bytes",
+      "description": "tester boundary generator: clean workbook of exactly 25,000,000 bytes",
+      "mode": "measured",
+      "modeDescription": "isolated test session with per-session code measurement",
+      "workbook": {
+        "sha256": "f1d457286bfefb55a398c906ee5cf6b4cec61e1b4482c302a87eb07fc30f3fe8",
+        "bytes": 25000000
+      },
+      "settings": {
+        "productionBounds": true,
+        "workerConcurrency": 2,
+        "auditTimeoutSeconds": 60.0,
+        "validationTimeoutSeconds": 30.0,
+        "queueTimeoutSeconds": 15.0,
+        "engineMemoryLimitMiB": 512,
+        "memoryLimitEnforced": true
+      },
+      "runs": [
+        {
+          "run": 1,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 1.089,
+          "intakeValidationSeconds": 0.936,
+          "queueSeconds": 0.185,
+          "workerValidationSeconds": null,
+          "engineSeconds": 0.934,
+          "workerJobSeconds": 1.035,
+          "acceptanceToTerminalSeconds": 1.221,
+          "endToEndSeconds": 2.366,
+          "auditStatus": "AUDIT_COMPLETE",
+          "outcome": "SUCCESS",
+          "findingCount": 0,
+          "findingsDigest": "560d330ff1647bfabb5259cd8d4f2059f273aebd25e3364705012a62708bcc0d",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 2,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 1.069,
+          "intakeValidationSeconds": 0.933,
+          "queueSeconds": 0.123,
+          "workerValidationSeconds": null,
+          "engineSeconds": 0.932,
+          "workerJobSeconds": 1.035,
+          "acceptanceToTerminalSeconds": 1.158,
+          "endToEndSeconds": 2.274,
+          "auditStatus": "AUDIT_COMPLETE",
+          "outcome": "SUCCESS",
+          "findingCount": 0,
+          "findingsDigest": "560d330ff1647bfabb5259cd8d4f2059f273aebd25e3364705012a62708bcc0d",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 3,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 1.136,
+          "intakeValidationSeconds": 0.983,
+          "queueSeconds": 0.067,
+          "workerValidationSeconds": null,
+          "engineSeconds": 0.986,
+          "workerJobSeconds": 1.089,
+          "acceptanceToTerminalSeconds": 1.156,
+          "endToEndSeconds": 2.304,
+          "auditStatus": "AUDIT_COMPLETE",
+          "outcome": "SUCCESS",
+          "findingCount": 0,
+          "findingsDigest": "560d330ff1647bfabb5259cd8d4f2059f273aebd25e3364705012a62708bcc0d",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 4,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 1.136,
+          "intakeValidationSeconds": 0.985,
+          "queueSeconds": 0.049,
+          "workerValidationSeconds": null,
+          "engineSeconds": 1.044,
+          "workerJobSeconds": 1.167,
+          "acceptanceToTerminalSeconds": 1.216,
+          "endToEndSeconds": 2.354,
+          "auditStatus": "AUDIT_COMPLETE",
+          "outcome": "SUCCESS",
+          "findingCount": 0,
+          "findingsDigest": "560d330ff1647bfabb5259cd8d4f2059f273aebd25e3364705012a62708bcc0d",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 5,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 1.127,
+          "intakeValidationSeconds": 0.984,
+          "queueSeconds": 0.062,
+          "workerValidationSeconds": null,
+          "engineSeconds": 0.985,
+          "workerJobSeconds": 1.077,
+          "acceptanceToTerminalSeconds": 1.138,
+          "endToEndSeconds": 2.273,
+          "auditStatus": "AUDIT_COMPLETE",
+          "outcome": "SUCCESS",
+          "findingCount": 0,
+          "findingsDigest": "560d330ff1647bfabb5259cd8d4f2059f273aebd25e3364705012a62708bcc0d",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        }
+      ],
+      "summary": {
+        "outcomes": {
+          "SUCCESS": 5,
+          "CONTROLLED_FAILURE": 0,
+          "UNCONTROLLED": 0
+        },
+        "allRunsSatisfyAc18": true,
+        "successfulFindingsIdentical": true,
+        "findingsDigests": [
+          "560d330ff1647bfabb5259cd8d4f2059f273aebd25e3364705012a62708bcc0d"
+        ],
+        "findingsByRule": {},
+        "maxEndToEndSeconds": 2.366,
+        "maxEngineSeconds": 1.044,
+        "maxQueueSeconds": 0.185
+      }
+    }
+  ]
+}

@@ -50,6 +50,8 @@ from app.jobs.remediation import require_correction_engine, validate_decisions_b
 from app.services.decisions import parse_remediation_request, validate_decisions
 from app.services.reports import bounded_json, canonical_request
 from app.storage.blobs import sha256
+from app.storage.locks import workbook_storage_lock
+from app.storage.sqlite import SQLiteRepository
 from app.test_interface.activity import (
     DEPLOYMENT_PROTECTION_SECONDS,
     DEPLOYMENT_RENEWAL_WINDOW_SECONDS,
@@ -267,45 +269,62 @@ class ProjectService:
         )
         # Durable reservation makes failed/ambiguous writes recoverable after restart.
         # Source keys are server-owned and immutable; the staging lease fences a late acceptance.
-        repository.reserve_upload_blob(version, datetime.now(UTC) + timedelta(seconds=30))
-        try:
-            returned_hash = blobs.put_source(key, data)
-            if returned_hash != validated.source_sha256:
-                raise IntegrityError("Source write checksum differs")
-            retained = blobs.read_source(key)
-            if len(retained) != len(data) or sha256(retained) != validated.source_sha256:
-                raise IntegrityError("Source read-back checksum differs")
-            # Queue time starts at acceptance, after bounded immutable storage I/O.
-            accepted_at = datetime.now(UTC)
-            version = version.model_copy(update={"created_at": accepted_at})
-            audit = audit.model_copy(update={"started_at": accepted_at})
-            job = job.model_copy(
-                update={
-                    "created_at": accepted_at,
-                    "queue_deadline": accepted_at
-                    + timedelta(seconds=services.settings.queue_timeout_seconds),
-                }
+        if isinstance(repository, SQLiteRepository) and repository.consume_storage_fault(
+            session_id
+        ):
+            raise ProjectException(
+                500,
+                "TEST_STORAGE_FAILURE",
+                "Storage failure requested by the isolated test session.",
             )
-            if existing is None:
-                workbook = workbook.model_copy(update={"created_at": accepted_at})
-            repository.create_upload(workbook, version, audit, job)
-        except Exception:
-            # A commit can succeed before its acknowledgement is lost. Never roll
-            # back bytes until a metadata read proves this version was not committed.
+        with workbook_storage_lock(services.settings.metadata_db_path, wid):
+            repository.reserve_upload_blob(version, datetime.now(UTC) + timedelta(seconds=30))
             try:
-                committed = repository.get_version(wid, vid)
+                returned_hash = blobs.put_source(key, data)
+                if returned_hash != validated.source_sha256:
+                    raise IntegrityError("Source write checksum differs")
+                retained = blobs.read_source(key)
+                if len(retained) != len(data) or sha256(retained) != validated.source_sha256:
+                    raise IntegrityError("Source read-back checksum differs")
+                # Queue time starts at acceptance, after bounded immutable storage I/O.
+                accepted_at = datetime.now(UTC)
+                effective = (
+                    repository.effective_now(session_id)
+                    if isinstance(repository, SQLiteRepository) and session_id is not None
+                    else accepted_at
+                )
+                version = version.model_copy(update={"created_at": effective})
+                audit = audit.model_copy(update={"started_at": effective})
+                job = job.model_copy(
+                    update={
+                        "created_at": accepted_at,
+                        "queue_deadline": accepted_at
+                        + timedelta(seconds=services.settings.queue_timeout_seconds),
+                    }
+                )
+                if existing is None:
+                    workbook = workbook.model_copy(update={"created_at": effective})
+                repository.create_upload(workbook, version, audit, job)
             except Exception:
-                raise StorageError("Upload acceptance could not be confirmed") from None
-            if committed is not None:
-                if committed.blob_key != key or committed.source_sha256 != validated.source_sha256:
-                    raise IntegrityError("Accepted source identity differs") from None
-            else:
+                # A commit can succeed before its acknowledgement is lost. Never roll
+                # back bytes until a metadata read proves this version was not committed.
                 try:
-                    repository.abandon_upload_blob(vid)
-                    blobs.delete_uncommitted_source(key, validated.source_sha256)
-                except StorageError:
-                    logger.error("source_rollback_failed", extra={"jobId": jid, "auditId": aid})
-                raise
+                    committed = repository.get_version(wid, vid)
+                except Exception:
+                    raise StorageError("Upload acceptance could not be confirmed") from None
+                if committed is not None:
+                    if (
+                        committed.blob_key != key
+                        or committed.source_sha256 != validated.source_sha256
+                    ):
+                        raise IntegrityError("Accepted source identity differs") from None
+                else:
+                    try:
+                        repository.abandon_upload_blob(vid)
+                        blobs.delete_uncommitted_source(key, validated.source_sha256)
+                    except StorageError:
+                        logger.error("source_rollback_failed", extra={"jobId": jid, "auditId": aid})
+                    raise
         return UploadResponse(workbookId=wid, versionId=vid, auditId=aid, status="PROCESSING")
 
     def _require_ruleset(self) -> None:
@@ -440,6 +459,12 @@ class ProjectService:
 
     def _new_audit(self, version: VersionRecord) -> tuple[AuditRecord, JobRecord]:
         now = datetime.now(UTC)
+        repository = self.services.repository
+        effective = (
+            repository.effective_now(version.session_id)
+            if isinstance(repository, SQLiteRepository) and version.session_id is not None
+            else now
+        )
         aid = identifier()
         audit = AuditRecord(
             audit_id=aid,
@@ -449,7 +474,7 @@ class ProjectService:
             session_id=version.session_id,
             ruleset_version=self.services.settings.ruleset_version,
             status=AuditStatus.PROCESSING,
-            started_at=now,
+            started_at=effective,
             completed_at=None,
             findings=[],
             limitations=[],
@@ -677,6 +702,11 @@ class ProjectService:
             record_measurement(self.services, session_id, measurement)
         decisions = sorted(decisions, key=lambda decision: decision.findingId)
         now = datetime.now(UTC)
+        effective = (
+            repository.effective_now(session_id)
+            if isinstance(repository, SQLiteRepository) and version.session_id is not None
+            else now
+        )
         rid, jid, ovid, oaid, oid = (identifier() for _ in range(5))
         namespace = f"tests/{session_id}" if session_id else "ordinary"
         remediation = RemediationRecord(
@@ -688,7 +718,7 @@ class ProjectService:
             session_id=version.session_id,
             ruleset_version=self.services.settings.ruleset_version,
             status="REMEDIATING",
-            created_at=now,
+            created_at=effective,
             decisions=decisions,
             output_version_id=None,
             output_id=None,

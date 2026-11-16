@@ -35,6 +35,7 @@ from tester.suite.checks import (
     CheckFailed,
     Prerequisite,
     SuiteContext,
+    SystemFault,
     expect_status,
 )
 from tester.suite.identity import finding_id
@@ -70,7 +71,7 @@ def limit(ctx: SuiteContext, name: str, default: int) -> int:
 
 def call(
     ctx: SuiteContext,
-    method: Literal["GET", "POST"],
+    method: Literal["GET", "POST", "PUT", "DELETE"],
     path: str,
     *,
     identity: Identity | None = "userA",
@@ -219,6 +220,7 @@ def poll_audit(
     version_id: str | None = None,
     session: SessionChoice = "main",
     allow_failure: bool = False,
+    identity: Identity = "userA",
 ) -> Json:
     """Poll about once a second within the section 10 audit deadline (no extension per poll)."""
     seconds = limit(ctx, "audit_poll_seconds", 80)
@@ -234,6 +236,7 @@ def poll_audit(
             ctx,
             "GET",
             audit_path(ids, wanted, version_id),
+            identity=identity,
             session=session,
             timeout=min(limit(ctx, "business_get_seconds", 10), left),
         )
@@ -250,7 +253,9 @@ def poll_audit(
         if audit["status"] == "PROCESSING_FAILED" and not allow_failure:
             # Section 1: PROCESSING_FAILED is not an acceptable result for an accepted fixture.
             summary = error_summary(audit["error"])
-            raise CheckFailed(f"{action} ended PROCESSING_FAILED ({summary}; auditId={wanted}).")
+            raise unexpected_failure(
+                ctx, f"{action} ended PROCESSING_FAILED ({summary}; auditId={wanted})."
+            )
         if audit["status"] != "PROCESSING":
             started = contract.parse_timestamp(audit["startedAt"])
             if contract.parse_timestamp(audit["completedAt"]) < started:
@@ -261,6 +266,16 @@ def poll_audit(
         if ctx.clock() + POLL_SECONDS > give_up:
             raise CheckFailed(f"{action} was still PROCESSING after {seconds} s.")
         ctx.sleep(POLL_SECONDS)
+
+
+def unexpected_failure(ctx: SuiteContext, message: str) -> Exception:
+    """A target's own PROCESSING_FAILED where success was expected.
+
+    Phase 4 (2.1.0) recorded it as fail. Specification 3.0.0 section 14 supersedes that for
+    Phase 5 runs: an unexpected internal processing failure that prevented evaluation is
+    error/source system. Earlier stored reports are never relabelled.
+    """
+    return SystemFault(message) if ctx.suite.manifest.phase == "5" else CheckFailed(message)
 
 
 def bounded(text: str, limit: int = 120) -> str:
@@ -491,9 +506,14 @@ def report_bytes(
 
 
 def history(
-    ctx: SuiteContext, ids: Mapping[str, str], action: str, *, session: SessionChoice = "main"
+    ctx: SuiteContext,
+    ids: Mapping[str, str],
+    action: str,
+    *,
+    session: SessionChoice = "main",
+    identity: Identity = "userA",
 ) -> Json:
-    response = call(ctx, "GET", history_path(ids), session=session)
+    response = call(ctx, "GET", history_path(ids), session=session, identity=identity)
     expect_status(response, 200, action)
     body = body_of(response, "HistoryResponse", action)
     if body["workbookId"] != ids["workbookId"]:
@@ -508,8 +528,9 @@ def version(
     *,
     version_id: str | None = None,
     session: SessionChoice = "main",
+    identity: Identity = "userA",
 ) -> Json:
-    response = call(ctx, "GET", version_path(ids, version_id), session=session)
+    response = call(ctx, "GET", version_path(ids, version_id), session=session, identity=identity)
     expect_status(response, 200, action)
     return body_of(response, "VersionResponse", action)
 
@@ -575,10 +596,18 @@ def submit(
     )
 
 
-def poll_remediation(ctx: SuiteContext, remediation_id: str, action: str) -> Json:
+def poll_remediation(
+    ctx: SuiteContext,
+    remediation_id: str,
+    action: str,
+    *,
+    session: SessionChoice = "main",
+    identity: Identity = "userA",
+) -> Json:
     seconds = limit(ctx, "remediation_poll_seconds", 210)
     tracker = tracker_for(ctx)
-    give_up = tracker.deadline("remediation", remediation_id, ctx.session_id, seconds)
+    namespace = ctx.session_id if session == "main" else None if session == "none" else session
+    give_up = tracker.deadline("remediation", remediation_id, namespace, seconds)
     while True:
         left = give_up - ctx.clock()
         if left <= 0:
@@ -587,6 +616,8 @@ def poll_remediation(ctx: SuiteContext, remediation_id: str, action: str) -> Jso
             ctx,
             "GET",
             f"/api/v1/remediations/{remediation_id}",
+            identity=identity,
+            session=session,
             timeout=min(limit(ctx, "business_get_seconds", 10), left),
         )
         expect_status(response, 200, action)
@@ -594,7 +625,7 @@ def poll_remediation(ctx: SuiteContext, remediation_id: str, action: str) -> Jso
         if status["remediationId"] != remediation_id:
             raise CheckFailed(f"{action} names a different remediation.")
         if status["status"] != "REMEDIATING":
-            tracker.complete("remediation", remediation_id, ctx.session_id)
+            tracker.complete("remediation", remediation_id, namespace)
             return status
         if ctx.client.remaining() < POLL_SECONDS:
             raise DeadlineExceeded("suite deadline reached while polling a remediation")
@@ -640,9 +671,10 @@ def _run_plan(ctx: SuiteContext, fixture: str, plan: str, key: str) -> Json:
     status = poll_remediation(ctx, accepted["remediationId"], f"{fixture} {plan} remediation")
     if status["status"] != "REMEDIATED":
         error = status["error"] or {}
-        raise CheckFailed(
-            f"{fixture} {plan} remediation ended {status['status']} ({error.get('code')})."
-        )
+        message = f"{fixture} {plan} remediation ended {status['status']} ({error.get('code')})."
+        if status["status"] == "PROCESSING_FAILED":
+            raise unexpected_failure(ctx, message)
+        raise CheckFailed(message)
     output, headers = download(
         ctx, f"/api/v1/outputs/{status['outputId']}/workbook", f"{fixture} {plan} output download"
     )
@@ -724,6 +756,8 @@ def output_audit_of(ctx: SuiteContext, result: Json, action: str) -> Json:
 
 def check_output_findings(ctx: SuiteContext, result: Json, audit: Json, action: str) -> None:
     expected = expected_output(ctx, result)
+    if audit["status"] == "PROCESSING_FAILED":
+        raise unexpected_failure(ctx, f"{action}: output audit ended PROCESSING_FAILED.")
     if audit["status"] != status_for(expected):
         raise CheckFailed(
             f"{action}: output audit ended {audit['status']}; expected {status_for(expected)}."
@@ -1388,7 +1422,7 @@ def report_complete(ctx: SuiteContext) -> str:
     output_version = version(ctx, ids, "Output version", version_id=status["outputVersionId"])
     expected = {
         "reportVersion": contract.REPORT_VERSION,
-        "specificationVersion": contract.SPECIFICATION_VERSION,
+        "specificationVersion": contract.specification_version(),
         "workbookId": ids["workbookId"],
         "versionId": status["outputVersionId"],
         "auditId": status["auditId"],
@@ -2017,6 +2051,8 @@ def idempotency(ctx: SuiteContext) -> str:
         )
     status = poll_remediation(ctx, accepted["remediationId"], "Keyed remediation")
     if status["status"] != "REMEDIATED":
+        if status["status"] == "PROCESSING_FAILED":
+            raise unexpected_failure(ctx, "The keyed remediation ended PROCESSING_FAILED.")
         raise CheckFailed(f"The keyed remediation ended {status['status']}.")
     if case == "replay":
         late = ok(

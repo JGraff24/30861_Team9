@@ -1,0 +1,6462 @@
+{
+  "recorded_at": "2026-11-12T15:45:11.008670Z",
+  "tester_url": "http://127.0.0.1:59279",
+  "target_url": "http://127.0.0.1:41075",
+  "target_revision": "005e921e219a880429f4751825d7a096aaeb152d",
+  "session_id": "cc58e9d6-6732-4740-961e-fcd9bdc11dcb",
+  "report_sha256": "f3b5a987eba53564f7cf02e51755136a15ba0c09185565e503034b7b58bff396",
+  "manifest_version": "3.0.0",
+  "specification_version": "3.0.0",
+  "ruleset_version": "2.0.0",
+  "counts": {
+    "run": 371,
+    "planned": 395,
+    "pass": 233,
+    "fail": 138,
+    "error": 0,
+    "skip": 24
+  },
+  "not_passed": [
+    {
+      "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+      "outcome": "fail",
+      "message": "Failed audit report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-FAULT-RECOVERY",
+      "outcome": "fail",
+      "message": "Historical failed report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-REAUDIT",
+      "outcome": "fail",
+      "message": "First report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-REAUDIT--EMPTY-OBJECT",
+      "outcome": "fail",
+      "message": "First report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-REAUDIT--REASON",
+      "outcome": "fail",
+      "message": "First report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-SOURCE-BEFORE",
+      "outcome": "fail",
+      "message": "Source report before remediation: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-DECISIONS-MIXED",
+      "outcome": "fail",
+      "message": "mixed_decisions source report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-APPLY-ALT",
+      "outcome": "fail",
+      "message": "alt_supported source report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-APPLY-RENAME",
+      "outcome": "fail",
+      "message": "rename_references source report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-APPLY-LINK",
+      "outcome": "fail",
+      "message": "link_supported source report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-APPLY-HEADER-RANGE",
+      "outcome": "fail",
+      "message": "header_range source report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-APPLY-HEADER-TABLE",
+      "outcome": "fail",
+      "message": "header_disabled_table source report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-APPLY-COMBINED",
+      "outcome": "fail",
+      "message": "mixed_decisions source report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-APPLY-STRING-LABEL",
+      "outcome": "fail",
+      "message": "link_supported source report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-APPLY-NO-EDITS",
+      "outcome": "fail",
+      "message": "review_only source report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-OUTPUT-HASH",
+      "outcome": "fail",
+      "message": "preservation_rich source report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-SOURCE-AFTER",
+      "outcome": "skip",
+      "message": "Not executed: no pre-remediation source evidence was recorded.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-PRESERVATION",
+      "outcome": "skip",
+      "message": "Not executed: a shared resource failed earlier (preservation_rich source report: body does not match AuditReport: specificationVersion: const constraint.)",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-OUTPUT-AUDIT",
+      "outcome": "skip",
+      "message": "Not executed: the mixed remediation did not complete.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-REPORT-COMPLETE",
+      "outcome": "skip",
+      "message": "Not executed: the mixed remediation output audit is unavailable.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-REPORT-STABLE",
+      "outcome": "skip",
+      "message": "Not executed: the mixed remediation did not complete.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-HISTORY",
+      "outcome": "skip",
+      "message": "Not executed: the mixed remediation did not complete.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-REMEDIATED-STATUS",
+      "outcome": "skip",
+      "message": "Not executed: the mixed remediation did not complete.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-UNAUTHENTICATED",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-INVALID-TOKEN",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-FOREIGN",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-UNKNOWN",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-WRONG-NAMESPACE",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-REVIEWER-READ",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-UNAUTHENTICATED",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-INVALID-TOKEN",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-FOREIGN",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-UNKNOWN",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-WRONG-NAMESPACE",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-REVIEWER-READ",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-REPORT-REVIEWER-READ",
+      "outcome": "fail",
+      "message": "report as reviewer_read: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-REMEDIATION-TEST-ADMIN",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-ACCESS-OUTPUT-TEST-ADMIN",
+      "outcome": "skip",
+      "message": "Not executed: no completed remediation exists to protect.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P4-DOWNLOAD-LARGE",
+      "outcome": "fail",
+      "message": "large_preservation source report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-DEFAULT",
+      "outcome": "fail",
+      "message": "Unconfigured schedule read returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-MIN",
+      "outcome": "fail",
+      "message": "Enable interval 1 returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-MAX",
+      "outcome": "fail",
+      "message": "Enable interval 90 returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-PUT-REPLAY",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-DEADLINE-ONLY",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-INTERVAL-CHANGE",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-DISABLE",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-REENABLE",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-BEFORE-DUE",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-EXACT-DUE",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-COALESCE",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-SAME-TIME",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-LATEST-UPLOAD",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-LATEST-OUTPUT",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-OLD-REAUDIT",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-BUSY-AUDIT",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-BUSY-REMEDIATION",
+      "outcome": "fail",
+      "message": "Initial schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-TWO-WORKBOOKS",
+      "outcome": "fail",
+      "message": "UserA schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-FAILED-NEXT",
+      "outcome": "fail",
+      "message": "Failed scheduled audit namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-REJECT-ZERO",
+      "outcome": "fail",
+      "message": "Baseline schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-REJECT-OVER",
+      "outcome": "fail",
+      "message": "Baseline schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-REJECT-BOOL",
+      "outcome": "fail",
+      "message": "Baseline schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-REJECT-STRING",
+      "outcome": "fail",
+      "message": "Baseline schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-REJECT-DECIMAL",
+      "outcome": "fail",
+      "message": "Baseline schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-REJECT-NULL",
+      "outcome": "fail",
+      "message": "Baseline schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-REJECT-MISSING",
+      "outcome": "fail",
+      "message": "Baseline schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-REJECT-INVALID-DAY",
+      "outcome": "fail",
+      "message": "Baseline schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-REJECT-BAD-FORM",
+      "outcome": "fail",
+      "message": "Baseline schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-SCHEDULE-UNKNOWN-FIELD",
+      "outcome": "fail",
+      "message": "Baseline schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-90",
+      "outcome": "fail",
+      "message": "90-day reminder deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-30",
+      "outcome": "fail",
+      "message": "30-day reminder namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-7",
+      "outcome": "fail",
+      "message": "7-day reminder namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-BEFORE",
+      "outcome": "fail",
+      "message": "Before threshold deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-CLEAN",
+      "outcome": "fail",
+      "message": "Clean suppression deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-NO-AUDIT",
+      "outcome": "fail",
+      "message": "Without completed audit deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-PROCESSING",
+      "outcome": "fail",
+      "message": "Processing audit deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-FAILED-AUDIT",
+      "outcome": "fail",
+      "message": "Deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-DECLINED",
+      "outcome": "fail",
+      "message": "Declined findings deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-PERIODIC-OFF",
+      "outcome": "fail",
+      "message": "Periodic disabled deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-CLEAR-DEADLINE",
+      "outcome": "fail",
+      "message": "Clear deadline deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-NO-BACKFILL",
+      "outcome": "fail",
+      "message": "No backfill namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-CONFIG-EXACT",
+      "outcome": "fail",
+      "message": "Configured at threshold namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-JUMP",
+      "outcome": "fail",
+      "message": "Forward jump deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-DEDUP",
+      "outcome": "fail",
+      "message": "Deduplication deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-CLEAN-THEN-DIRTY",
+      "outcome": "fail",
+      "message": "Clean then dirty deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-RETURN-DEADLINE",
+      "outcome": "fail",
+      "message": "Return to deadline deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-DEADLINE-EDIT",
+      "outcome": "fail",
+      "message": "Deadline edit deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-LATEST-VERSION",
+      "outcome": "fail",
+      "message": "Latest version deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-AUDIT-SAME-TICK",
+      "outcome": "fail",
+      "message": "Schedule due at the threshold returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-LEAP-UTC",
+      "outcome": "fail",
+      "message": "Leap-year thresholds namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-FAILED-RECORD",
+      "outcome": "fail",
+      "message": "Notification failure (AC-13) namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-EMPTY",
+      "outcome": "fail",
+      "message": "Notifications without reminders returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-REMINDER-ORDER",
+      "outcome": "fail",
+      "message": "Order deadline returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-CLOCK-DEFAULT",
+      "outcome": "fail",
+      "message": "Equal-time call at the default returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-CLOCK-CUSTOM",
+      "outcome": "fail",
+      "message": "Custom clock namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-CLOCK-REWIND",
+      "outcome": "fail",
+      "message": "Schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-CLOCK-SAME",
+      "outcome": "fail",
+      "message": "Same timestamp namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-CLOCK-UTC",
+      "outcome": "fail",
+      "message": "Clock body (offset) returned HTTP 404; expected 400.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-CLOCK-ISOLATION",
+      "outcome": "fail",
+      "message": "A schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-CLOCK-OWNER",
+      "outcome": "fail",
+      "message": "Clock advance by userA returned HTTP 404; expected 403.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-CLOCK-DISABLED",
+      "outcome": "fail",
+      "message": "Clock call without a test namespace returned code NOT_FOUND; expected TEST_CLOCK_DISABLED.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-CLOCK-CLEANED",
+      "outcome": "fail",
+      "message": "Clock call naming an unknown session returned HTTP 404; expected 400.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-CLOCK-NOT-READY",
+      "outcome": "skip",
+      "message": "Not executed: the HTTP interface offers no way to hold a known namespace in a preparing/failed state; SESSION_NOT_READY is left to target local integration.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-DELETE-COMPLETE",
+      "outcome": "fail",
+      "message": "Complete deletion schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-DELETE-OLD-URLS",
+      "outcome": "fail",
+      "message": "Old URLs schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-DELETE-REPEAT",
+      "outcome": "fail",
+      "message": "First deletion returned HTTP 404; expected 204.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-DELETE-CANCEL-FUTURE",
+      "outcome": "fail",
+      "message": "Deleted workbook schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-DELETE-OTHER-DATA",
+      "outcome": "fail",
+      "message": "Owner deletion returned HTTP 404; expected 204.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-DELETE-RETAIN-TESTER",
+      "outcome": "fail",
+      "message": "Owner deletion returned HTTP 404; expected 204.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-DELETE-ACTIVE-AUDIT",
+      "outcome": "fail",
+      "message": "Schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-DELETE-ACTIVE-REMEDIATION",
+      "outcome": "fail",
+      "message": "Schedule returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-DELETE-FAIL-ONCE",
+      "outcome": "fail",
+      "message": "Deletion fails once namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-WRITE-NO-TOKEN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-WRITE-INVALID-TOKEN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-WRITE-FOREIGN-OWNER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-WRITE-WRONG-NAMESPACE",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-WRITE-TEST-ADMIN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-WRITE-UNKNOWN-RESOURCE",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-WRITE-OWNER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-WRITE-GRANTED-REVIEWER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-WRITE-UNGRANTED-REVIEWER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-READ-NO-TOKEN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-READ-INVALID-TOKEN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-READ-FOREIGN-OWNER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-READ-WRONG-NAMESPACE",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-READ-TEST-ADMIN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-READ-UNKNOWN-RESOURCE",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-READ-OWNER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-READ-GRANTED-REVIEWER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-SCHEDULE-READ-UNGRANTED-REVIEWER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-NOTIFICATIONS-NO-TOKEN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-NOTIFICATIONS-INVALID-TOKEN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-NOTIFICATIONS-FOREIGN-OWNER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-NOTIFICATIONS-WRONG-NAMESPACE",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-NOTIFICATIONS-TEST-ADMIN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-NOTIFICATIONS-UNKNOWN-RESOURCE",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-NOTIFICATIONS-OWNER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-NOTIFICATIONS-GRANTED-REVIEWER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-NOTIFICATIONS-UNGRANTED-REVIEWER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-DELETE-NO-TOKEN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-DELETE-INVALID-TOKEN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-DELETE-FOREIGN-OWNER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-DELETE-WRONG-NAMESPACE",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-DELETE-TEST-ADMIN",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-DELETE-UNKNOWN-RESOURCE",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-DELETE-OWNER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-DELETE-GRANTED-REVIEWER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-DELETE-UNGRANTED-REVIEWER",
+      "outcome": "fail",
+      "message": "Owner schedule before returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-CLOCK-NO-TOKEN",
+      "outcome": "fail",
+      "message": "Clock advance as no_token returned HTTP 404; expected 401.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-CLOCK-INVALID-TOKEN",
+      "outcome": "fail",
+      "message": "Clock advance as invalid_token returned HTTP 404; expected 401.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-CLOCK-OWNER-USER",
+      "outcome": "fail",
+      "message": "Clock advance as owner_user returned HTTP 404; expected 403.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-CLOCK-REVIEWER",
+      "outcome": "fail",
+      "message": "Clock advance as reviewer returned HTTP 404; expected 403.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-CLOCK-FOREIGN-ADMIN",
+      "outcome": "fail",
+      "message": "Clock advance as foreign_admin returned HTTP 404; expected 403.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-ACCESS-CLOCK-CREATING-ADMIN",
+      "outcome": "fail",
+      "message": "Creating test-admin advance returned HTTP 404; expected 200.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-FAULT-AUDIT",
+      "outcome": "fail",
+      "message": "Failed audit report: body does not match AuditReport: specificationVersion: const constraint.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-FAULT-REMEDIATION",
+      "outcome": "fail",
+      "message": "Fault remediation_failures namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-FAULT-REPORT",
+      "outcome": "fail",
+      "message": "Fault report_failures namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-FAULT-STORAGE",
+      "outcome": "fail",
+      "message": "Fault storage_failures namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-FAULT-SCHEDULED_AUDIT",
+      "outcome": "fail",
+      "message": "Fault scheduled_audit_failures namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-FAULT-NOTIFICATION",
+      "outcome": "fail",
+      "message": "Fault notification_failures namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-FAULT-DELETION",
+      "outcome": "fail",
+      "message": "Fault deletion_failures namespace setup returned HTTP 400; expected 201.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-FAULT-REJECT-DISABLED",
+      "outcome": "skip",
+      "message": "Not executed: this deployment enables the fault capability (namespace t9-e7851f6405c94f80ba3991eccf5a7ea4 was created), so the disabled-capability 403 is unobservable here.",
+      "classification": "unclassified"
+    },
+    {
+      "test_id": "P5-TESTER-CROSS-OMIT",
+      "outcome": "skip",
+      "message": "Not executed: this is an own-team session; the cross-team omission does not apply.",
+      "classification": "unclassified"
+    }
+  ],
+  "coverage": {
+    "code": {
+      "covered": 2739,
+      "total": 3542,
+      "basis": "Child line sets in app/workbooks and app/audit from validation, audit, and any correction calls; excludes API, storage, UI, and modules outside those paths."
+    },
+    "component": {
+      "covered": 11,
+      "total": 12,
+      "basis": "Shared component catalog C1-C12 (specification 3.0.0 section 15) in the frozen suite manifest; a component counts once when a test executed one of its predeclared qualifying assertions in this session, even if it failed. Setup, preparation, accepted-work draining and skipped tests earn nothing. HTTP-only run: C9 user interface needs retained browser/manual evidence and is never counted here, so covered is at most 11."
+    },
+    "system": {
+      "covered": 17,
+      "total": 18,
+      "basis": "Shared acceptance criteria AC-01 to AC-18 (denominator 18, specification 3.0.0 section 17): a criterion counts once when at least one mapped qualifying assertion executed, even if it failed. This is evaluated coverage, not acceptance. HTTP-only run: AC-17 needs browser/manual accessibility evidence and is never counted here; AC-09 counts only the automated preservation portion (Excel no-repair inspection is separate); AC-16 counts HTTP deletion evidence only (HTTPS, credential protection and backup/restore evidence are manual); AC-18 counts tester-observed real-time runs (target-side queue/engine timing is separate)."
+    },
+    "model": {
+      "covered": 15,
+      "total": 23,
+      "basis": "Team team9 Phase 5 design version 0.1.0: all 23 design requirements (map SHA256 8d8c0719c91b584601bdf89b904170cd06bb6f667707b940d8d59ce98a7654ec); requirements-to-tests mapping https://github.com/JGraff24/30861_Team9/blob/main/docs/design/team9-design-map.json. A requirement counts once when at least one mapped test executed its qualifying assertion in this session, even if it failed; setup, skips and unmapped or untested requirements earn nothing."
+    }
+  },
+  "report_profile": "own",
+  "operation_status": [
+    {
+      "number": 1,
+      "name": "Check service availability",
+      "method": "GET",
+      "path": "/api/v1/health",
+      "requirements": [
+        "REQ-15"
+      ],
+      "phase3": true,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "yes",
+      "error_conformance": "untested",
+      "evidence": [
+        {
+          "test_id": "P3-HEALTH",
+          "path": "success",
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Upload an initial workbook",
+      "method": "POST",
+      "path": "/api/v1/workbooks",
+      "requirements": [
+        "REQ-01",
+        "REQ-02",
+        "REQ-03",
+        "REQ-04",
+        "REQ-11",
+        "REQ-13"
+      ],
+      "phase3": true,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "yes",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P3-AUTH-UPLOAD",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUTH-UPLOAD-INVALID",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-MISSING-FILE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CSV",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-MISSING-EXTENSION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XLS",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XLSM",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CORRUPT",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-BYTES-OVER",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-BYTES-AT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-SHEETS-OVER",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-SHEETS-AT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-SHEETS-CHARTSHEET",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CELLS-OVER",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CELLS-AT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-CLEAN",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-SEEDED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-3",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-4",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-5",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-UNICODE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-REPEATED-IDS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-MULTIPLE-DRAWINGS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-IN-CELL-PICTURE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-IMAGE-FORMULA",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-FORM-CONTROLS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-VML-COMMENTS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-INACTIVE-PROTECTION",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ZIP-TRAVERSAL",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ZIP-DUPLICATE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XML-DTD",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-MACRO-PARTS",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ENCRYPTED-ZIP",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED-SHEET",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED-STRUCTURE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-UPLOAD-ALL-SIX",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-CLEAN-ALL-SIX",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-MANUAL-ONLY-STATUS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DECLARED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DISABLED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-BLANK",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DUPLICATE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-FORMULA",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DENSE-RANGE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-SPARSE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-TITLE-LIST",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-HIDDEN",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-MERGE-POPULATED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-MERGE-EMPTY",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-GENERIC",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-RAW-ADDRESS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-CELL-DISPLAY",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-FORMULA-LITERAL",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-FORMULA-DYNAMIC",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-RANGE-DUPLICATE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-DEFAULT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-LOW-CONTRAST",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-LARGE-TEXT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-BOUNDARY",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-NEGATIVE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-POSITIVE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-ONE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-FIVE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-INDEXED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-MEANING",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-CONDITIONAL",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-UNSUPPORTED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-HIDDEN",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-FAULT-AUDIT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-REPORT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-STORAGE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-1",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-2",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-3",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-4",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-5",
+          "path": "success",
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Upload a new workbook version",
+      "method": "POST",
+      "path": "/api/v1/workbooks/{workbookId}/versions",
+      "requirements": [
+        "REQ-03",
+        "REQ-10",
+        "REQ-11",
+        "REQ-13",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P4-VERSION-NEW",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-VERSION-SAME-BYTES",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-HISTORY",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-NEW-VERSION-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-NEW-VERSION-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-NEW-VERSION-FOREIGN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-NEW-VERSION-UNKNOWN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-NEW-VERSION-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-NEW-VERSION-REVIEWER-WRITE-REFUSED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-NEW-VERSION-TEST-ADMIN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-SCHEDULE-LATEST-UPLOAD",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-STORAGE",
+          "path": "error",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Retrieve a version",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}",
+      "requirements": [
+        "REQ-03",
+        "REQ-11",
+        "REQ-14"
+      ],
+      "phase3": true,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P3-VERSION-VALID",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-SOURCE-HASH",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-FOREIGN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-REVIEWER",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-NOT-FOUND",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-MISMATCH",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-VERSION-NEW",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-VERSION-SAME-BYTES",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-OUTPUT-HASH",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-SOURCE-AFTER",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-REMEDIATED-STATUS",
+          "path": "success",
+          "outcome": "skip"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Retrieve an audit and its findings",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}",
+      "requirements": [
+        "REQ-04",
+        "REQ-05",
+        "REQ-06",
+        "REQ-10",
+        "REQ-11",
+        "REQ-13"
+      ],
+      "phase3": true,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P3-AUDIT-CLEAN",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-SEEDED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-FOREIGN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-REVIEWER",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-MISMATCH",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-UNKNOWN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-3",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-4",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-DETERMINISM-5",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-UNICODE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-REPEATED-IDS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-MULTIPLE-DRAWINGS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-IN-CELL-PICTURE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-IMAGE-FORMULA",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-FORM-CONTROLS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-VML-COMMENTS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-INACTIVE-PROTECTION",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-FAULT-RECOVERY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-AUDIT-ALL-SIX",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-CLEAN-ALL-SIX",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-MANUAL-ONLY-STATUS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DECLARED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DISABLED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-BLANK",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DUPLICATE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-FORMULA",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DENSE-RANGE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-SPARSE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-TITLE-LIST",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-HIDDEN",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-MERGE-POPULATED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-MERGE-EMPTY",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-GENERIC",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-RAW-ADDRESS",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-CELL-DISPLAY",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-FORMULA-LITERAL",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-FORMULA-DYNAMIC",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-RANGE-DUPLICATE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-DEFAULT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-LOW-CONTRAST",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-LARGE-TEXT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-BOUNDARY",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-NEGATIVE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-POSITIVE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-ONE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-FIVE",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-INDEXED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-MEANING",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-CONDITIONAL",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-UNSUPPORTED",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-HIDDEN",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-VERSION-NEW",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REAUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT--EMPTY-OBJECT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT--REASON",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT-DETERMINISM",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-APPLY-ALT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-RENAME",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-LINK",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-RANGE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-TABLE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-SOURCE-AFTER",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-OUTPUT-AUDIT",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-REMEDIATED-STATUS",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P5-SCHEDULE-EXACT-DUE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-FAILED-NEXT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-AUDIT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-REPORT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-SCHEDULED_AUDIT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-1",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-2",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-3",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-4",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-5",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-COMPARE",
+          "path": "success",
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "name": "Trigger a manual re-audit",
+      "method": "POST",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits",
+      "requirements": [
+        "REQ-04",
+        "REQ-10",
+        "REQ-11",
+        "REQ-12",
+        "REQ-13"
+      ],
+      "phase3": false,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P4-FAULT-RECOVERY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT--EMPTY-OBJECT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT--REASON",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT-INVALID",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REAUDIT-INVALID--UNKNOWN-FIELD",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REAUDIT-DETERMINISM",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REPORT-STABLE",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-HISTORY",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-REAUDIT-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REAUDIT-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REAUDIT-FOREIGN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REAUDIT-UNKNOWN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REAUDIT-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REAUDIT-REVIEWER-WRITE-REFUSED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REAUDIT-TEST-ADMIN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-SCHEDULE-OLD-REAUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-BUSY-AUDIT",
+          "path": "error",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Submit remediation decisions",
+      "method": "POST",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/remediations",
+      "requirements": [
+        "REQ-06",
+        "REQ-07",
+        "REQ-08",
+        "REQ-09",
+        "REQ-10",
+        "REQ-13"
+      ],
+      "phase3": false,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P4-REVIEW-REVIEWER",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-DECISIONS-MIXED",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-ALT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-RENAME",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-LINK",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-RANGE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-TABLE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-COMBINED",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-STRING-LABEL",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-NO-EDITS",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REJECT-EMPTY",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FIELD",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FIELD--DECISION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-DUPLICATE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FINDING",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-CROSS-AUDIT-FINDING",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-STALE-AUDIT",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-AUDIT-PROCESSING",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-AUDIT-FAILED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-MISSING",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--OTHER-RULE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--UNKNOWN-FIELD",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--NULL",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-ON-DECLINE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-ON-DECLINE--MANUAL-REVIEW",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-BLANK",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-BLANK--DESCRIPTION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-TOO-LONG",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-TOO-LONG--DESCRIPTION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--EDGE-WHITESPACE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--SEPARATOR",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--GENERIC",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--RESERVED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--CASE-ONLY",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--UNCHANGED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--SOURCE-COLLISION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-SWAP",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-LINK-AMBIGUOUS",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW--BOOLEAN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW--REPLACEMENT-LABELS",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--DUPLICATE-ALT",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--COLOR",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--FORMULA-LINK",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--MERGE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--UNSAFE-RENAME",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MISSING-KEY",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MISSING-KEY--MALFORMED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-DECISIONS-OVER",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-BATCH-ATOMIC-REJECTION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-REPLAY",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-CONFLICT",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-INVALID-FIRST",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REPORT-STABLE",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-HISTORY",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-DECISIONS-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-DECISIONS-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-DECISIONS-FOREIGN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-DECISIONS-UNKNOWN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-DECISIONS-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-DECISIONS-REVIEWER-WRITE-REFUSED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-DECISIONS-TEST-ADMIN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-SCHEDULE-LATEST-OUTPUT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-BUSY-REMEDIATION",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-REMEDIATION",
+          "path": "error",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "name": "Retrieve remediation status",
+      "method": "GET",
+      "path": "/api/v1/remediations/{remediationId}",
+      "requirements": [
+        "REQ-08",
+        "REQ-09",
+        "REQ-10",
+        "REQ-11",
+        "REQ-13"
+      ],
+      "phase3": false,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P4-DECISIONS-MIXED",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-ALT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-RENAME",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-LINK",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-RANGE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-TABLE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-COMBINED",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-STRING-LABEL",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-NO-EDITS",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-REPLAY",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-CONFLICT",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-OUTPUT-AUDIT",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-REMEDIATED-STATUS",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-REMEDIATION-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-REMEDIATION-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-REMEDIATION-FOREIGN",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-REMEDIATION-UNKNOWN",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-REMEDIATION-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-REMEDIATION-REVIEWER-READ",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-REMEDIATION-TEST-ADMIN",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P5-FAULT-REMEDIATION",
+          "path": "error",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Download the remediated workbook",
+      "method": "GET",
+      "path": "/api/v1/outputs/{outputId}/workbook",
+      "requirements": [
+        "REQ-08",
+        "REQ-09",
+        "REQ-13",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "incomplete",
+      "evidence": [
+        {
+          "test_id": "P4-DECISIONS-MIXED",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-ALT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-RENAME",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-LINK",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-RANGE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-TABLE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-COMBINED",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-STRING-LABEL",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-NO-EDITS",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-BATCH-ATOMIC-REJECTION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-OUTPUT-HASH",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-SOURCE-AFTER",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-PRESERVATION",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-OUTPUT-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-OUTPUT-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-OUTPUT-FOREIGN",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-OUTPUT-UNKNOWN",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-OUTPUT-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-OUTPUT-REVIEWER-READ",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-OUTPUT-TEST-ADMIN",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-DOWNLOAD-LARGE",
+          "path": "success",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "name": "Retrieve version and audit history",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/history",
+      "requirements": [
+        "REQ-10",
+        "REQ-11",
+        "REQ-14"
+      ],
+      "phase3": false,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "yes",
+      "evidence": [
+        {
+          "test_id": "P4-FAULT-RECOVERY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-VERSION-NEW",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-VERSION-SAME-BYTES",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REAUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT--EMPTY-OBJECT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT--REASON",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT-INVALID",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REAUDIT-INVALID--UNKNOWN-FIELD",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-APPLY-NO-EDITS",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REJECT-EMPTY",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FIELD",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FIELD--DECISION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-DUPLICATE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FINDING",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-CROSS-AUDIT-FINDING",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-STALE-AUDIT",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-AUDIT-PROCESSING",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-AUDIT-FAILED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-MISSING",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--OTHER-RULE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--UNKNOWN-FIELD",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--NULL",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-ON-DECLINE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-ON-DECLINE--MANUAL-REVIEW",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-BLANK",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-BLANK--DESCRIPTION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-TOO-LONG",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-TOO-LONG--DESCRIPTION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--EDGE-WHITESPACE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--SEPARATOR",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--GENERIC",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--RESERVED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--CASE-ONLY",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--UNCHANGED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--SOURCE-COLLISION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-SWAP",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-LINK-AMBIGUOUS",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW--BOOLEAN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW--REPLACEMENT-LABELS",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--DUPLICATE-ALT",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--COLOR",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--FORMULA-LINK",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--MERGE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--UNSAFE-RENAME",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MISSING-KEY",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MISSING-KEY--MALFORMED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-DECISIONS-OVER",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-BATCH-ATOMIC-REJECTION",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-REPLAY",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-CONFLICT",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-HISTORY",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-REMEDIATED-STATUS",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-HISTORY-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-HISTORY-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-HISTORY-FOREIGN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-HISTORY-UNKNOWN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-HISTORY-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-HISTORY-REVIEWER-READ",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-HISTORY-TEST-ADMIN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-SCHEDULE-DISABLE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-SAME-TIME",
+          "path": "success",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "name": "Configure a schedule",
+      "method": "PUT",
+      "path": "/api/v1/workbooks/{workbookId}/schedule",
+      "requirements": [
+        "REQ-12"
+      ],
+      "phase3": false,
+      "phase4": false,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; delivered in Phase 5.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P5-SCHEDULE-MIN",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-MAX",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-PUT-REPLAY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-DEADLINE-ONLY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-INTERVAL-CHANGE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-DISABLE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REENABLE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-ZERO",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-OVER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-BOOL",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-STRING",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-DECIMAL",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-NULL",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-MISSING",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-INVALID-DAY",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-BAD-FORM",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-UNKNOWN-FIELD",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-90",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-30",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-7",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-BEFORE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAN",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-NO-AUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-PROCESSING",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-FAILED-AUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DECLINED",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-PERIODIC-OFF",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAR-DEADLINE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-NO-BACKFILL",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CONFIG-EXACT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-JUMP",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DEDUP",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAN-THEN-DIRTY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-RETURN-DEADLINE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DEADLINE-EDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-LATEST-VERSION",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-AUDIT-SAME-TICK",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-LEAP-UTC",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-FAILED-RECORD",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-EMPTY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-ORDER",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-NO-TOKEN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-FOREIGN-OWNER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-TEST-ADMIN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-UNKNOWN-RESOURCE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-OWNER",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-GRANTED-REVIEWER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-UNGRANTED-REVIEWER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-SCHEDULED_AUDIT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-NOTIFICATION",
+          "path": "error",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "name": "Read notifications",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/notifications",
+      "requirements": [
+        "REQ-12"
+      ],
+      "phase3": false,
+      "phase4": false,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; delivered in Phase 5.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P5-REMINDER-90",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-30",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-7",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-BEFORE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAN",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-NO-AUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-PROCESSING",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-FAILED-AUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DECLINED",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-PERIODIC-OFF",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAR-DEADLINE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-NO-BACKFILL",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CONFIG-EXACT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-JUMP",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DEDUP",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAN-THEN-DIRTY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-RETURN-DEADLINE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DEADLINE-EDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-LATEST-VERSION",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-AUDIT-SAME-TICK",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-LEAP-UTC",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-FAILED-RECORD",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-EMPTY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-ORDER",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-NO-TOKEN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-FOREIGN-OWNER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-TEST-ADMIN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-UNKNOWN-RESOURCE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-OWNER",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-GRANTED-REVIEWER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-UNGRANTED-REVIEWER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-NOTIFICATION",
+          "path": "error",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "name": "Advance an isolated test clock",
+      "method": "POST",
+      "path": "/api/v1/test/clock",
+      "requirements": [
+        "REQ-12",
+        "REQ-13"
+      ],
+      "phase3": false,
+      "phase4": false,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; delivered in Phase 5.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P5-SCHEDULE-DISABLE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REENABLE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-BEFORE-DUE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-EXACT-DUE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-COALESCE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-SAME-TIME",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-LATEST-UPLOAD",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-LATEST-OUTPUT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-OLD-REAUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-BUSY-AUDIT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-BUSY-REMEDIATION",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-TWO-WORKBOOKS",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-FAILED-NEXT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-90",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-30",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-7",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-BEFORE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAN",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-NO-AUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-PROCESSING",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-FAILED-AUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DECLINED",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-PERIODIC-OFF",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAR-DEADLINE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-NO-BACKFILL",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CONFIG-EXACT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-JUMP",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DEDUP",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAN-THEN-DIRTY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-RETURN-DEADLINE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DEADLINE-EDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-LATEST-VERSION",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-AUDIT-SAME-TICK",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-LEAP-UTC",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-FAILED-RECORD",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-EMPTY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-ORDER",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-DEFAULT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-CUSTOM",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-REWIND",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-SAME",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-UTC",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-ISOLATION",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-OWNER",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-DISABLED",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-CLEANED",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-NOT-READY",
+          "path": "error",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-NO-TOKEN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-OWNER-USER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-REVIEWER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-FOREIGN-ADMIN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-CREATING-ADMIN",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-SCHEDULED_AUDIT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-NOTIFICATION",
+          "path": "error",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "name": "Delete a workbook",
+      "method": "DELETE",
+      "path": "/api/v1/workbooks/{workbookId}",
+      "requirements": [
+        "REQ-14"
+      ],
+      "phase3": false,
+      "phase4": false,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; delivered in Phase 5.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P5-DELETE-COMPLETE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-OLD-URLS",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-REPEAT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-CANCEL-FUTURE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-OTHER-DATA",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-RETAIN-TESTER",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-ACTIVE-AUDIT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-ACTIVE-REMEDIATION",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-FAIL-ONCE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-NO-TOKEN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-FOREIGN-OWNER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-TEST-ADMIN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-UNKNOWN-RESOURCE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-OWNER",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-GRANTED-REVIEWER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-UNGRANTED-REVIEWER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-DELETION",
+          "path": "error",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": "S",
+      "name": "Download a version's source workbook",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/source",
+      "requirements": [
+        "REQ-03",
+        "REQ-08"
+      ],
+      "phase3": false,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-SOURCE-BEFORE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-OUTPUT-HASH",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-SOURCE-AFTER",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-PRESERVATION",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-SOURCE-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-SOURCE-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-SOURCE-FOREIGN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-SOURCE-UNKNOWN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-SOURCE-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-SOURCE-REVIEWER-READ",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-SOURCE-TEST-ADMIN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-DOWNLOAD-LARGE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-EXACT-DUE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-FAILED-NEXT",
+          "path": "error",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": "V",
+      "name": "Retrieve review context",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}/review",
+      "requirements": [
+        "REQ-06",
+        "REQ-07"
+      ],
+      "phase3": false,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "yes",
+      "error_conformance": "yes",
+      "evidence": [
+        {
+          "test_id": "P4-REVIEW-CONTEXT",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REVIEW-REVIEWER",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REVIEW-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REVIEW-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REVIEW-FOREIGN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REVIEW-UNKNOWN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REVIEW-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REVIEW-REVIEWER-READ",
+          "path": "success",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REVIEW-TEST-ADMIN",
+          "path": "error",
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "number": "R",
+      "name": "Download the JSON audit report",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/versions/{versionId}/audits/{auditId}/report",
+      "requirements": [
+        "REQ-08",
+        "REQ-10"
+      ],
+      "phase3": false,
+      "phase4": true,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; inherited Phase 4 semantics.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P3-AUDIT-FAILURE-ENVELOPE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT--EMPTY-OBJECT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT--REASON",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-DECISIONS-MIXED",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-NO-EDITS",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-SOURCE-AFTER",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-REPORT-COMPLETE",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-REPORT-STABLE",
+          "path": "success",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-ACCESS-REPORT-UNAUTHENTICATED",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REPORT-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REPORT-FOREIGN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REPORT-UNKNOWN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REPORT-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-ACCESS-REPORT-REVIEWER-READ",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-ACCESS-REPORT-TEST-ADMIN",
+          "path": "error",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-FAULT-AUDIT",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-REPORT",
+          "path": "error",
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "number": "G",
+      "name": "Read a schedule",
+      "method": "GET",
+      "path": "/api/v1/workbooks/{workbookId}/schedule",
+      "requirements": [
+        "REQ-12"
+      ],
+      "phase3": false,
+      "phase4": false,
+      "phase5": true,
+      "note": "Specification 3.0.0 section 5; delivered in Phase 5.",
+      "implemented": "observed responding",
+      "success_conformance": "no",
+      "error_conformance": "no",
+      "evidence": [
+        {
+          "test_id": "P5-SCHEDULE-DEFAULT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-PUT-REPLAY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-DEADLINE-ONLY",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-INTERVAL-CHANGE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-COALESCE",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-LATEST-UPLOAD",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-LATEST-OUTPUT",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-NO-TOKEN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-INVALID-TOKEN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-FOREIGN-OWNER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-WRONG-NAMESPACE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-TEST-ADMIN",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-UNKNOWN-RESOURCE",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-OWNER",
+          "path": "success",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-GRANTED-REVIEWER",
+          "path": "error",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-UNGRANTED-REVIEWER",
+          "path": "error",
+          "outcome": "fail"
+        }
+      ]
+    }
+  ],
+  "acceptance_status": {
+    "AC-01": {
+      "scope": "Re-run upload regression workflow and intake boundaries (section 17).",
+      "evidence": [
+        {
+          "test_id": "P3-INPUT-BYTES-AT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-SHEETS-AT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-SHEETS-CHARTSHEET",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CELLS-AT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-CLEAN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-SEEDED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-VERSION-VALID",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-UNICODE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-REPEATED-IDS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-MULTIPLE-DRAWINGS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-IN-CELL-PICTURE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-IMAGE-FORMULA",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-FORM-CONTROLS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-VML-COMMENTS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-UPLOAD-INACTIVE-PROTECTION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-UPLOAD-ALL-SIX",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-VERSION-NEW",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-02": {
+      "scope": "Re-run supported-file rejection and intake regressions (section 17).",
+      "evidence": [
+        {
+          "test_id": "P3-INPUT-MISSING-FILE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CSV",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-MISSING-EXTENSION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XLS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XLSM",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CORRUPT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-BYTES-OVER",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-SHEETS-OVER",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-CELLS-OVER",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ZIP-TRAVERSAL",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ZIP-DUPLICATE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-XML-DTD",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-MACRO-PARTS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-ENCRYPTED-ZIP",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED-SHEET",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-INPUT-PROTECTED-STRUCTURE",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-03": {
+      "scope": "Re-run immutable source and hash regressions (section 17).",
+      "evidence": [
+        {
+          "test_id": "P3-SOURCE-HASH",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-SOURCE-BEFORE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-OUTPUT-HASH",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-SOURCE-AFTER",
+          "outcome": "skip"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-04": {
+      "scope": "Re-run six-rule finding regressions; real-world precision study is manual.",
+      "evidence": [
+        {
+          "test_id": "P3-AUDIT-CLEAN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-SEEDED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-UNICODE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-REPEATED-IDS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-MULTIPLE-DRAWINGS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-IN-CELL-PICTURE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-IMAGE-FORMULA",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-FORM-CONTROLS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-VML-COMMENTS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-INACTIVE-PROTECTION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-AUDIT-ALL-SIX",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-CLEAN-ALL-SIX",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DECLARED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DISABLED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-BLANK",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DUPLICATE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-FORMULA",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DENSE-RANGE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-SPARSE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-TITLE-LIST",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-HIDDEN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-MERGE-POPULATED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-MERGE-EMPTY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-GENERIC",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-RAW-ADDRESS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-CELL-DISPLAY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-FORMULA-LITERAL",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-FORMULA-DYNAMIC",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-RANGE-DUPLICATE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-DEFAULT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-LOW-CONTRAST",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-LARGE-TEXT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-BOUNDARY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-NEGATIVE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-POSITIVE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-ONE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-FIVE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-INDEXED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-MEANING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-CONDITIONAL",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-UNSUPPORTED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-HIDDEN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REAUDIT-DETERMINISM",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-OUTPUT-AUDIT",
+          "outcome": "skip"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-05": {
+      "scope": "Re-run classification and finding-identity regressions (section 17).",
+      "evidence": [
+        {
+          "test_id": "P3-AUDIT-SEEDED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-UNICODE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-REPEATED-IDS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-MULTIPLE-DRAWINGS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-IN-CELL-PICTURE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-IMAGE-FORMULA",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-FORM-CONTROLS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P3-AUDIT-VML-COMMENTS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-AUDIT-ALL-SIX",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-MANUAL-ONLY-STATUS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DECLARED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DISABLED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-BLANK",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DUPLICATE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-FORMULA",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DENSE-RANGE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-SPARSE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-TITLE-LIST",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-HIDDEN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-MERGE-POPULATED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-MERGE-EMPTY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-GENERIC",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-RAW-ADDRESS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-CELL-DISPLAY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-FORMULA-LITERAL",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-FORMULA-DYNAMIC",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-RANGE-DUPLICATE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-DEFAULT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-LOW-CONTRAST",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-LARGE-TEXT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-BOUNDARY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-NEGATIVE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-POSITIVE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-ONE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-FIVE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-INDEXED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-MEANING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-CONDITIONAL",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-UNSUPPORTED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-HIDDEN",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-06": {
+      "scope": "Re-run review-context regressions (section 17).",
+      "evidence": [
+        {
+          "test_id": "P4-AUDIT-ALL-SIX",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-MANUAL-ONLY-STATUS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DECLARED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DISABLED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-BLANK",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DUPLICATE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-FORMULA",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-DENSE-RANGE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-SPARSE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-TITLE-LIST",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-HEADER-HIDDEN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-MERGE-POPULATED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-MERGE-EMPTY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-GENERIC",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-RAW-ADDRESS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-CELL-DISPLAY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-FORMULA-LITERAL",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-FORMULA-DYNAMIC",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-LINK-RANGE-DUPLICATE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-DEFAULT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-LOW-CONTRAST",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-LARGE-TEXT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-BOUNDARY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-NEGATIVE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--BLUE-POSITIVE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-ONE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-THEME-TINT--GRAY-FIVE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-INDEXED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-MEANING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-CONDITIONAL",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-UNSUPPORTED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-RULE-COLOR-HIDDEN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REVIEW-CONTEXT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REVIEW-REVIEWER",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-DECISIONS-MIXED",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-NO-EDITS",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REJECT-EMPTY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FIELD",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FIELD--DECISION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-DUPLICATE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FINDING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-CROSS-AUDIT-FINDING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-STALE-AUDIT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-AUDIT-PROCESSING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-AUDIT-FAILED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-MISSING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--OTHER-RULE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--UNKNOWN-FIELD",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--NULL",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-ON-DECLINE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-ON-DECLINE--MANUAL-REVIEW",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-BLANK",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-BLANK--DESCRIPTION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-TOO-LONG",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-TOO-LONG--DESCRIPTION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--EDGE-WHITESPACE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--SEPARATOR",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--GENERIC",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--RESERVED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--CASE-ONLY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--UNCHANGED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--SOURCE-COLLISION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-SWAP",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-LINK-AMBIGUOUS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW--BOOLEAN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW--REPLACEMENT-LABELS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--DUPLICATE-ALT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--COLOR",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--FORMULA-LINK",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--MERGE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--UNSAFE-RENAME",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MISSING-KEY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MISSING-KEY--MALFORMED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-DECISIONS-OVER",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REMEDIATED-STATUS",
+          "outcome": "skip"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-07": {
+      "scope": "Re-run decision and rejected-decision regressions (section 17).",
+      "evidence": [
+        {
+          "test_id": "P4-REVIEW-CONTEXT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-DECISIONS-MIXED",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-ALT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-RENAME",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-LINK",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-RANGE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-TABLE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-COMBINED",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-STRING-LABEL",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-NO-EDITS",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REJECT-EMPTY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FIELD",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FIELD--DECISION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-DUPLICATE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FINDING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-CROSS-AUDIT-FINDING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-STALE-AUDIT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-AUDIT-PROCESSING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-AUDIT-FAILED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-MISSING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--OTHER-RULE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--UNKNOWN-FIELD",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--NULL",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-ON-DECLINE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-ON-DECLINE--MANUAL-REVIEW",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-BLANK",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-BLANK--DESCRIPTION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-TOO-LONG",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-TOO-LONG--DESCRIPTION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--EDGE-WHITESPACE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--SEPARATOR",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--GENERIC",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--RESERVED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--CASE-ONLY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--UNCHANGED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--SOURCE-COLLISION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-SWAP",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-LINK-AMBIGUOUS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW--BOOLEAN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW--REPLACEMENT-LABELS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--DUPLICATE-ALT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--COLOR",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--FORMULA-LINK",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--MERGE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--UNSAFE-RENAME",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MISSING-KEY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MISSING-KEY--MALFORMED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-DECISIONS-OVER",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-BATCH-ATOMIC-REJECTION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-REPLAY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-CONFLICT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-INVALID-FIRST",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-OUTPUT-AUDIT",
+          "outcome": "skip"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-08": {
+      "scope": "Re-run report regressions (section 17).",
+      "evidence": [
+        {
+          "test_id": "P4-DECISIONS-MIXED",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-NO-EDITS",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-OUTPUT-HASH",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REPORT-COMPLETE",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-DOWNLOAD-LARGE",
+          "outcome": "fail"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-09": {
+      "scope": "Independent preservation; Excel no-repair checks remain manual (section 17).",
+      "evidence": [
+        {
+          "test_id": "P4-APPLY-ALT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-RENAME",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-LINK",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-RANGE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-HEADER-TABLE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-COMBINED",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-APPLY-STRING-LABEL",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-BATCH-ATOMIC-REJECTION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-OUTPUT-HASH",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-SOURCE-AFTER",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-PRESERVATION",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-DOWNLOAD-LARGE",
+          "outcome": "fail"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-10": {
+      "scope": "Re-run correction and download regressions (section 17).",
+      "evidence": [
+        {
+          "test_id": "P4-DECISIONS-MIXED",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-OUTPUT-AUDIT",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-REPORT-COMPLETE",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-REPORT-STABLE",
+          "outcome": "skip"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-11": {
+      "scope": "Re-run history regressions (section 17).",
+      "evidence": [
+        {
+          "test_id": "P4-FAULT-RECOVERY",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-VERSION-NEW",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-VERSION-SAME-BYTES",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REAUDIT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT--EMPTY-OBJECT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT--REASON",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REAUDIT-INVALID",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REAUDIT-INVALID--UNKNOWN-FIELD",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REAUDIT-DETERMINISM",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-APPLY-NO-EDITS",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P4-REJECT-EMPTY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FIELD",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FIELD--DECISION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-DUPLICATE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-UNKNOWN-FINDING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-CROSS-AUDIT-FINDING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-STALE-AUDIT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-AUDIT-PROCESSING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-AUDIT-FAILED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-MISSING",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--OTHER-RULE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--UNKNOWN-FIELD",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-WRONG-SHAPE--NULL",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-ON-DECLINE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-VALUE-ON-DECLINE--MANUAL-REVIEW",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-BLANK",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-BLANK--DESCRIPTION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-TOO-LONG",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-ALT-TOO-LONG--DESCRIPTION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--EDGE-WHITESPACE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--SEPARATOR",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--GENERIC",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--RESERVED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--CASE-ONLY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--UNCHANGED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-INVALID--SOURCE-COLLISION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-NAME-SWAP",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-LINK-AMBIGUOUS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW--BOOLEAN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-HEADER-ROW--REPLACEMENT-LABELS",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--DUPLICATE-ALT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--COLOR",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--FORMULA-LINK",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--MERGE",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MANUAL-APPLY--UNSAFE-RENAME",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MISSING-KEY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-MISSING-KEY--MALFORMED",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-REJECT-DECISIONS-OVER",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-REPLAY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-IDEMPOTENCY-CONFLICT",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P4-SOURCE-AFTER",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-REPORT-STABLE",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-HISTORY",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P4-REMEDIATED-STATUS",
+          "outcome": "skip"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-12": {
+      "scope": "Intervals 1/90, invalid types, due boundaries, disable, newest version, coalescing; restart/claim isolation is local evidence.",
+      "evidence": [
+        {
+          "test_id": "P5-SCHEDULE-DEFAULT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-MIN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-MAX",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-PUT-REPLAY",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-DEADLINE-ONLY",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-INTERVAL-CHANGE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-DISABLE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REENABLE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-BEFORE-DUE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-EXACT-DUE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-COALESCE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-SAME-TIME",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-LATEST-UPLOAD",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-LATEST-OUTPUT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-OLD-REAUDIT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-BUSY-AUDIT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-BUSY-REMEDIATION",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-TWO-WORKBOOKS",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-FAILED-NEXT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-ZERO",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-OVER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-BOOL",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-STRING",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-DECIMAL",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-NULL",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-MISSING",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-UNKNOWN-FIELD",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-DEFAULT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-CUSTOM",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-REWIND",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-SAME",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-UTC",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-ISOLATION",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-OWNER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-DISABLED",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-CLEANED",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-CLOCK-NOT-READY",
+          "outcome": "skip"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-13": {
+      "scope": "Reminders at 90/30/7 UTC days, clean suppression, eligibility, dedup, deadline changes; external-version UI disclosure is manual.",
+      "evidence": [
+        {
+          "test_id": "P5-SCHEDULE-REJECT-INVALID-DAY",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-SCHEDULE-REJECT-BAD-FORM",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-90",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-30",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-7",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-BEFORE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-NO-AUDIT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-PROCESSING",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-FAILED-AUDIT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DECLINED",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-PERIODIC-OFF",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAR-DEADLINE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-NO-BACKFILL",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CONFIG-EXACT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-JUMP",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DEDUP",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-CLEAN-THEN-DIRTY",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-RETURN-DEADLINE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-DEADLINE-EDIT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-LATEST-VERSION",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-AUDIT-SAME-TICK",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-LEAP-UTC",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-FAILED-RECORD",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-EMPTY",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-REMINDER-ORDER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-NOTIFICATION",
+          "outcome": "fail"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-14": {
+      "scope": "Controlled audit, remediation, report, storage and scheduled-audit failures.",
+      "evidence": [
+        {
+          "test_id": "P5-FAULT-AUDIT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-REMEDIATION",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-REPORT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-STORAGE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-SCHEDULED_AUDIT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-REJECT-UNKNOWN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-FAULT-REJECT-BOOLEAN",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-FAULT-REJECT-EMPTY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-FAULT-REJECT-DISABLED",
+          "outcome": "skip"
+        },
+        {
+          "test_id": "P5-FAULT-REJECT-ORDINARY",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-FAULT-REJECT-OTHER-SESSION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-FAULT-REJECT-REUSED-ID",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-FAULT-REJECT-AUDIT-REPORT-COMBINATION",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-FAULT-REJECT-REJECT-NO-CONSUME",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-15": {
+      "scope": "Owner/granted reviewer/foreign/unauthenticated/test-admin boundaries on every new operation and namespace.",
+      "evidence": [
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-NO-TOKEN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-INVALID-TOKEN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-FOREIGN-OWNER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-WRONG-NAMESPACE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-TEST-ADMIN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-UNKNOWN-RESOURCE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-OWNER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-GRANTED-REVIEWER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-WRITE-UNGRANTED-REVIEWER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-NO-TOKEN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-INVALID-TOKEN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-FOREIGN-OWNER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-WRONG-NAMESPACE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-TEST-ADMIN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-UNKNOWN-RESOURCE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-OWNER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-GRANTED-REVIEWER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-SCHEDULE-READ-UNGRANTED-REVIEWER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-NO-TOKEN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-INVALID-TOKEN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-FOREIGN-OWNER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-WRONG-NAMESPACE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-TEST-ADMIN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-UNKNOWN-RESOURCE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-OWNER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-GRANTED-REVIEWER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-NOTIFICATIONS-UNGRANTED-REVIEWER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-NO-TOKEN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-INVALID-TOKEN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-FOREIGN-OWNER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-WRONG-NAMESPACE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-TEST-ADMIN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-UNKNOWN-RESOURCE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-OWNER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-GRANTED-REVIEWER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-DELETE-UNGRANTED-REVIEWER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-NO-TOKEN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-INVALID-TOKEN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-OWNER-USER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-REVIEWER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-FOREIGN-ADMIN",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-ACCESS-CLOCK-CREATING-ADMIN",
+          "outcome": "fail"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-16": {
+      "scope": "Complete owner deletion over HTTP; HTTPS, credential and backup/restore evidence is manual.",
+      "evidence": [
+        {
+          "test_id": "P5-DELETE-COMPLETE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-OLD-URLS",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-REPEAT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-CANCEL-FUTURE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-OTHER-DATA",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-RETAIN-TESTER",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-ACTIVE-AUDIT",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-ACTIVE-REMEDIATION",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-DELETE-FAIL-ONCE",
+          "outcome": "fail"
+        },
+        {
+          "test_id": "P5-FAULT-DELETION",
+          "outcome": "fail"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-17": {
+      "scope": "Automated scan, keyboard workflow and contrast evidence (manual/browser only).",
+      "evidence": [],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    },
+    "AC-18": {
+      "scope": "Five real-time boundary runs with controlled outcomes and identical findings.",
+      "evidence": [
+        {
+          "test_id": "P5-PERFORMANCE-RUN-1",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-2",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-3",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-4",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-RUN-5",
+          "outcome": "pass"
+        },
+        {
+          "test_id": "P5-PERFORMANCE-COMPARE",
+          "outcome": "pass"
+        }
+      ],
+      "completeness": "exercised-criterion evidence only; per-AC human evidence is tracked separately and outcomes do not prove every boundary"
+    }
+  },
+  "known_deviations": [
+    "HTTP-only run: C9 and AC-17 are never counted; Excel no-repair (AC-09), HTTPS/credential/backup (AC-16) and monitoring evidence are manual.",
+    "Local-integration (57) and manual-release (21) plan entries are outside this report; tester-side ones are pytest cases, the rest are target/release evidence.",
+    "AC-18 timings are tester-observed end-to-end real time; the target-side validation/queue/engine split is separate (Ryan's measured execution).",
+    "Human fixture/Excel review was not performed; no approval is inferred from automated results."
+  ],
+  "pending_confirmation": [
+    "Pod adoption of specification/pack 3.0.0 (ADOPTION.md) is not recorded; this executable manifest and its fixture hashes await Team 12 agreement.",
+    "Reviewer access assumes the configured reviewer holds a read grant from userA only; the ungranted-reviewer cases read a userB workbook. Team 12 provisioning must match.",
+    "Foreign test-admin clock cases need an optional second credential (test-adminB); without it they are reported as skips.",
+    "Busy-version, active-deletion and PROCESSING-eligibility cases assert only when the active window is observed on both sides of the call; otherwise they skip as unobservable. A fast target may need target-side local evidence for these.",
+    "P5-CLOCK-NOT-READY and P5-FAULT-REJECT-DISABLED are unobservable over HTTP on a deployment whose fault/clock capability is enabled; they report skips.",
+    "Synchronous TEST_STORAGE_FAILURE details are not specified; only the code and ProjectError shape are asserted.",
+    "Scheduled-audit, notification, report and remediation injected messages follow the section 11 pattern '<Operation> failure requested by the isolated test session.'",
+    "Ordinary-namespace probes (fault/clock isolation) upload one clean workbook as userA and remove it with owner deletion; a failed deletion leaves it behind.",
+    "Inherited Phase 4 pending items (link targets, check order, formula links, x14 rename, stale-audit observability) are unchanged; see manifest-phase4.json."
+  ],
+  "manifest_sha256": "44251afcdc5b11721ef8ba6c2cab3fc461c2f3202b217844d63efc287169291f",
+  "manifest_hash_basis": "canonical UTF-8 JSON of the validated immutable manifest",
+  "fixture_hashes": {
+    "corrupt": "c51c63778cc8b7337c98ea4a62ee51d3abb17b537b28a64cfeffc0ef9d292265",
+    "zip_traversal": "8643e444288c01475000843f03d8621e6c59660eb8a45974392a7e2ce3880ebc",
+    "zip_duplicate": "dd10f96a1ca5f1dac9caa59396acb6929f862b1ab7fd1123ccb2c110fdf9a98d",
+    "xml_dtd": "accad3c326749fcc2e1fc1aa77999d7a5bf74c9cb9fbc7e2244ae374947c4843",
+    "macro_parts": "0b2819c85a29d598707f08a43371133fae7db386be8233c3a536d86e576663fe",
+    "encrypted_zip": "cde084966c1c048cfd860b82f492087521816a1bca32c9342cb5589d6782dd06",
+    "protected_sheet": "390e3ea3f9f3768c52fddf67c146ff569e3a1fa81da1d9e0a3c888c56419e3dc",
+    "protected_structure": "3b611ae68cd84e2bbffc17ad086886732e7409c689ec2e6bc6416de28758bc11",
+    "clean": "e1de45e415b8552304a69050a86c5d605ab07eeaf96cef0c92dde6ba2d63e35e",
+    "seeded_issues": "6e54efe60ce3a45530f364168557ea7ceb085a454b3c02fe5927ab715b00d223",
+    "unicode": "5d938a482bcb0f0bf84df3bfd9cc6dfedf7f0c57a0f9ac3357ef9b15520e1efd",
+    "repeated_ids": "680d7d50899bfb4d2178acaafecbf9741f46fb0a9bdff1fb374670c50c813883",
+    "multiple_drawings": "52fb02a37099b7ab9a0787e7858d36340155a1c5682dc7000fe35fa79ef2eb27",
+    "in_cell_picture": "63921a4e08cd90ee035afe125d94676dffabeaa7fd74aaf6c993fd7fe4088f1b",
+    "image_formula": "edefdb8a4b567fe2ef4cb79e37aeb1b3c85116286c0d040ed8956b6a124effc5",
+    "form_controls": "53630b5946d30abdf056cfd12a6ebd124b19d6e9d318766e67f57af2dddcc53c",
+    "vml_comments": "dacd584e94b8647c37417ddae6714fa6e3a55471a7122ac7868f55578015029f",
+    "inactive_protection": "1f01f6857964fb9d52c04bee2457ab06ed5c0128bc5f793d0418568d867e21d7",
+    "clean_all_six": "916ac672e6b3ef914493312e6c63c7c94dc45c84a9381087dbee5966ceec33a7",
+    "seeded_all_six": "0b3b8eed0f295cece0fdf1da56c534acba5b2b2a84ce3082e953a903d2f907a6",
+    "review_only": "d1eb3d0da748009c75ae41b75991ca861e1e4a9b9086d7c467ae037d09159de7",
+    "mixed_decisions": "888056e1c67048ce1c7214e8848801ac6d102c2e96f0645835d337a988a5d6b4",
+    "unsupported_edits": "08ef768ac2cbae331fd6436718d27db1a75aa18393507a4bfa186da95005343d",
+    "alt_supported": "c6490ba00e7879f6dfb73cf5b07c95bd1375697d6d46bf812a16399e333fe57f",
+    "link_supported": "346a3d095c4b79d96b118389e999c71962dbab27edb5731c1a72e14cea0b5ad1",
+    "header_range": "ee2c92878ca27bf2830e8abd4a5d17df478de62a6e9fa8bae4ddb3b2e9956721",
+    "header_disabled_table": "28ef03661dbc430c66436f43225f11ec092ff122895b5d58996380a1bfc9c9e5",
+    "rename_references": "fabf363d00df9f6af44e791945d9d67dec8405dc9fadb516633a1684c8221d51",
+    "preservation_rich": "7e870c77e26a57bb97c34a76eb18cde4dd19be69edbcdf68af3a24ef2085fad7",
+    "large_preservation": "d55c8af59d4d1b5c52299d403a9b5798411f425461c02e240364d78ce7f6eb05",
+    "table_header_vectors": "f6a1f5905e7b6c5d5ef11666f92614cacba1c96e8753a5c6168729ed30ab85b7",
+    "merge_vectors": "66c3f84e0d8367cac38dad9a18d4b5faa28d9d360908e38869d9734a09c73ede",
+    "link_vectors": "9f7b4a843c385d42fd135ee5af2272244d6430bf54c31cc92e12e4334b95399c",
+    "contrast_vectors": "71af778563435779715c64b1dda39e293c501b0aebd7c9439cc326ff495a5a0c",
+    "tint_half_vectors": "13be0503cf498e3f5417acce3e3773af0874a2f8a9b021226a45c9412cd66826",
+    "performance_250000_cells": "2e48fede3b950478fb95a3022465d5a1fc862a8e56e969fe622d042b68d730b0"
+  },
+  "pack_revision": "3.0.0",
+  "pack_hashes": {
+    "ADOPTION.md": "5b9fa028a106b763d9d478ee4a5515f9b2fcb73f866ca05a6870a49b468f5942",
+    "CHANGELOG.md": "b480b8aa60b66b8c96821f42fcafd5b1811decc9d93b5197e05a9e717143f96d",
+    "PACK_VALIDATION.md": "6e3f529567e1db6c02ba9cf2325aaab2c4133d345c1410e4a3465d9b353f43bb",
+    "Phase5_Shared_Specification.md": "1813d6f29e841efd584f66fa07f23063a23fb4c6364da8e2a85fb4b217eecae1",
+    "README.md": "168ef7ccfe49f33ec7fb19c4fa2ba513188b264a8b165352fa452784b67749ad",
+    "TRACEABILITY.md": "b3b698239544d133419b7bc0bb2ea32b2d2e98b070e733b2163ed5e58bd1e483",
+    "baseline_phase4/CORRECTIONS.md": "816f65a5af73bceee9b30857cc392094211de66305e27e60374e8a196319af30",
+    "baseline_phase4/Phase4_Shared_Specification.md": "ba8a1a1bf3a09d216b50336b99c2749f8854b14697865e37ed6bfa57c686a698",
+    "baseline_phase4/README.md": "82d8f2cc8b21afdab28691158e609465e9518a9f5a539453888c884ea95af9d3",
+    "baseline_phase4/phase4-examples.json": "124e5737e86038ac7ef0d40a99b3f5951914f5a707b93a2c38e4725ac87d3a06",
+    "baseline_phase4/phase4-policy-vectors.json": "a5b3ad3e635e9a902ab821e6e11dcd2d8c17f7b2f6c3e012c3eb5a635f003a24",
+    "baseline_phase4/phase4-test-plan.json": "1d894c8085318205f39d622d175a8deda6852e4005e433cf5e2dc997abb4ee60",
+    "baseline_phase4/phase4-wire-schemas.json": "4acb67c26e27c501d1b45f69b25f7faf29344be892f5302ae515f776bc182d4a",
+    "phase5-examples.json": "aa4a0bf77038b551fb682662df7004079cab7d28730ad9f4a05543b691b36a53",
+    "phase5-policy-vectors.json": "15dad75c0123d82ebe783618c393ae0146c6a1c780df93f85a22f15ab381b47e",
+    "phase5-test-plan.json": "bef526a2fc3c037cbc8f814f76c3c18c47c6bac0d07ad69dfed96a941db76503",
+    "phase5-wire-schemas.json": "4a94d327b14432b941194b844f10b9cb483aada86e0ce448361ef8a89bc38182",
+    "team-design-map.template.json": "6fb6e13541fbc3f337554d20e0013b53da85cf0d3e8355ded599b9a1ce9c9237",
+    "validate_pack.py": "6d8fca88e73f98230782cd309882cc643a6d8cbdca0491f9fd958296046659ce"
+  },
+  "source_working_tree_dirty": false,
+  "checkpoint": {
+    "real_engine": true,
+    "api_restart_retained_upload": true,
+    "separate_worker": true,
+    "worker_concurrency": 2,
+    "source_sha256_unchanged": true,
+    "report_byte_identical": true,
+    "repeat_run_status": 409
+  }
+}
