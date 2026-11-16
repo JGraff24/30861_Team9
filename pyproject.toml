@@ -1,7 +1,7 @@
 [project]
 name = "team9-excel-accessibility-hub"
 version = "0.1.0"
-description = "Phase 3 shared foundation for the Team 9 Excel accessibility hub"
+description = "Phase 5 Excel accessibility hub with review, scheduling and lifecycle controls"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "boto3==1.43.113",

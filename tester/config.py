@@ -87,9 +87,9 @@ class TesterSettings(EnvironmentSettings):
     )
     fixture_manifest_path: Path = Field(
         default_factory=lambda: (
-            Path(__file__).resolve().parent / "fixtures" / "manifest-phase4.json"
-            if (Path(__file__).resolve().parent / "fixtures" / "manifest-phase4.json").exists()
-            else Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "manifest-phase4.json"
+            Path(__file__).resolve().parent / "fixtures" / "manifest-phase5.json"
+            if (Path(__file__).resolve().parent / "fixtures" / "manifest-phase5.json").exists()
+            else Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "manifest-phase5.json"
         )
     )
     # Phase 5 report profile (specification 3.0.0 section 14). Trusted operator configuration
@@ -116,7 +116,7 @@ class TesterSettings(EnvironmentSettings):
         )
     )
     tester_setup_timeout_seconds: PositiveSeconds = 45
-    tester_run_timeout_seconds: PositiveSeconds = 600
+    tester_run_timeout_seconds: PositiveSeconds = 2400
     # Failed setups are always compensated on the next setup. This flag additionally
     # enables cleanup of successfully retrieved reports' target namespaces.
     tester_cleanup_prior_sessions: bool = False

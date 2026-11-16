@@ -54,7 +54,7 @@ def main() -> int:
         action="store_true",
         help=(
             "Run the Phase 5 independent suite (own-team profile) against the real system. "
-            "Until the Phase 5 system work lands, its new operations are reported as gaps."
+            "Includes the inherited six-rule workflows and the Phase 5 lifecycle operations."
         ),
     )
     parser.add_argument(
@@ -127,7 +127,12 @@ def main() -> int:
             "APP_ENV": "test",
             "RULESET_VERSION": suite.manifest.ruleset_version,
             "ENABLE_TEST_AUDIT_FAULTS": "true" if args.phase4 else "false",
-            "TESTER_RUN_TIMEOUT_SECONDS": "1800" if args.phase4 else "600",
+            "ENABLE_TEST_CLOCK": "true" if args.phase5 else "false",
+            "TESTER_RUN_TIMEOUT_SECONDS": "2400"
+            if args.phase5
+            else "1800"
+            if args.phase4
+            else "600",
             "DEPLOYMENT_SHA": revision,
             "METADATA_DB_PATH": str(state / "system.sqlite3"),
             "BLOB_ROOT": str(state / "sources"),

@@ -7,8 +7,7 @@ x-system: &system
     APP_ENV: production
     DEPLOYMENT_SHA: ${DEPLOYMENT_SHA:?Set source release SHA}
     API_ROOT_PATH: /system
-    # This is the designated shared Phase 4 target. Private credentials/grants stay
-    # in env_file; these release requirements must override retained Phase 3 values.
+    # Designated shared Phase 5 target. Private credentials/grants stay in env_file.
     RULESET_VERSION: "2.0.0"
     ENABLE_TEST_INTERFACE: "true"
     ENABLE_TEST_AUDIT_FAULTS: "true"
@@ -43,7 +42,9 @@ services:
       TESTER_ROOT_PATH: /tester
       TESTER_DB_PATH: /service/tester-state/tester.sqlite3
       # Docker installs the wheel in this fixed Python 3.12 virtual environment.
-      FIXTURE_MANIFEST_PATH: /service/.venv/lib/python3.12/site-packages/tester/fixtures/manifest-phase4.json
+      FIXTURE_MANIFEST_PATH: /service/.venv/lib/python3.12/site-packages/tester/fixtures/manifest-phase5.json
+      TESTER_TEAM_ID: team9
+      # Supply the exact approved URL -> team map through the private env_file.
       TESTER_RUN_TIMEOUT_SECONDS: "2400"
       AWS_EC2_METADATA_DISABLED: "true"
     command: ["uvicorn", "tester.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8001", "--no-access-log"]
