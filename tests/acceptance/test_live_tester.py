@@ -95,3 +95,22 @@ def test_lost_run_response_is_recovered_without_another_run(client: httpx.Client
     report = SuiteReport.model_validate_json(stored.content)
     assert report.session_id == sid
     assert client.post("/test/run", json={"session_id": sid}).status_code == 409
+
+
+def test_report_profile_matches_trusted_configuration(client: httpx.Client) -> None:
+    """Phase 5: own-team reports carry coverage.model; cross-team reports omit the key."""
+    import json
+
+    expected = os.environ.get("TEAM9_EXPECT_PROFILE")
+    if expected not in ("own", "cross"):
+        pytest.skip("TEAM9_EXPECT_PROFILE (own or cross) not configured")
+    setup = client.post("/test/setup", json={"target_url": TARGET})
+    assert setup.status_code == 201, setup.text
+    sid = setup.json()["session_id"]
+    run = client.post("/test/run", json={"session_id": sid})
+    assert run.status_code in (200, 500), run.text
+    stored = client.get("/test/report", params={"session_id": sid})
+    assert stored.status_code == 200
+    coverage = json.loads(stored.content)["coverage"]
+    assert ("model" in coverage) == (expected == "own")
+    assert b'"model"' not in stored.content or expected == "own"

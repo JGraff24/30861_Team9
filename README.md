@@ -154,6 +154,23 @@ coverage excludes the review UI. Code coverage measures `app/workbooks` and `app
 including editing and preservation, and excludes API, storage and UI code. Coverage
 percentages alone do not establish acceptance.
 
+## Phase 5 tester (suite 3.0.0)
+
+The [Phase 5 pack](docs/contracts/phase5/) (specification 3.0.0, ruleset 2.0.0) is adopted
+byte for byte. Its [runnable manifest](tests/fixtures/manifest-phase5.json) has 395 hosted
+cases: the 253 Phase 4 cases with their IDs and order, then 142 new scheduling, reminder,
+isolated-clock, deletion, authorization, controlled-failure, tester-profile and AC-18
+performance cases. Runs take up to 2,400 seconds; callers and proxies need at least 2,430.
+The Phase 4 manifest stays the default until the deployed tester is switched (see
+[reciprocal runbook](docs/testing/phase5-reciprocal-team12.md)).
+
+Reports follow the instructor profile rules: own-team runs carry `coverage.model` over the
+[Team 9 design map](docs/design/), cross-team runs omit the key, and trusted tester
+configuration (`TESTER_TEAM_ID`, `TARGET_TEAM_MAP_JSON`) decides which. An unexpected
+target processing failure that prevents evaluation is `error`/`system`. See the
+[Phase 5 implementation notes](docs/implementation/dixon_phase5.md) and the generated
+[coverage catalogs](docs/testing/phase5-coverage-catalogs.md).
+
 ## Local setup
 
 Use Python 3.12 and uv 0.13.1. Install uv if needed:

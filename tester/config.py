@@ -12,17 +12,25 @@ from app.contracts.models import SHA256, ContractModel, NonemptyText
 
 
 class TargetAuth(ContractModel):
+    """Private per-target credentials. `reviewer` must hold a read grant from userA only.
+
+    `test-adminB` is an optional second test-admin used only to prove that a foreign
+    test-admin cannot advance this tester's namespace clock (Phase 5 AC-15). Without it the
+    dependent cases are reported as skips, never as passes.
+    """
+
     user_a: SecretStr = Field(alias="userA", repr=False)
     user_b: SecretStr = Field(alias="userB", repr=False)
     reviewer: SecretStr = Field(repr=False)
     test_admin: SecretStr = Field(alias="test-admin", repr=False)
+    test_admin_b: SecretStr | None = Field(default=None, alias="test-adminB", repr=False)
 
     @model_validator(mode="after")
     def nonempty_tokens(self) -> Self:
-        if any(
-            not value.get_secret_value().strip()
-            for value in (self.user_a, self.user_b, self.reviewer, self.test_admin)
-        ):
+        values = [self.user_a, self.user_b, self.reviewer, self.test_admin]
+        if self.test_admin_b is not None:
+            values.append(self.test_admin_b)
+        if any(not value.get_secret_value().strip() for value in values):
             raise ValueError("configured target tokens must be nonempty")
         return self
 
@@ -84,6 +92,29 @@ class TesterSettings(EnvironmentSettings):
             else Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "manifest-phase4.json"
         )
     )
+    # Phase 5 report profile (specification 3.0.0 section 14). Trusted operator configuration
+    # only: the tester's own team, the exact approved-target-URL to team map, and the team's
+    # versioned design-requirements map. Never derived from a grader request or from hosts.
+    tester_team_id: NonemptyText | None = None
+    target_team_map: dict[NonemptyText, NonemptyText] = Field(
+        default_factory=dict, validation_alias="TARGET_TEAM_MAP_JSON"
+    )
+    tester_design_map_path: Path | None = Field(
+        default_factory=lambda: next(
+            (
+                path
+                for path in (
+                    Path(__file__).resolve().parent / "design" / "team9-design-map.json",
+                    Path(__file__).resolve().parents[1]
+                    / "docs"
+                    / "design"
+                    / "team9-design-map.json",
+                )
+                if path.exists()
+            ),
+            None,
+        )
+    )
     tester_setup_timeout_seconds: PositiveSeconds = 45
     tester_run_timeout_seconds: PositiveSeconds = 600
     # Failed setups are always compensated on the next setup. This flag additionally
@@ -98,4 +129,6 @@ class TesterSettings(EnvironmentSettings):
             raise ValueError("allowed target URLs must be unique")
         if set(self.target_auth_map) - set(self.allowed_target_urls):
             raise ValueError("target access map keys must be exact approved base URLs")
+        if set(self.target_team_map) - set(self.allowed_target_urls):
+            raise ValueError("target team map keys must be exact approved base URLs")
         return self

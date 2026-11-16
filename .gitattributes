@@ -1,2 +1,7 @@
 # These contract artifacts have published raw-byte hashes; never translate newlines.
 docs/contracts/phase4/* -text
+docs/contracts/phase5/** -text
+# Hashed into Phase 5 coverage bases and the generated catalogs; keep bytes identical on Windows.
+docs/design/** -text
+tests/fixtures/manifest-phase5.json -text
+tests/fixtures/expectations-phase5.json -text

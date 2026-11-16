@@ -1,0 +1,270 @@
+{
+  "teamId": "team9",
+  "designVersion": "0.1.0",
+  "mappingUrl": "https://github.com/JGraff24/30861_Team9/blob/main/docs/design/team9-design-map.json",
+  "requirements": [
+    {
+      "requirementId": "T9-D-01",
+      "description": "Configuration-only bearer identities: missing or invalid tokens are refused with 401 before any resource lookup (app/auth/service.py).",
+      "testIds": [
+        "P3-AUTH-UPLOAD",
+        "P3-AUTH-UPLOAD-INVALID",
+        "P4-ACCESS-HISTORY-UNAUTHENTICATED",
+        "P5-ACCESS-SCHEDULE-WRITE-NO-TOKEN",
+        "P5-ACCESS-DELETE-INVALID-TOKEN",
+        "P5-ACCESS-CLOCK-NO-TOKEN"
+      ],
+      "qualifyingAssertion": "A protected call without or with an invalid bearer token returns 401 UNAUTHORIZED and no data."
+    },
+    {
+      "requirementId": "T9-D-02",
+      "description": "Owner/explicit-reviewer-grant authorization after namespace resolution: foreign 403, unknown or wrong-namespace 404, reviewers read-only, test-admin has no business access.",
+      "testIds": [
+        "P3-VERSION-FOREIGN",
+        "P4-ACCESS-HISTORY-FOREIGN",
+        "P4-ACCESS-HISTORY-REVIEWER-READ",
+        "P5-ACCESS-SCHEDULE-READ-GRANTED-REVIEWER",
+        "P5-ACCESS-SCHEDULE-WRITE-GRANTED-REVIEWER",
+        "P5-ACCESS-NOTIFICATIONS-UNGRANTED-REVIEWER",
+        "P5-ACCESS-DELETE-WRONG-NAMESPACE",
+        "P5-ACCESS-SCHEDULE-READ-TEST-ADMIN"
+      ],
+      "qualifyingAssertion": "The evaluated identity receives exactly the expected 200/403/404 and no state change."
+    },
+    {
+      "requirementId": "T9-D-03",
+      "description": "Intake validation and processing limits (25,000,000 bytes, 50 worksheets, 250,000 nonempty cells, hostile packages) before acceptance (app/workbooks/validation.py).",
+      "testIds": [
+        "P3-INPUT-BYTES-AT",
+        "P3-INPUT-SHEETS-OVER",
+        "P3-INPUT-CELLS-OVER",
+        "P3-INPUT-CELLS-AT",
+        "P3-INPUT-CORRUPT",
+        "P3-INPUT-ZIP-TRAVERSAL"
+      ],
+      "qualifyingAssertion": "Boundary and hostile workbooks are accepted or rejected with the expected status and code."
+    },
+    {
+      "requirementId": "T9-D-04",
+      "description": "Immutable source storage with integrity verification on every read (app/storage/blobs.py, sqlite.py).",
+      "testIds": [
+        "P3-SOURCE-HASH",
+        "P4-SOURCE-BEFORE",
+        "P4-SOURCE-AFTER"
+      ],
+      "qualifyingAssertion": "Downloaded source bytes and hashes equal the uploaded fixture before and after audits/remediation."
+    },
+    {
+      "requirementId": "T9-D-05",
+      "description": "Six-rule audit engine, ruleset 2.0.0, with deterministic finding identities (app/audit).",
+      "testIds": [
+        "P4-AUDIT-ALL-SIX",
+        "P4-CLEAN-ALL-SIX",
+        "P4-RULE-HEADER-DENSE-RANGE",
+        "P3-DETERMINISM",
+        "P5-PERFORMANCE-COMPARE"
+      ],
+      "qualifyingAssertion": "Exact independently expected finding tuples are returned and repeat identically."
+    },
+    {
+      "requirementId": "T9-D-06",
+      "description": "Durable audit/remediation job queue with two bounded worker slots, a 15 s queue bound and 60/180 s execution bounds (app/jobs/worker.py).",
+      "testIds": [
+        "P4-FAULT-RECOVERY",
+        "P5-PERFORMANCE-RUN-1",
+        "P5-PERFORMANCE-RUN-2",
+        "P5-PERFORMANCE-RUN-3",
+        "P5-PERFORMANCE-RUN-4",
+        "P5-PERFORMANCE-RUN-5"
+      ],
+      "qualifyingAssertion": "Accepted jobs reach a terminal state within their real-time bounds or fail in a controlled way."
+    },
+    {
+      "requirementId": "T9-D-07",
+      "description": "Review context projection from the stored audit inventory (operation V).",
+      "testIds": [
+        "P4-REVIEW-CONTEXT",
+        "P4-REVIEW-REVIEWER"
+      ],
+      "qualifyingAssertion": "Owner and reviewer review contexts list the expected actions and current values."
+    },
+    {
+      "requirementId": "T9-D-08",
+      "description": "All-or-nothing targeted OOXML remediation with independent preservation verification and idempotency keys (app/workbooks/editor.py, preservation.py).",
+      "testIds": [
+        "P4-APPLY-ALT",
+        "P4-APPLY-RENAME",
+        "P4-PRESERVATION",
+        "P4-BATCH-ATOMIC-REJECTION",
+        "P4-IDEMPOTENCY-REPLAY"
+      ],
+      "qualifyingAssertion": "Approved edits take effect, everything else is preserved and rejected batches change nothing."
+    },
+    {
+      "requirementId": "T9-D-09",
+      "description": "Immutable report snapshots and version/audit history (app/services/reports.py).",
+      "testIds": [
+        "P4-REPORT-COMPLETE",
+        "P4-REPORT-STABLE",
+        "P4-HISTORY"
+      ],
+      "qualifyingAssertion": "Report bytes and history records are complete and unchanged on later reads."
+    },
+    {
+      "requirementId": "T9-D-10",
+      "description": "Isolated test sessions with namespaced data, administrator cleanup and per-session measured code coverage (app/test_interface, app/measurement).",
+      "testIds": [
+        "P3-SESSION-UNKNOWN",
+        "P3-SESSION-DUPLICATE",
+        "P4-SESSION-CLEANUP",
+        "P4-SESSION-COVERAGE",
+        "P5-TESTER-CODE-COPY"
+      ],
+      "qualifyingAssertion": "Namespaces are isolated and cleanable, and the session code report is retrievable."
+    },
+    {
+      "requirementId": "T9-D-11",
+      "description": "Trusted one-shot isolated fault controls for the seven Phase 5 keys, rejected when malformed and never rearmed.",
+      "testIds": [
+        "P5-FAULT-AUDIT",
+        "P5-FAULT-REMEDIATION",
+        "P5-FAULT-REPORT",
+        "P5-FAULT-STORAGE",
+        "P5-FAULT-SCHEDULED_AUDIT",
+        "P5-FAULT-NOTIFICATION",
+        "P5-FAULT-DELETION",
+        "P5-FAULT-REJECT-UNKNOWN",
+        "P5-FAULT-REJECT-REUSED-ID",
+        "P5-FAULT-REJECT-REJECT-NO-CONSUME"
+      ],
+      "qualifyingAssertion": "Each armed fault produces its exact failure once with preservation, and invalid controls are rejected."
+    },
+    {
+      "requirementId": "T9-D-12",
+      "description": "Persisted full-replacement schedule configuration with newest-committed-version selection (operations 11 and G).",
+      "testIds": [
+        "P5-SCHEDULE-DEFAULT",
+        "P5-SCHEDULE-MIN",
+        "P5-SCHEDULE-MAX",
+        "P5-SCHEDULE-PUT-REPLAY",
+        "P5-SCHEDULE-DEADLINE-ONLY",
+        "P5-SCHEDULE-REJECT-DECIMAL",
+        "P5-SCHEDULE-LATEST-OUTPUT"
+      ],
+      "qualifyingAssertion": "Valid configurations persist with the exact nextAuditAt/versionId; invalid ones change nothing."
+    },
+    {
+      "requirementId": "T9-D-13",
+      "description": "Scheduler dispatch on the original cadence grid with coalescing, transactional claims and busy-version deferral.",
+      "testIds": [
+        "P5-SCHEDULE-EXACT-DUE",
+        "P5-SCHEDULE-COALESCE",
+        "P5-SCHEDULE-SAME-TIME",
+        "P5-SCHEDULE-BUSY-AUDIT",
+        "P5-SCHEDULE-TWO-WORKBOOKS",
+        "P5-SCHEDULE-FAILED-NEXT"
+      ],
+      "qualifyingAssertion": "Due work dispatches exactly one audit per occurrence on the expected grid and never on a busy version."
+    },
+    {
+      "requirementId": "T9-D-14",
+      "description": "Durable per-namespace simulated clock with atomic, idempotent advancement independent of real leases.",
+      "testIds": [
+        "P5-CLOCK-DEFAULT",
+        "P5-CLOCK-CUSTOM",
+        "P5-CLOCK-REWIND",
+        "P5-CLOCK-SAME",
+        "P5-CLOCK-ISOLATION",
+        "P5-CLOCK-OWNER",
+        "P5-ACCESS-CLOCK-CREATING-ADMIN"
+      ],
+      "qualifyingAssertion": "Clock calls set, reject or replay time exactly and never affect another namespace."
+    },
+    {
+      "requirementId": "T9-D-15",
+      "description": "Reminder evaluator: UTC 90/30/7-day thresholds, pre-dispatch eligibility snapshot, no backfill and durable considered keys.",
+      "testIds": [
+        "P5-REMINDER-90",
+        "P5-REMINDER-30",
+        "P5-REMINDER-7",
+        "P5-REMINDER-CLEAN",
+        "P5-REMINDER-DEDUP",
+        "P5-REMINDER-NO-BACKFILL",
+        "P5-REMINDER-AUDIT-SAME-TICK",
+        "P5-REMINDER-LEAP-UTC"
+      ],
+      "qualifyingAssertion": "Exactly the eligible, not yet considered thresholds produce records with the expected scheduledFor."
+    },
+    {
+      "requirementId": "T9-D-16",
+      "description": "Durable in-application notification records (DELIVERED/FAILED), ordered by scheduledFor then creation sequence (operation 12).",
+      "testIds": [
+        "P5-REMINDER-EMPTY",
+        "P5-REMINDER-ORDER",
+        "P5-REMINDER-FAILED-RECORD",
+        "P5-ACCESS-NOTIFICATIONS-OWNER"
+      ],
+      "qualifyingAssertion": "Notification reads return the exact records in order, including FAILED records."
+    },
+    {
+      "requirementId": "T9-D-17",
+      "description": "Owner deletion with a durable reservation, active-work fencing and recoverable cleanup of all retained content (operation 14).",
+      "testIds": [
+        "P5-DELETE-COMPLETE",
+        "P5-DELETE-OLD-URLS",
+        "P5-DELETE-REPEAT",
+        "P5-DELETE-CANCEL-FUTURE",
+        "P5-DELETE-ACTIVE-AUDIT",
+        "P5-DELETE-FAIL-ONCE"
+      ],
+      "qualifyingAssertion": "After 204 every known URL is 404 and no future work runs; refused or failed deletions change nothing."
+    },
+    {
+      "requirementId": "T9-D-18",
+      "description": "Uniform ProjectError envelope with X-Request-ID on every business error path, including new Phase 5 codes.",
+      "testIds": [
+        "P5-SCHEDULE-REJECT-ZERO",
+        "P5-CLOCK-UTC",
+        "P5-CLOCK-DISABLED",
+        "P5-CLOCK-CLEANED"
+      ],
+      "qualifyingAssertion": "Each refusal carries the exact ProjectError code and a request ID."
+    },
+    {
+      "requirementId": "T9-D-19",
+      "description": "Review UI: schedule, notification and delete controls with keyboard operation, labels, focus and the stored-version disclosure (app/ui).",
+      "testIds": [],
+      "qualifyingAssertion": "Browser/manual accessibility evidence; not exercised by HTTP-only tester runs."
+    },
+    {
+      "requirementId": "T9-D-20",
+      "description": "Operational monitoring of queue depth, failed jobs, scheduled-dispatch lag and notification failures with a response procedure.",
+      "testIds": [],
+      "qualifyingAssertion": "Release evidence; not observable through the hosted interface."
+    },
+    {
+      "requirementId": "T9-D-21",
+      "description": "Renewable deployment protection of remote tester sessions across the full suite window, with draining instead of interruption (app/test_interface/activity.py, scripts/deploy_host.py).",
+      "testIds": [],
+      "qualifyingAssertion": "Deployment/local evidence; not observable through the hosted interface."
+    },
+    {
+      "requirementId": "T9-D-22",
+      "description": "Additive metadata migration that preserves earlier sources, audits, reports and tester reports byte for byte.",
+      "testIds": [],
+      "qualifyingAssertion": "Local integration evidence; not observable through the hosted interface."
+    },
+    {
+      "requirementId": "T9-D-23",
+      "description": "Independent tester report profiles: own-team model coverage, cross-team omission, 12-component and 18-criterion catalogs (tester/).",
+      "testIds": [
+        "P5-TESTER-SELF-MODEL",
+        "P5-TESTER-CROSS-OMIT",
+        "P5-TESTER-SYSTEM-18",
+        "P5-TESTER-COMPONENT-12",
+        "P5-TESTER-STORED-BYTES"
+      ],
+      "qualifyingAssertion": "The frozen profile and catalogs produce the required report shape."
+    }
+  ]
+}

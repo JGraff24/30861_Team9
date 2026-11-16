@@ -1,0 +1,13 @@
+{
+  "artifact_kind": "configuration_template_not_a_real_design_map",
+  "teamId": null,
+  "designVersion": null,
+  "mappingUrl": null,
+  "requirements": [],
+  "instructions": [
+    "Replace nulls with actual team identity, version and accessible mapping URL.",
+    "List every Phase5 team design requirement, including untested requirements with empty testIds.",
+    "Only actual qualifying assertions executed in this session earn credit.",
+    "Validate the filled object after removing artifact_kind and instructions against TeamDesignMap."
+  ]
+}
