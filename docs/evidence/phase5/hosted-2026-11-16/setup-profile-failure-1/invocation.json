@@ -1,0 +1,28 @@
+{
+  "tester_url": "https://3.139.178.70.sslip.io/tester",
+  "target_url": "https://3.139.178.70.sslip.io/system",
+  "local_source_revision": "ff417c28705ebe66d1da453a5feece75de0f5e61",
+  "target_revision": "unknown",
+  "tester_revision": "unknown",
+  "revision_evidence": "Public UI asset hashes and native API catalogs matched merged main; host image SHA is not exposed by the public interface.",
+  "manifest_version": "3.0.0",
+  "manifest_file_sha256": "68192ece6ea50101b667e17683cb3fc0831e9f202f8c27a99e39bbc2bac4b676",
+  "planned_cases": 395,
+  "expected_profile": "own",
+  "setup_post_attempts": 1,
+  "run_post_attempts": 0,
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "AVAILABLE",
+      "apiVersion": "1.0",
+      "rulesetVersion": "2.0.0"
+    }
+  },
+  "setup_started_at": "2026-11-16T20:44:40.386563+00:00",
+  "setup_status": 500,
+  "setup_body": {
+    "message": "Tester report profile configuration is missing or invalid.",
+    "source": "tester"
+  }
+}

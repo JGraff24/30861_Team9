@@ -350,6 +350,17 @@ if (bounds is None or suite.manifest.ruleset_version != '2.0.0'
         or suite.manifest.limits is None or suite.manifest.limits.suite_seconds != bounds[0]
         or suite.manifest.limits.run_read_timeout_seconds < bounds[1]):
     raise RuntimeError('Private tester suite is incompatible')
+if suite.manifest.phase == '5':
+    from tester.phase5.profile import ProfileError, classify
+    try:
+        if not settings.tester_own_target_url:
+            raise ProfileError('Own-system URL is not configured')
+        classify(settings.tester_own_target_url, tester_team=settings.tester_team_id,
+                 target_teams=settings.target_team_map,
+                 design_map_path=settings.tester_design_map_path,
+                 planned_ids=[test.test_id for test in suite.manifest.tests])
+    except ProfileError as error:
+        raise RuntimeError('Private tester report profile configuration is incomplete') from error
 with urlopen('http://127.0.0.1:8001/openapi.json', timeout=5) as response:
     operation = json.load(response)['paths']['/test/report']['get']
 parameter = next(p for p in operation['parameters'] if p['name'] == 'session_id')

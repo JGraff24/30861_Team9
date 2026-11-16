@@ -1,0 +1,53 @@
+{
+  "base_revision": "ff417c28705ebe66d1da453a5feece75de0f5e61",
+  "branch": "fix/phase5-hosted-profile",
+  "checks": [
+    {
+      "command": "pytest -q tests/unit/test_phase5_tester.py tests/unit/test_autodeploy.py tests/unit/test_jackson_deploy.py",
+      "result": "105 passed",
+      "exitCode": 0
+    },
+    {
+      "command": "pytest -q",
+      "result": "1121 passed, 7 skipped",
+      "seconds": 200.84,
+      "exitCode": 0
+    },
+    {
+      "command": "ruff check .; ruff format --check .; mypy --platform linux app tester scripts; export_schemas --check",
+      "result": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "check_phase5_policy; build_phase5_manifest --check; build_phase5_catalogs --check",
+      "result": "passed; 395 hosted cases unchanged",
+      "exitCode": 0
+    }
+  ],
+  "source_files": [
+    {
+      "path": "tester/config.py",
+      "sha256": "1d1fd4dde204f08ceb499edd357965fa20254807e80c9045ffc4761338ab51a0"
+    },
+    {
+      "path": "deploy/compose.production.yaml",
+      "sha256": "aaec99a3afe1752cc30a510a0e585b89455c6e185f7b127580e492d4c59c3f52"
+    },
+    {
+      "path": "scripts/deploy_host.py",
+      "sha256": "f820677c4cfde645cd586a7244f2fe568218ed979424079b091f9de7f56ff431"
+    },
+    {
+      "path": "tests/unit/test_phase5_tester.py",
+      "sha256": "efdf79436ecebacd4d4aeab56395f2032d7ba38f789bebca7b7da19dec487649"
+    },
+    {
+      "path": "tests/unit/test_autodeploy.py",
+      "sha256": "e1a69c76707539d3b48ee669da79c19ace190f9bd0ac6fb39d5d5785c1f074e5"
+    },
+    {
+      "path": "tests/unit/test_jackson_deploy.py",
+      "sha256": "079d8226f808549d617407c80b7f0aa36f165009ade1c708bc5f1c68b3617927"
+    }
+  ]
+}

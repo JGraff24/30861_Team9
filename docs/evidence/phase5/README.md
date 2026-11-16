@@ -1,7 +1,10 @@
 # Phase 5 tester evidence (Dixon, November 12 2026)
 
-All runs below are local. None contacted Team 12, AWS or any hosted deployment. No credentials
-are stored in these files.
+The original Dixon records below are local contribution-time evidence. Current combined
+[local integration](../phase5_integration.md) and
+[hosted own-system verification](hosted-2026-11-16/README.md) are tracked separately.
+The first hosted setup failed on report-profile configuration before any tests ran. No
+credentials are stored in these files.
 
 | File | What it is |
 |---|---|

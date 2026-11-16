@@ -124,6 +124,7 @@ def test_designated_production_target_overrides_only_release_capabilities() -> N
     assert 'TESTER_RUN_TIMEOUT_SECONDS: "2400"' in source
     assert 'ENABLE_TEST_CLOCK: "true"' in source
     assert "TESTER_TEAM_ID: team9" in source
+    assert "TESTER_OWN_TARGET_URL: https://${SERVER_NAME:?Set deployed hostname}/system" in source
     assert "env_file: ${TEAM9_ENV_FILE:" in source
     assert "SYSTEM_TOKEN_HASHES_JSON:" not in source
     assert "TARGET_AUTH_MAP_JSON:" not in source

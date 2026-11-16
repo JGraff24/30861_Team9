@@ -602,7 +602,10 @@ def test_private_failure_restores_real_phase3_schema_records_permissions_and_wal
     assert deploy_host.read_env(host.config)["DEPLOYMENT_SHA"] == OLD
 
 
-@pytest.mark.parametrize("bad_configuration", [None, "faults_disabled", "legacy_manifest"])
+@pytest.mark.parametrize(
+    "bad_configuration",
+    [None, "faults_disabled", "legacy_manifest", "phase5", "phase5_missing_design"],
+)
 def test_private_probes_use_actual_apps_readonly_before_proxy_publication(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -626,6 +629,16 @@ def test_private_probes_use_actual_apps_readonly_before_proxy_publication(
     monkeypatch.setenv("BLOB_ROOT", str(tmp_path / "blobs"))
     monkeypatch.setenv("TESTER_DB_PATH", str(tmp_path / "tester.sqlite3"))
     monkeypatch.setenv("FIXTURE_MANIFEST_PATH", str(root / "tests/fixtures/manifest-phase4.json"))
+    if bad_configuration in ("phase5", "phase5_missing_design"):
+        monkeypatch.setenv(
+            "FIXTURE_MANIFEST_PATH", str(root / "tests/fixtures/manifest-phase5.json")
+        )
+        monkeypatch.setenv("TESTER_TEAM_ID", "team9")
+        monkeypatch.setenv("TESTER_OWN_TARGET_URL", "http://127.0.0.1:8000")
+        monkeypatch.setenv("ALLOWED_TARGET_URLS", '["http://127.0.0.1:8000"]')
+        monkeypatch.setenv("TARGET_TEAM_MAP_JSON", "{}")
+        if bad_configuration == "phase5_missing_design":
+            monkeypatch.setenv("TESTER_DESIGN_MAP_PATH", str(tmp_path / "missing-design.json"))
     settings = SystemSettings(_env_file=None)
     requested: list[str] = []
     with (
@@ -666,7 +679,7 @@ def test_private_probes_use_actual_apps_readonly_before_proxy_publication(
             return ""
 
         monkeypatch.setattr(deploy, "compose", container_exec)
-        if bad_configuration is None:
+        if bad_configuration in (None, "phase5"):
             deploy.wait_private_healthy(tmp_path, "team9-phase3:" + SHA)
             assert requested == [
                 "http://127.0.0.1:8000/api/v1/health",
