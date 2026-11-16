@@ -1,0 +1,157 @@
+{
+  "sourceSha256": "fabf363d00df9f6af44e791945d9d67dec8405dc9fadb516633a1684c8221d51",
+  "rulesetVersion": "2.0.0",
+  "sheets": [
+    {
+      "name": "Sheet1",
+      "part": "xl/worksheets/sheet1.xml",
+      "sheetId": "1",
+      "kind": "worksheet"
+    },
+    {
+      "name": "Report",
+      "part": "xl/worksheets/sheet2.xml",
+      "sheetId": "2",
+      "kind": "worksheet"
+    },
+    {
+      "name": "Sheet1 Notes",
+      "part": "xl/worksheets/sheet3.xml",
+      "sheetId": "3",
+      "kind": "worksheet"
+    }
+  ],
+  "renameBlockers": [],
+  "x14ConditionalFormulasUnderstood": 1,
+  "opaqueExtensionFormulasPresent": false,
+  "worksheetNameFindings": [
+    {
+      "worksheet": "Sheet1",
+      "target": "xl/worksheets/sheet1.xml#sheetId=1",
+      "findingId": "dcb9e80871098735dbf6642ddb77e6830db062943c21b057d3932b51dbc74233",
+      "classification": "REQUIRES_USER_INPUT",
+      "referenceSites": [
+        {
+          "kind": "cell_formula",
+          "part": "xl/worksheets/sheet2.xml",
+          "where": "A1",
+          "formula": "Sheet1!B2"
+        },
+        {
+          "kind": "cell_formula",
+          "part": "xl/worksheets/sheet2.xml",
+          "where": "A2",
+          "formula": "SUM(Sheet1!B2:B3)"
+        },
+        {
+          "kind": "cell_formula",
+          "part": "xl/worksheets/sheet2.xml",
+          "where": "A3",
+          "formula": "'Sheet1'!B3"
+        },
+        {
+          "kind": "validation",
+          "part": "xl/worksheets/sheet2.xml",
+          "where": "dataValidation",
+          "formula": "Sheet1!$B$2:$B$3"
+        },
+        {
+          "kind": "conditional_x14",
+          "part": "xl/worksheets/sheet2.xml",
+          "where": "x14:conditionalFormatting",
+          "formula": "Sheet1!$B$2>5"
+        },
+        {
+          "kind": "hyperlink_location",
+          "part": "xl/worksheets/sheet2.xml",
+          "where": "E1",
+          "formula": "Sheet1!A1"
+        },
+        {
+          "kind": "defined_name",
+          "part": "xl/workbook.xml",
+          "where": "Totals",
+          "formula": "Sheet1!$B$2:$B$3"
+        },
+        {
+          "kind": "chart_formula",
+          "part": "xl/charts/chart1.xml",
+          "where": "0",
+          "formula": "Sheet1!$B$2:$B$3"
+        }
+      ],
+      "referenceKinds": [
+        "cell_formula",
+        "chart_formula",
+        "conditional_x14",
+        "defined_name",
+        "hyperlink_location",
+        "validation"
+      ],
+      "strictX14Classification": "MANUAL_REVIEW"
+    }
+  ],
+  "limitations": [
+    "Cells without a fill were screened as white, and text without a font color as black.",
+    "Single cells, one-row ranges and one-column lists are not inferred as tables under this screening profile."
+  ],
+  "apply": {
+    "worksheet": "Sheet1",
+    "newName": "Data source",
+    "applied": true,
+    "outputSha256": "f8dff4aa8429a9542204835607d6c540cb221b77a2048bc09b91908d939dce3b",
+    "preservationVerified": true,
+    "outputFindingsForSheet": [],
+    "rewrittenReferenceSites": [
+      {
+        "kind": "cell_formula",
+        "part": "xl/worksheets/sheet2.xml",
+        "where": "A1",
+        "formula": "'Data source'!B2"
+      },
+      {
+        "kind": "cell_formula",
+        "part": "xl/worksheets/sheet2.xml",
+        "where": "A2",
+        "formula": "SUM('Data source'!B2:B3)"
+      },
+      {
+        "kind": "cell_formula",
+        "part": "xl/worksheets/sheet2.xml",
+        "where": "A3",
+        "formula": "'Data source'!B3"
+      },
+      {
+        "kind": "validation",
+        "part": "xl/worksheets/sheet2.xml",
+        "where": "dataValidation",
+        "formula": "'Data source'!$B$2:$B$3"
+      },
+      {
+        "kind": "conditional_x14",
+        "part": "xl/worksheets/sheet2.xml",
+        "where": "x14:conditionalFormatting",
+        "formula": "'Data source'!$B$2>5"
+      },
+      {
+        "kind": "hyperlink_location",
+        "part": "xl/worksheets/sheet2.xml",
+        "where": "E1",
+        "formula": "'Data source'!A1"
+      },
+      {
+        "kind": "defined_name",
+        "part": "xl/workbook.xml",
+        "where": "Totals",
+        "formula": "'Data source'!$B$2:$B$3"
+      },
+      {
+        "kind": "chart_formula",
+        "part": "xl/charts/chart1.xml",
+        "where": "0",
+        "formula": "'Data source'!$B$2:$B$3"
+      }
+    ],
+    "remainingOldNameSites": []
+  }
+}

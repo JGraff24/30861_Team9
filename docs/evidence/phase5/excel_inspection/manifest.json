@@ -1,0 +1,931 @@
+{
+  "kind": "excel-no-repair-inspection-packet",
+  "specificationVersion": "3.0.0",
+  "rulesetVersion": "2.0.0",
+  "generatedAt": "2026-11-15T21:08:43Z",
+  "revision": {
+    "commit": "f6a9250295ec6650c158511f4e35bfcc00e85a28",
+    "branch": "feature/dylan-phase5-engine",
+    "dirtyPaths": [
+      "docs/evidence/phase5/",
+      "docs/implementation/dylan_phase5.md"
+    ]
+  },
+  "environment": {
+    "platform": "macOS-15.5-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "cpuCount": 8,
+    "python": "3.12.3",
+    "implementation": "CPython"
+  },
+  "system": "local real stack (in-process API, SQLite, filesystem storage, worker children)",
+  "outputs": [
+    {
+      "id": "review_only__no_edits",
+      "testIds": [
+        "P5-MANUAL-EXCEL"
+      ],
+      "families": [],
+      "sourcePath": "tests/fixtures/phase4/synthetic/review_only.xlsx",
+      "sourceSha256": "d1eb3d0da748009c75ae41b75991ca861e1e4a9b9086d7c467ae037d09159de7",
+      "decisions": [
+        {
+          "finding": [
+            "MERGED_CELLS",
+            "xl/worksheets/sheet1.xml#merge=A1:C1"
+          ],
+          "action": "DECLINE"
+        },
+        {
+          "finding": [
+            "COLOR_CONTRAST",
+            "xl/worksheets/sheet1.xml#cell=A3"
+          ],
+          "action": "MANUAL_REVIEW"
+        }
+      ],
+      "approvedEffects": [],
+      "automated": {
+        "remediationAccepted": 202,
+        "remediationStatus": "REMEDIATED",
+        "outputSha256": "d1eb3d0da748009c75ae41b75991ca861e1e4a9b9086d7c467ae037d09159de7",
+        "declaredOutputSha256": "d1eb3d0da748009c75ae41b75991ca861e1e4a9b9086d7c467ae037d09159de7",
+        "outputBytes": 5489,
+        "identicalToSource": true,
+        "independentComparator": {
+          "tool": "tester.phase4.package.compare_packages",
+          "problems": [],
+          "result": "PASS"
+        },
+        "outputAudit": {
+          "status": "REVIEW_REQUIRED",
+          "findings": [
+            [
+              "COLOR_CONTRAST",
+              "Summary",
+              "xl/worksheets/sheet1.xml#cell=A3",
+              "MANUAL_REVIEW"
+            ],
+            [
+              "MERGED_CELLS",
+              "Summary",
+              "xl/worksheets/sheet1.xml#merge=A1:C1",
+              "MANUAL_REVIEW"
+            ]
+          ]
+        }
+      },
+      "manual": {
+        "excelVersion": "PENDING",
+        "platform": "PENDING",
+        "reviewer": "PENDING",
+        "date": "PENDING",
+        "openedWithoutRepairPrompt": "PENDING",
+        "approvedEffectsObserved": "PENDING",
+        "unexplainedChangesObserved": "PENDING",
+        "notes": ""
+      },
+      "outputFile": "review_only__no_edits.output.xlsx"
+    },
+    {
+      "id": "mixed_decisions__combined",
+      "testIds": [
+        "P4-MANUAL-EXCEL-ALT",
+        "P4-MANUAL-EXCEL-HEADER",
+        "P4-MANUAL-EXCEL-LINK",
+        "P4-MANUAL-EXCEL-RENAME",
+        "P5-MANUAL-EXCEL"
+      ],
+      "families": [
+        "alt",
+        "header_range",
+        "link",
+        "rename"
+      ],
+      "sourcePath": "tests/fixtures/phase4/synthetic/mixed_decisions.xlsx",
+      "sourceSha256": "888056e1c67048ce1c7214e8848801ac6d102c2e96f0645835d337a988a5d6b4",
+      "decisions": [
+        {
+          "finding": [
+            "ALT_TEXT",
+            "xl/drawings/drawing1.xml#id=2"
+          ],
+          "action": "APPLY",
+          "value": {
+            "title": "Regional units chart",
+            "description": "Picture of a column chart: North 12 units, South 4 units."
+          }
+        },
+        {
+          "finding": [
+            "LINK_TEXT",
+            "xl/worksheets/sheet1.xml#cell=D1"
+          ],
+          "action": "APPLY",
+          "value": {
+            "text": "Unit definitions"
+          }
+        },
+        {
+          "finding": [
+            "TABLE_HEADER",
+            "xl/worksheets/sheet1.xml#range=A1:B3"
+          ],
+          "action": "APPLY",
+          "value": {
+            "headerRow": 1
+          }
+        },
+        {
+          "finding": [
+            "WORKSHEET_NAME",
+            "xl/worksheets/sheet1.xml#sheetId=1"
+          ],
+          "action": "APPLY",
+          "value": {
+            "name": "Units data"
+          }
+        },
+        {
+          "finding": [
+            "COLOR_CONTRAST",
+            "xl/worksheets/sheet1.xml#cell=A5"
+          ],
+          "action": "DECLINE"
+        }
+      ],
+      "approvedEffects": [
+        {
+          "type": "alt",
+          "part": "xl/drawings/drawing1.xml",
+          "id": "2",
+          "title": "Regional units chart",
+          "descr": "Picture of a column chart: North 12 units, South 4 units."
+        },
+        {
+          "type": "link",
+          "part": "xl/worksheets/sheet1.xml",
+          "cell": "D1",
+          "text": "Unit definitions"
+        },
+        {
+          "type": "header_range",
+          "sheet_part": "xl/worksheets/sheet1.xml",
+          "range": "A1:B3",
+          "columns": [
+            "Region",
+            "Units"
+          ],
+          "table_id": 1,
+          "name": "A11yTable1",
+          "table_part": "xl/tables/table1.xml",
+          "rel_id": "rId3",
+          "sheet_rels_part": "xl/worksheets/_rels/sheet1.xml.rels"
+        },
+        {
+          "type": "rename",
+          "sheet": "Sheet1",
+          "name": "Units data",
+          "references": [
+            {
+              "part": "xl/worksheets/sheet2.xml",
+              "kind": "cell_formula",
+              "ref": "A1",
+              "formula": "SUM('Units data'!B2:B3)"
+            }
+          ]
+        }
+      ],
+      "automated": {
+        "remediationAccepted": 202,
+        "remediationStatus": "REMEDIATED",
+        "outputSha256": "df1f051f24557a04b1d53229e49758d5c98ed997bac42f29590b950ba22baa3b",
+        "declaredOutputSha256": "df1f051f24557a04b1d53229e49758d5c98ed997bac42f29590b950ba22baa3b",
+        "outputBytes": 10843,
+        "identicalToSource": false,
+        "independentComparator": {
+          "tool": "tester.phase4.package.compare_packages",
+          "problems": [],
+          "result": "PASS"
+        },
+        "outputAudit": {
+          "status": "REMEDIATION_AVAILABLE",
+          "findings": [
+            [
+              "COLOR_CONTRAST",
+              "Units data",
+              "xl/worksheets/sheet1.xml#cell=A5",
+              "MANUAL_REVIEW"
+            ],
+            [
+              "MERGED_CELLS",
+              "Units data",
+              "xl/worksheets/sheet1.xml#merge=F1:G1",
+              "MANUAL_REVIEW"
+            ],
+            [
+              "WORKSHEET_NAME",
+              "Sheet2",
+              "xl/worksheets/sheet2.xml#sheetId=2",
+              "REQUIRES_USER_INPUT"
+            ]
+          ]
+        }
+      },
+      "manual": {
+        "excelVersion": "PENDING",
+        "platform": "PENDING",
+        "reviewer": "PENDING",
+        "date": "PENDING",
+        "openedWithoutRepairPrompt": "PENDING",
+        "approvedEffectsObserved": "PENDING",
+        "unexplainedChangesObserved": "PENDING",
+        "notes": ""
+      },
+      "outputFile": "mixed_decisions__combined.output.xlsx"
+    },
+    {
+      "id": "mixed_decisions__mixed",
+      "testIds": [
+        "P4-MANUAL-EXCEL-ALT",
+        "P5-MANUAL-EXCEL"
+      ],
+      "families": [
+        "alt"
+      ],
+      "sourcePath": "tests/fixtures/phase4/synthetic/mixed_decisions.xlsx",
+      "sourceSha256": "888056e1c67048ce1c7214e8848801ac6d102c2e96f0645835d337a988a5d6b4",
+      "decisions": [
+        {
+          "finding": [
+            "ALT_TEXT",
+            "xl/drawings/drawing1.xml#id=2"
+          ],
+          "action": "APPLY",
+          "value": {
+            "title": "Regional units chart",
+            "description": "Picture of a column chart: North 12 units, South 4 units."
+          }
+        },
+        {
+          "finding": [
+            "LINK_TEXT",
+            "xl/worksheets/sheet1.xml#cell=D1"
+          ],
+          "action": "DECLINE"
+        },
+        {
+          "finding": [
+            "MERGED_CELLS",
+            "xl/worksheets/sheet1.xml#merge=F1:G1"
+          ],
+          "action": "MANUAL_REVIEW"
+        }
+      ],
+      "approvedEffects": [
+        {
+          "type": "alt",
+          "part": "xl/drawings/drawing1.xml",
+          "id": "2",
+          "title": "Regional units chart",
+          "descr": "Picture of a column chart: North 12 units, South 4 units."
+        }
+      ],
+      "automated": {
+        "remediationAccepted": 202,
+        "remediationStatus": "REMEDIATED",
+        "outputSha256": "2bed48fa429fd2566c5d2e0d13a73b4ce812df012fed1698ab9f839b56a6ca28",
+        "declaredOutputSha256": "2bed48fa429fd2566c5d2e0d13a73b4ce812df012fed1698ab9f839b56a6ca28",
+        "outputBytes": 10142,
+        "identicalToSource": false,
+        "independentComparator": {
+          "tool": "tester.phase4.package.compare_packages",
+          "problems": [],
+          "result": "PASS"
+        },
+        "outputAudit": {
+          "status": "REMEDIATION_AVAILABLE",
+          "findings": [
+            [
+              "COLOR_CONTRAST",
+              "Sheet1",
+              "xl/worksheets/sheet1.xml#cell=A5",
+              "MANUAL_REVIEW"
+            ],
+            [
+              "LINK_TEXT",
+              "Sheet1",
+              "xl/worksheets/sheet1.xml#cell=D1",
+              "REQUIRES_USER_INPUT"
+            ],
+            [
+              "MERGED_CELLS",
+              "Sheet1",
+              "xl/worksheets/sheet1.xml#merge=F1:G1",
+              "MANUAL_REVIEW"
+            ],
+            [
+              "TABLE_HEADER",
+              "Sheet1",
+              "xl/worksheets/sheet1.xml#range=A1:B3",
+              "REQUIRES_USER_INPUT"
+            ],
+            [
+              "WORKSHEET_NAME",
+              "Sheet1",
+              "xl/worksheets/sheet1.xml#sheetId=1",
+              "REQUIRES_USER_INPUT"
+            ],
+            [
+              "WORKSHEET_NAME",
+              "Sheet2",
+              "xl/worksheets/sheet2.xml#sheetId=2",
+              "REQUIRES_USER_INPUT"
+            ]
+          ]
+        }
+      },
+      "manual": {
+        "excelVersion": "PENDING",
+        "platform": "PENDING",
+        "reviewer": "PENDING",
+        "date": "PENDING",
+        "openedWithoutRepairPrompt": "PENDING",
+        "approvedEffectsObserved": "PENDING",
+        "unexplainedChangesObserved": "PENDING",
+        "notes": ""
+      },
+      "outputFile": "mixed_decisions__mixed.output.xlsx"
+    },
+    {
+      "id": "alt_supported__alt",
+      "testIds": [
+        "P4-MANUAL-EXCEL-ALT",
+        "P5-MANUAL-EXCEL"
+      ],
+      "families": [
+        "alt"
+      ],
+      "sourcePath": "tests/fixtures/phase4/synthetic/alt_supported.xlsx",
+      "sourceSha256": "c6490ba00e7879f6dfb73cf5b07c95bd1375697d6d46bf812a16399e333fe57f",
+      "decisions": [
+        {
+          "finding": [
+            "ALT_TEXT",
+            "xl/drawings/drawing1.xml#id=2"
+          ],
+          "action": "APPLY",
+          "value": {
+            "title": "Expense chart",
+            "description": "Bar chart: rent & travel <2026> \"Q1\" costs 📊\nSecond line\tafter a tab."
+          }
+        }
+      ],
+      "approvedEffects": [
+        {
+          "type": "alt",
+          "part": "xl/drawings/drawing1.xml",
+          "id": "2",
+          "title": "Expense chart",
+          "descr": "Bar chart: rent & travel <2026> \"Q1\" costs 📊\nSecond line\tafter a tab."
+        }
+      ],
+      "automated": {
+        "remediationAccepted": 202,
+        "remediationStatus": "REMEDIATED",
+        "outputSha256": "8aca460192f268e91dddb1cae9ba59eb6c9c1d4d027e9c3191b7051a48990a3b",
+        "declaredOutputSha256": "8aca460192f268e91dddb1cae9ba59eb6c9c1d4d027e9c3191b7051a48990a3b",
+        "outputBytes": 8429,
+        "identicalToSource": false,
+        "independentComparator": {
+          "tool": "tester.phase4.package.compare_packages",
+          "problems": [],
+          "result": "PASS"
+        },
+        "outputAudit": {
+          "status": "REMEDIATION_AVAILABLE",
+          "findings": [
+            [
+              "ALT_TEXT",
+              "Expenses",
+              "xl/drawings/drawing1.xml#id=3",
+              "REQUIRES_USER_INPUT"
+            ]
+          ]
+        }
+      },
+      "manual": {
+        "excelVersion": "PENDING",
+        "platform": "PENDING",
+        "reviewer": "PENDING",
+        "date": "PENDING",
+        "openedWithoutRepairPrompt": "PENDING",
+        "approvedEffectsObserved": "PENDING",
+        "unexplainedChangesObserved": "PENDING",
+        "notes": ""
+      },
+      "outputFile": "alt_supported__alt.output.xlsx"
+    },
+    {
+      "id": "link_supported__link",
+      "testIds": [
+        "P4-MANUAL-EXCEL-LINK",
+        "P5-MANUAL-EXCEL"
+      ],
+      "families": [
+        "link"
+      ],
+      "sourcePath": "tests/fixtures/phase4/synthetic/link_supported.xlsx",
+      "sourceSha256": "346a3d095c4b79d96b118389e999c71962dbab27edb5731c1a72e14cea0b5ad1",
+      "decisions": [
+        {
+          "finding": [
+            "LINK_TEXT",
+            "xl/worksheets/sheet1.xml#cell=A1"
+          ],
+          "action": "APPLY",
+          "value": {
+            "text": "Accessibility policy (PDF)"
+          }
+        }
+      ],
+      "approvedEffects": [
+        {
+          "type": "link",
+          "part": "xl/worksheets/sheet1.xml",
+          "cell": "A1",
+          "text": "Accessibility policy (PDF)"
+        }
+      ],
+      "automated": {
+        "remediationAccepted": 202,
+        "remediationStatus": "REMEDIATED",
+        "outputSha256": "60f09e899989073294df328c40e92a9bb42bcdc1aede6dad76795bb7638da8fa",
+        "declaredOutputSha256": "60f09e899989073294df328c40e92a9bb42bcdc1aede6dad76795bb7638da8fa",
+        "outputBytes": 6795,
+        "identicalToSource": false,
+        "independentComparator": {
+          "tool": "tester.phase4.package.compare_packages",
+          "problems": [],
+          "result": "PASS"
+        },
+        "outputAudit": {
+          "status": "REMEDIATION_AVAILABLE",
+          "findings": [
+            [
+              "LINK_TEXT",
+              "Links",
+              "xl/worksheets/sheet1.xml#cell=C1",
+              "REQUIRES_USER_INPUT"
+            ]
+          ]
+        }
+      },
+      "manual": {
+        "excelVersion": "PENDING",
+        "platform": "PENDING",
+        "reviewer": "PENDING",
+        "date": "PENDING",
+        "openedWithoutRepairPrompt": "PENDING",
+        "approvedEffectsObserved": "PENDING",
+        "unexplainedChangesObserved": "PENDING",
+        "notes": ""
+      },
+      "outputFile": "link_supported__link.output.xlsx"
+    },
+    {
+      "id": "link_supported__string_label",
+      "testIds": [
+        "P4-MANUAL-EXCEL-LINK",
+        "P5-MANUAL-EXCEL"
+      ],
+      "families": [
+        "link"
+      ],
+      "sourcePath": "tests/fixtures/phase4/synthetic/link_supported.xlsx",
+      "sourceSha256": "346a3d095c4b79d96b118389e999c71962dbab27edb5731c1a72e14cea0b5ad1",
+      "decisions": [
+        {
+          "finding": [
+            "LINK_TEXT",
+            "xl/worksheets/sheet1.xml#cell=C1"
+          ],
+          "action": "APPLY",
+          "value": {
+            "text": "=Overview of services"
+          }
+        }
+      ],
+      "approvedEffects": [
+        {
+          "type": "link",
+          "part": "xl/worksheets/sheet1.xml",
+          "cell": "C1",
+          "text": "=Overview of services"
+        }
+      ],
+      "automated": {
+        "remediationAccepted": 202,
+        "remediationStatus": "REMEDIATED",
+        "outputSha256": "7a26d6a1406519bf986785ccdd2a20d36ceadd8916b2c684b4702075c7bc0180",
+        "declaredOutputSha256": "7a26d6a1406519bf986785ccdd2a20d36ceadd8916b2c684b4702075c7bc0180",
+        "outputBytes": 6764,
+        "identicalToSource": false,
+        "independentComparator": {
+          "tool": "tester.phase4.package.compare_packages",
+          "problems": [],
+          "result": "PASS"
+        },
+        "outputAudit": {
+          "status": "REMEDIATION_AVAILABLE",
+          "findings": [
+            [
+              "LINK_TEXT",
+              "Links",
+              "xl/worksheets/sheet1.xml#cell=A1",
+              "REQUIRES_USER_INPUT"
+            ]
+          ]
+        }
+      },
+      "manual": {
+        "excelVersion": "PENDING",
+        "platform": "PENDING",
+        "reviewer": "PENDING",
+        "date": "PENDING",
+        "openedWithoutRepairPrompt": "PENDING",
+        "approvedEffectsObserved": "PENDING",
+        "unexplainedChangesObserved": "PENDING",
+        "notes": ""
+      },
+      "outputFile": "link_supported__string_label.output.xlsx"
+    },
+    {
+      "id": "header_range__header_range",
+      "testIds": [
+        "P4-MANUAL-EXCEL-HEADER",
+        "P5-MANUAL-EXCEL"
+      ],
+      "families": [
+        "header_range"
+      ],
+      "sourcePath": "tests/fixtures/phase4/synthetic/header_range.xlsx",
+      "sourceSha256": "ee2c92878ca27bf2830e8abd4a5d17df478de62a6e9fa8bae4ddb3b2e9956721",
+      "decisions": [
+        {
+          "finding": [
+            "TABLE_HEADER",
+            "xl/worksheets/sheet1.xml#range=A1:C4"
+          ],
+          "action": "APPLY",
+          "value": {
+            "headerRow": 1
+          }
+        }
+      ],
+      "approvedEffects": [
+        {
+          "type": "header_range",
+          "sheet_part": "xl/worksheets/sheet1.xml",
+          "range": "A1:C4",
+          "columns": [
+            "Name",
+            "Score",
+            "Grade"
+          ],
+          "table_id": 1,
+          "name": "A11yTable1",
+          "table_part": "xl/tables/table1.xml",
+          "rel_id": "rId1",
+          "sheet_rels_part": "xl/worksheets/_rels/sheet1.xml.rels"
+        }
+      ],
+      "automated": {
+        "remediationAccepted": 202,
+        "remediationStatus": "REMEDIATED",
+        "outputSha256": "de436e92ebb261ce2b7f7c159e9f7894e8e34d067e1224b364b25ae2ba59fe2f",
+        "declaredOutputSha256": "de436e92ebb261ce2b7f7c159e9f7894e8e34d067e1224b364b25ae2ba59fe2f",
+        "outputBytes": 6729,
+        "identicalToSource": false,
+        "independentComparator": {
+          "tool": "tester.phase4.package.compare_packages",
+          "problems": [],
+          "result": "PASS"
+        },
+        "outputAudit": {
+          "status": "AUDIT_COMPLETE",
+          "findings": []
+        }
+      },
+      "manual": {
+        "excelVersion": "PENDING",
+        "platform": "PENDING",
+        "reviewer": "PENDING",
+        "date": "PENDING",
+        "openedWithoutRepairPrompt": "PENDING",
+        "approvedEffectsObserved": "PENDING",
+        "unexplainedChangesObserved": "PENDING",
+        "notes": ""
+      },
+      "outputFile": "header_range__header_range.output.xlsx"
+    },
+    {
+      "id": "header_disabled_table__header_table",
+      "testIds": [
+        "P4-MANUAL-EXCEL-HEADER",
+        "P5-MANUAL-EXCEL"
+      ],
+      "families": [
+        "header_table"
+      ],
+      "sourcePath": "tests/fixtures/phase4/synthetic/header_disabled_table.xlsx",
+      "sourceSha256": "28ef03661dbc430c66436f43225f11ec092ff122895b5d58996380a1bfc9c9e5",
+      "decisions": [
+        {
+          "finding": [
+            "TABLE_HEADER",
+            "xl/tables/table1.xml#tableId=1"
+          ],
+          "action": "APPLY",
+          "value": {
+            "headerRow": 1
+          }
+        }
+      ],
+      "approvedEffects": [
+        {
+          "type": "header_table",
+          "table_part": "xl/tables/table1.xml"
+        }
+      ],
+      "automated": {
+        "remediationAccepted": 202,
+        "remediationStatus": "REMEDIATED",
+        "outputSha256": "59927bf892fe4eebe383c69d9dde96ca531456f996bd8ea2e82a05612fcbaa26",
+        "declaredOutputSha256": "59927bf892fe4eebe383c69d9dde96ca531456f996bd8ea2e82a05612fcbaa26",
+        "outputBytes": 6915,
+        "identicalToSource": false,
+        "independentComparator": {
+          "tool": "tester.phase4.package.compare_packages",
+          "problems": [],
+          "result": "PASS"
+        },
+        "outputAudit": {
+          "status": "AUDIT_COMPLETE",
+          "findings": []
+        }
+      },
+      "manual": {
+        "excelVersion": "PENDING",
+        "platform": "PENDING",
+        "reviewer": "PENDING",
+        "date": "PENDING",
+        "openedWithoutRepairPrompt": "PENDING",
+        "approvedEffectsObserved": "PENDING",
+        "unexplainedChangesObserved": "PENDING",
+        "notes": ""
+      },
+      "outputFile": "header_disabled_table__header_table.output.xlsx"
+    },
+    {
+      "id": "rename_references__rename",
+      "testIds": [
+        "P4-MANUAL-EXCEL-RENAME",
+        "P5-MANUAL-EXCEL"
+      ],
+      "families": [
+        "rename"
+      ],
+      "sourcePath": "tests/fixtures/phase4/synthetic/rename_references.xlsx",
+      "sourceSha256": "fabf363d00df9f6af44e791945d9d67dec8405dc9fadb516633a1684c8221d51",
+      "decisions": [
+        {
+          "finding": [
+            "WORKSHEET_NAME",
+            "xl/worksheets/sheet1.xml#sheetId=1"
+          ],
+          "action": "APPLY",
+          "value": {
+            "name": "Data source"
+          }
+        }
+      ],
+      "approvedEffects": [
+        {
+          "type": "rename",
+          "sheet": "Sheet1",
+          "name": "Data source",
+          "references": [
+            {
+              "part": "xl/worksheets/sheet2.xml",
+              "kind": "cell_formula",
+              "ref": "A1",
+              "formula": "'Data source'!B2"
+            },
+            {
+              "part": "xl/worksheets/sheet2.xml",
+              "kind": "cell_formula",
+              "ref": "A2",
+              "formula": "SUM('Data source'!B2:B3)"
+            },
+            {
+              "part": "xl/worksheets/sheet2.xml",
+              "kind": "cell_formula",
+              "ref": "A3",
+              "formula": "'Data source'!B3"
+            },
+            {
+              "part": "xl/workbook.xml",
+              "kind": "defined_name",
+              "name": "Totals",
+              "formula": "'Data source'!$B$2:$B$3"
+            },
+            {
+              "part": "xl/charts/chart1.xml",
+              "kind": "chart_formula",
+              "index": 0,
+              "formula": "'Data source'!$B$2:$B$3"
+            },
+            {
+              "part": "xl/worksheets/sheet2.xml",
+              "kind": "validation",
+              "sqref": "C1",
+              "formula": "'Data source'!$B$2:$B$3"
+            },
+            {
+              "part": "xl/worksheets/sheet2.xml",
+              "kind": "conditional",
+              "sqref": "D1",
+              "formula": "'Data source'!$B$2>5"
+            },
+            {
+              "part": "xl/worksheets/sheet2.xml",
+              "kind": "hyperlink_location",
+              "ref": "E1",
+              "location": "'Data source'!A1"
+            }
+          ]
+        }
+      ],
+      "automated": {
+        "remediationAccepted": 202,
+        "remediationStatus": "REMEDIATED",
+        "outputSha256": "f8dff4aa8429a9542204835607d6c540cb221b77a2048bc09b91908d939dce3b",
+        "declaredOutputSha256": "f8dff4aa8429a9542204835607d6c540cb221b77a2048bc09b91908d939dce3b",
+        "outputBytes": 11943,
+        "identicalToSource": false,
+        "independentComparator": {
+          "tool": "tester.phase4.package.compare_packages",
+          "problems": [],
+          "result": "PASS"
+        },
+        "outputAudit": {
+          "status": "AUDIT_COMPLETE",
+          "findings": []
+        }
+      },
+      "manual": {
+        "excelVersion": "PENDING",
+        "platform": "PENDING",
+        "reviewer": "PENDING",
+        "date": "PENDING",
+        "openedWithoutRepairPrompt": "PENDING",
+        "approvedEffectsObserved": "PENDING",
+        "unexplainedChangesObserved": "PENDING",
+        "notes": ""
+      },
+      "outputFile": "rename_references__rename.output.xlsx"
+    },
+    {
+      "id": "preservation_rich__preserve",
+      "testIds": [
+        "P4-MANUAL-EXCEL-ALT",
+        "P5-MANUAL-EXCEL"
+      ],
+      "families": [
+        "alt"
+      ],
+      "sourcePath": "tests/fixtures/phase4/synthetic/preservation_rich.xlsx",
+      "sourceSha256": "7e870c77e26a57bb97c34a76eb18cde4dd19be69edbcdf68af3a24ef2085fad7",
+      "decisions": [
+        {
+          "finding": [
+            "ALT_TEXT",
+            "xl/drawings/drawing1.xml#id=2"
+          ],
+          "action": "APPLY",
+          "value": {
+            "title": "Ledger illustration",
+            "description": "A small white placeholder image."
+          }
+        }
+      ],
+      "approvedEffects": [
+        {
+          "type": "alt",
+          "part": "xl/drawings/drawing1.xml",
+          "id": "2",
+          "title": "Ledger illustration",
+          "descr": "A small white placeholder image."
+        }
+      ],
+      "automated": {
+        "remediationAccepted": 202,
+        "remediationStatus": "REMEDIATED",
+        "outputSha256": "1601eb2830f0292fbaaeb1d7a6597e59e3ea72ee664472e22a5a534d26cc00d6",
+        "declaredOutputSha256": "1601eb2830f0292fbaaeb1d7a6597e59e3ea72ee664472e22a5a534d26cc00d6",
+        "outputBytes": 12645,
+        "identicalToSource": false,
+        "independentComparator": {
+          "tool": "tester.phase4.package.compare_packages",
+          "problems": [],
+          "result": "PASS"
+        },
+        "outputAudit": {
+          "status": "REVIEW_REQUIRED",
+          "findings": [
+            [
+              "ALT_TEXT",
+              "Data",
+              "xl/drawings/vmlDrawing1.vml#id=_x0000_s1025",
+              "MANUAL_REVIEW"
+            ]
+          ]
+        }
+      },
+      "manual": {
+        "excelVersion": "PENDING",
+        "platform": "PENDING",
+        "reviewer": "PENDING",
+        "date": "PENDING",
+        "openedWithoutRepairPrompt": "PENDING",
+        "approvedEffectsObserved": "PENDING",
+        "unexplainedChangesObserved": "PENDING",
+        "notes": ""
+      },
+      "outputFile": "preservation_rich__preserve.output.xlsx"
+    },
+    {
+      "id": "large_preservation__large",
+      "testIds": [
+        "P4-MANUAL-EXCEL-ALT",
+        "P5-MANUAL-EXCEL"
+      ],
+      "families": [
+        "alt"
+      ],
+      "sourcePath": "tests/fixtures/phase4/synthetic/large_preservation.xlsx",
+      "sourceSha256": "d55c8af59d4d1b5c52299d403a9b5798411f425461c02e240364d78ce7f6eb05",
+      "decisions": [
+        {
+          "finding": [
+            "ALT_TEXT",
+            "xl/drawings/drawing1.xml#id=2"
+          ],
+          "action": "APPLY",
+          "value": {
+            "title": "Site photo",
+            "description": "A blank test image."
+          }
+        }
+      ],
+      "approvedEffects": [
+        {
+          "type": "alt",
+          "part": "xl/drawings/drawing1.xml",
+          "id": "2",
+          "title": "Site photo",
+          "descr": "A blank test image."
+        }
+      ],
+      "automated": {
+        "remediationAccepted": 202,
+        "remediationStatus": "REMEDIATED",
+        "outputSha256": "d0b21422e94a6a97d7a59181d24fb097fc5ef989bebc8eff9ec6b453cfea1e2c",
+        "declaredOutputSha256": "d0b21422e94a6a97d7a59181d24fb097fc5ef989bebc8eff9ec6b453cfea1e2c",
+        "outputBytes": 3007714,
+        "identicalToSource": false,
+        "independentComparator": {
+          "tool": "tester.phase4.package.compare_packages",
+          "problems": [],
+          "result": "PASS"
+        },
+        "outputAudit": {
+          "status": "AUDIT_COMPLETE",
+          "findings": []
+        }
+      },
+      "manual": {
+        "excelVersion": "PENDING",
+        "platform": "PENDING",
+        "reviewer": "PENDING",
+        "date": "PENDING",
+        "openedWithoutRepairPrompt": "PENDING",
+        "approvedEffectsObserved": "PENDING",
+        "unexplainedChangesObserved": "PENDING",
+        "notes": ""
+      }
+    }
+  ]
+}

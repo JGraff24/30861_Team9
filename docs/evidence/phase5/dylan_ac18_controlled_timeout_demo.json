@@ -1,0 +1,147 @@
+{
+  "kind": "ac18-local-performance",
+  "specificationVersion": "3.0.0",
+  "rulesetVersion": "2.0.0",
+  "startedAt": "2026-11-15T21:07:59Z",
+  "revision": {
+    "commit": "f6a9250295ec6650c158511f4e35bfcc00e85a28",
+    "branch": "feature/dylan-phase5-engine",
+    "dirtyPaths": [
+      "docs/evidence/phase5/",
+      "docs/implementation/dylan_phase5.md"
+    ]
+  },
+  "environment": {
+    "platform": "macOS-15.5-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "arm",
+    "cpuCount": 8,
+    "python": "3.12.3",
+    "implementation": "CPython",
+    "memoryBytes": 8589934592
+  },
+  "system": "local real stack: in-process API, SQLite, filesystem storage, production worker loop and bounded engine children; not a hosted deployment",
+  "clock": "time.monotonic real elapsed time; no simulated time",
+  "measurements": [
+    {
+      "workload": "cells",
+      "description": "tester boundary generator: one worksheet, exactly 250,000 numeric cells",
+      "mode": "ordinary",
+      "modeDescription": "ordinary data, no code measurement",
+      "workbook": {
+        "sha256": "2e48fede3b950478fb95a3022465d5a1fc862a8e56e969fe622d042b68d730b0",
+        "bytes": 6906151
+      },
+      "settings": {
+        "productionBounds": false,
+        "workerConcurrency": 2,
+        "auditTimeoutSeconds": 2.0,
+        "validationTimeoutSeconds": 30.0,
+        "queueTimeoutSeconds": 15.0,
+        "engineMemoryLimitMiB": 512,
+        "memoryLimitEnforced": false
+      },
+      "runs": [
+        {
+          "run": 1,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 2.0,
+          "intakeValidationSeconds": 1.925,
+          "queueSeconds": 0.09,
+          "workerValidationSeconds": null,
+          "engineSeconds": 2.05,
+          "workerJobSeconds": 2.064,
+          "acceptanceToTerminalSeconds": 2.154,
+          "endToEndSeconds": 4.162,
+          "auditStatus": "PROCESSING_FAILED",
+          "outcome": "CONTROLLED_FAILURE",
+          "errorCode": "PROCESSING_TIMEOUT",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 2,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 1.605,
+          "intakeValidationSeconds": 1.562,
+          "queueSeconds": 0.162,
+          "workerValidationSeconds": null,
+          "engineSeconds": 2.04,
+          "workerJobSeconds": 2.057,
+          "acceptanceToTerminalSeconds": 2.219,
+          "endToEndSeconds": 3.876,
+          "auditStatus": "PROCESSING_FAILED",
+          "outcome": "CONTROLLED_FAILURE",
+          "errorCode": "PROCESSING_FAILED",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 3,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 1.588,
+          "intakeValidationSeconds": 1.514,
+          "queueSeconds": 0.163,
+          "workerValidationSeconds": null,
+          "engineSeconds": 2.003,
+          "workerJobSeconds": 2.019,
+          "acceptanceToTerminalSeconds": 2.183,
+          "endToEndSeconds": 3.793,
+          "auditStatus": "PROCESSING_FAILED",
+          "outcome": "CONTROLLED_FAILURE",
+          "errorCode": "PROCESSING_FAILED",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 4,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 1.615,
+          "intakeValidationSeconds": 1.556,
+          "queueSeconds": 0.166,
+          "workerValidationSeconds": null,
+          "engineSeconds": 2.011,
+          "workerJobSeconds": 2.028,
+          "acceptanceToTerminalSeconds": 2.194,
+          "endToEndSeconds": 3.811,
+          "auditStatus": "PROCESSING_FAILED",
+          "outcome": "CONTROLLED_FAILURE",
+          "errorCode": "PROCESSING_TIMEOUT",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        },
+        {
+          "run": 5,
+          "uploadStatus": 202,
+          "uploadRequestSeconds": 1.733,
+          "intakeValidationSeconds": 1.684,
+          "queueSeconds": 0.077,
+          "workerValidationSeconds": null,
+          "engineSeconds": 2.005,
+          "workerJobSeconds": 2.018,
+          "acceptanceToTerminalSeconds": 2.095,
+          "endToEndSeconds": 3.838,
+          "auditStatus": "PROCESSING_FAILED",
+          "outcome": "CONTROLLED_FAILURE",
+          "errorCode": "PROCESSING_FAILED",
+          "withinSixtySecondsEndToEnd": true,
+          "ac18Satisfied": true
+        }
+      ],
+      "summary": {
+        "outcomes": {
+          "SUCCESS": 0,
+          "CONTROLLED_FAILURE": 5,
+          "UNCONTROLLED": 0
+        },
+        "allRunsSatisfyAc18": true,
+        "successfulFindingsIdentical": true,
+        "findingsDigests": [],
+        "findingsByRule": {},
+        "maxEndToEndSeconds": 4.162,
+        "maxEngineSeconds": 2.05,
+        "maxQueueSeconds": 0.166
+      }
+    }
+  ]
+}
