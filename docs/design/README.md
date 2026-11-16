@@ -30,3 +30,9 @@ A requirement counts once when at least one mapped test executed a qualifying as
 session, even if it failed. Setup, preparation, skips and the drain of unexpectedly accepted
 work earn nothing. `total` is the whole list. Cross-team runs omit `coverage.model` entirely and
 never read this file.
+
+Production declares its own exact approved target URL through `TESTER_OWN_TARGET_URL` in
+Compose. The settings loader merges only that explicitly declared self identity into the
+private team map, preserving other entries and rejecting conflicts. The private release probe
+validates the own-team profile/design map before opening ingress. Missing mappings for other
+targets still fail setup; no caller or hostname similarity chooses a report profile.

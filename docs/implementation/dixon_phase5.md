@@ -5,7 +5,9 @@ requires deployment of both the new system/website with its worker and the indep
 tester. See the
 [Phase 5 integration record](../evidence/phase5_integration.md) and
 [Class Access Guide](../Team9_Class_Access_Guide_Phase5.md) for the current assembled
-configuration and fresh evidence. The contribution-specific results and handoff boundaries
+configuration and fresh evidence. The
+[hosted verification record](../evidence/phase5/hosted-2026-11-16/README.md) tracks the first
+real hosted setup failure and the explicit own-system identity correction. The contribution-specific results and handoff boundaries
 below retain their original revision context.
 
 Branch `phase5/dixon-tester`, based on `main` at `ca6becb` (the reviewed Phase 4 baseline).

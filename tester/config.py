@@ -94,8 +94,11 @@ class TesterSettings(EnvironmentSettings):
     )
     # Phase 5 report profile (specification 3.0.0 section 14). Trusted operator configuration
     # only: the tester's own team, the exact approved-target-URL to team map, and the team's
-    # versioned design-requirements map. Never derived from a grader request or from hosts.
+    # versioned design-requirements map. Never inferred from grader input or host similarity.
     tester_team_id: NonemptyText | None = None
+    # Exact own-system URL declared by the operator/deployment, never by a grader.
+    # Merge only this explicit identity into the private map; never infer other teams.
+    tester_own_target_url: NonemptyText | None = None
     target_team_map: dict[NonemptyText, NonemptyText] = Field(
         default_factory=dict, validation_alias="TARGET_TEAM_MAP_JSON"
     )
@@ -129,6 +132,15 @@ class TesterSettings(EnvironmentSettings):
             raise ValueError("allowed target URLs must be unique")
         if set(self.target_auth_map) - set(self.allowed_target_urls):
             raise ValueError("target access map keys must be exact approved base URLs")
+        if self.tester_own_target_url is not None:
+            own = self.tester_own_target_url
+            validate_base_url(own, self.app_env)
+            if not self.tester_team_id or own not in self.allowed_target_urls:
+                raise ValueError("own target requires a tester team and an exact approved URL")
+            mapped = self.target_team_map.get(own)
+            if mapped is not None and mapped != self.tester_team_id:
+                raise ValueError("own target conflicts with its configured team identity")
+            self.target_team_map = {**self.target_team_map, own: self.tester_team_id}
         if set(self.target_team_map) - set(self.allowed_target_urls):
             raise ValueError("target team map keys must be exact approved base URLs")
         return self

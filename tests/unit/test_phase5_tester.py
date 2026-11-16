@@ -13,6 +13,7 @@ from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
 from app.contracts.models import CoverageMeasure, Outcome, SuiteReport
 from scripts.build_phase5_manifest import build, render
@@ -238,6 +239,61 @@ def test_caller_cannot_supply_a_profile_override(tmp_path: Path) -> None:
             "/test/setup", json={"target_url": BASE_URL, "profile": "cross"}, headers=HEADERS
         )
     assert response.status_code == 400 and response.json()["source"] == "tester"
+
+
+def test_explicit_own_target_allows_setup_without_private_self_mapping(tmp_path: Path) -> None:
+    with client_for(
+        tmp_path,
+        FakePhase5(**SMALL),
+        tester_own_target_url=BASE_URL,
+        TARGET_TEAM_MAP_JSON={},
+    ) as client:
+        response = client.post("/test/setup", json={"target_url": BASE_URL}, headers=HEADERS)
+    assert response.status_code == 201
+
+
+def test_explicit_own_target_preserves_other_trusted_mappings(tmp_path: Path) -> None:
+    cross = "http://127.0.0.1:8010"
+    unknown = "http://127.0.0.1:8011"
+    configured = settings(
+        tmp_path,
+        tester_own_target_url=BASE_URL,
+        allowed_target_urls=[BASE_URL, cross, unknown],
+        TARGET_TEAM_MAP_JSON={cross: "team12"},
+    )
+    assert configured.target_team_map == {BASE_URL: "team9", cross: "team12"}
+    profile = classify(
+        cross,
+        tester_team=configured.tester_team_id,
+        target_teams=configured.target_team_map,
+        design_map_path=None,
+        planned_ids=[],
+    )
+    assert profile.kind == "cross" and profile.design_map is None
+    with pytest.raises(ProfileError):
+        classify(
+            unknown,
+            tester_team=configured.tester_team_id,
+            target_teams=configured.target_team_map,
+            design_map_path=None,
+            planned_ids=[],
+        )
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"tester_team_id": None},
+        {"allowed_target_urls": []},
+        {"tester_own_target_url": BASE_URL + "/"},
+        {"TARGET_TEAM_MAP_JSON": {BASE_URL: "team12"}},
+    ],
+)
+def test_explicit_own_target_rejects_ambiguous_configuration(
+    tmp_path: Path, overrides: dict[str, Any]
+) -> None:
+    with pytest.raises(ValidationError):
+        settings(tmp_path, **({"tester_own_target_url": BASE_URL} | overrides))
 
 
 @pytest.mark.parametrize(

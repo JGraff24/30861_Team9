@@ -189,8 +189,9 @@ An already-running deployment continues. Inspect its service/journal before main
 Use the [integrated release record](../docs/evidence/phase5_integration.md) and
 [backend restore procedure](../docs/implementation/jackson_phase5.md) before activation.
 Schema 3 is incompatible with Phase 4 binaries. Inventory/register content backups and verify
-versioned S3 deletion permissions and restore fencing. Set the private exact URL→team map
-for every approved tester target; production selects tester team `team9`, manifest 3.0.0 and
+versioned S3 deletion permissions and restore fencing. Production declares its own exact target through
+`TESTER_OWN_TARGET_URL=https://<SERVER_NAME>/system`; it must already be approved in private
+`ALLOWED_TARGET_URLS`. Keep additional cross-team entries in the private `TARGET_TEAM_MAP_JSON`; production selects tester team `team9`, manifest 3.0.0 and
 a 2,400-second suite. The source change alone does not update private host configuration.
 The 2,700-second guard must defer deployment while evaluations remain protected.
 Hosted validation requires deployment of **both the Phase 5 system/website with its matching
@@ -200,3 +201,8 @@ Confirm tester suite 3.0.0 (395 cases) and private own/cross profile configurati
 health response or restored Wi-Fi connection does not establish that either release is active.
 Record the deployment SHA/image and then retain hosted own-team/reciprocal reports separately
 from the local integration evidence.
+
+The Phase 5 private tester probe validates its own report profile and packaged design map
+before proxy publication. An invalid/missing profile prevents activation. This is a read-only
+configuration check and creates no target/tester sessions. The explicit own-system URL does
+not infer identity for similar hosts or unconfigured cross-team targets.

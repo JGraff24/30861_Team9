@@ -2,10 +2,13 @@
 
 Prepared November 16, 2026 for Jackson's request to combine the four Phase 5 PRs,
 run checks and the system suite, update documentation and create a Phase 5 class guide.
-Hosted Phase 5 testing is **pending deployment of both the Phase 5 system/website and
-the independent tester**, including the compatible worker and trusted private configuration.
-The earlier Wi-Fi issue prevented access, but restored connectivity alone does not establish
-a Phase 5 deployment. Existing registered endpoints and ruleset-2 health are insufficient.
+The hosted system/website and tester now serve Phase 5 UI assets and native API catalogs
+matching merged main. A focused hosted browser upload also displayed schedule/notification
+controls successfully. Full own-team hosted verification encountered a **tester setup failure**
+on November 16: HTTP 500, `Tester report profile configuration is missing or invalid.`
+No suite run was started. This is a trusted profile configuration problem, not connectivity.
+See the [hosted verification record](phase5/hosted-2026-11-16/README.md) for original evidence,
+the configuration correction and the subsequent full-run outcome when available.
 
 Jackson first requested a local-only handoff. On November 16, 2026, Jackson superseded that
 restriction and authorized merging to main, publishing the integration and cleaning up
@@ -176,7 +179,8 @@ immutable HTTP report. Code coverage is measured child execution in `app/workboo
 
 - Deploy the Phase 5 system/website, compatible worker **and Phase 5 tester** before hosted
   testing. Confirm the active source/image SHA and tester suite 3.0.0 with trusted own/cross
-  identity configuration. No hosted own-team or Team 12 reciprocal result exists yet.
+  identity configuration. The first own-team hosted setup failed before any suite execution;
+  no Team 12 reciprocal result exists yet. See the separate hosted record for the latest status.
 - Docker, Linux memory enforcement and fresh Windows execution: unavailable on this macOS
   host. CI is configured to run the Linux image/runtime and Windows portable checks after
   publication. Earlier individual PR CI results are not combined-source proof.
@@ -212,4 +216,5 @@ retained through a normal merge commit. Branch cleanup follows verified ancestry
    reciprocal runs, retaining their unchanged reports and source/fixture hashes.
 
 The local reports above claim no cloud modification, active hosted release or passing
-hosted test. Deployment and hosted results remain unverified until those steps execute.
+hosted test. Exact host image SHAs remain unverified through the public interface. Full hosted results
+are tracked separately in the hosted verification record; the original local reports are unchanged.

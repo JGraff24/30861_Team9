@@ -259,7 +259,7 @@ recoverable owner deletion. Follow [Jackson's Phase 5 operations and restore pro
 for backup registration/migration, the deletion journal, required S3 version permissions,
 clock/fault enablement and monitoring. Those instructions govern all schema-3 content copies and deletion recovery. The worker retains two execution slots. Deployment and
 proxy protection is now 2,700 seconds for a 2,400-second Phase 5 suite; caller read timeouts
-must be at least 2,430 seconds. Production now selects the actual 395-case Phase 5 manifest 3.0.0, not the historical Phase 4 suite. Configure TESTER_TEAM_ID=team9 and the exact TARGET_TEAM_MAP_JSON in the private runtime inputs before setup. Own-team setup requires the packaged design map; the draft map still needs team confirmation. No live release is claimed by these source changes.
+must be at least 2,430 seconds. Production now selects the actual 395-case Phase 5 manifest 3.0.0, not the historical Phase 4 suite. Production supplies TESTER_TEAM_ID=team9 and TESTER_OWN_TARGET_URL from its trusted SERVER_NAME. That exact URL must already be in private ALLOWED_TARGET_URLS. Additional cross-team identities remain in the private TARGET_TEAM_MAP_JSON. Own-team setup requires the packaged design map; the draft map still needs team confirmation. No live release is claimed by these source changes.
 
 ## Phase 5 hosted-test prerequisite
 
