@@ -24,6 +24,23 @@ def test_deployment_renderer(tmp_path: Path) -> None:
     subprocess.run(command, cwd=root, env=env, check=True, capture_output=True)
     for name in ("iam-role-policy.json", "bucket-policy.json"):
         assert json.loads((output / name).read_text())["Version"] == "2012-10-17"
+    policy = json.loads((output / "iam-role-policy.json").read_text())
+    bucket = "arn:aws:s3:::review-only-bucket"
+    # Cleanup lists versions even on unversioned buckets, then deletes by version ID.
+    # Exact grants prevent broadening deletion beyond stored source objects.
+    assert all(statement["Effect"] == "Allow" for statement in policy["Statement"])
+    assert {
+        (action, statement["Resource"])
+        for statement in policy["Statement"]
+        for action in statement["Action"]
+    } == {
+        ("s3:ListBucket", bucket),
+        ("s3:ListBucketVersions", bucket),
+        ("s3:GetObject", bucket + "/sources/*"),
+        ("s3:PutObject", bucket + "/sources/*"),
+        ("s3:DeleteObject", bucket + "/sources/*"),
+        ("s3:DeleteObjectVersion", bucket + "/sources/*"),
+    }
     nginx = (output / "nginx.conf").read_text()
     assert "server_name review.invalid;" in nginx
     assert "proxy_set_header Host $host;" in nginx
