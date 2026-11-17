@@ -123,11 +123,22 @@ at host/container networking level before release; setting `AWS_EC2_METADATA_DIS
 only disables the SDK path. The API/worker child guard receives no AWS or bearer environment.
 
 `IfNoneMatch='*'` prevents overwrite, SHA256 is submitted to S3 and verified on read, and no
-public ACL is sent. The role can Get/Put/Delete only the chosen source prefix; ListBucket is
-used by HeadBucket health. DeleteObject is required for compensating failed-upload cleanup
+public ACL is sent. The role can Get/Put/Delete and DeleteObjectVersion only the chosen source
+prefix. ListBucket supports HeadBucket health; ListBucketVersions supports workbook cleanup.
+Cleanup lists versions even when bucket versioning is disabled (objects have null version IDs).
+DeleteObject is required for compensating failed-upload cleanup
 and explicit test cleanup. IAM cannot distinguish a committed key from an uncommitted key in
 this application design; internal code is the deletion boundary. Owners can delete workbooks through the Phase 5 DELETE endpoint; cleanup includes stored object versions and registered managed backups. Bucket versioning/Object Lock are not enabled in this template: adding them
 requires lifecycle/cleanup/retention design and cost review.
+
+Existing Phase 3/4 hosts need an IAM policy update before Phase 5 deletion can work. Review and
+apply the `source-io` policy change in `aws.yaml` to the existing stack, or the equivalent rendered
+`iam-role-policy.json` to its instance role. A source merge or application image rollout alone
+does not update IAM. Review the change set for the intended role policy change without resource
+replacement; preserve the existing bucket and source-prefix scope. After applying it, verify
+owner deletion and old-URL rejection on an isolated test workbook before repeating the full
+hosted suite. Missing permissions can produce HTTP 500 `DELETION_FAILED`; inspect S3 access
+errors and registered-backup cleanup if deletion still fails. Never bypass retention controls.
 
 ## Build, TLS, release and startup
 
